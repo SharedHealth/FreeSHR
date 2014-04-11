@@ -6,6 +6,7 @@
 
 #Idea directories
 .idea/
+*.iml
 
 #Build dirs
 build/
