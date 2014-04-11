@@ -11,11 +11,14 @@ buildscript {
 
 apply plugin: 'java'
 apply plugin: 'spring-boot'
+apply plugin: 'checkstyle'
 
 jar {
     baseName = 'bdeshr'
-    version =  '0.1-SNAPSHOT'
+    version = '0.1-SNAPSHOT'
 }
+
+jar.dependsOn 'checkstyleMain'
 
 repositories {
     mavenCentral()
