@@ -1,1 +1,8 @@
+#Vagrant directories
 .vagrant/
+
+#Gradle directories
+.gradle/
+
+#Idea directories
+.idea/
