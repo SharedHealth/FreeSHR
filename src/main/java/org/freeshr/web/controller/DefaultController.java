@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@EnableAutoConfiguration
 @RequestMapping("/patient")
 public class DefaultController {
 
@@ -14,9 +13,5 @@ public class DefaultController {
     @RequestMapping("/message")
     public String simpleMessage() {
         return "Hello world";
-    }
-
-    public static void main(String[] args) throws Exception {
-        SpringApplication.run(DefaultController.class, args);
     }
 }
