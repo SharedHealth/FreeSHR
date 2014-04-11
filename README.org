@@ -7,3 +7,9 @@ Getting started
 ---------------
 
 To build the BDE-SHR artifact, run the gradlew file in the operating system of your choice.
+
+To run the application execute 
+
+<code>
+	gradlew :bootRun
+</code>
