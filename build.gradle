@@ -1,3 +1,29 @@
-task wrapper(type: Wrapper) {
-    gradleVersion = '1.8'
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "http://repo.spring.io/snapshot" }
+        maven { url "http://repo.spring.io/milestone" }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.0.2.BUILD-SNAPSHOT")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'spring-boot'
+
+jar {
+    baseName = 'bdeshr'
+    version =  '0.1-SNAPSHOT'
+}
+
+repositories {
+    mavenCentral()
+    maven { url "http://repo.spring.io/snapshot" }
+    maven { url "http://repo.spring.io/milestone" }
+}
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web")
+    testCompile("junit:junit")
 }

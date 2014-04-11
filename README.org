@@ -1,1 +1,9 @@
-* Contains the sources for BDE FreeSHR project
+BDE-SHR
+-------
+  
+BDE-SHR is a free implementation of a shared health record.
+
+Getting started
+---------------
+
+To build the BDE-SHR artifact, run the gradlew file in the operating system of your choice.

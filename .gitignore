@@ -6,3 +6,6 @@
 
 #Idea directories
 .idea/
+
+#Build dirs
+build/
