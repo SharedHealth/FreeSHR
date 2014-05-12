@@ -1,9 +1,16 @@
 apply plugin: 'java'
 apply plugin: 'spring-boot'
+apply plugin: 'war'
 
 jar {
     baseName = 'bdeshr-api'
     version = '0.1-SNAPSHOT'
+}
+
+war {
+    manifest {
+        attributes('Main-Class': 'launch.Main')
+    }
 }
 
 buildscript {
@@ -18,5 +25,5 @@ buildscript {
 }
 
 dependencies {
-    compile libraries.spring_boot
+    compile libraries.spring_boot, project(":shr")
 }
