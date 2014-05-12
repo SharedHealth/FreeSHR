@@ -1,5 +1,6 @@
 package org.freeshr.web.controller;
 
+import org.freeshr.encounter.model.Encounter;
 import org.freeshr.encounter.service.EncounterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +19,8 @@ public class EncounterController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String create() {
+    public String create(Encounter encounter) {
+        encounterService.ensureCreated(encounter);
         return "Hello world";
     }
 }
