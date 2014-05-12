@@ -28,5 +28,5 @@ repositories {
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
-    testCompile("junit:junit")
+    testCompile("junit:junit", "org.mockito:mockito-all:1.8.4")
 }
