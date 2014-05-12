@@ -1,8 +1,6 @@
 package org.freeshr.patient.model;
 
 
-import java.util.Map;
-
 public class Patient {
 
     private final boolean isNull;

@@ -6,6 +6,8 @@ import org.freeshr.patient.wrapper.MasterClientIndexWrapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -31,7 +33,7 @@ public class PatientRegistryTest {
     public void shouldBeValidPatientWhenPatientCouldBeFoundLocally() {
         String healthId = "healthId";
 
-        when(allPatients.find(healthId)).thenReturn(new Patient());
+        Mockito.when(allPatients.find(healthId)).thenReturn(new Patient());
         Boolean result = patientRegistry.isValid(healthId);
         assertTrue(result);
     }
@@ -40,8 +42,8 @@ public class PatientRegistryTest {
     public void shouldBeValidPatientWhenPatientCouldBeFoundInTheIndex() {
         String healthId = "healthId";
 
-        when(allPatients.find(healthId)).thenReturn(null);
-        when(masterClientIndexWrapper.isValid(healthId)).thenReturn(Boolean.TRUE);
+        Mockito.when(allPatients.find(healthId)).thenReturn(null);
+        Mockito.when(masterClientIndexWrapper.isValid(healthId)).thenReturn(Boolean.TRUE);
 
         Boolean result = patientRegistry.isValid(healthId);
         assertTrue(result);
@@ -51,8 +53,8 @@ public class PatientRegistryTest {
     public void shouldNotBeValidPatientWhenPatientCouldNotBeFound() {
         String healthId = "healthId";
 
-        when(allPatients.find(healthId)).thenReturn(null);
-        when(masterClientIndexWrapper.isValid(healthId)).thenReturn(Boolean.FALSE);
+        Mockito.when(allPatients.find(healthId)).thenReturn(null);
+        Mockito.when(masterClientIndexWrapper.isValid(healthId)).thenReturn(Boolean.FALSE);
 
         Boolean result = patientRegistry.isValid(healthId);
         assertFalse(result);
