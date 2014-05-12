@@ -1,4 +1,4 @@
-subprojects{
+subprojects {
 
     apply plugin: 'java'
 
@@ -8,9 +8,18 @@ subprojects{
         maven { url "http://repo.spring.io/milestone" }
     }
 
-    task checkStyle(type: Checkstyle){
+    task checkStyle(type: Checkstyle) {
         configFile file("${project.projectDir}/../config/checkstyle/checkstyle.xml")
     }
 
     jar.dependsOn 'checkStyle'
 }
+
+ext.libraries = [
+        spring_boot: "org.springframework.boot:spring-boot-starter-web:1.0.2.RELEASE",
+]
+
+ext.testLibraries = [
+        junit  : "junit:junit:4.10",
+        mockito: "org.mockito:mockito-all:1.8.4"
+]
