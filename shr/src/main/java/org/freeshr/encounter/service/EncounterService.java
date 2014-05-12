@@ -13,12 +13,13 @@ public class EncounterService {
     private PatientRegistry patientRegistry;
 
     @Autowired
-    public EncounterService(PatientRegistry patientRegistry) {
+    public EncounterService(AllEncounters allEncounters, PatientRegistry patientRegistry) {
+        this.allEncounters = allEncounters;
         this.patientRegistry = patientRegistry;
     }
 
     public void ensureCreated(Encounter encounter) {
-        Boolean valid = patientRegistry.isValid("");
+        Boolean valid = patientRegistry.isValid(encounter.getHealthId());
         if (valid) {
             allEncounters.save(encounter);
         }
