@@ -1,32 +1,16 @@
-buildscript {
+subprojects{
+
+    apply plugin: 'java'
+
     repositories {
         mavenCentral()
         maven { url "http://repo.spring.io/snapshot" }
         maven { url "http://repo.spring.io/milestone" }
     }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.0.2.BUILD-SNAPSHOT")
+
+    task checkStyle(type: Checkstyle){
+        configFile file("${project.projectDir}/../config/checkstyle/checkstyle.xml")
     }
-}
 
-apply plugin: 'java'
-apply plugin: 'spring-boot'
-apply plugin: 'checkstyle'
-
-jar {
-    baseName = 'bdeshr'
-    version = '0.1-SNAPSHOT'
-}
-
-jar.dependsOn 'checkstyleMain'
-
-repositories {
-    mavenCentral()
-    maven { url "http://repo.spring.io/snapshot" }
-    maven { url "http://repo.spring.io/milestone" }
-}
-
-dependencies {
-    compile("org.springframework.boot:spring-boot-starter-web")
-    testCompile("junit:junit", "org.mockito:mockito-all:1.8.4")
+    jar.dependsOn 'checkStyle'
 }

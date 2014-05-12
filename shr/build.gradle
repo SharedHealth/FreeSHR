@@ -1,0 +1,11 @@
+apply plugin: 'java'
+
+jar {
+    baseName = 'bdeshr'
+    version = '0.1-SNAPSHOT'
+}
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web:1.0.2.RELEASE")
+    testCompile("junit:junit:4.11", "org.mockito:mockito-all:1.8.4")
+}
