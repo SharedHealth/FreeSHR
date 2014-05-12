@@ -6,6 +6,6 @@ jar {
 }
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-web:1.0.2.RELEASE")
-    testCompile("junit:junit:4.11", "org.mockito:mockito-all:1.8.4")
+    compile libraries.spring_boot
+    testCompile testLibraries.mockito, testLibraries.junit
 }
