@@ -1,6 +1,7 @@
 package org.freeshr.shr.patient.repository;
 
 import org.freeshr.shr.config.SHRConfig;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +12,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SHRConfig.class)
@@ -38,7 +40,12 @@ public class AllPatientsTest {
 
     @Test
     public void shouldNotFindPatientWithoutMatchingHealthId() {
-        cqlTemplate.execute("TRUNCATE patient");
+        assertNull(allPatients.find(healthId + "invalid"));
+    }
+
+    @After
+    public void teardown() {
+        cqlTemplate.execute("truncate patient");
     }
 
 }

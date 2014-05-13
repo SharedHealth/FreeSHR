@@ -5,6 +5,14 @@ jar {
     version = '0.1-SNAPSHOT'
 }
 
+test.doFirst {
+    project(":shr-api").tasks.startMockClientIndex.execute()
+}
+
+test.doLast {
+    project(":shr-api").tasks.stopMockClientIndex.execute()
+}
+
 dependencies {
     compile libraries.spring_boot, libraries.spring_data_cassandra
     testCompile testLibraries.mockito, testLibraries.junit, testLibraries.spring_test
