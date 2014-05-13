@@ -1,8 +1,9 @@
-package org.freeshr.encounter.service;
+package org.freeshr.shr.encounter.service;
 
-import org.freeshr.encounter.model.Encounter;
-import org.freeshr.encounter.repository.AllEncounters;
-import org.freeshr.patient.service.PatientRegistry;
+import org.freeshr.shr.encounter.model.Encounter;
+import org.freeshr.shr.encounter.repository.AllEncounters;
+import org.freeshr.shr.encounter.service.EncounterService;
+import org.freeshr.shr.patient.service.PatientRegistry;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

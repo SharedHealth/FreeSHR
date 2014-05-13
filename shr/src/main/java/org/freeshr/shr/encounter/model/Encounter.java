@@ -1,4 +1,4 @@
-package org.freeshr.encounter.model;
+package org.freeshr.shr.encounter.model;
 
 public class Encounter {
     private String healthId;

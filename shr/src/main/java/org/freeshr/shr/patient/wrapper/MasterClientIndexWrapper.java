@@ -1,4 +1,4 @@
-package org.freeshr.patient.wrapper;
+package org.freeshr.shr.patient.wrapper;
 
 import org.springframework.stereotype.Component;
 

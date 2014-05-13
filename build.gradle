@@ -5,6 +5,7 @@ subprojects {
     repositories {
         mavenCentral()
         maven { url "http://repo.spring.io/snapshot" }
+        maven { url "http://repo.spring.io/libs-snapshot" }
         maven { url "http://repo.spring.io/milestone" }
     }
 
@@ -16,10 +17,12 @@ subprojects {
 }
 
 ext.libraries = [
-        spring_boot: "org.springframework.boot:spring-boot-starter-web:1.0.2.RELEASE",
+        spring_boot          : "org.springframework.boot:spring-boot-starter-web:1.0.2.RELEASE",
+        spring_data_cassandra: "org.springframework.data:spring-data-cassandra:1.0.0.BUILD-SNAPSHOT+"
 ]
 
 ext.testLibraries = [
-        junit  : "junit:junit:4.10",
-        mockito: "org.mockito:mockito-all:1.8.4"
+        junit      : "junit:junit:4.10",
+        mockito    : "org.mockito:mockito-all:1.8.4",
+        spring_test: "org.springframework:spring-test:4.0.3.RELEASE"
 ]
