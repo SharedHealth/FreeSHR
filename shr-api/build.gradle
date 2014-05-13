@@ -1,6 +1,15 @@
+import groovy.json.JsonSlurper
+
 apply plugin: 'java'
 apply plugin: 'spring-boot'
 apply plugin: 'war'
+
+
+def slurper = new JsonSlurper();
+
+dependencies {
+    compile libraries.spring_boot, project(":shr")
+}
 
 jar {
     baseName = 'bdeshr-api'
@@ -13,17 +22,40 @@ war {
     }
 }
 
+task startMockClientIndex << {
+    ProcessBuilder builder = new ProcessBuilder('java', '-jar', '/home/balajin/src/FreeSHR/shr-api/lib/wiremock.jar', '--port', '9999', '&');
+    builder.start();
+}
+
+startMockClientIndex.doLast {
+    tasks.uploadConfig.execute()
+}
+
+
+task uploadConfig(type: org._10ne.gradle.rest.RestTask) {
+    httpMethod = 'post'
+    uri = 'http://localhost:9999/__admin/mappings/new'
+    requestBody = slurper.parse(new InputStreamReader(new FileInputStream(file('buildconfig/patientmock.json')), 'UTF-8'))
+    contentType = groovyx.net.http.ContentType.JSON
+}
+
+task stopMockClientIndex(type: Exec) {
+    commandLine 'bash', '-c', "ps aux | grep wiremock | awk '{print \$2}' | head -1 | xargs -n 1 kill -9 \$1"
+}
+
+
 buildscript {
     repositories {
         mavenCentral()
         maven { url "http://repo.spring.io/snapshot" }
         maven { url "http://repo.spring.io/milestone" }
+        maven { url 'http://dl.bintray.com/content/noamt/gradle-plugins' }
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.0.2.BUILD-SNAPSHOT")
+        classpath(
+                "org.springframework.boot:spring-boot-gradle-plugin:1.0.2.BUILD-SNAPSHOT",
+                "org._10ne.gradle:rest-gradle-plugin:0.1+"
+        )
     }
 }
 
-dependencies {
-    compile libraries.spring_boot, project(":shr")
-}
