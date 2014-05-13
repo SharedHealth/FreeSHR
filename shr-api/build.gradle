@@ -1,9 +1,12 @@
 import groovy.io.FileType
 import groovy.json.JsonSlurper
+import groovyx.net.http.ContentType
+import org._10ne.gradle.rest.RestTask
 
 apply plugin: 'java'
 apply plugin: 'spring-boot'
 apply plugin: 'war'
+apply plugin: 'rpm'
 
 def slurper = new JsonSlurper();
 def wireMockPort = '9999'
@@ -42,15 +45,73 @@ def uploadConfig(wireMockPort, slurper) {
         files << file
     }
     files.each {
-        def name = it.getName() - 'upload'
-        tasks.create(name: 'upload' + it.getName(), type: org._10ne.gradle.rest.RestTask) {
-            httpMethod = 'post'
-            uri = 'http://localhost:' + wireMockPort + '/__admin/mappings/new'
-            requestBody = slurper.parse(new InputStreamReader(new FileInputStream(file('mock/' + name)), 'UTF-8'))
-            contentType = groovyx.net.http.ContentType.JSON
-        }
-        tasks['upload' + it.getName()].execute();
+        config(it, wireMockPort, slurper)
     }
+}
+
+private void config(file, wireMockPort, slurper) {
+    def name = file.getName() - 'upload'
+    tasks.create(name: 'upload' + file.getName(), type: RestTask) {
+        httpMethod = 'post'
+        uri = 'http://localhost:' + wireMockPort + '/__admin/mappings/new'
+        requestBody = slurper.parse(new InputStreamReader(new FileInputStream(new File("${projectDir}/mock/" + name)), 'UTF-8'))
+        contentType = ContentType.JSON
+    }
+    tasks['upload' + file.getName()].execute();
+}
+
+task assembly(dependsOn: 'build') << {
+    new File("${buildDir}/etc/").mkdir();
+}
+
+task exportProperties(dependsOn: 'assembly') << {
+    PrintStream output = new PrintStream(new FileOutputStream(file("${buildDir}/etc/bdshr")));
+    Properties properties = new Properties()
+    properties.load(new FileInputStream(file("${projectDir}/../env/local.properties")));
+    properties.each { prop, val ->
+        output.println("export " + prop + "=" + val)
+    }
+}
+
+task dist(dependsOn: 'exportProperties', type: Rpm) {
+    packageName = 'shr'
+    version = '0.1'
+    release = 1
+    arch = NOARCH
+    os = LINUX
+
+    into '/opt/bdshr'
+
+    from("${buildDir}/etc") {
+        fileMode = 0755
+        createDirectoryEntry = true
+        into 'etc'
+    }
+
+    from("scripts/rpm") {
+        fileMode = 0755
+        createDirectoryEntry = true
+        exclude 'placeholder'
+        into 'bin'
+    }
+
+    from("${buildDir}/libs") {
+        fileMode = 0755
+        createDirectoryEntry = true
+        into 'lib'
+    }
+
+    from("scripts/rpm") {
+        fileMode = 0755
+        createDirectoryEntry = true
+        exclude 'bdshr'
+        into 'var'
+    }
+
+    link('/opt/bdshr/bin/bdshr', '/etc/init.d/bdshr')
+    link('/opt/bdshr/etc/bdshr', '/etc/default/bdshr')
+    link('/opt/bdshr/var', '/var/run/bdshr')
+
 }
 
 buildscript {
@@ -63,7 +124,8 @@ buildscript {
     dependencies {
         classpath(
                 "org.springframework.boot:spring-boot-gradle-plugin:1.0.2.BUILD-SNAPSHOT",
-                "org._10ne.gradle:rest-gradle-plugin:0.1+"
+                "org._10ne.gradle:rest-gradle-plugin:0.1+",
+                'com.trigonic:gradle-rpm-plugin:1.4'
         )
     }
 }

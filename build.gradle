@@ -32,17 +32,16 @@ ext.testLibraries = [
         spring_test: "org.springframework:spring-test:4.0.3.RELEASE"
 ]
 
-task runSHR << {
+def getProcessBuilder() {
     Properties properties = new Properties();
     properties.load(new FileInputStream(file('env/local.properties')))
-    ProcessBuilder builder = new ProcessBuilder('./gradlew', 'run')
+    return new ProcessBuilder('./gradlew', 'run')
+}
 
-    // Build environment
+task runSHR << {
+    ProcessBuilder builder = getProcessBuilder()
     builder.environment().putAll(properties)
-
-    //Redirect output to stdout
     builder.redirectOutput(ProcessBuilder.Redirect.INHERIT)
-
     Process process = builder.start();
     process.waitFor();
 }
