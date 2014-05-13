@@ -1,14 +1,16 @@
+import groovy.io.FileType
 import groovy.json.JsonSlurper
 
 apply plugin: 'java'
 apply plugin: 'spring-boot'
 apply plugin: 'war'
 
-
 def slurper = new JsonSlurper();
+def wireMockPort = '9999'
 
 dependencies {
     compile libraries.spring_boot, project(":shr")
+    testCompile testLibraries.mockito, testLibraries.junit, testLibraries.spring_test
 }
 
 jar {
@@ -23,34 +25,37 @@ war {
 }
 
 task startMockClientIndex << {
-    ProcessBuilder builder = new ProcessBuilder('java', '-jar', '/home/balajin/src/FreeSHR/shr-api/lib/wiremock.jar', '--port', '9999', '&');
+    ProcessBuilder builder = new ProcessBuilder('java', '-jar', '/home/balajin/src/FreeSHR/shr-api/lib/wiremock.jar', '--port', wireMockPort, '&');
     builder.start();
 }
 
 startMockClientIndex.doLast {
-    tasks.uploadValidHealthIdConfig.execute()
-    tasks.uploadInvalidHealthIdConfig.execute()
+    uploadConfig(wireMockPort, slurper)
 }
 
+/*Upload all the config files in build config to mock server*/
 
-task uploadValidHealthIdConfig(type: org._10ne.gradle.rest.RestTask) {
-    httpMethod = 'post'
-    uri = 'http://localhost:9999/__admin/mappings/new'
-    requestBody = slurper.parse(new InputStreamReader(new FileInputStream(file('buildconfig/patientmock.json')), 'UTF-8'))
-    contentType = groovyx.net.http.ContentType.JSON
-}
-
-task uploadInvalidHealthIdConfig(type: org._10ne.gradle.rest.RestTask) {
-    httpMethod = 'post'
-    uri = 'http://localhost:9999/__admin/mappings/new'
-    requestBody = slurper.parse(new InputStreamReader(new FileInputStream(file('buildconfig/invalid_patientmock.json')), 'UTF-8'))
-    contentType = groovyx.net.http.ContentType.JSON
+def uploadConfig(wireMockPort, slurper) {
+    def files = []
+    def pathToConfigs = new File("${projectDir}/buildconfig")
+    pathToConfigs.eachFileRecurse(FileType.FILES) { file ->
+        files << file
+    }
+    files.each {
+        def name = it.getName() - 'upload'
+        tasks.create(name: 'upload' + it.getName(), type: org._10ne.gradle.rest.RestTask) {
+            httpMethod = 'post'
+            uri = 'http://localhost:' + wireMockPort + '/__admin/mappings/new'
+            requestBody = slurper.parse(new InputStreamReader(new FileInputStream(file('buildconfig/' + name)), 'UTF-8'))
+            contentType = groovyx.net.http.ContentType.JSON
+        }
+        tasks['upload' + it.getName()].execute();
+    }
 }
 
 task stopMockClientIndex(type: Exec) {
     commandLine 'bash', '-c', "ps aux | grep wiremock | awk '{print \$2}' | head -1 | xargs -n 1 kill -9 \$1"
 }
-
 
 buildscript {
     repositories {
