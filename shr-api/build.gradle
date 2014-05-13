@@ -28,14 +28,22 @@ task startMockClientIndex << {
 }
 
 startMockClientIndex.doLast {
-    tasks.uploadConfig.execute()
+    tasks.uploadValidHealthIdConfig.execute()
+    tasks.uploadInvalidHealthIdConfig.execute()
 }
 
 
-task uploadConfig(type: org._10ne.gradle.rest.RestTask) {
+task uploadValidHealthIdConfig(type: org._10ne.gradle.rest.RestTask) {
     httpMethod = 'post'
     uri = 'http://localhost:9999/__admin/mappings/new'
     requestBody = slurper.parse(new InputStreamReader(new FileInputStream(file('buildconfig/patientmock.json')), 'UTF-8'))
+    contentType = groovyx.net.http.ContentType.JSON
+}
+
+task uploadInvalidHealthIdConfig(type: org._10ne.gradle.rest.RestTask) {
+    httpMethod = 'post'
+    uri = 'http://localhost:9999/__admin/mappings/new'
+    requestBody = slurper.parse(new InputStreamReader(new FileInputStream(file('buildconfig/invalid_patientmock.json')), 'UTF-8'))
     contentType = groovyx.net.http.ContentType.JSON
 }
 
