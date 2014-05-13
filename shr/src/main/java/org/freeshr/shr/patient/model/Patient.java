@@ -1,4 +1,4 @@
-package org.freeshr.patient.model;
+package org.freeshr.shr.patient.model;
 
 
 public class Patient {

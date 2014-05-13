@@ -1,7 +1,7 @@
-package org.freeshr.patient.service;
+package org.freeshr.shr.patient.service;
 
-import org.freeshr.patient.repository.AllPatients;
-import org.freeshr.patient.wrapper.MasterClientIndexWrapper;
+import org.freeshr.shr.patient.repository.AllPatients;
+import org.freeshr.shr.patient.wrapper.MasterClientIndexWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,17 +1,16 @@
-package org.freeshr.patient.service;
+package org.freeshr.shr.patient.service;
 
-import org.freeshr.patient.model.Patient;
-import org.freeshr.patient.repository.AllPatients;
-import org.freeshr.patient.wrapper.MasterClientIndexWrapper;
+import org.freeshr.shr.patient.model.Patient;
+import org.freeshr.shr.patient.repository.AllPatients;
+import org.freeshr.shr.patient.service.PatientRegistry;
+import org.freeshr.shr.patient.wrapper.MasterClientIndexWrapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class PatientRegistryTest {

@@ -1,7 +1,7 @@
 package org.freeshr.web.controller;
 
-import org.freeshr.encounter.model.Encounter;
-import org.freeshr.encounter.service.EncounterService;
+import org.freeshr.shr.encounter.model.Encounter;
+import org.freeshr.shr.encounter.service.EncounterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
