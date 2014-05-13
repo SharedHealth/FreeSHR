@@ -1,0 +1,8 @@
+{
+    "request": {
+        "urlPattern": "/isValid/[0-9 a-z A-Z]+", "method": "GET"
+     },
+     "response": {
+        "status": 200,
+     }
+}
