@@ -25,7 +25,7 @@ war {
 }
 
 task startMockClientIndex << {
-    ProcessBuilder builder = new ProcessBuilder('java', '-jar', '/home/balajin/src/FreeSHR/shr-api/lib/wiremock.jar', '--port', wireMockPort, '&');
+    ProcessBuilder builder = new ProcessBuilder('java', '-jar', "${projectDir}/lib/wiremock.jar", '--port', wireMockPort, '&');
     builder.start();
 }
 
@@ -37,7 +37,7 @@ startMockClientIndex.doLast {
 
 def uploadConfig(wireMockPort, slurper) {
     def files = []
-    def pathToConfigs = new File("${projectDir}/buildconfig")
+    def pathToConfigs = new File("${projectDir}/mock")
     pathToConfigs.eachFileRecurse(FileType.FILES) { file ->
         files << file
     }
@@ -46,15 +46,11 @@ def uploadConfig(wireMockPort, slurper) {
         tasks.create(name: 'upload' + it.getName(), type: org._10ne.gradle.rest.RestTask) {
             httpMethod = 'post'
             uri = 'http://localhost:' + wireMockPort + '/__admin/mappings/new'
-            requestBody = slurper.parse(new InputStreamReader(new FileInputStream(file('buildconfig/' + name)), 'UTF-8'))
+            requestBody = slurper.parse(new InputStreamReader(new FileInputStream(file('mock/' + name)), 'UTF-8'))
             contentType = groovyx.net.http.ContentType.JSON
         }
         tasks['upload' + it.getName()].execute();
     }
-}
-
-task stopMockClientIndex(type: Exec) {
-    commandLine 'bash', '-c', "ps aux | grep wiremock | awk '{print \$2}' | head -1 | xargs -n 1 kill -9 \$1"
 }
 
 buildscript {
