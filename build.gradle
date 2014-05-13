@@ -13,6 +13,11 @@ subprojects {
         configFile file("${project.projectDir}/../config/checkstyle/checkstyle.xml")
     }
 
+    task stopMockClientIndex(type: Exec) {
+        commandLine 'bash', '-c', "ps aux | grep wiremock | awk '{print \$2}' | head -1 | xargs -n 1 kill -9 \$1"
+        ignoreExitValue true
+    }
+
     jar.dependsOn 'checkStyle'
 }
 
@@ -26,3 +31,18 @@ ext.testLibraries = [
         mockito    : "org.mockito:mockito-all:1.8.4",
         spring_test: "org.springframework:spring-test:4.0.3.RELEASE"
 ]
+
+task runSHR << {
+    Properties properties = new Properties();
+    properties.load(new FileInputStream(file('env/local.properties')))
+    ProcessBuilder builder = new ProcessBuilder('./gradlew', 'run')
+
+    // Build environment
+    builder.environment().putAll(properties)
+
+    //Redirect output to stdout
+    builder.redirectOutput(ProcessBuilder.Redirect.INHERIT)
+
+    Process process = builder.start();
+    process.waitFor();
+}

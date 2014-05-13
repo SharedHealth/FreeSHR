@@ -1,5 +1,8 @@
 apply plugin: 'java'
 
+def localEnv = new Properties();
+localEnv.load(new FileInputStream(file("${projectDir}/../env/local.properties")))
+
 jar {
     baseName = 'bdeshr'
     version = '0.1-SNAPSHOT'
@@ -9,9 +12,11 @@ test.doFirst {
     project(":shr-api").tasks.startMockClientIndex.execute()
 }
 
-test.doLast {
-    project(":shr-api").tasks.stopMockClientIndex.execute()
+test {
+    environment localEnv
 }
+
+test.finalizedBy(stopMockClientIndex)
 
 dependencies {
     compile libraries.spring_boot, libraries.spring_data_cassandra

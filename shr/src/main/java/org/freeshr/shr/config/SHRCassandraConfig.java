@@ -1,5 +1,6 @@
 package org.freeshr.shr.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.cassandra.core.CqlTemplate;
 import org.springframework.context.annotation.Bean;
@@ -11,9 +12,12 @@ import org.springframework.data.cassandra.repository.config.EnableCassandraRepos
 @EnableCassandraRepositories(basePackages = "org.freeshr.shr")
 public class SHRCassandraConfig extends AbstractCassandraConfiguration {
 
+    @Autowired
+    private SHRProperties shrProperties;
+
     @Override
     protected String getKeyspaceName() {
-        return "freeshr";
+        return shrProperties.getCassandraKeySpace();
     }
 
     @Bean(name = "SHRCassandraTemplate")
