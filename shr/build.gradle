@@ -13,6 +13,6 @@ test.doFirst {
 test.finalizedBy(stopMockClientIndex)
 
 dependencies {
-    compile libraries.spring_boot, libraries.spring_data_cassandra
+    compile libraries.spring_boot, libraries.spring_data_cassandra, libraries.mutagen_cassandra
     testCompile testLibraries.mockito, testLibraries.junit, testLibraries.spring_test
 }

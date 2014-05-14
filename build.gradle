@@ -32,7 +32,8 @@ subprojects {
 
 ext.libraries = [
         spring_boot          : "org.springframework.boot:spring-boot-starter-web:1.0.2.RELEASE",
-        spring_data_cassandra: "org.springframework.data:spring-data-cassandra:1.0.0.BUILD-SNAPSHOT+"
+        spring_data_cassandra: "org.springframework.data:spring-data-cassandra:1.0.0.BUILD-SNAPSHOT+",
+        mutagen_cassandra    : "com.toddfast.mutagen:mutagen-cassandra:0.4.0"
 ]
 
 ext.testLibraries = [
@@ -61,7 +62,7 @@ idea {
             def runManager = xmlFile.asNode().component.find { it.@name == 'RunManager' }
             def junitDefaults = runManager.configuration.find { it.@default == 'true' && it.@type == 'JUnit' }
             junitDefaults.remove(junitDefaults.envs)
-            junitDefaults.append new NodeBuilder().envs(){
+            junitDefaults.append new NodeBuilder().envs() {
                 env(name: 'PATH_TO_CONFIG', value: "\$PROJECT_DIR\$/env/local.properties")
             }
         }
