@@ -1,5 +1,6 @@
 package org.freeshr.shr.patient.repository;
 
+import org.freeshr.shr.config.EnvironmentMock;
 import org.freeshr.shr.config.SHRConfig;
 import org.junit.After;
 import org.junit.Before;
@@ -15,7 +16,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = SHRConfig.class)
+@ContextConfiguration(initializers = EnvironmentMock.class, classes = SHRConfig.class)
 public class AllPatientsTest {
 
     private final String healthId = "testHealthId";
@@ -26,7 +27,6 @@ public class AllPatientsTest {
     @Autowired
     @Qualifier("SHRCassandraTemplate")
     private CqlOperations cqlTemplate;
-
 
     @Before
     public void setup() {
