@@ -10,6 +10,11 @@ To build the BDE-SHR artifact, run the gradlew file in the operating system of y
 
 To run the application execute 
 
+TODO
+----
+
+# Add a gradle idea should set the environment variable PATH_TO_CONFIG to local.properties
+
 #+BEGIN_SRC
 	gradlew :bootRun
 #+END_SRC
