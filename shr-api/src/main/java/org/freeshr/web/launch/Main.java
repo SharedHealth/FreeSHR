@@ -9,7 +9,9 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan(basePackages = "org.freeshr.web")
 public class Main {
 
+
     public static void main(String[] args) throws Exception {
+        new Migrations().migrate();
         SpringApplication.run(Main.class, args);
     }
 }
