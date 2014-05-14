@@ -61,14 +61,19 @@ private void config(file, wireMockPort, slurper) {
     tasks['upload' + file.getName()].execute();
 }
 
+private Properties loadConfig() {
+    Properties properties = new Properties()
+    properties.load(new FileInputStream(file("${projectDir}/../env/local.properties")));
+    properties
+}
+
 task assembly(dependsOn: 'build') << {
     new File("${buildDir}/etc/").mkdir();
 }
 
 task exportProperties(dependsOn: 'assembly') << {
     PrintStream output = new PrintStream(new FileOutputStream(file("${buildDir}/etc/bdshr")));
-    Properties properties = new Properties()
-    properties.load(new FileInputStream(file("${projectDir}/../env/local.properties")));
+    Properties properties = loadConfig()
     properties.each { prop, val ->
         output.println("export " + prop + "=" + val)
     }
@@ -115,6 +120,22 @@ task dist(dependsOn: 'exportProperties', type: Rpm) {
 
 }
 
+sourceSets {
+    migrate {
+        java {
+            srcDir 'src/main/java/org/freeshr/web/launch/migration'
+        }
+        compileClasspath += sourceSets.main.compileClasspath
+    }
+}
+
+task applyDbMigrations(dependsOn: compileMigrateJava, type: JavaExec) {
+    workingDir = project.sourceSets.migrate.output.classesDir
+    classpath(sourceSets.main.runtimeClasspath)
+    main = "org.freeshr.web.launch.migration.Migrations"
+    environment(loadConfig())
+}
+
 buildscript {
     repositories {
         mavenCentral()
@@ -126,7 +147,7 @@ buildscript {
         classpath(
                 "org.springframework.boot:spring-boot-gradle-plugin:1.0.2.BUILD-SNAPSHOT",
                 "org._10ne.gradle:rest-gradle-plugin:0.1+",
-                'com.trigonic:gradle-rpm-plugin:1.4'
+                'com.trigonic:gradle-rpm-plugin:1.4',
         )
     }
 }
