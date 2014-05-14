@@ -8,13 +8,16 @@ Getting started
 
 To build the BDE-SHR artifact, run the gradlew file in the operating system of your choice.
 
-To run the application execute 
-
-TODO
-----
-
-# Add a gradle idea should set the environment variable PATH_TO_CONFIG to local.properties
+To run the application execute
 
 #+BEGIN_SRC
 	gradlew :bootRun
 #+END_SRC
+
+To setup your intellij run
+
+#+BEGIN_SRC
+	gradlew :idea
+#+END_SRC
+
+and open the project file it has generated in idea.

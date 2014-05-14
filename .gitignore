@@ -7,6 +7,8 @@
 #Idea directories
 .idea/
 *.iml
+*.ipr
+*.iws
 
 #Build dirs
 build/
