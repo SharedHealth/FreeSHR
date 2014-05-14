@@ -1,5 +1,6 @@
 package org.freeshr.shr.encounter.repository;
 
+import org.freeshr.shr.config.EnvironmentMock;
 import org.freeshr.shr.config.SHRConfig;
 import org.freeshr.shr.encounter.model.Encounter;
 import org.junit.After;
@@ -15,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = SHRConfig.class)
+@ContextConfiguration(initializers = EnvironmentMock.class, classes = SHRConfig.class)
 public class AllEncountersTest {
 
     @Autowired
