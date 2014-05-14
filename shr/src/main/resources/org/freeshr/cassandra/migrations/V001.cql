@@ -1,1 +1,0 @@
-create table patient (health_id varchar PRIMARY_KEY);
