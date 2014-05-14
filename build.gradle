@@ -1,3 +1,5 @@
+apply plugin: 'idea'
+
 subprojects {
 
     apply plugin: 'java'
@@ -51,4 +53,17 @@ task runSHR << {
     builder.redirectOutput(ProcessBuilder.Redirect.INHERIT)
     Process process = builder.start();
     process.waitFor();
+}
+
+idea {
+    workspace {
+        iws.withXml { xmlFile ->
+            def runManager = xmlFile.asNode().component.find { it.@name == 'RunManager' }
+            def junitDefaults = runManager.configuration.find { it.@default == 'true' && it.@type == 'JUnit' }
+            junitDefaults.remove(junitDefaults.envs)
+            junitDefaults.append new NodeBuilder().envs(){
+                env(name: 'PATH_TO_CONFIG', value: "\$PROJECT_DIR\$/env/local.properties")
+            }
+        }
+    }
 }
