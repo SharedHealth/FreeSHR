@@ -30,12 +30,6 @@ jar {
     version = '0.1-SNAPSHOT'
 }
 
-war {
-    manifest {
-        attributes('Main-Class': 'launch.Main')
-    }
-}
-
 task startMockClientIndex << {
     ProcessBuilder builder = new ProcessBuilder('java', '-jar', "${projectDir}/lib/wiremock.jar", '--port', wireMockPort, '&');
     builder.start();
@@ -150,6 +144,13 @@ task applyDbMigrations(type: JavaExec) {
     classpath(project.sourceSets.migrate.output.classesDir,project.sourceSets.migrate.output.resourcesDir, sourceSets.main.runtimeClasspath)
     main  "org.freeshr.web.launch.migration.Migrations"
     environment(loadConfig())
+}
+
+war {
+    from sourceSets.migrate.resources
+    manifest {
+        attributes('Main-Class': 'launch.Main')
+    }
 }
 
 buildscript {
