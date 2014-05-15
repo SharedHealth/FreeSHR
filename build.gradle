@@ -48,6 +48,17 @@ def getProcessBuilder() {
     return new ProcessBuilder('./gradlew', 'run')
 }
 
+def exportEnvironmentVariablesToXML(defaults) {
+    defaults.remove(defaults.envs)
+    Properties environmentVariables = new Properties();
+    environmentVariables.load(new FileInputStream(new File('env/local.properties')))
+    defaults.append new NodeBuilder().envs() {
+        environmentVariables.each { prop, value ->
+            env(name: prop, value: value)
+        }
+    }
+}
+
 task runSHR << {
     ProcessBuilder builder = getProcessBuilder()
     builder.environment().putAll(properties)
@@ -65,6 +76,10 @@ idea {
             junitDefaults.append new NodeBuilder().envs() {
                 env(name: 'PATH_TO_CONFIG', value: "\$PROJECT_DIR\$/env/local.properties")
             }
+            /*Configuring application runtime parameters*/
+            exportEnvironmentVariablesToXML(runManager.configuration.find {
+                it.@default == 'true' && it.@type == 'Application'
+            });
         }
     }
 }
