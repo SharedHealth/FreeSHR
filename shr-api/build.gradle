@@ -17,6 +17,14 @@ dependencies {
     testCompile testLibraries.mockito, testLibraries.junit, testLibraries.spring_test
 }
 
+configurations {
+    migration {
+        extendsFrom compile
+    }
+}
+
+configurations.migration.extendsFrom -= project(":shr")
+
 jar {
     baseName = 'bdeshr-api'
     version = '0.1-SNAPSHOT'
@@ -124,14 +132,23 @@ sourceSets {
         java {
             srcDir 'src/main/java/org/freeshr/web/launch/migration'
         }
-        compileClasspath += sourceSets.main.compileClasspath
+        resources {
+            srcDir 'src/main/resources'
+        }
+        compileClasspath += configurations.migration
     }
 }
 
-task applyDbMigrations(dependsOn: compileMigrateJava, type: JavaExec) {
-    workingDir = project.sourceSets.migrate.output.classesDir
-    classpath(sourceSets.main.runtimeClasspath)
-    main = "org.freeshr.web.launch.migration.Migrations"
+task migrateDatabase << {
+    tasks.compileMigrateJava.execute()
+    tasks.processMigrateResources.execute()
+    tasks.applyDbMigrations.execute()
+}
+
+task applyDbMigrations(type: JavaExec) {
+    workingDir=project.sourceSets.migrate.output.classesDir
+    classpath(project.sourceSets.migrate.output.classesDir,project.sourceSets.migrate.output.resourcesDir, sourceSets.main.runtimeClasspath)
+    main  "org.freeshr.web.launch.migration.Migrations"
     environment(loadConfig())
 }
 
