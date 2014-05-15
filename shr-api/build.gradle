@@ -1,15 +1,9 @@
-import groovy.io.FileType
-import groovy.json.JsonSlurper
-import groovyx.net.http.ContentType
-import org._10ne.gradle.rest.RestTask
-
 apply plugin: 'java'
 apply plugin: 'spring-boot'
 apply plugin: 'war'
 apply plugin: 'rpm'
 apply plugin: 'idea'
 
-def slurper = new JsonSlurper();
 def wireMockPort = '9999'
 
 dependencies {
@@ -33,34 +27,6 @@ jar {
 task startMockClientIndex << {
     ProcessBuilder builder = new ProcessBuilder('java', '-jar', "${projectDir}/lib/wiremock.jar", '--port', wireMockPort, '&');
     builder.start();
-}
-
-startMockClientIndex.doLast {
-    uploadConfig(wireMockPort, slurper)
-}
-
-/*Upload all the config files in build config to mock server*/
-
-def uploadConfig(wireMockPort, slurper) {
-    def files = []
-    def pathToConfigs = new File("${projectDir}/mock")
-    pathToConfigs.eachFileRecurse(FileType.FILES) { file ->
-        files << file
-    }
-    files.each {
-        config(it, wireMockPort, slurper)
-    }
-}
-
-private void config(file, wireMockPort, slurper) {
-    def name = file.getName() - 'upload'
-    tasks.create(name: 'upload' + file.getName(), type: RestTask) {
-        httpMethod = 'post'
-        uri = 'http://localhost:' + wireMockPort + '/__admin/mappings/new'
-        requestBody = slurper.parse(new InputStreamReader(new FileInputStream(new File("${projectDir}/mock/" + name)), 'UTF-8'))
-        contentType = ContentType.JSON
-    }
-    tasks['upload' + file.getName()].execute();
 }
 
 private Properties loadConfig() {
@@ -158,13 +124,11 @@ buildscript {
         mavenCentral()
         maven { url "http://repo.spring.io/snapshot" }
         maven { url "http://repo.spring.io/milestone" }
-        maven { url 'http://dl.bintray.com/content/noamt/gradle-plugins' }
     }
     dependencies {
         classpath(
                 "org.springframework.boot:spring-boot-gradle-plugin:1.0.2.BUILD-SNAPSHOT",
-                "org._10ne.gradle:rest-gradle-plugin:0.1+",
-                'com.trigonic:gradle-rpm-plugin:1.4',
+                'com.trigonic:gradle-rpm-plugin:1.4'
         )
     }
 }
