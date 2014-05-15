@@ -24,7 +24,7 @@ public class Migrations {
 
     public void migrate() throws IOException, ConnectionException {
         CassandraMutagen mutagen = new CassandraMutagenImpl();
-        mutagen.initialize("org/freeshr/cassandra/migrations");
+        mutagen.initialize(getenv("CASSANDRA_MIGRATIONS_PATH"));
         Keyspace keyspace = getKeySpace();
         Plan.Result<Integer> result = mutagen.mutate(keyspace);
         if (result.getException() != null) {
