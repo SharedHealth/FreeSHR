@@ -1,5 +1,6 @@
 package org.freeshr.shr.config;
 
+import com.datastax.driver.core.SocketOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.cassandra.core.CqlTemplate;
@@ -28,6 +29,13 @@ public class SHRCassandraConfig extends AbstractCassandraConfiguration {
     @Override
     protected int getPort() {
         return shrProperties.getCassandraPort();
+    }
+
+    @Override
+    protected SocketOptions getSocketOptions() {
+        SocketOptions socketOptions = super.getSocketOptions();
+        socketOptions.setConnectTimeoutMillis(shrProperties.getCassandraTimeout());
+        return socketOptions;
     }
 
     @Bean(name = "SHRCassandraTemplate")
