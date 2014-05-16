@@ -25,6 +25,11 @@ public class SHRCassandraConfig extends AbstractCassandraConfiguration {
         return shrProperties.getContactPoints();
     }
 
+    @Override
+    protected int getPort() {
+        return shrProperties.getCassandraPort();
+    }
+
     @Bean(name = "SHRCassandraTemplate")
     public CqlOperations CassandraTemplate() throws Exception {
         return new CqlTemplate(session().getObject());
