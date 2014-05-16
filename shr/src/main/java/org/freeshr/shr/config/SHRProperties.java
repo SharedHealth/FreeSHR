@@ -12,6 +12,8 @@ public class SHRProperties {
     private String mciPort;
     @Value("${CASSANDRA_KEYSPACE}")
     private String cassandraKeySpace;
+    @Value("${CASSANDRA_HOST}")
+    private String cassandraHost;
 
     public String getMCIUrl() {
         return "http://" + mciHost + ":" + mciPort;
@@ -19,5 +21,9 @@ public class SHRProperties {
 
     public String getCassandraKeySpace() {
         return cassandraKeySpace;
+    }
+
+    public String getContactPoints() {
+        return cassandraHost;
     }
 }

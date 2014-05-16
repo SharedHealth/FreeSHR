@@ -20,6 +20,11 @@ public class SHRCassandraConfig extends AbstractCassandraConfiguration {
         return shrProperties.getCassandraKeySpace();
     }
 
+    @Override
+    protected String getContactPoints() {
+        return shrProperties.getContactPoints();
+    }
+
     @Bean(name = "SHRCassandraTemplate")
     public CqlOperations CassandraTemplate() throws Exception {
         return new CqlTemplate(session().getObject());
