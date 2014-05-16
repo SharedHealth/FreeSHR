@@ -14,7 +14,7 @@ test.doFirst {
 test.finalizedBy(stopMockClientIndex)
 
 dependencies {
-    compile libraries.spring_boot, libraries.spring_data_cassandra 
+    compile libraries.snappy, libraries.spring_boot, libraries.spring_data_cassandra
     compile('com.toddfast.mutagen:mutagen-cassandra:0.4.0'){
         exclude group: 'org.slf4j', module: 'slf4j-log4j12'
     }
