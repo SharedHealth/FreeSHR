@@ -35,6 +35,7 @@ public class SHRCassandraConfig extends AbstractCassandraConfiguration {
     protected SocketOptions getSocketOptions() {
         SocketOptions socketOptions = new SocketOptions();
         socketOptions.setConnectTimeoutMillis(shrProperties.getCassandraTimeout());
+        socketOptions.setReadTimeoutMillis(shrProperties.getCassandraTimeout());
         return socketOptions;
     }
 
