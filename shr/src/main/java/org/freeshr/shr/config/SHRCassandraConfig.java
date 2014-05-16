@@ -33,7 +33,7 @@ public class SHRCassandraConfig extends AbstractCassandraConfiguration {
 
     @Override
     protected SocketOptions getSocketOptions() {
-        SocketOptions socketOptions = super.getSocketOptions();
+        SocketOptions socketOptions = new SocketOptions();
         socketOptions.setConnectTimeoutMillis(shrProperties.getCassandraTimeout());
         return socketOptions;
     }
