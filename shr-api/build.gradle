@@ -57,6 +57,7 @@ task dist(dependsOn: 'exportProperties', type: Rpm) {
     into '/opt/bdshr'
 
     postInstall = file('scripts/utils/postInstall.sh')
+    preUninstall = file('scripts/utils/preUninstall.sh')
     postUninstall = file('scripts/utils/postUninstall.sh')
 
     from("${buildDir}/etc") {
