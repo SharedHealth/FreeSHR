@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.concurrent.ExecutionException;
+
 @RestController
 @RequestMapping("/encounter")
 public class EncounterController {
@@ -19,7 +21,7 @@ public class EncounterController {
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public void create(@RequestBody Encounter encounter) {
+    public void create(@RequestBody Encounter encounter) throws ExecutionException, InterruptedException {
         encounterService.ensureCreated(encounter);
     }
 }
