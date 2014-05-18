@@ -4,6 +4,9 @@ import org.freeshr.shr.patient.repository.AllPatients;
 import org.freeshr.shr.patient.wrapper.MasterClientIndexWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.ListenableFutureCallback;
+
+import java.net.URI;
 
 @Service
 public class PatientRegistry {
@@ -17,7 +20,9 @@ public class PatientRegistry {
         this.masterClientIndexWrapper = masterClientIndexWrapper;
     }
 
-    public Boolean isValid(final String healthId) {
-        return (allPatients.find(healthId) != null) || masterClientIndexWrapper.isValid(healthId);
+    public void isValid(final String healthId, ListenableFutureCallback<URI> result) {
+        if (allPatients.find(healthId) == null) {
+            masterClientIndexWrapper.isValid(healthId, result);
+        }
     }
 }
