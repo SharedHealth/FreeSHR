@@ -1,10 +1,12 @@
 package org.freeshr.shr.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.AsyncRestTemplate;
 
 @Configuration
@@ -12,9 +14,15 @@ import org.springframework.web.client.AsyncRestTemplate;
 @ComponentScan(basePackages = "org.freeshr.shr")
 public class SHRConfig {
 
+    @Autowired
+    private SHRProperties shrProperties;
+
     @Bean(name = "SHRRestTemplate")
     public AsyncRestTemplate shrRestTemplate() {
-        return new AsyncRestTemplate();
+        /*TODO: See whether ThreadPoolExecutor is the best for the job*/
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(shrProperties.getRestPoolSize());
+        return new AsyncRestTemplate(executor);
     }
 
     @Bean
