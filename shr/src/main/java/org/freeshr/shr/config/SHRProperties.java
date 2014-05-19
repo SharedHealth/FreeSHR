@@ -18,6 +18,8 @@ public class SHRProperties {
     private int cassandraPort;
     @Value("${CASSANDRA_TIMEOUT}")
     private int cassandraTimeout;
+    @Value("${REST_POOL_SIZE}")
+    private int restPoolSize;
 
     public String getMCIUrl() {
         return "http://" + mciHost + ":" + mciPort;
@@ -37,5 +39,9 @@ public class SHRProperties {
 
     public int getCassandraTimeout() {
         return cassandraTimeout;
+    }
+
+    public int getRestPoolSize() {
+        return restPoolSize;
     }
 }
