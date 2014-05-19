@@ -1,12 +1,12 @@
 {
     "request": {
-        "url": "/isValid/",
+        "url": "/isValid",
         "method": "POST",
         "bodyPatterns" : [
             { "equalToJson" : "{ \"healthId\": \"20\" }", "jsonCompareMode": "LENIENT" }
         ]
      },
      "response": {
-        "status": 200
+        "status": 404
      }
 }

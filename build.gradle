@@ -46,7 +46,10 @@ ext.testLibraries = [
 def getProcessBuilder() {
     Properties properties = new Properties();
     properties.load(new FileInputStream(file('env/local.properties')))
-    return new ProcessBuilder('./gradlew', 'run')
+    def builder = new ProcessBuilder('./gradlew', 'run')
+    builder.environment().putAll(properties)
+    builder.redirectOutput(ProcessBuilder.Redirect.INHERIT)
+    return builder
 }
 
 def exportEnvironmentVariablesToXML(defaults) {
@@ -62,8 +65,6 @@ def exportEnvironmentVariablesToXML(defaults) {
 
 task runSHR << {
     ProcessBuilder builder = getProcessBuilder()
-    builder.environment().putAll(properties)
-    builder.redirectOutput(ProcessBuilder.Redirect.INHERIT)
     Process process = builder.start();
     process.waitFor();
 }
