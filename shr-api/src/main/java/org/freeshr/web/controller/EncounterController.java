@@ -22,7 +22,6 @@ public class EncounterController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.OK)
     public DeferredResult<Boolean> create(@RequestBody Encounter encounter) throws ExecutionException, InterruptedException {
         final DeferredResult<Boolean> deferredResult = new DeferredResult<Boolean>();
         encounterService.ensureCreated(encounter).addCallback(new ListenableFutureCallback<Boolean>() {
