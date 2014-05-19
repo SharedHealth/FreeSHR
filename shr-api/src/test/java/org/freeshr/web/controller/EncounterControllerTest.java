@@ -12,12 +12,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.nio.charset.Charset;
-
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class EncounterControllerTest {
@@ -45,7 +45,9 @@ public class EncounterControllerTest {
         String content = new ObjectMapper().writeValueAsString(encounter);
 
         when(encounterService.ensureCreated(encounter)).thenReturn(new PreResolvedListenableFuture<Boolean>(Boolean.TRUE));
-        mockMvc.perform(post("/encounter").content(content).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+        mockMvc.perform(
+                post("/encounter").content(content).contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk()).andExpect(request().asyncResult(Boolean.TRUE));
         verify(encounterService).ensureCreated(encounter);
     }
 }
