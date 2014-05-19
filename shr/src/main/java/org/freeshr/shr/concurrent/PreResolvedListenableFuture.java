@@ -4,6 +4,11 @@ import org.springframework.util.concurrent.ListenableFutureTask;
 
 import java.util.concurrent.Callable;
 
+/**
+ * Helps create methods which return a ListenableFuture in one case and a resolved value in another
+ *
+ * @param <T> The promised value
+ */
 public class PreResolvedListenableFuture<T> extends ListenableFutureTask<T> {
 
     public PreResolvedListenableFuture(final T value) {
@@ -13,5 +18,6 @@ public class PreResolvedListenableFuture<T> extends ListenableFutureTask<T> {
                 return value;
             }
         });
+        set(value);
     }
 }
