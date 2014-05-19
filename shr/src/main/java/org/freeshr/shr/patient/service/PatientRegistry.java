@@ -33,7 +33,7 @@ public class PatientRegistry {
                         throw new ExecutionException(e);
                     }
                 } else {
-                    return Boolean.FALSE;
+                    return Boolean.TRUE;
                 }
             }
         };
