@@ -25,12 +25,6 @@ public class PatientRegistry {
         this.masterClientIndexWrapper = masterClientIndexWrapper;
     }
 
-    /**
-     * TODO: Here the future variable could be shared between two threads depending on which executor the ListenableFuture uses.
-     *
-     * @param healthId
-     * @return
-     */
     public ListenableFuture<Boolean> isValid(final String healthId) {
         final SettableFuture<Boolean> future = SettableFuture.create();
         new NotNull<Patient>(allPatients.find(healthId)).addCallback(new ListenableFutureCallback<Boolean>() {
