@@ -11,8 +11,14 @@ import org.mockito.Mock;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.ListenableFutureCallback;
 
-import static org.mockito.Matchers.eq;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -45,9 +51,62 @@ public class EncounterControllerTest {
         String content = new ObjectMapper().writeValueAsString(encounter);
 
         when(encounterService.ensureCreated(encounter)).thenReturn(new PreResolvedListenableFuture<Boolean>(Boolean.TRUE));
-        mockMvc.perform(
-                post("/encounter").content(content).contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isOk()).andExpect(request().asyncResult(Boolean.TRUE));
+        mockMvc.perform
+                (
+                        post("/encounter").content(content).contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(request().asyncResult(Boolean.TRUE));
         verify(encounterService).ensureCreated(encounter);
     }
+
+    @Test
+    public void shouldRespondWithErrorWhenUnableToResolvePromisedValue() throws Exception {
+        String healthId = "healthId";
+        Encounter encounter = new Encounter();
+        encounter.setHealthId(healthId);
+
+        String content = new ObjectMapper().writeValueAsString(encounter);
+
+        when(encounterService.ensureCreated(encounter)).thenReturn(failure);
+        mockMvc.perform
+                (
+                        post("/encounter").content(content).contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(request().asyncResult(instanceOf(RuntimeException.class)));
+    }
+
+    private static ListenableFuture<Boolean> failure = new ListenableFuture<Boolean>() {
+
+        @Override
+        public boolean cancel(boolean b) {
+            return false;
+        }
+
+        @Override
+        public boolean isCancelled() {
+            return false;
+        }
+
+        @Override
+        public boolean isDone() {
+            return true;
+        }
+
+        @Override
+        public Boolean get() throws InterruptedException, ExecutionException {
+            return null;
+        }
+
+        @Override
+        public Boolean get(long l, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {
+            return null;
+        }
+
+        @Override
+        public void addCallback(ListenableFutureCallback<? super Boolean> callback) {
+            callback.onFailure(new RuntimeException("Exception"));
+        }
+    };
 }
