@@ -28,17 +28,12 @@ public class PatientRegistry {
             protected Boolean adapt(Patient result) throws ExecutionException {
                 if (null == result) {
                     try {
-                        return new ListenableFutureAdapter<Boolean, Boolean>(masterClientIndexWrapper.isValid(healthId)) {
-                            @Override
-                            protected Boolean adapt(Boolean result) throws ExecutionException {
-                                return result;
-                            }
-                        }.get();
+                        return masterClientIndexWrapper.isValid(healthId).get();
                     } catch (Exception e) {
                         throw new ExecutionException(e);
                     }
                 } else {
-                    return Boolean.TRUE;
+                    return Boolean.FALSE;
                 }
             }
         };
