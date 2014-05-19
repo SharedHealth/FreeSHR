@@ -5,9 +5,9 @@ import org.freeshr.shr.encounter.repository.AllEncounters;
 import org.freeshr.shr.patient.service.PatientRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.concurrent.ListenableFutureCallback;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.ListenableFutureAdapter;
 
-import java.net.URI;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -22,19 +22,15 @@ public class EncounterService {
         this.patientRegistry = patientRegistry;
     }
 
-    public void ensureCreated(final Encounter encounter) throws ExecutionException, InterruptedException {
-        patientRegistry.isValid(encounter.getHealthId(), new ListenableFutureCallback<URI>() {
+    public ListenableFuture<Boolean> ensureCreated(final Encounter encounter) throws ExecutionException, InterruptedException {
+        return new ListenableFutureAdapter<Boolean, Boolean>(patientRegistry.isValid(encounter.getHealthId())) {
             @Override
-            public void onSuccess(URI result) {
-                if (result != null) {
+            protected Boolean adapt(Boolean result) throws ExecutionException {
+                if (result) {
                     allEncounters.save(encounter);
                 }
+                return result;
             }
-
-            @Override
-            public void onFailure(Throwable t) {
-                throw new RuntimeException(t);
-            }
-        });
+        };
     }
 }

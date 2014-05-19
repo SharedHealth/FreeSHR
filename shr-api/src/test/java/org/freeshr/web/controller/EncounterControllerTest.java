@@ -2,6 +2,7 @@ package org.freeshr.web.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.freeshr.shr.concurrent.PreResolvedListenableFuture;
 import org.freeshr.shr.encounter.model.Encounter;
 import org.freeshr.shr.encounter.service.EncounterService;
 import org.junit.Before;
@@ -14,6 +15,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.nio.charset.Charset;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -42,6 +44,7 @@ public class EncounterControllerTest {
 
         String content = new ObjectMapper().writeValueAsString(encounter);
 
+        when(encounterService.ensureCreated(encounter)).thenReturn(new PreResolvedListenableFuture<Boolean>(Boolean.TRUE));
         mockMvc.perform(post("/encounter").content(content).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
         verify(encounterService).ensureCreated(encounter);
     }

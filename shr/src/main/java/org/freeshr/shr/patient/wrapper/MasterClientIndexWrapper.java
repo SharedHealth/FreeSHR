@@ -1,5 +1,6 @@
 package org.freeshr.shr.patient.wrapper;
 
+import org.freeshr.shr.concurrent.NotNull;
 import org.freeshr.shr.config.SHRProperties;
 import org.freeshr.shr.patient.wrapper.request.IsValidHealthId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +8,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.web.client.AsyncRestTemplate;
 
 import java.net.URI;
@@ -24,11 +24,9 @@ public class MasterClientIndexWrapper {
         this.shrProperties = shrProperties;
     }
 
-    public ListenableFuture<URI> isValid(String healthId, ListenableFutureCallback<URI> callback) {
+    public ListenableFuture<Boolean> isValid(String healthId) {
         IsValidHealthId isValidHealthId = new IsValidHealthId();
         isValidHealthId.setHealthId(healthId);
-        ListenableFuture<URI> result = shrRestTemplate.postForLocation(shrProperties.getMCIUrl() + "/isValid", new HttpEntity<Object>(isValidHealthId));
-        result.addCallback(callback);
-        return result;
+        return new NotNull<URI>(shrRestTemplate.postForLocation(shrProperties.getMCIUrl() + "/isValid", new HttpEntity<Object>(isValidHealthId)));
     }
 }

@@ -4,7 +4,9 @@ import org.freeshr.shr.encounter.model.Encounter;
 import org.freeshr.shr.encounter.service.EncounterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.async.DeferredResult;
 
 import java.util.concurrent.ExecutionException;
 
@@ -21,7 +23,19 @@ public class EncounterController {
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public void create(@RequestBody Encounter encounter) throws ExecutionException, InterruptedException {
-        encounterService.ensureCreated(encounter);
+    public DeferredResult<Boolean> create(@RequestBody Encounter encounter) throws ExecutionException, InterruptedException {
+        final DeferredResult<Boolean> deferredResult = new DeferredResult<Boolean>();
+        encounterService.ensureCreated(encounter).addCallback(new ListenableFutureCallback<Boolean>() {
+            @Override
+            public void onSuccess(Boolean result) {
+                deferredResult.setResult(result);
+            }
+
+            @Override
+            public void onFailure(Throwable error) {
+                deferredResult.setErrorResult(error);
+            }
+        });
+        return deferredResult;
     }
 }
