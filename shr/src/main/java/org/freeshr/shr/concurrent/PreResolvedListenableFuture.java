@@ -7,7 +7,7 @@ import java.util.concurrent.Callable;
 /**
  * Helps create methods which return a ListenableFuture in one case and a resolved value in another
  *
- * @param <T> The promised value
+ * @param <T> Type of the value promised
  */
 public class PreResolvedListenableFuture<T> extends ListenableFutureTask<T> {
 

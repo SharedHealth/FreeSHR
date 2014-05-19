@@ -12,6 +12,8 @@ import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.concurrent.ExecutionException;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -34,13 +36,13 @@ public class AllPatientsTest {
     }
 
     @Test
-    public void shouldFindPatientWithMatchingHealthId() {
-        assertNotNull(allPatients.find(healthId));
+    public void shouldFindPatientWithMatchingHealthId() throws ExecutionException, InterruptedException {
+        assertNotNull(allPatients.find(healthId).get());
     }
 
     @Test
-    public void shouldNotFindPatientWithoutMatchingHealthId() {
-        assertNull(allPatients.find(healthId + "invalid"));
+    public void shouldNotFindPatientWithoutMatchingHealthId() throws ExecutionException, InterruptedException {
+        assertNull(allPatients.find(healthId + "invalid").get());
     }
 
     @After
