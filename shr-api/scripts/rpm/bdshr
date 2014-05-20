@@ -20,7 +20,7 @@
 
 case "$1" in
   start)
-    nohup java -jar /opt/bdshr/lib/shr-api.war > /var/log/bdshr/bdshr.log &
+    nohup java -Dserver.port=$BDSHR_PORT -jar /opt/bdshr/lib/shr-api.war > /var/log/bdshr/bdshr.log &
     echo $! > /var/run/bdshr/bdshr.pid
     ;;
   stop)
