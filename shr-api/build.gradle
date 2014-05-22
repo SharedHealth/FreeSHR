@@ -125,11 +125,12 @@ buildscript {
         mavenCentral()
         maven { url "http://repo.spring.io/snapshot" }
         maven { url "http://repo.spring.io/milestone" }
+        jcenter()
     }
     dependencies {
         classpath(
                 "org.springframework.boot:spring-boot-gradle-plugin:1.0.2.BUILD-SNAPSHOT",
-                'com.trigonic:gradle-rpm-plugin:1.4'
+                'com.netflix.nebula:gradle-ospackage-plugin:1.9.1+'
         )
     }
 }
