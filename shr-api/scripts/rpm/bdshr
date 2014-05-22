@@ -24,6 +24,6 @@ case "$1" in
     echo $! > /var/run/bdshr/bdshr.pid
     ;;
   stop)
-    (true) || (cat /var/run/bdshr/bdshr.pid |  xargs -n 1 kill)
+    (cat /var/run/bdshr/bdshr.pid |  xargs -n 1 kill) || (true)
     ;;
 esac
