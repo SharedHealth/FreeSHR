@@ -39,4 +39,8 @@ public class AllPatients {
             }
         };
     }
+
+    public void save(Patient patient) {
+        cqlOperations.executeAsynchronously("INSERT into patient (healthId) values  ('" + patient.getProfile().getHID() + "')");
+    }
 }

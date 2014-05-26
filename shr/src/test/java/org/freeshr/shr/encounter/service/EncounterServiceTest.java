@@ -41,7 +41,7 @@ public class EncounterServiceTest {
         Encounter encounter = new Encounter();
         encounter.setHealthId(healthId);
 
-        when(patientRegistry.isValid(healthId)).thenReturn(new PreResolvedListenableFuture<Boolean>(Boolean.TRUE));
+        when(patientRegistry.ensurePresent(healthId)).thenReturn(new PreResolvedListenableFuture<Boolean>(Boolean.TRUE));
         encounterService.ensureCreated(encounter);
         verify(allEncounters, never()).save(encounter);
     }
@@ -52,7 +52,7 @@ public class EncounterServiceTest {
         Encounter encounter = new Encounter();
         encounter.setHealthId(healthId);
 
-        when(patientRegistry.isValid(healthId)).thenReturn(new PreResolvedListenableFuture<Boolean>(Boolean.TRUE));
+        when(patientRegistry.ensurePresent(healthId)).thenReturn(new PreResolvedListenableFuture<Boolean>(Boolean.TRUE));
         assertTrue(encounterService.ensureCreated(encounter).get());
         verify(allEncounters).save(encounter);
     }
@@ -63,7 +63,7 @@ public class EncounterServiceTest {
         Encounter encounter = new Encounter();
         encounter.setHealthId(healthId);
 
-        when(patientRegistry.isValid(healthId)).thenReturn(new PreResolvedListenableFuture<Boolean>(Boolean.FALSE));
+        when(patientRegistry.ensurePresent(healthId)).thenReturn(new PreResolvedListenableFuture<Boolean>(Boolean.FALSE));
         assertFalse(encounterService.ensureCreated(encounter).get());
         verify(allEncounters, never()).save(encounter);
     }

@@ -35,7 +35,7 @@ public class PatientRegistryTest {
         String healthId = "healthId";
 
         when(allPatients.find(healthId)).thenReturn(new PreResolvedListenableFuture<Patient>(new Patient()));
-        assertTrue(patientRegistry.isValid(healthId).get());
+        assertTrue(patientRegistry.ensurePresent(healthId).get());
         verify(allPatients).find(healthId);
     }
 
@@ -44,8 +44,8 @@ public class PatientRegistryTest {
         String healthId = "healthId";
 
         when(allPatients.find(healthId)).thenReturn(new PreResolvedListenableFuture<Patient>(new Patient()));
-        patientRegistry.isValid(healthId);
-        verify(masterClientIndexWrapper, never()).isValid(healthId);
+        patientRegistry.ensurePresent(healthId);
+        verify(masterClientIndexWrapper, never()).getPatient(healthId);
     }
 
     @Test
@@ -53,8 +53,8 @@ public class PatientRegistryTest {
         String healthId = "healthId";
 
         when(allPatients.find(healthId)).thenReturn(new PreResolvedListenableFuture<Patient>(null));
-        when(masterClientIndexWrapper.isValid(healthId)).thenReturn(new PreResolvedListenableFuture<Boolean>(Boolean.TRUE));
-        assertTrue(patientRegistry.isValid(healthId).get());
+        when(masterClientIndexWrapper.getPatient(healthId)).thenReturn(new PreResolvedListenableFuture<Patient>(new Patient()));
+        assertTrue(patientRegistry.ensurePresent(healthId).get());
     }
 
     @Test
@@ -62,7 +62,7 @@ public class PatientRegistryTest {
         String healthId = "healthId";
 
         when(allPatients.find(healthId)).thenReturn(new PreResolvedListenableFuture<Patient>(null));
-        when(masterClientIndexWrapper.isValid(healthId)).thenReturn(new PreResolvedListenableFuture<Boolean>(Boolean.FALSE));
-        assertFalse(patientRegistry.isValid(healthId).get());
+        when(masterClientIndexWrapper.getPatient(healthId)).thenReturn(new PreResolvedListenableFuture<Patient>(null));
+        assertFalse(patientRegistry.ensurePresent(healthId).get());
     }
 }
