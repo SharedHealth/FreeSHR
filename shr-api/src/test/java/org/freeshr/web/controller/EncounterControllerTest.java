@@ -2,9 +2,9 @@ package org.freeshr.web.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.freeshr.shr.concurrent.PreResolvedListenableFuture;
-import org.freeshr.shr.encounter.model.Encounter;
-import org.freeshr.shr.encounter.service.EncounterService;
+import org.freeshr.utils.concurrent.PreResolvedListenableFuture;
+import org.freeshr.domain.model.encounter.Encounter;
+import org.freeshr.domain.service.EncounterService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

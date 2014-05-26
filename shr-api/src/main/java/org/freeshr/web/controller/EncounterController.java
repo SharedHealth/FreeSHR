@@ -1,9 +1,8 @@
 package org.freeshr.web.controller;
 
-import org.freeshr.shr.encounter.model.Encounter;
-import org.freeshr.shr.encounter.service.EncounterService;
+import org.freeshr.domain.model.encounter.Encounter;
+import org.freeshr.domain.service.EncounterService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
