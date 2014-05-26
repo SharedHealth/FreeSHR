@@ -1,11 +1,11 @@
 package org.freeshr.shr.patient.wrapper;
 
 import org.freeshr.shr.config.SHRProperties;
+import org.freeshr.shr.patient.model.Patient;
 import org.freeshr.shr.patient.wrapper.request.IsValidHealthId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -26,13 +26,17 @@ public class MasterClientIndexWrapper {
         this.shrProperties = shrProperties;
     }
 
-    public ListenableFuture<Boolean> isValid(String healthId) {
+    public ListenableFuture<Patient> getPatient(String healthId) {
         IsValidHealthId isValidHealthId = new IsValidHealthId();
         isValidHealthId.setHealthId(healthId);
-        return new ListenableFutureAdapter<Boolean, ResponseEntity<String>>(shrRestTemplate.postForEntity(shrProperties.getMCIUrl() + "/isValid", new HttpEntity<Object>(isValidHealthId), String.class)) {
+        return new ListenableFutureAdapter<Patient, ResponseEntity<Patient>>(shrRestTemplate.postForEntity(shrProperties.getMCIUrl() + "/isValid", new HttpEntity<Object>(isValidHealthId), Patient.class)) {
             @Override
-            protected Boolean adapt(ResponseEntity<String> result) throws ExecutionException {
-                return HttpStatus.OK.equals(result.getStatusCode());
+            protected Patient adapt(ResponseEntity<Patient> result) throws ExecutionException {
+                if (result.getStatusCode().is2xxSuccessful()) {
+                    return result.getBody();
+                } else {
+                    return null;
+                }
             }
         };
     }

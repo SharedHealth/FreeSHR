@@ -23,7 +23,7 @@ public class EncounterService {
     }
 
     public ListenableFuture<Boolean> ensureCreated(final Encounter encounter) throws ExecutionException, InterruptedException {
-        return new ListenableFutureAdapter<Boolean, Boolean>(patientRegistry.isValid(encounter.getHealthId())) {
+        return new ListenableFutureAdapter<Boolean, Boolean>(patientRegistry.ensurePresent(encounter.getHealthId())) {
             @Override
             protected Boolean adapt(Boolean result) throws ExecutionException {
                 if (result) {

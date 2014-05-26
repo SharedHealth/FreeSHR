@@ -22,13 +22,19 @@ public class PatientRegistry {
         this.masterClientIndexWrapper = masterClientIndexWrapper;
     }
 
-    public ListenableFuture<Boolean> isValid(final String healthId) {
+    public ListenableFuture<Boolean> ensurePresent(final String healthId) {
         return new ListenableFutureAdapter<Boolean, Patient>(allPatients.find(healthId)) {
             @Override
             protected Boolean adapt(Patient result) throws ExecutionException {
                 if (null == result) {
                     try {
-                        return masterClientIndexWrapper.isValid(healthId).get();
+                        return new ListenableFutureAdapter<Boolean, Patient>(masterClientIndexWrapper.getPatient(healthId)) {
+                            @Override
+                            protected Boolean adapt(Patient result) throws ExecutionException {
+                                allPatients.save(result);
+                                return null != result;
+                            }
+                        }.get();
                     } catch (Exception e) {
                         throw new ExecutionException(e);
                     }
