@@ -4,10 +4,7 @@ yum install -y https://github.com/SharedHealth/FreeSHR-SCM/raw/master/dist/shr_s
 yum install -y https://github.com/SharedHealth/FreeSHR-SCM/raw/master/dist/shr_scm-0.1-1.noarch.rpm || true
 
 #Provision using ansible
-sudo ansible-deploy  -i /vagrant/hosts/local /playbooks/FreeSHR-Playbooks/freeshr/site.yml
-
-#Configure IPTables
-(iptables -L | grep "CassandraDB") || (sudo /sbin/iptables -I INPUT 1 -p tcp --dport 9042 -j ACCEPT -m comment --comment "CassandraDB" && sudo service iptables save)
+sudo ansible-playbook  -i /playbooks/FreeSHR-Playbooks/vagrant /playbooks/FreeSHR-Playbooks/bdshr-servers.yml
 
 #Change host
 sed -i 's/listen_address: localhost/listen_address: 192.168.33.10/g' /etc/cassandra/conf/cassandra.yaml
