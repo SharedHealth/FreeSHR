@@ -1,0 +1,1 @@
+create table encounter (health_id varchar PRIMARY KEY);
