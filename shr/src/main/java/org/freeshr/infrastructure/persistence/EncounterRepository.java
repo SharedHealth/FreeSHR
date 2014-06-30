@@ -17,7 +17,7 @@ public class EncounterRepository {
     }
 
     public void save(Encounter encounter) {
-        cqlOperations.executeAsynchronously("INSERT INTO patient (health_id) VALUES ('" + encounter.getHealthId() + "');");
+        cqlOperations.executeAsynchronously("INSERT INTO encounter (health_id) VALUES ('" + encounter.getHealthId() + "');");
     }
 
 }

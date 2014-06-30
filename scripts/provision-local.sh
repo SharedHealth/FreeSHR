@@ -4,7 +4,7 @@ yum install -y https://github.com/SharedHealth/FreeSHR-SCM/raw/master/dist/shr_s
 yum install -y https://github.com/SharedHealth/FreeSHR-SCM/raw/master/dist/shr_scm-0.1-1.noarch.rpm || true
 
 #Provision using ansible
-sudo ansible-playbook  -i /playbooks/FreeSHR-Playbooks/vagrant /playbooks/FreeSHR-Playbooks/bdshr-servers.yml
+sudo ansible-playbook  -i /playbooks/FreeSHR-Playbooks/vagrant /playbooks/FreeSHR-Playbooks/bdshr-servers.yml --skip-tags="application"
 
 #Change host
 sed -i 's/listen_address: localhost/listen_address: 192.168.33.10/g' /etc/cassandra/conf/cassandra.yaml

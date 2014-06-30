@@ -20,7 +20,7 @@ test {
 test.finalizedBy(stopMockClientIndex)
 
 dependencies {
-    compile libraries.snappy, libraries.spring_boot, libraries.spring_data_cassandra
+    compile libraries.snappy, libraries.spring_boot, libraries.spring_data_cassandra, libraries.fhir
     compile ('io.netty:netty:3.9.0.Final'){
         force = 'true'
     }
