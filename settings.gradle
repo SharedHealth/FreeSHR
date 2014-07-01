@@ -1,2 +1,4 @@
 include 'shr', 'shr-api'
 
+include 'fhir'
+
