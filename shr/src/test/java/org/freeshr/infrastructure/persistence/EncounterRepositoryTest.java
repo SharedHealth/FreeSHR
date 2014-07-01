@@ -30,11 +30,11 @@ public class EncounterRepositoryTest {
     public void shouldCreateEncounter() {
         Encounter encounter = new Encounter();
         encounterRepository.save(encounter);
-        assertEquals(1, cqlOperations.query("SELECT * FROM freeshr.patient;").all().size());
+        assertEquals(1, cqlOperations.query("SELECT * FROM freeshr.encounter;").all().size());
     }
 
     @After
     public void teardown() {
-        cqlOperations.execute("truncate patient");
+        cqlOperations.execute("truncate encounter");
     }
 }
