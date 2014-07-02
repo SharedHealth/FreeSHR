@@ -3,13 +3,16 @@ package org.freeshr.web.controller;
 import org.freeshr.domain.model.encounter.Encounter;
 import org.freeshr.domain.service.EncounterService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.util.concurrent.ListenableFutureCallback;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import java.util.concurrent.ExecutionException;
 
-@RestController
+@Controller
 @RequestMapping("/encounter")
 public class EncounterController {
 
