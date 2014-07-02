@@ -3,10 +3,15 @@
         "url": "/isValid",
         "method": "POST",
         "bodyPatterns" : [
-            { "equalToJson" : "{ \"healthId\": \"10\" }", "jsonCompareMode": "LENIENT" }
+            { "equalToJson" : "{ \"healthId\": null }", "jsonCompareMode": "LENIENT" }
         ]
      },
      "response": {
-        "status": 200
+        "status": 200,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "body": "{\"profile\": { \"hid\" : \"10\" }}"
      }
 }
+

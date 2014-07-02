@@ -1,3 +1,13 @@
+import com.netflix.astyanax.AstyanaxContext
+import com.netflix.astyanax.connectionpool.Host
+import com.netflix.astyanax.connectionpool.NodeDiscoveryType
+import com.netflix.astyanax.connectionpool.impl.ConnectionPoolConfigurationImpl
+import com.netflix.astyanax.connectionpool.impl.ConnectionPoolType
+import com.netflix.astyanax.connectionpool.impl.CountingConnectionPoolMonitor
+import com.netflix.astyanax.impl.AstyanaxConfigurationImpl
+import com.netflix.astyanax.recipes.ConstantSupplier
+import com.netflix.astyanax.thrift.ThriftFamilyFactory
+
 apply plugin: 'java'
 apply plugin: 'idea'
 
@@ -10,8 +20,34 @@ repositories {
     mavenCentral()
 }
 
+task dropSchema << {
+    try {
+        List<com.netflix.astyanax.connectionpool.Host> hosts = new ArrayList<>();
+        hosts.add(new Host("localhost:9160", 9160));
+        new AstyanaxContext.Builder()
+                .forKeyspace('freeshr')
+                .withAstyanaxConfiguration(new AstyanaxConfigurationImpl()
+                .setCqlVersion("3.0.0")
+                .setTargetCassandraVersion("1.2")
+                .setDiscoveryType(NodeDiscoveryType.NONE)
+                .setConnectionPoolType(ConnectionPoolType.BAG)
+        )
+                .withHostSupplier(new ConstantSupplier<List<Host>>(hosts))
+                .withConnectionPoolConfiguration(new ConnectionPoolConfigurationImpl('shrMigrationConnectionPool')
+                .setPort(9160)
+                .setMaxConnsPerHost(1)
+                .setSeeds('localhost:9160')
+        )
+                .withConnectionPoolMonitor(new CountingConnectionPoolMonitor())
+                .buildKeyspace(ThriftFamilyFactory.getInstance()).getClient().dropKeyspace();
+    } finally {
+        // Do Nothing
+    }
+}
+
 test.doFirst {
     project(":shr-api").tasks.startMockClientIndex.execute()
+    project(":shr").tasks.dropSchema.execute()
     project(":shr-api").tasks.migrateDatabase.execute()
 }
 
@@ -24,7 +60,7 @@ test {
 test.finalizedBy(stopMockClientIndex)
 
 dependencies {
-    compile libraries.snappy, libraries.spring_boot, libraries.spring_data_cassandra
+    compile libraries.snappy, libraries.spring_boot, libraries.spring_data_cassandra, libraries.apache_commons_io
     compile('io.netty:netty:3.9.0.Final') {
         force = 'true'
     }

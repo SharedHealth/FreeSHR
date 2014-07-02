@@ -1,6 +1,6 @@
 package org.freeshr.infrastructure.persistence;
 
-import org.freeshr.domain.model.encounter.Encounter;
+import org.freeshr.application.fhir.EncounterBundle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cassandra.core.CqlOperations;
@@ -16,8 +16,8 @@ public class EncounterRepository {
         this.cqlOperations = cassandraTemplate;
     }
 
-    public void save(Encounter encounter) {
-        cqlOperations.executeAsynchronously("INSERT INTO encounter (health_id) VALUES ('" + encounter.getHealthId() + "');");
+    public void save(EncounterBundle encounterBundle) {
+        cqlOperations.executeAsynchronously("INSERT INTO encounter (encounter_id, content) VALUES ('" + encounterBundle.getId() + "','" + encounterBundle.getContent() + "');");
     }
 
 }

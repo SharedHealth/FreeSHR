@@ -1,6 +1,6 @@
 package org.freeshr.web.controller;
 
-import org.freeshr.domain.model.encounter.Encounter;
+import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.domain.service.EncounterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -8,6 +8,7 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import java.util.concurrent.ExecutionException;
@@ -24,11 +25,12 @@ public class EncounterController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public DeferredResult<Boolean> create(@RequestBody Encounter encounter) throws ExecutionException, InterruptedException {
-        final DeferredResult<Boolean> deferredResult = new DeferredResult<Boolean>();
-        encounterService.ensureCreated(encounter).addCallback(new ListenableFutureCallback<Boolean>() {
+    @ResponseBody
+    public DeferredResult<String> create(@RequestBody EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
+        final DeferredResult<String> deferredResult = new DeferredResult<String>();
+        encounterService.ensureCreated(encounterBundle).addCallback(new ListenableFutureCallback<String>() {
             @Override
-            public void onSuccess(Boolean result) {
+            public void onSuccess(String result) {
                 deferredResult.setResult(result);
             }
 
