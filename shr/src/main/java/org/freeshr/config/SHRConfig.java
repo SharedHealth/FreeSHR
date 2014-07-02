@@ -21,6 +21,7 @@ public class SHRConfig {
     public AsyncRestTemplate shrRestTemplate() {
         /*TODO: See whether ThreadPoolExecutor is the best for the job*/
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.initialize();
         executor.setCorePoolSize(shrProperties.getRestPoolSize());
         return new AsyncRestTemplate(executor);
     }

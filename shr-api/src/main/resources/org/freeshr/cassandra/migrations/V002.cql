@@ -1,1 +1,1 @@
-create table encounter (health_id varchar PRIMARY KEY);
+create table encounter (encounter_id varchar PRIMARY KEY, content varchar);

@@ -27,6 +27,7 @@ public class Main {
                 shr.addMapping("/");
                 shr.setInitParameter("contextClass", "org.springframework.web.context.support.AnnotationConfigWebApplicationContext");
                 shr.setInitParameter("contextConfigLocation", "org.freeshr.web.config.WebMvcConfig");
+                shr.setAsyncSupported(true);
             }
         });
         return factory;

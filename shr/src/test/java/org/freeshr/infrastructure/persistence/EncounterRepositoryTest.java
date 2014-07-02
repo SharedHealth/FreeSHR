@@ -1,8 +1,8 @@
 package org.freeshr.infrastructure.persistence;
 
-import org.freeshr.config.SHREnvironmentMock;
+import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.config.SHRConfig;
-import org.freeshr.domain.model.encounter.Encounter;
+import org.freeshr.config.SHREnvironmentMock;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,9 +27,8 @@ public class EncounterRepositoryTest {
     CqlOperations cqlOperations;
 
     @Test
-    public void shouldCreateEncounter() {
-        Encounter encounter = new Encounter();
-        encounterRepository.save(encounter);
+    public void shouldCreateEncounter() throws InterruptedException {
+        encounterRepository.save(new EncounterBundle());
         assertEquals(1, cqlOperations.query("SELECT * FROM freeshr.encounter;").all().size());
     }
 

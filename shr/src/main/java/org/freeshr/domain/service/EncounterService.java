@@ -1,12 +1,13 @@
 package org.freeshr.domain.service;
 
-import org.freeshr.domain.model.encounter.Encounter;
+import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureAdapter;
 
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -21,14 +22,16 @@ public class EncounterService {
         this.patientRegistry = patientRegistry;
     }
 
-    public ListenableFuture<Boolean> ensureCreated(final Encounter encounter) throws ExecutionException, InterruptedException {
-        return new ListenableFutureAdapter<Boolean, Boolean>(patientRegistry.ensurePresent(encounter.getHealthId())) {
+    public ListenableFuture<String> ensureCreated(final EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
+        return new ListenableFutureAdapter<String, Boolean>(patientRegistry.ensurePresent(encounterBundle.getId())) {
             @Override
-            protected Boolean adapt(Boolean result) throws ExecutionException {
+            protected String adapt(Boolean result) throws ExecutionException {
                 if (result) {
-                    entcounterRepository.save(encounter);
+                    encounterBundle.setId(UUID.randomUUID().toString());
+                    entcounterRepository.save(encounterBundle);
+                    return encounterBundle.getId();
                 }
-                return result;
+                return null;
             }
         };
     }
