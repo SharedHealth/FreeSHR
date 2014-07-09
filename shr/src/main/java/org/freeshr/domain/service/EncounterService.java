@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureAdapter;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
@@ -36,11 +37,11 @@ public class EncounterService {
         };
     }
 
-    public ListenableFuture<EncounterBundle> findByHealthId(String patientId) {
-        return new ListenableFutureAdapter<EncounterBundle, EncounterBundle>(encounterRepository.findByHealthId(patientId)) {
+    public ListenableFuture<List<EncounterBundle>> findByHealthId(String healthId) {
+        return new ListenableFutureAdapter<List<EncounterBundle>, List<EncounterBundle>>(encounterRepository.findByHealthId(healthId)) {
             @Override
-            protected EncounterBundle adapt(EncounterBundle bundle) throws ExecutionException {
-                return bundle;
+            protected List<EncounterBundle> adapt(List<EncounterBundle> bundles) throws ExecutionException {
+                return bundles;
             }
         };
     }

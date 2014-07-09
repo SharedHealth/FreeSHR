@@ -12,6 +12,8 @@ import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Component
@@ -34,21 +36,21 @@ public class EncounterRepository {
                 + "');");
     }
 
-    public ListenableFuture<EncounterBundle> findByHealthId(String healthId) {
-        return new SimpleListenableFuture<EncounterBundle, ResultSet>(
+    public ListenableFuture<List<EncounterBundle>> findByHealthId(String healthId) {
+        return new SimpleListenableFuture<List<EncounterBundle>, ResultSet>(
                 cqlOperations.queryAsynchronously("SELECT * FROM encounter WHERE health_id='" + healthId + "';")) {
             @Override
-            protected EncounterBundle adapt(ResultSet resultSet) throws ExecutionException {
-                Row result = resultSet.one();
-                if (null != result) {
+            protected List<EncounterBundle> adapt(ResultSet resultSet) throws ExecutionException {
+                List<EncounterBundle> bundles = new ArrayList<EncounterBundle>();
+                for (Row result : resultSet.all()) {
                     EncounterBundle bundle = new EncounterBundle();
-                    bundle.setHealthId(result.getString("patient_id"));
                     bundle.setEncounterId(result.getString("encounter_id"));
+                    bundle.setHealthId(result.getString("health_id"));
+                    bundle.setDate(result.getString("date"));
                     bundle.setContent(result.getString("content"));
-                    return bundle;
-                } else {
-                    return null;
+                    bundles.add(bundle);
                 }
+                return bundles;
             }
         };
     }

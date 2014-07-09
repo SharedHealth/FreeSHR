@@ -30,9 +30,9 @@ public class MasterClientIndexWrapper {
         this.shrProperties = shrProperties;
     }
 
-    public ListenableFuture<Patient> getPatient(String healthId) throws URISyntaxException {
+    public ListenableFuture<Patient> getPatient(String healthId) {
         return new ListenableFutureAdapter<Patient, ResponseEntity<Patient>>(shrRestTemplate.exchange(
-                new URI(shrProperties.getMCIUrl() + "/patient/" + healthId),
+                shrProperties.getMCIUrl() + "/patient/" + healthId,
                 HttpMethod.GET,
                 new HttpEntity(getHeaders()),
                 Patient.class)) {

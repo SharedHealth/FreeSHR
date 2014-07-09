@@ -7,6 +7,7 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -40,12 +41,12 @@ public class EncounterController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public DeferredResult<EncounterBundle> findByHealthId(@RequestParam(value = "hid") String healthId) {
-        final DeferredResult<EncounterBundle> deferredResult = new DeferredResult<EncounterBundle>();
+    public DeferredResult<List<EncounterBundle>> findByHealthId(@RequestParam(value = "hid") String healthId) {
+        final DeferredResult<List<EncounterBundle>> deferredResult = new DeferredResult<List<EncounterBundle>>();
 
-        encounterService.findByHealthId(healthId).addCallback(new ListenableFutureCallback<EncounterBundle>() {
+        encounterService.findByHealthId(healthId).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
             @Override
-            public void onSuccess(EncounterBundle result) {
+            public void onSuccess(List<EncounterBundle> result) {
                 deferredResult.setResult(result);
             }
 
