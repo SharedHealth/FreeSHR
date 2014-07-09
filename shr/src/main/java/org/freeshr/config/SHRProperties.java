@@ -10,6 +10,11 @@ public class SHRProperties {
     private String mciHost;
     @Value("${MCI_PORT}")
     private String mciPort;
+    @Value("${MCI_USER}")
+    private String mciUser;
+    @Value("${MCI_PASSWORD}")
+    private String mciPassword;
+
     @Value("${CASSANDRA_KEYSPACE}")
     private String cassandraKeySpace;
     @Value("${CASSANDRA_HOST}")
@@ -43,5 +48,13 @@ public class SHRProperties {
 
     public int getRestPoolSize() {
         return restPoolSize;
+    }
+
+    public String getMciUser() {
+        return mciUser;
+    }
+
+    public String getMciPassword() {
+        return mciPassword;
     }
 }

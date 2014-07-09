@@ -3,17 +3,15 @@ package org.freeshr.web.controller;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.domain.service.EncounterService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.util.concurrent.ListenableFutureCallback;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import java.util.concurrent.ExecutionException;
 
-@Controller
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
+@RestController
 @RequestMapping("/encounter")
 public class EncounterController {
 
@@ -24,13 +22,30 @@ public class EncounterController {
         this.encounterService = encounterService;
     }
 
-    @RequestMapping(method = RequestMethod.POST)
-    @ResponseBody
+    @RequestMapping(method = RequestMethod.POST, consumes = {APPLICATION_JSON_VALUE})
     public DeferredResult<String> create(@RequestBody EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
         final DeferredResult<String> deferredResult = new DeferredResult<String>();
         encounterService.ensureCreated(encounterBundle).addCallback(new ListenableFutureCallback<String>() {
             @Override
             public void onSuccess(String result) {
+                deferredResult.setResult(result);
+            }
+
+            @Override
+            public void onFailure(Throwable error) {
+                deferredResult.setErrorResult(error);
+            }
+        });
+        return deferredResult;
+    }
+
+    @RequestMapping(method = RequestMethod.GET)
+    public DeferredResult<EncounterBundle> findByHealthId(@RequestParam(value = "hid") String healthId) {
+        final DeferredResult<EncounterBundle> deferredResult = new DeferredResult<EncounterBundle>();
+
+        encounterService.findByHealthId(healthId).addCallback(new ListenableFutureCallback<EncounterBundle>() {
+            @Override
+            public void onSuccess(EncounterBundle result) {
                 deferredResult.setResult(result);
             }
 

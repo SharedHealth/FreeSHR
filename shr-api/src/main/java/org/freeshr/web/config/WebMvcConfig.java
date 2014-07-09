@@ -1,7 +1,7 @@
 package org.freeshr.web.config;
 
 import org.freeshr.config.SHRConfig;
-import org.freeshr.web.converter.BundleMessageConverter;
+import org.freeshr.web.converter.EncounterBundleMessageConverter;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -26,7 +26,7 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.add(new BundleMessageConverter());
+        converters.add(new EncounterBundleMessageConverter());
         converters.add(new MappingJackson2HttpMessageConverter());
         super.configureMessageConverters(converters);
     }

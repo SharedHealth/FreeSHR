@@ -1,26 +1,20 @@
 package org.freeshr.domain.model.patient;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Patient {
 
-    private final boolean isNull;
-    private final Profile profile;
+    @JsonProperty("hid")
+    private String healthId;
 
-    public Patient() {
-        this.isNull = true;
-        this.profile = null;
+    public String getHealthId() {
+        return healthId;
     }
 
-    public Patient(Profile profile) {
-        this.isNull = false;
-        this.profile = profile;
-    }
-
-    public boolean isNull() {
-        return isNull;
-    }
-
-    public Profile getProfile() {
-        return profile;
+    public void setHealthId(String healthId) {
+        this.healthId = healthId;
     }
 }
