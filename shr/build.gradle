@@ -60,7 +60,10 @@ test {
 test.finalizedBy(stopMockClientIndex)
 
 dependencies {
-    compile libraries.snappy, libraries.spring_boot, libraries.spring_data_cassandra, libraries.apache_commons_io
+    compile('org.springframework.boot:spring-boot-starter-web:1.1.1.RELEASE') {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
+    compile libraries.snappy, libraries.spring_data_cassandra, libraries.spring_boot_logging, libraries.apache_commons_io
     compile('io.netty:netty:3.9.0.Final') {
         force = 'true'
     }

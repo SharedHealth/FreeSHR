@@ -31,7 +31,7 @@ subprojects {
 }
 
 ext.libraries = [
-        spring_boot          : "org.springframework.boot:spring-boot-starter-web:1.0.2.RELEASE",
+        spring_boot_logging  : "org.springframework.boot:spring-boot-starter-log4j:1.1.1.RELEASE",
         spring_data_cassandra: "org.springframework.data:spring-data-cassandra:1.0.0.BUILD-SNAPSHOT+",
         mutagen_cassandra    : "com.toddfast.mutagen:mutagen-cassandra:0.4.0",
         snappy               : 'org.xerial.snappy:snappy-java:1.1.1-M1',

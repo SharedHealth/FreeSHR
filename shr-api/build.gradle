@@ -7,7 +7,14 @@ apply plugin: 'idea'
 def wireMockPort = '9999'
 
 dependencies {
-    compile libraries.spring_boot, project(":shr")
+    compile('org.springframework.boot:spring-boot-starter-web:1.1.1.RELEASE') {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
+    compile('org.springframework.boot:spring-boot-starter-security:1.1.1.RELEASE') {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
+    compile libraries.spring_boot_logging
+    compile project(":shr")
     testCompile testLibraries.mockito, testLibraries.junit, testLibraries.spring_test
 }
 
