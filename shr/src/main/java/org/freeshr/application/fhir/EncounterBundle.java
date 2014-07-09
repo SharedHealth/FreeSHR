@@ -39,4 +39,15 @@ public class EncounterBundle {
     public void setContent(String content) {
         this.content = content;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("EncounterBundle{");
+        sb.append("encounterId='").append(encounterId).append('\'');
+        sb.append(", healthId='").append(healthId).append('\'');
+        sb.append(", date='").append(date).append('\'');
+        //sb.append(", content='").append(content).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
 }
