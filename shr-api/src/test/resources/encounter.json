@@ -1,0 +1,60 @@
+{
+  "resourceType": "Bundle",
+  "title": "Encounter",
+  "updated": "2012-09-20T12:04:45.6787909+00:00",
+  "id": "urn:uuid:50ea3e5e-b6a7-4f55-956c-caef491bbc08",
+  "category": [
+    {
+      "term": "[Tag Term]",
+      "label": "[Tag Label]",
+      "scheme": "[Tag Scheme]"
+    }
+  ],
+  "totalResults": 3,
+  "entry": [
+    {
+      "title": "Encounter between patient X and Doctor Y",
+      "id": "urn:uuid:abcDa3e5e-b6a7-4f55-956c-caef491aYh1x",
+      "content": {
+        "resourceType": "Composition",
+        "identifier": {
+          "value": "Encounter-1234"
+        },
+        "date": "2012-01-04T09:10:14Z",
+        "type": {},
+        "status": "final",
+        "confidentiality": { },
+        "subject": { },
+        "author": [
+          {}
+        ],
+        "section": [
+          {
+            "resourceType": "Encounter",
+            "text": {
+              "status": "generated"
+            },
+            "status": "finished",
+            "class": "outpatient",
+            "subject": {
+              "reference": "patient-id-1000"
+            },
+            "participant": [
+              {
+                "individual": {
+                  "reference": "http://providers.twhosted.com/D101"
+                }
+              }
+            ],
+            "serviceProvider": { },
+            "identifier": [
+              {}
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "signature": "<signature xmlns=\"http://www.w3.org/2000/09/xmldsig\">...</signature>"
+}
+

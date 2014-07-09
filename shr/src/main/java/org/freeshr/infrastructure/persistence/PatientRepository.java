@@ -4,7 +4,6 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import org.freeshr.utils.concurrent.SimpleListenableFuture;
 import org.freeshr.domain.model.patient.Patient;
-import org.freeshr.domain.model.patient.Profile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cassandra.core.CqlOperations;
@@ -29,9 +28,8 @@ public class PatientRepository {
             protected Patient adapt(ResultSet resultSet) throws ExecutionException {
                 Row result = resultSet.one();
                 if (null != result) {
-                    Profile profile = new Profile();
-                    Patient patient = new Patient(profile);
-                    profile.setHID(result.getString("health_id"));
+                    Patient patient = new Patient();
+                    patient.setHealthId(result.getString("health_id"));
                     return patient;
                 } else {
                     return null;
@@ -41,6 +39,6 @@ public class PatientRepository {
     }
 
     public void save(Patient patient) {
-        cqlOperations.executeAsynchronously("INSERT into patient (healthId) values  ('" + patient.getProfile().getHID() + "')");
+        cqlOperations.executeAsynchronously("INSERT into patient (health_id) values  ('" + patient.getHealthId() + "')");
     }
 }

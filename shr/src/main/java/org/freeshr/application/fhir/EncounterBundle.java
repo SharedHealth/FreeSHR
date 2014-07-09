@@ -3,15 +3,33 @@ package org.freeshr.application.fhir;
 
 public class EncounterBundle {
 
-    private String id;
+    private String encounterId;
+    private String healthId;
+    private String date;
     private String content;
 
-    public String getId() {
-        return id;
+    public String getEncounterId() {
+        return encounterId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setEncounterId(String encounterId) {
+        this.encounterId = encounterId;
+    }
+
+    public String getHealthId() {
+        return healthId;
+    }
+
+    public void setHealthId(String healthId) {
+        this.healthId = healthId;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 
     public String getContent() {

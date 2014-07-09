@@ -13,25 +13,34 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class EncounterService {
 
-    private EncounterRepository entcounterRepository;
+    private EncounterRepository encounterRepository;
     private PatientRegistry patientRegistry;
 
     @Autowired
-    public EncounterService(EncounterRepository entcounterRepository, PatientRegistry patientRegistry) {
-        this.entcounterRepository = entcounterRepository;
+    public EncounterService(EncounterRepository encounterRepository, PatientRegistry patientRegistry) {
+        this.encounterRepository = encounterRepository;
         this.patientRegistry = patientRegistry;
     }
 
     public ListenableFuture<String> ensureCreated(final EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
-        return new ListenableFutureAdapter<String, Boolean>(patientRegistry.ensurePresent(encounterBundle.getId())) {
+        return new ListenableFutureAdapter<String, Boolean>(patientRegistry.ensurePresent(encounterBundle.getHealthId())) {
             @Override
             protected String adapt(Boolean result) throws ExecutionException {
                 if (result) {
-                    encounterBundle.setId(UUID.randomUUID().toString());
-                    entcounterRepository.save(encounterBundle);
-                    return encounterBundle.getId();
+                    encounterBundle.setEncounterId(UUID.randomUUID().toString());
+                    encounterRepository.save(encounterBundle);
+                    return encounterBundle.getEncounterId();
                 }
                 return null;
+            }
+        };
+    }
+
+    public ListenableFuture<EncounterBundle> findByHealthId(String patientId) {
+        return new ListenableFutureAdapter<EncounterBundle, EncounterBundle>(encounterRepository.findByHealthId(patientId)) {
+            @Override
+            protected EncounterBundle adapt(EncounterBundle bundle) throws ExecutionException {
+                return bundle;
             }
         };
     }
