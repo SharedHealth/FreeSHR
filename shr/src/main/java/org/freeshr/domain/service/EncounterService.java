@@ -37,8 +37,8 @@ public class EncounterService {
         };
     }
 
-    public ListenableFuture<List<EncounterBundle>> findByHealthId(String healthId) {
-        return new ListenableFutureAdapter<List<EncounterBundle>, List<EncounterBundle>>(encounterRepository.findByHealthId(healthId)) {
+    public ListenableFuture<List<EncounterBundle>> findAll(String healthId) {
+        return new ListenableFutureAdapter<List<EncounterBundle>, List<EncounterBundle>>(encounterRepository.findAll(healthId)) {
             @Override
             protected List<EncounterBundle> adapt(List<EncounterBundle> bundles) throws ExecutionException {
                 return bundles;

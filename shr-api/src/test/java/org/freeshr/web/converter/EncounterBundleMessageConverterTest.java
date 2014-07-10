@@ -1,6 +1,7 @@
 package org.freeshr.web.converter;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.junit.Assert;
 import org.junit.Test;
@@ -20,13 +21,14 @@ public class EncounterBundleMessageConverterTest {
     public void shouldCreateEncounterFromHttpInputMessage() throws IOException {
 
         HttpInputMessage inputMessage = mock(HttpInputMessage.class);
-        final URL resource = URLClassLoader.getSystemResource("encounter.json");
+        final URL resource = URLClassLoader.getSystemResource("encounters.json");
         when(inputMessage.getBody()).thenReturn(resource.openStream());
         EncounterBundle bundle = new EncounterBundleMessageConverter().createEncounterBundle(inputMessage);
 
         Assert.assertNull(bundle.getEncounterId());
-        Assert.assertEquals("patient-id-1000", bundle.getHealthId());
-        Assert.assertEquals("2012-01-04T09:10:14Z", bundle.getDate());
-        Assert.assertEquals(FileUtils.readFileToString(new File(resource.getPath())), bundle.getContent());
+        Assert.assertNull(bundle.getHealthId());
+        Assert.assertNull(bundle.getDate());
+        String expectedContent = StringUtils.deleteWhitespace(FileUtils.readFileToString(new File(resource.getPath())).replaceAll("\\n", ""));
+        Assert.assertEquals(expectedContent, bundle.getContent().toString());
     }
 }

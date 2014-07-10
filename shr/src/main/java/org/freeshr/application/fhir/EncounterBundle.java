@@ -1,12 +1,21 @@
 package org.freeshr.application.fhir;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+
 public class EncounterBundle {
 
     private String encounterId;
     private String healthId;
     private String date;
-    private String content;
+    private JsonNode content;
+
+    @JsonIgnore
+    private static ObjectMapper mapper = new ObjectMapper();
 
     public String getEncounterId() {
         return encounterId;
@@ -32,12 +41,16 @@ public class EncounterBundle {
         this.date = date;
     }
 
-    public String getContent() {
+    public JsonNode getContent() {
         return content;
     }
 
     public void setContent(String content) {
-        this.content = content;
+        try {
+            this.content = mapper.readTree(content);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

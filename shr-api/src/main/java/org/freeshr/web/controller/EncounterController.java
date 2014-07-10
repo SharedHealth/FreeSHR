@@ -15,7 +15,7 @@ import java.util.concurrent.ExecutionException;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequestMapping("/encounter")
+@RequestMapping("/patients/{healthId}")
 public class EncounterController {
     private static final Logger logger = LoggerFactory.getLogger(EncounterController.class);
 
@@ -26,9 +26,11 @@ public class EncounterController {
         this.encounterService = encounterService;
     }
 
-    @RequestMapping(method = RequestMethod.POST, consumes = {APPLICATION_JSON_VALUE})
-    public DeferredResult<String> create(@RequestBody EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
+    @RequestMapping(value = "/encounters", method = RequestMethod.POST, consumes = APPLICATION_JSON_VALUE)
+    public DeferredResult<String> create(@PathVariable String healthId, @RequestBody EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
+        encounterBundle.setHealthId(healthId);
         logger.debug("Create encounter. " + encounterBundle);
+
         final DeferredResult<String> deferredResult = new DeferredResult<String>();
         encounterService.ensureCreated(encounterBundle).addCallback(new ListenableFutureCallback<String>() {
             @Override
@@ -44,12 +46,12 @@ public class EncounterController {
         return deferredResult;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
-    public DeferredResult<List<EncounterBundle>> findByHealthId(@RequestParam(value = "hid") String healthId) {
-        logger.debug("Find encounter by health id: " + healthId);
+    @RequestMapping(value = "/encounters", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    public DeferredResult<List<EncounterBundle>> findAll(@PathVariable String healthId) {
+        logger.debug("Find all encounters by health id: " + healthId);
         final DeferredResult<List<EncounterBundle>> deferredResult = new DeferredResult<List<EncounterBundle>>();
 
-        encounterService.findByHealthId(healthId).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
+        encounterService.findAll(healthId).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
             @Override
             public void onSuccess(List<EncounterBundle> result) {
                 deferredResult.setResult(result);
