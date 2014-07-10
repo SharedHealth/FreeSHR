@@ -3,9 +3,6 @@ package org.freeshr.web.converter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.freeshr.application.fhir.EncounterBundle;
-import org.freeshr.web.dto.Bundle;
-import org.freeshr.web.dto.Composition;
-import org.hl7.fhir.instance.model.Encounter;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -36,15 +33,7 @@ public class EncounterBundleMessageConverter extends AbstractHttpMessageConverte
 
     EncounterBundle createEncounterBundle(HttpInputMessage inputMessage) throws IOException {
         EncounterBundle encounterBundle = new EncounterBundle();
-        String messageBody = IOUtils.toString(inputMessage.getBody());
-
-        Bundle bundle = objectMapper.readValue(messageBody, Bundle.class);
-        Composition composition = bundle.getEntries().get(0).getContent();
-        Encounter encounter = composition.getSections().get(0);
-
-        encounterBundle.setHealthId(encounter.getSubject().getReference().getValue());
-        encounterBundle.setDate(composition.getDate());
-        encounterBundle.setContent(messageBody);
+        encounterBundle.setContent(IOUtils.toString(inputMessage.getBody()));
         return encounterBundle;
     }
 
