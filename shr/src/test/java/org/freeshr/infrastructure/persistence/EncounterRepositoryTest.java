@@ -1,6 +1,6 @@
 package org.freeshr.infrastructure.persistence;
 
-import com.datastax.driver.core.Row;
+import com.google.gson.Gson;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
@@ -13,9 +13,14 @@ import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -29,24 +34,26 @@ public class EncounterRepositoryTest {
     @Qualifier("SHRCassandraTemplate")
     CqlOperations cqlOperations;
 
+    @Test
+    public void shouldFetchAllEncounters() throws InterruptedException, ExecutionException {
+        encounterRepository.save(createEncounterBundle("e-0"));
+        encounterRepository.save(createEncounterBundle("e-1"));
+        encounterRepository.save(createEncounterBundle("e-2"));
+
+        List<EncounterBundle> encounters = encounterRepository.findAll("h100").get();
+
+        assertEquals(3, encounters.size());
+    }
 
     @Test
-    public void shouldCreateAndFindAllEncounters() throws InterruptedException {
-        encounterRepository.save(createEncounterBundle("0"));
-        encounterRepository.save(createEncounterBundle("1"));
-        encounterRepository.save(createEncounterBundle("2"));
+    public void shouldSaveAndRetrieveAnEncounter() throws ExecutionException, InterruptedException {
+        encounterRepository.save(createEncounterBundle("test-encounter"));
 
-        final List<Row> resultSet = cqlOperations.query("SELECT * FROM freeshr.encounter;").all();
-        final int size = resultSet.size();
-        assertEquals(3, size);
+        EncounterBundle encounter = encounterRepository.findAll("h100").get().get(0);
 
-        for (int i = 0; i < size; i++) {
-            Row result = resultSet.get(i);
-            assertEquals("e100-" + i, result.getString("encounter_id"));
-            assertEquals("h100", result.getString("health_id"));
-            assertEquals("2012-01-04T09:10:14Z", result.getString("date"));
-            assertEquals("helloworld-" + i, result.getString("content"));
-        }
+        assertEquals("test-encounter", encounter.getEncounterId());
+        assertThat(encounter.getDate(), is(notNullValue()));
+        assertThat(encounter.getContent().toString(), is(patientDetails()));
     }
 
     @After
@@ -54,12 +61,21 @@ public class EncounterRepositoryTest {
         cqlOperations.execute("truncate encounter");
     }
 
-    private EncounterBundle createEncounterBundle(String counter) {
+    private EncounterBundle createEncounterBundle(String encounterId) {
         EncounterBundle bundle = new EncounterBundle();
-        bundle.setEncounterId("e100-" + counter);
+        bundle.setEncounterId(encounterId);
         bundle.setHealthId("h100");
-        bundle.setDate("2012-01-04T09:10:14Z");
-        bundle.setContent("helloworld-" + counter);
+        bundle.setContent(patientDetails());
         return bundle;
+    }
+
+    private String patientDetails() {
+        HashMap<String, Object> content = new HashMap<String, Object>();
+        HashMap<String, String> patient = new HashMap<String, String>();
+        patient.put("gender", "Male");
+        patient.put("address", "test address");
+        patient.put("blood_group", "a positive");
+        content.put("patient", patient);
+        return new Gson().toJson(content);
     }
 }

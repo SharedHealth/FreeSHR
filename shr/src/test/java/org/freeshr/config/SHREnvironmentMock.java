@@ -9,6 +9,7 @@ import org.springframework.mock.env.MockPropertySource;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Properties;
 
 @Configuration
@@ -19,7 +20,7 @@ public class SHREnvironmentMock implements ApplicationContextInitializer<Configu
         MutablePropertySources propertySources = applicationContext.getEnvironment().getPropertySources();
         MockPropertySource mockEnvVars = new MockPropertySource();
         try {
-            FileInputStream inputStream = new FileInputStream(new File(System.getenv("PATH_TO_CONFIG")));
+            InputStream inputStream = this.getClass().getResourceAsStream("/test-shr.properties");
             Properties properties = new Properties();
             properties.load(inputStream);
             for (Object property : properties.keySet()) {
