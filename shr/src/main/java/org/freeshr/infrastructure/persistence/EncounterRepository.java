@@ -2,7 +2,6 @@ package org.freeshr.infrastructure.persistence;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.utils.concurrent.SimpleListenableFuture;
 import org.slf4j.Logger;
@@ -13,7 +12,6 @@ import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
