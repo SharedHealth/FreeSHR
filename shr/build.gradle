@@ -16,17 +16,6 @@ repositories {
     mavenCentral()
 }
 
-//wiremock for MCI
-def wireMockPort = '9999'
-task startMockClientIndex << {
-    ProcessBuilder builder = new ProcessBuilder('java', '-jar', "${projectDir}/lib/wiremock.jar", '--port', wireMockPort, '&');
-    builder.start();
-}
-
-test.doFirst {
-    tasks.startMockClientIndex.execute()
-}
-
 test {
     testLogging {
         exceptionFormat "full" // default is "short"
@@ -47,7 +36,7 @@ dependencies {
         exclude group: 'org.slf4j', module: 'slf4j-log4j12'
     }
     compile project(":fhir")
-    testCompile testLibraries.mockito, testLibraries.junit, testLibraries.spring_test, testLibraries.cassandra_unit
+    testCompile testLibraries.mockito, testLibraries.junit, testLibraries.spring_test, testLibraries.cassandra_unit, testLibraries.wiremock
 }
 
 configurations.all {
