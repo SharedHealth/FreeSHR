@@ -2,6 +2,8 @@ package org.freeshr.infrastructure.persistence;
 
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
+import org.freeshr.domain.model.patient.Address;
+import org.freeshr.domain.model.patient.Patient;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,8 +16,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.concurrent.ExecutionException;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
@@ -30,14 +34,32 @@ public class PatientRepositoryTest {
     @Qualifier("SHRCassandraTemplate")
     private CqlOperations cqlTemplate;
 
-    @Before
-    public void setup() {
-        cqlTemplate.execute("INSERT into patient (health_id) VALUES ('" + healthId + "');");
-    }
-
     @Test
     public void shouldFindPatientWithMatchingHealthId() throws ExecutionException, InterruptedException {
-        assertNotNull(patientRepository.find(healthId).get());
+        patientRepository.saveSynchronously(patient(healthId));
+
+        Patient patient = patientRepository.find(healthId).get();
+        assertNotNull(patient);
+        assertThat(patient, is(patient(healthId)));
+        assertThat(patient.getAddress(), is(address()));
+    }
+
+    private Patient patient(String healthId) {
+        Patient patient = new Patient();
+        patient.setHealthId(healthId);
+        patient.setGender("1");
+        patient.setAddress(address());
+        return patient;
+    }
+
+    private Address address() {
+        Address address = new Address();
+        address.setDistrict("district");
+        address.setDivision("division");
+        address.setLine("line");
+        address.setUpazilla("upazilla");
+        address.setUnion("union");
+        return address;
     }
 
     @Test

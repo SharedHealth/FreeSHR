@@ -2,15 +2,22 @@ package org.freeshr.infrastructure.persistence;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
-import org.freeshr.utils.concurrent.SimpleListenableFuture;
+import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
+import org.freeshr.utils.CollectionUtils;
+import org.freeshr.utils.concurrent.SimpleListenableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import static java.util.Arrays.asList;
+import static org.apache.commons.lang.StringUtils.join;
+import static org.freeshr.utils.CollectionUtils.map;
 
 @Component
 public class PatientRepository {
@@ -29,7 +36,15 @@ public class PatientRepository {
                 Row result = resultSet.one();
                 if (null != result) {
                     Patient patient = new Patient();
+                    Address address = new Address();
                     patient.setHealthId(result.getString("health_id"));
+                    patient.setGender(result.getString("gender"));
+                    address.setLine(result.getString("address_line"));
+                    address.setDistrict(result.getString("district_id"));
+                    address.setUnion(result.getString("union_id"));
+                    address.setUpazilla(result.getString("upazilla_id"));
+                    address.setDivision(result.getString("division_id"));
+                    patient.setAddress(address);
                     return patient;
                 } else {
                     return null;
@@ -39,6 +54,29 @@ public class PatientRepository {
     }
 
     public void save(Patient patient) {
-        cqlOperations.executeAsynchronously("INSERT into patient (health_id) values  ('" + patient.getHealthId() + "')");
+        //TODO:use query builder
+        cqlOperations.executeAsynchronously(toCQL(patient));
+    }
+
+    public void saveSynchronously(Patient patient){
+        cqlOperations.execute(toCQL(patient));
+    }
+
+    private String toCQL(Patient patient) {
+        Address address = patient.getAddress();
+        String query = query(asList(patient.getHealthId(),
+                patient.getGender(), address.getLine(), address.getDistrict(),
+                address.getDivision(), address.getUnion(), address.getUpazilla()));
+        return "INSERT into patient (health_id, gender, address_line, district_id, division_id, union_id, upazilla_id) values  (" + query + ")";
+    }
+
+
+
+    private String query(List<String> values) {
+        return join(map(values, new CollectionUtils.Fn<String, String>() {
+            public String call(String input) {
+                return "'" + input + "'";
+            }
+        }), ",");
     }
 }

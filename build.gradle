@@ -47,7 +47,8 @@ ext.testLibraries = [
         junit         : "junit:junit:4.10",
         mockito       : "org.mockito:mockito-all:1.8.4",
         spring_test   : "org.springframework:spring-test:4.0.3.RELEASE",
-        cassandra_unit: "org.cassandraunit:cassandra-unit-spring:2.0.2.2-SNAPSHOT"
+        cassandra_unit: "org.cassandraunit:cassandra-unit-spring:2.0.2.2-SNAPSHOT",
+        wiremock      : "com.github.tomakehurst:wiremock:1.43"
 ]
 
 def getProcessBuilder() {
