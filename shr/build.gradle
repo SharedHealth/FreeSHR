@@ -1,15 +1,10 @@
-import com.netflix.astyanax.AstyanaxContext
-import com.netflix.astyanax.connectionpool.Host
-import com.netflix.astyanax.connectionpool.NodeDiscoveryType
-import com.netflix.astyanax.connectionpool.impl.ConnectionPoolConfigurationImpl
-import com.netflix.astyanax.connectionpool.impl.ConnectionPoolType
-import com.netflix.astyanax.connectionpool.impl.CountingConnectionPoolMonitor
-import com.netflix.astyanax.impl.AstyanaxConfigurationImpl
-import com.netflix.astyanax.recipes.ConstantSupplier
-import com.netflix.astyanax.thrift.ThriftFamilyFactory
-
 apply plugin: 'java'
+apply plugin: 'spring-boot'
+apply plugin: 'war'
+apply plugin: 'rpm'
 apply plugin: 'idea'
+
+mainClassName = "org.freeshr.launch.Main"
 
 jar {
     baseName = 'bdeshr'
@@ -17,38 +12,19 @@ jar {
 }
 
 repositories {
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots"}
     mavenCentral()
 }
 
-task dropSchema << {
-    try {
-        List<com.netflix.astyanax.connectionpool.Host> hosts = new ArrayList<>();
-        hosts.add(new Host("localhost:9160", 9160));
-        new AstyanaxContext.Builder()
-                .forKeyspace('freeshr')
-                .withAstyanaxConfiguration(new AstyanaxConfigurationImpl()
-                .setCqlVersion("3.0.0")
-                .setTargetCassandraVersion("1.2")
-                .setDiscoveryType(NodeDiscoveryType.NONE)
-                .setConnectionPoolType(ConnectionPoolType.BAG)
-        )
-                .withHostSupplier(new ConstantSupplier<List<Host>>(hosts))
-                .withConnectionPoolConfiguration(new ConnectionPoolConfigurationImpl('shrMigrationConnectionPool')
-                .setPort(9160)
-                .setMaxConnsPerHost(1)
-                .setSeeds('localhost:9160')
-        )
-                .withConnectionPoolMonitor(new CountingConnectionPoolMonitor())
-                .buildKeyspace(ThriftFamilyFactory.getInstance()).getClient().dropKeyspace();
-    } finally {
-        // Do Nothing
-    }
+//wiremock for MCI
+def wireMockPort = '9999'
+task startMockClientIndex << {
+    ProcessBuilder builder = new ProcessBuilder('java', '-jar', "${projectDir}/lib/wiremock.jar", '--port', wireMockPort, '&');
+    builder.start();
 }
 
 test.doFirst {
-    project(":shr-api").tasks.startMockClientIndex.execute()
-    project(":shr").tasks.dropSchema.execute()
-    project(":shr-api").tasks.migrateDatabase.execute()
+    tasks.startMockClientIndex.execute()
 }
 
 test {
@@ -71,9 +47,124 @@ dependencies {
         exclude group: 'org.slf4j', module: 'slf4j-log4j12'
     }
     compile project(":fhir")
-    testCompile testLibraries.mockito, testLibraries.junit, testLibraries.spring_test
+    testCompile testLibraries.mockito, testLibraries.junit, testLibraries.spring_test, testLibraries.cassandra_unit
 }
 
 configurations.all {
     exclude group: 'org.jboss.netty', module: 'netty'
 }
+
+
+task migrateDatabase << {
+    tasks.compileMigrateJava.execute()
+    tasks.processMigrateResources.execute()
+    tasks.applyDbMigrations.execute()
+}
+
+configurations {
+    migration {
+        extendsFrom compile
+    }
+}
+
+
+sourceSets {
+    migrate {
+        java {
+            srcDir 'src/main/java/org/freeshr/utils/cassandra'
+        }
+        resources {
+            srcDir 'src/main/resources'
+        }
+        compileClasspath += configurations.migration
+    }
+}
+
+task applyDbMigrations(type: JavaExec) {
+    workingDir=project.sourceSets.migrate.output.classesDir
+    classpath(project.sourceSets.migrate.output.classesDir,project.sourceSets.migrate.output.resourcesDir, sourceSets.main.runtimeClasspath)
+    main  "org.freeshr.utils.cassandra.Migrations"
+    environment(loadConfig())
+}
+
+//build artifact
+private Properties loadConfig() {
+    Properties properties = new Properties()
+    properties.load(new FileInputStream(file("${projectDir}/../env/local.properties")));
+    properties
+}
+
+task assembly(dependsOn: 'build') << {
+    new File("${buildDir}/etc/").mkdir();
+}
+
+task exportProperties(dependsOn: 'assembly') << {
+    PrintStream output = new PrintStream(new FileOutputStream(file("${buildDir}/etc/bdshr")));
+    Properties properties = loadConfig()
+    properties.each { prop, val ->
+        output.println("export " + prop + "=" + val)
+    }
+}
+
+task dist(dependsOn: 'exportProperties', type: Rpm) {
+    packageName = 'shr'
+    version = '0.1'
+    release = 1
+    arch = NOARCH
+    os = LINUX
+
+    into '/opt/bdshr'
+
+    postInstall = file('scripts/utils/postInstall.sh')
+    preUninstall = file('scripts/utils/preUninstall.sh')
+    postUninstall = file('scripts/utils/postUninstall.sh')
+
+    from("${buildDir}/etc") {
+        fileMode = 0755
+        createDirectoryEntry = true
+        into 'etc'
+    }
+
+    from("scripts/rpm") {
+        fileMode = 0755
+        createDirectoryEntry = true
+        exclude 'placeholder'
+        into 'bin'
+    }
+
+    from("${buildDir}/libs") {
+        fileMode = 0755
+        createDirectoryEntry = true
+        into 'lib'
+    }
+
+    from("scripts/rpm") {
+        fileMode = 0755
+        createDirectoryEntry = true
+        exclude 'bdshr'
+        into 'var'
+    }
+}
+
+war {
+    from sourceSets.migrate.resources
+    manifest {
+        attributes('Main-Class': mainClassName)
+    }
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "http://repo.spring.io/snapshot" }
+        maven { url "http://repo.spring.io/milestone" }
+        jcenter()
+    }
+    dependencies {
+        classpath(
+                "org.springframework.boot:spring-boot-gradle-plugin:1.0.2.BUILD-SNAPSHOT",
+                'com.netflix.nebula:gradle-ospackage-plugin:1.9.1+'
+        )
+    }
+}
+

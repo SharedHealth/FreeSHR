@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# bdshr        This shell script takes care of starting and stopping
+#              the bdshr system
+#
+# chkconfig: - 64 36
+# description: The bdshr shared health record system
+# processname: bdshr
+# config: /etc/default/bdshr
+# pidfile: /var/run/bdshr/bdshr.pid
+### BEGIN INIT INFO
+# Provides: bdshr
+# Required-Start: $local_fs $remote_fs $network $named $syslog $time
+# Required-Stop: $local_fs $remote_fs $network $named $syslog $time
+# Short-Description: start and stop bdshr system,
+# Description: BDSHR system
+### END INIT INFO
+
+. /etc/default/bdshr
+
+case "$1" in
+  start)
+    nohup java -Dserver.port=$BDSHR_PORT -jar /opt/bdshr/lib/shr.war > /var/log/bdshr/bdshr.log &
+    echo $! > /var/run/bdshr/bdshr.pid
+    ;;
+  stop)
+    (cat /var/run/bdshr/bdshr.pid |  xargs -n 1 kill) || (true)
+    ;;
+esac
