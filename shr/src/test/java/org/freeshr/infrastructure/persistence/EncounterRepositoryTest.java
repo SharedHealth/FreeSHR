@@ -36,46 +36,35 @@ public class EncounterRepositoryTest {
 
     @Test
     public void shouldFetchAllEncounters() throws InterruptedException, ExecutionException {
-        encounterRepository.save(createEncounterBundle("e-0"));
-        encounterRepository.save(createEncounterBundle("e-1"));
-        encounterRepository.save(createEncounterBundle("e-2"));
+        encounterRepository.save(createEncounterBundle("e-0", "h100"));
+        encounterRepository.save(createEncounterBundle("e-1", "h100"));
+        encounterRepository.save(createEncounterBundle("e-2", "h100"));
 
         List<EncounterBundle> encounters = encounterRepository.findAll("h100").get();
+        EncounterBundle encounter = encounters.get(0);
 
         assertEquals(3, encounters.size());
-    }
-
-    @Test
-    public void shouldSaveAndRetrieveAnEncounter() throws ExecutionException, InterruptedException {
-        encounterRepository.save(createEncounterBundle("test-encounter"));
-
-        EncounterBundle encounter = encounterRepository.findAll("h100").get().get(0);
-
-        assertEquals("test-encounter", encounter.getEncounterId());
         assertThat(encounter.getDate(), is(notNullValue()));
-        assertThat(encounter.getContent().toString(), is(patientDetails()));
+        assertThat(encounter.getContent().toString(), is(content()));
     }
+
 
     @After
     public void teardown() {
         cqlOperations.execute("truncate encounter");
     }
 
-    private EncounterBundle createEncounterBundle(String encounterId) {
+    private EncounterBundle createEncounterBundle(String encounterId, String healthId) {
         EncounterBundle bundle = new EncounterBundle();
         bundle.setEncounterId(encounterId);
-        bundle.setHealthId("h100");
-        bundle.setContent(patientDetails());
+        bundle.setHealthId(healthId);
+        bundle.setContent(content());
         return bundle;
     }
 
-    private String patientDetails() {
+    private String content() {
         HashMap<String, Object> content = new HashMap<String, Object>();
-        HashMap<String, String> patient = new HashMap<String, String>();
-        patient.put("gender", "Male");
-        patient.put("address", "test address");
-        patient.put("blood_group", "a positive");
-        content.put("patient", patient);
+        content.put("blood_group", "a positive");
         return new Gson().toJson(content);
     }
 }

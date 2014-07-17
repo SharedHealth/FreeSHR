@@ -11,7 +11,10 @@ import org.springframework.web.client.AsyncRestTemplate;
 
 @Configuration
 @Import(SHRCassandraConfig.class)
-@ComponentScan(basePackages = "org.freeshr")
+@ComponentScan(basePackages = {"org.freeshr.config",
+        "org.freeshr.infrastructure",
+        "org.freeshr.interfaces",
+        "org.freeshr.domain"})
 public class SHRConfig {
 
     @Autowired

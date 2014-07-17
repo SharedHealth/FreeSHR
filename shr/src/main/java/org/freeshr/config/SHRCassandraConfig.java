@@ -11,7 +11,7 @@ import org.springframework.data.cassandra.config.java.AbstractCassandraConfigura
 import org.springframework.data.cassandra.repository.config.EnableCassandraRepositories;
 
 @Configuration
-@EnableCassandraRepositories(basePackages = "org.freeshr")
+@EnableCassandraRepositories(basePackages = "org.freeshr.infrastructure.persistence")
 public class SHRCassandraConfig extends AbstractCassandraConfiguration {
 
     @Autowired
