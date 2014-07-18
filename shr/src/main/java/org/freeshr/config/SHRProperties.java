@@ -26,8 +26,8 @@ public class SHRProperties {
     @Value("${REST_POOL_SIZE}")
     private int restPoolSize;
 
-    public String getMCIUrl() {
-        return "http://" + mciHost + ":" + mciPort;
+    public String getMCIPatientUrl() {
+        return String.format("http://%s:%s/api/v1/patients",mciHost,mciPort);
     }
 
     public String getCassandraKeySpace() {
