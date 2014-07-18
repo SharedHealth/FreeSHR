@@ -12,8 +12,6 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureAdapter;
 import org.springframework.web.client.AsyncRestTemplate;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
@@ -32,7 +30,7 @@ public class MasterClientIndexWrapper {
 
     public ListenableFuture<Patient> getPatient(String healthId) {
         return new ListenableFutureAdapter<Patient, ResponseEntity<Patient>>(shrRestTemplate.exchange(
-                shrProperties.getMCIUrl() + "/patient/" + healthId,
+                shrProperties.getMCIPatientUrl() + "/" + healthId,
                 HttpMethod.GET,
                 new HttpEntity(getHeaders()),
                 Patient.class)) {
