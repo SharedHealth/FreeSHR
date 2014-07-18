@@ -38,7 +38,7 @@ public class EncounterServiceIntegrationTest {
     @Test
     public void shouldCaptureAnEncounterAlongWithPatientDetails() throws Exception {
         String heathId = "5dd24827-fd5d-4024-9f65-5a3c88a28af5";
-        givenThat(get(urlEqualTo("/patient/" + heathId))
+        givenThat(get(urlEqualTo("/api/v1/patients/" + heathId))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
