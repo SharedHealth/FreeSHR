@@ -5,4 +5,4 @@ rm -f /etc/default/bdshr
 rm -f /var/run/bdshr
 
 #Remove bdshr from chkconfig
-chkconfig --del bdshr
+chkconfig --del bdshr || true

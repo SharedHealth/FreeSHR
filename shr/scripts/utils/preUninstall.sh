@@ -1,3 +1,3 @@
 #!/bin/sh
 
-service bdshr stop
+service bdshr stop || (true)
