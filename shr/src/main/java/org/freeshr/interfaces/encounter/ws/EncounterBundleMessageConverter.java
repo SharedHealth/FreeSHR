@@ -1,6 +1,7 @@
 package org.freeshr.interfaces.encounter.ws;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.springframework.http.HttpInputMessage;
@@ -23,7 +24,9 @@ public class EncounterBundleMessageConverter extends AbstractHttpMessageConverte
 
     @Override
     protected boolean canRead(MediaType mediaType) {
-        return MediaType.APPLICATION_JSON.equals(mediaType);
+        return MediaType.APPLICATION_JSON.getType().equals(mediaType.getType()) &&
+                MediaType.APPLICATION_JSON.getSubtype().equals(mediaType.getSubtype()) &&
+                Charsets.UTF_8.equals(mediaType.getCharSet());
     }
 
     @Override
