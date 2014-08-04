@@ -18,6 +18,14 @@
 
 . /etc/default/bdshr
 
+if [[ ! -e /var/run/bdshr ]]; then
+    ln -s /opt/bdshr/var /var/run/bdshr
+fi
+
+if [[ ! -e /var/log/bdshr ]]; then
+    mkdir /var/log/bdshr
+fi
+
 case "$1" in
   start)
     nohup java -Dserver.port=$BDSHR_PORT -jar /opt/bdshr/lib/shr.war > /var/log/bdshr/bdshr.log &
