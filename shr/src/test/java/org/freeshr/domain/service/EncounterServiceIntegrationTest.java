@@ -2,11 +2,13 @@ package org.freeshr.domain.service;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.freeshr.application.fhir.EncounterBundle;
+import org.freeshr.application.fhir.InvalidEncounter;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.persistence.PatientRepository;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,20 +37,53 @@ public class EncounterServiceIntegrationTest {
     @Autowired
     private PatientRepository patientRepository;
 
-    @Test
-    public void shouldCaptureAnEncounterAlongWithPatientDetails() throws Exception {
-        String heathId = "5dd24827-fd5d-4024-9f65-5a3c88a28af5";
-        givenThat(get(urlEqualTo("/api/v1/patients/" + heathId))
+    private static final String HEALTH_ID = "5dd24827-fd5d-4024-9f65-5a3c88a28af5";
+
+    @Before
+    public void setUp() throws Exception {
+        givenThat(get(urlEqualTo("/api/v1/patients/" + HEALTH_ID))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/patient.json"))));
 
-        String encounterId = encounterService.ensureCreated(encounter(heathId)).get();
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/conceptreferenceterm/fa460ea6-04c7-45af-a6fa-5072e7caed40"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/refterm.json"))));
+
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/concepts/eddb01eb-61fc-4f9e-aca5-e44193509f35"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/concept.json"))));
+    }
+
+    @Test(expected = InvalidEncounter.class)
+    public void shouldRejectEncounterWithInvalidReferenceCode() throws Exception {
+        encounterService.ensureCreated(invalidReferenceTermEncounter("5dd24827-fd5d-4024-9f65-5a3c88a28af5")).get();
+    }
+
+    @Test(expected = InvalidEncounter.class)
+    public void shouldRejectEncounterWithInvalidConceptCode() throws Exception {
+        encounterService.ensureCreated(invalidConceptEncounter("5dd24827-fd5d-4024-9f65-5a3c88a28af5")).get();
+    }
+
+    @Test
+    public void shouldCaptureAnEncounterAlongWithPatientDetails() throws Exception {
+        givenThat(get(urlEqualTo("/api/v1/patients/" + HEALTH_ID))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/patient.json"))));
+
+        String encounterId = encounterService.ensureCreated(validEncounter(HEALTH_ID)).get();
 
         assertThat(encounterId, is(notNullValue()));
-        assertValidPatient(patientRepository.find(heathId).get());
+        assertValidPatient(patientRepository.find(HEALTH_ID).get());
     }
+
 
     private void assertValidPatient(Patient patient) {
         assertThat(patient, is(notNullValue()));
@@ -60,9 +95,22 @@ public class EncounterServiceIntegrationTest {
         assertThat(address.getDivision(), is("10"));
     }
 
+    private EncounterBundle invalidReferenceTermEncounter(String healthId) {
+        EncounterBundle encounterBundle = new EncounterBundle();
+        encounterBundle.setHealthId(healthId);
+        encounterBundle.setContent(asString("jsons/invalid_ref_encounter.json"));
+        return encounterBundle;
+    }
+    private EncounterBundle invalidConceptEncounter(String healthId) {
+        EncounterBundle encounterBundle = new EncounterBundle();
+        encounterBundle.setHealthId(healthId);
+        encounterBundle.setContent(asString("jsons/invalid_concept_encounter.json"));
+        return encounterBundle;
+    }
 
-    private EncounterBundle encounter(String healthId) {
+    private EncounterBundle validEncounter(String healthId) {
         EncounterBundle encounter = new EncounterBundle();
+        encounter.setContent(asString("jsons/encounter.json"));
         encounter.setHealthId(healthId);
         return encounter;
     }

@@ -2,6 +2,9 @@ package org.freeshr.domain.service;
 
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
+import org.freeshr.infrastructure.tr.TerminologyServer;
+import org.hl7.fhir.instance.model.Condition;
+import org.hl7.fhir.instance.model.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -16,14 +19,17 @@ public class EncounterService {
 
     private EncounterRepository encounterRepository;
     private PatientRegistry patientRegistry;
+    private TerminologyServer terminologyServer;
 
     @Autowired
-    public EncounterService(EncounterRepository encounterRepository, PatientRegistry patientRegistry) {
+    public EncounterService(EncounterRepository encounterRepository, PatientRegistry patientRegistry, TerminologyServer terminologyServer) {
         this.encounterRepository = encounterRepository;
         this.patientRegistry = patientRegistry;
+        this.terminologyServer = terminologyServer;
     }
 
     public ListenableFuture<String> ensureCreated(final EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
+        encounterBundle.validate(terminologyServer);
         return new ListenableFutureAdapter<String, Boolean>(patientRegistry.ensurePresent(encounterBundle.getHealthId())) {
             @Override
             protected String adapt(Boolean result) throws ExecutionException {

@@ -2,6 +2,7 @@ package org.freeshr.interfaces.encounter.ws;
 
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.domain.service.EncounterService;
+import org.freeshr.application.fhir.InvalidEncounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,17 +37,21 @@ public class EncounterController {
         logger.debug("Create encounter. " + encounterBundle);
 
         final DeferredResult<String> deferredResult = new DeferredResult<String>();
-        encounterService.ensureCreated(encounterBundle).addCallback(new ListenableFutureCallback<String>() {
-            @Override
-            public void onSuccess(String result) {
-                deferredResult.setResult(result);
-            }
+        try{
+            encounterService.ensureCreated(encounterBundle).addCallback(new ListenableFutureCallback<String>() {
+                @Override
+                public void onSuccess(String result) {
+                    deferredResult.setResult(result);
+                }
 
-            @Override
-            public void onFailure(Throwable error) {
-                deferredResult.setErrorResult(error);
-            }
-        });
+                @Override
+                public void onFailure(Throwable error) {
+                    deferredResult.setErrorResult(error);
+                }
+            });
+        } catch(InvalidEncounter e){
+            deferredResult.setErrorResult(e.getError());
+        }
         return deferredResult;
     }
 

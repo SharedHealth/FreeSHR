@@ -1,9 +1,11 @@
 package org.freeshr.infrastructure.persistence;
 
 import com.google.gson.Gson;
+import org.apache.commons.lang.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
+import org.freeshr.utils.FileUtil;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import static org.apache.commons.lang.StringUtils.deleteWhitespace;
+import static org.freeshr.utils.FileUtil.asString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
@@ -58,13 +62,11 @@ public class EncounterRepositoryTest {
         EncounterBundle bundle = new EncounterBundle();
         bundle.setEncounterId(encounterId);
         bundle.setHealthId(healthId);
-        bundle.setContent(content());
+        bundle.setContent(asString("jsons/encounter.json"));
         return bundle;
     }
 
     private String content() {
-        HashMap<String, Object> content = new HashMap<String, Object>();
-        content.put("blood_group", "a positive");
-        return new Gson().toJson(content);
+        return deleteWhitespace(asString("jsons/encounter.json"));
     }
 }
