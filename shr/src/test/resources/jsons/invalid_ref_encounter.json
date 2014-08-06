@@ -1,0 +1,183 @@
+{
+    "resourceType": "Bundle",
+    "title": "Encounter",
+    "id": "bcf6c340-d04a-4c29-b50c-2552beeee037",
+    "updated": "2014-07-25T16:50:29+05:30",
+    "entry": [
+        {
+            "title": "Composition",
+            "id": "Encounter - dfbc9b30-ceef-473e-9q22-4ee31qfceqdd",
+            "content": {
+                "resourceType": "Composition",
+                "identifier": {
+                    "value": "Encounter - dfbc9b30-ceef-473e-9q22-4ee31qfceqdd"
+                },
+                "date": "2014-07-25T16:50:29+05:30",
+                "status": "final",
+                "encounter": {
+                    "reference": "dfbc9b30-ceef-473e-9q22-4ee31qfceqdd",
+                    "display": "encounter"
+                },
+                "section": [
+                    {
+                        "content": {
+                            "reference": "dfbc9b30-ceef-473e-9q22-4ee31qfceqdd",
+                            "display": "Encounter"
+                        }
+                    },
+                    {
+                        "content": {
+                            "reference": "87156002-70f4-48d8-8335-f76028587add",
+                            "display": "Complaint"
+                        }
+                    },
+                    {
+                        "content": {
+                            "reference": "5f982a33-4454-4b74-9236-b8157aa8effd",
+                            "display": "Diagnosis"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "title": "Encounter",
+            "id": "dfbc9b30-ceef-473e-9q22-4ee31qfceqdd",
+            "content": {
+                "resourceType": "Encounter",
+                "identifier": [
+                    {
+                        "value": "dfbc9b30-ceef-473e-9q22-4ee31qfceqdd"
+                    }
+                ],
+                "status": "finished",
+                "class": "outpatient",
+                "type": [
+                    {
+                        "text": "OPD"
+                    }
+                ],
+                "subject": {
+                    "reference": "5893922485019082753"
+                },
+                "participant": [
+                    {
+                        "individual": {
+                            "reference": "7e2bd1c6-2370-418c-b2f7-1e46febc4ee0"
+                        }
+                    }
+                ],
+                "indication": {
+                    "reference": "dfbc9b30-ceef-473e-9q22-4ee31qfceqdd",
+                    "display": "encounter"
+                },
+                "serviceProvider": {
+                    "reference": "Bahmni"
+                }
+            }
+        },
+        {
+            "title": "Complaint",
+            "id": "87156002-70f4-48d8-8335-f76028587add",
+            "content": {
+                "resourceType": "Condition",
+                "identifier": [
+                    {
+                        "value": "87156002-70f4-48d8-8335-f76028587add"
+                    }
+                ],
+                "subject": {
+                    "reference": "5893922485019082753"
+                },
+                "encounter": {
+                    "reference": "dfbc9b30-ceef-473e-9q22-4ee31qfceqdd",
+                    "display": "encounter"
+                },
+                "asserter": {
+                    "reference": "7e2bd1c6-2370-418c-b2f7-1e46febc4ee0"
+                },
+                "dateAsserted": "2014-07-25T17:07:14+05:30",
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://192.168.33.18:8080/openmrs/ws/rest/v1/concept/63f1fe5e-1944-457e-bd3d-d6bf44028e66",
+                            "code": "63f1fe5e-1944-457e-bd3d-d6bf44028e66",
+                            "display": "headache"
+                        }
+                    ]
+                },
+                "category": {
+                    "coding": [
+                        {
+                            "system": "http://hl7.org/fhir/vs/condition-category",
+                            "code": "Complaint",
+                            "display": "Complaint"
+                        }
+                    ]
+                },
+                "status": "confirmed",
+                "severity": {
+                    "coding": [
+                        {
+                            "system": "http://hl7.org/fhir/vs/condition-severity",
+                            "code": "6736007",
+                            "display": "Moderate"
+                        }
+                    ]
+                },
+                "onsetDateTime": "2014-07-05T17:07:14+05:30"
+            }
+        },
+        {
+            "title": "Diagnosis",
+            "id": "5f982a33-4454-4b74-9236-b8157aa8effd",
+            "content": {
+                "resourceType": "Condition",
+                "identifier": [
+                    {
+                        "value": "5f982a33-4454-4b74-9236-b8157aa8effd"
+                    }
+                ],
+                "subject": {
+                    "reference": "5893922485019082753"
+                },
+                "encounter": {
+                    "reference": "dfbc9b30-ceef-473e-9q22-4ee31qfceqdd",
+                    "display": "encounter"
+                },
+                "asserter": {
+                    "reference": "7e2bd1c6-2370-418c-b2f7-1e46febc4ee0"
+                },
+                "dateAsserted": "2014-07-25T16:51:37+05:30",
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://localhost:9997/openmrs/ws/rest/v1/conceptreferenceterm/fa460ea6-04c7-45af-a6fa-5072e7caed40",
+                            "code": "J19.314247",
+                            "display": "Viral pneumonia 314247"
+                        }
+                    ]
+                },
+                "category": {
+                    "coding": [
+                        {
+                            "system": "http://hl7.org/fhir/vs/condition-category",
+                            "code": "Diagnosis",
+                            "display": "Diagnosis"
+                        }
+                    ]
+                },
+                "status": "confirmed",
+                "severity": {
+                    "coding": [
+                        {
+                            "system": "Moderate",
+                            "code": "6736007",
+                            "display": "http://hl7.org/fhir/vs/condition-severity"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

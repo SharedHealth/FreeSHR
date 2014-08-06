@@ -1,7 +1,13 @@
 package org.freeshr.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang.StringUtils.split;
 
 public class CollectionUtils {
 
@@ -13,7 +19,98 @@ public class CollectionUtils {
         return result;
     }
 
+
+    public static <I, O> O reduce(I[] xs, O acc, ReduceFn<I, O> fn) {
+        return reduce(toList(xs), acc, fn);
+    }
+
+    public static <I, O> O reduce(List<I> xs, O acc, ReduceFn<I, O> fn) {
+        O result = acc;
+        for (I x : xs) {
+            if (x != null) {
+                result = fn.call(x, result);
+            }
+        }
+        return result;
+    }
+
+    public static <I> List<I> toList(I... xs) {
+        if (isNotEmpty(xs)) {
+            return Arrays.asList(xs);
+        }
+        return Collections.emptyList();
+    }
+
+    private static <I> boolean isNotEmpty(I[] xs) {
+        return xs != null && xs.length > 0;
+    }
+
+    public static <I> List<I> filter(List<I> xs, Fn<I, Boolean> fn) {
+        List<I> result = new ArrayList<I>();
+        for (I x : xs) {
+            if (fn.call(x)) {
+                result.add(x);
+            }
+        }
+        return result;
+    }
+
+    public static <I> boolean isNotEmpty(List<I> xs) {
+        return xs != null && xs.size() > 0;
+    }
+
+    public static <I> I first(List<I> xs) {
+        return isNotEmpty(xs) ? xs.get(0) : null;
+    }
+
+    public static <I> boolean isEvery(List<I> xs, Fn<I, Boolean> fn){
+        for (I x : xs){
+            if (!fn.call(x)){
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static interface Fn<I, O> {
         O call(I input);
     }
+
+    public static interface ReduceFn<I, O> {
+        O call(I input, O acc);
+    }
+
+    public static class And<I> implements Fn<I, Boolean> {
+
+        private final Fn<I, Boolean> fn1;
+        private final Fn<I, Boolean> fn2;
+
+        public And(Fn<I, Boolean> fn1, Fn<I, Boolean> fn2) {
+            this.fn1 = fn1;
+            this.fn2 = fn2;
+        }
+
+        @Override
+        public Boolean call(I input) {
+            return fn1.call(input) && fn2.call(input);
+        }
+    }
+
+    public static Object fetch(Map map, String path) {
+        return reduce(split(path, "."), map, new ReduceFn<String, Object>() {
+            @Override
+            public Object call(String input, Object acc) {
+                if (acc == null) {
+                    return EMPTY;
+                }
+                if (acc instanceof Map) {
+                    Map map = (Map) acc;
+                    return map.containsKey(input) ? map.get(input) : null;
+                }
+                return acc;
+            }
+        });
+
+    }
+
 }

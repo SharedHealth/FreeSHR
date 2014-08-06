@@ -14,6 +14,10 @@ public class SHRProperties {
     private String mciUser;
     @Value("${MCI_PASSWORD}")
     private String mciPassword;
+    @Value("${TR_USER}")
+    private String trUser;
+    @Value("${TR_PASSWORD}")
+    private String trPassword;
 
     @Value("${CASSANDRA_KEYSPACE}")
     private String cassandraKeySpace;
@@ -56,5 +60,13 @@ public class SHRProperties {
 
     public String getMciPassword() {
         return mciPassword;
+    }
+
+    public String getTrUser() {
+        return trUser;
+    }
+
+    public String getTrPassword() {
+        return trPassword;
     }
 }

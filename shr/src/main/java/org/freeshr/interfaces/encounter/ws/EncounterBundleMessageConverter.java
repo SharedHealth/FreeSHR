@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.freeshr.application.fhir.EncounterBundle;
+import org.freeshr.application.fhir.EncounterContent;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -36,7 +37,7 @@ public class EncounterBundleMessageConverter extends AbstractHttpMessageConverte
 
     EncounterBundle createEncounterBundle(HttpInputMessage inputMessage) throws IOException {
         EncounterBundle encounterBundle = new EncounterBundle();
-        encounterBundle.setContent(IOUtils.toString(inputMessage.getBody()));
+        encounterBundle.setContent(new EncounterContent(IOUtils.toString(inputMessage.getBody())));
         return encounterBundle;
     }
 

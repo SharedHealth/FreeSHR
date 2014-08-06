@@ -1,9 +1,11 @@
 package org.freeshr.utils.concurrent;
 
 import com.google.common.util.concurrent.MoreExecutors;
+import org.springframework.util.concurrent.FailureCallback;
 import org.springframework.util.concurrent.FutureAdapter;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
+import org.springframework.util.concurrent.SuccessCallback;
 
 import java.util.concurrent.ExecutionException;
 
@@ -21,18 +23,25 @@ public abstract class SimpleListenableFuture<T, S> extends FutureAdapter<T, S> i
 
     @Override
     public void addCallback(final ListenableFutureCallback<? super T> callback) {
+        addCallback(callback, callback);
+    }
+
+    @Override
+    public void addCallback(final SuccessCallback<? super T> successCallback, final FailureCallback failureCallback) {
         final com.google.common.util.concurrent.ListenableFuture adaptee = (com.google.common.util.concurrent.ListenableFuture) getAdaptee();
         adaptee.addListener(new Runnable() {
             @Override
             public void run() {
                 try {
-                    callback.onSuccess(get());
+                    successCallback.onSuccess(get());
                 } catch (InterruptedException e) {
-                    callback.onFailure(e);
+                    failureCallback.onFailure(e);
                 } catch (ExecutionException e) {
-                    callback.onFailure(e);
+                    failureCallback.onFailure(e);
                 }
             }
         }, MoreExecutors.sameThreadExecutor());
     }
+
+
 }

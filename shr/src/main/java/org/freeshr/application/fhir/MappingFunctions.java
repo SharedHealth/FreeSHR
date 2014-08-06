@@ -1,0 +1,45 @@
+package org.freeshr.application.fhir;
+
+
+import org.hl7.fhir.instance.model.AtomEntry;
+import org.hl7.fhir.instance.model.Coding;
+import org.hl7.fhir.instance.model.Condition;
+import org.hl7.fhir.instance.model.Resource;
+
+import java.util.List;
+
+import static org.freeshr.utils.CollectionUtils.Fn;
+import static org.freeshr.utils.CollectionUtils.isEvery;
+import static org.freeshr.utils.CollectionUtils.isNotEmpty;
+
+public class MappingFunctions {
+
+    public static final Fn<Condition, Boolean> isDiagnosis = new Fn<Condition, Boolean>() {
+        @Override
+        public Boolean call(Condition resource) {
+            List<Coding> coding = resource.getCategory().getCoding();
+
+            return isNotEmpty(coding) && isEvery(coding, new Fn<Coding, Boolean>() {
+                @Override
+                public Boolean call(Coding input) {
+                    return input.getCodeSimple().equals("Diagnosis");
+                }
+            });
+        }
+    };
+
+    public static final Fn<Resource, Boolean> isCondition = new Fn<Resource, Boolean>() {
+        @Override
+        public Boolean call(Resource resource) {
+            return resource instanceof Condition;
+        }
+    };
+
+    public static final Fn<AtomEntry<? extends Resource>, Resource> toResource = new Fn<AtomEntry<? extends Resource>, Resource>() {
+        @Override
+        public Resource call(AtomEntry<? extends Resource> input) {
+            return input.getResource();
+        }
+    };
+
+}
