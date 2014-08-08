@@ -1,11 +1,8 @@
 package org.freeshr.infrastructure.persistence;
 
-import com.google.gson.Gson;
-import org.apache.commons.lang.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
-import org.freeshr.utils.FileUtil;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,7 +12,6 @@ import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -49,7 +45,7 @@ public class EncounterRepositoryTest {
 
         assertEquals(3, encounters.size());
         assertThat(encounter.getDate(), is(notNullValue()));
-        assertThat(encounter.getContent().toString(), is(content()));
+        assertThat(encounter.getEncounterContent().toString(), is(content()));
     }
 
 
@@ -62,11 +58,11 @@ public class EncounterRepositoryTest {
         EncounterBundle bundle = new EncounterBundle();
         bundle.setEncounterId(encounterId);
         bundle.setHealthId(healthId);
-        bundle.setContent(asString("jsons/encounter.json"));
+        bundle.setEncounterContent(asString("jsons/encounters/valid.json"));
         return bundle;
     }
 
     private String content() {
-        return deleteWhitespace(asString("jsons/encounter.json"));
+        return deleteWhitespace(asString("jsons/encounters/valid.json"));
     }
 }

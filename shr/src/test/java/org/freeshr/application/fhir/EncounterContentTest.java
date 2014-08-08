@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 
 public class EncounterContentTest {
 
-    private static final String encounterJson = FileUtil.asString("jsons/encounter.json");
+    private static final String encounterJson = FileUtil.asString("jsons/encounters/valid.json");
 
     @Test
     public void shouldIdentifyDiagnosis() throws Exception {

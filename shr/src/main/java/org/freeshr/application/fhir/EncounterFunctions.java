@@ -1,6 +1,7 @@
 package org.freeshr.application.fhir;
 
 
+import org.apache.commons.lang.StringUtils;
 import org.hl7.fhir.instance.model.AtomEntry;
 import org.hl7.fhir.instance.model.Coding;
 import org.hl7.fhir.instance.model.Condition;
@@ -12,7 +13,7 @@ import static org.freeshr.utils.CollectionUtils.Fn;
 import static org.freeshr.utils.CollectionUtils.isEvery;
 import static org.freeshr.utils.CollectionUtils.isNotEmpty;
 
-public class MappingFunctions {
+public class EncounterFunctions {
 
     public static final Fn<Condition, Boolean> isDiagnosis = new Fn<Condition, Boolean>() {
         @Override
@@ -25,6 +26,13 @@ public class MappingFunctions {
                     return input.getCodeSimple().equals("Diagnosis");
                 }
             });
+        }
+    };
+
+    public static final Fn<Coding, Boolean> hasSystem = new Fn<Coding, Boolean>() {
+        @Override
+        public Boolean call(Coding coding) {
+            return coding.getSystem() != null && StringUtils.isNotEmpty(coding.getSystem().getValue());
         }
     };
 

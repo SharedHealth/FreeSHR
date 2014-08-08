@@ -1,0 +1,62 @@
+{
+    "resourceType": "Bundle",
+    "title": "Encounter",
+    "id": "bcf6c340-d04a-4c29-b50c-2552beeee037",
+    "updated": "2014-07-25T16:50:29+05:30",
+    "entry": [
+        {
+            "title": "Diagnosis",
+            "id": "5f982a33-4454-4b74-9236-b8157aa8effd",
+            "content": {
+                "resourceType": "Condition",
+                "identifier": [
+                    {
+                        "value": "5f982a33-4454-4b74-9236-b8157aa8effd"
+                    }
+                ],
+                "subject": {
+                    "reference": "5893922485019082753"
+                },
+                "encounter": {
+                    "reference": "dfbc9b30-ceef-473e-9q22-4ee31qfceqdd",
+                    "display": "encounter"
+                },
+                "asserter": {
+                    "reference": "7e2bd1c6-2370-418c-b2f7-1e46febc4ee0"
+                },
+                "dateAsserted": "2014-07-25T16:51:37+05:30",
+                "code": {
+                    "coding": [
+                        {
+                            "code": "ICD10-BD-A",
+                            "display": "Viral pneumonia 314247"
+                        },
+                        {
+                            "code": "ICD10-BD-B",
+                            "display": "Viral pneumonia"
+                        }
+                    ]
+                },
+                "category": {
+                    "coding": [
+                        {
+                            "system": "http://hl7.org/fhir/vs/condition-category",
+                            "code": "Diagnosis",
+                            "display": "Diagnosis"
+                        }
+                    ]
+                },
+                "status": "confirmed",
+                "severity": {
+                    "coding": [
+                        {
+                            "system": "Moderate",
+                            "code": "6736007",
+                            "display": "http://hl7.org/fhir/vs/condition-severity"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

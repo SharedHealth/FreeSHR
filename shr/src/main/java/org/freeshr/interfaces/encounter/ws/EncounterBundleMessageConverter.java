@@ -37,7 +37,7 @@ public class EncounterBundleMessageConverter extends AbstractHttpMessageConverte
 
     EncounterBundle createEncounterBundle(HttpInputMessage inputMessage) throws IOException {
         EncounterBundle encounterBundle = new EncounterBundle();
-        encounterBundle.setContent(new EncounterContent(IOUtils.toString(inputMessage.getBody())));
+        encounterBundle.setEncounterContent(IOUtils.toString(inputMessage.getBody()));
         return encounterBundle;
     }
 

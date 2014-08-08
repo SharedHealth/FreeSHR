@@ -1,7 +1,6 @@
 package org.freeshr.domain.service;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.InvalidEncounter;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
@@ -20,6 +19,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.givenThat;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.freeshr.data.EncounterBundleData.withInvalidConcept;
+import static org.freeshr.data.EncounterBundleData.withInvalidReferenceTerm;
+import static org.freeshr.data.EncounterBundleData.withValidEncounter;
 import static org.freeshr.utils.FileUtil.asString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -47,7 +49,7 @@ public class EncounterServiceIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/patient.json"))));
 
-        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/conceptreferenceterm/fa460ea6-04c7-45af-a6fa-5072e7caed40"))
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/referenceterms/fa460ea6-04c7-45af-a6fa-5072e7caed40"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
@@ -62,12 +64,12 @@ public class EncounterServiceIntegrationTest {
 
     @Test(expected = InvalidEncounter.class)
     public void shouldRejectEncounterWithInvalidReferenceCode() throws Exception {
-        encounterService.ensureCreated(invalidReferenceTermEncounter("5dd24827-fd5d-4024-9f65-5a3c88a28af5")).get();
+        encounterService.ensureCreated(withInvalidReferenceTerm("5dd24827-fd5d-4024-9f65-5a3c88a28af5")).get();
     }
 
     @Test(expected = InvalidEncounter.class)
     public void shouldRejectEncounterWithInvalidConceptCode() throws Exception {
-        encounterService.ensureCreated(invalidConceptEncounter("5dd24827-fd5d-4024-9f65-5a3c88a28af5")).get();
+        encounterService.ensureCreated(withInvalidConcept("5dd24827-fd5d-4024-9f65-5a3c88a28af5")).get();
     }
 
     @Test
@@ -78,7 +80,7 @@ public class EncounterServiceIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/patient.json"))));
 
-        String encounterId = encounterService.ensureCreated(validEncounter(HEALTH_ID)).get();
+        String encounterId = encounterService.ensureCreated(withValidEncounter(HEALTH_ID)).get();
 
         assertThat(encounterId, is(notNullValue()));
         assertValidPatient(patientRepository.find(HEALTH_ID).get());
@@ -95,23 +97,4 @@ public class EncounterServiceIntegrationTest {
         assertThat(address.getDivision(), is("10"));
     }
 
-    private EncounterBundle invalidReferenceTermEncounter(String healthId) {
-        EncounterBundle encounterBundle = new EncounterBundle();
-        encounterBundle.setHealthId(healthId);
-        encounterBundle.setContent(asString("jsons/invalid_ref_encounter.json"));
-        return encounterBundle;
-    }
-    private EncounterBundle invalidConceptEncounter(String healthId) {
-        EncounterBundle encounterBundle = new EncounterBundle();
-        encounterBundle.setHealthId(healthId);
-        encounterBundle.setContent(asString("jsons/invalid_concept_encounter.json"));
-        return encounterBundle;
-    }
-
-    private EncounterBundle validEncounter(String healthId) {
-        EncounterBundle encounter = new EncounterBundle();
-        encounter.setContent(asString("jsons/encounter.json"));
-        encounter.setHealthId(healthId);
-        return encounter;
-    }
 }

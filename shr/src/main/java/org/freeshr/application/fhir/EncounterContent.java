@@ -9,11 +9,12 @@ import java.io.ByteArrayInputStream;
 import java.util.List;
 
 import static org.apache.commons.lang.StringUtils.deleteWhitespace;
-import static org.freeshr.application.fhir.MappingFunctions.isDiagnosis;
-import static org.freeshr.application.fhir.MappingFunctions.toResource;
+import static org.freeshr.application.fhir.EncounterFunctions.isDiagnosis;
+import static org.freeshr.application.fhir.EncounterFunctions.toResource;
 import static org.freeshr.utils.CollectionUtils.Fn;
 import static org.freeshr.utils.CollectionUtils.filter;
 import static org.freeshr.utils.CollectionUtils.map;
+
 
 public class EncounterContent {
     private final String json;
@@ -39,7 +40,7 @@ public class EncounterContent {
     }
 
     public List<Condition> conditions() {
-        return map(filter(resources(), MappingFunctions.isCondition), new Fn<Resource, Condition>() {
+        return map(filter(resources(), EncounterFunctions.isCondition), new Fn<Resource, Condition>() {
             public Condition call(Resource input) {
                 return (Condition) input;
             }
