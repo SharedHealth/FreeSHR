@@ -1,5 +1,6 @@
 package org.freeshr.infrastructure.tr;
 
+import org.freeshr.application.fhir.InvalidEncounter;
 import org.freeshr.config.SHRProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,6 +20,9 @@ import static org.freeshr.utils.HttpUtil.basicAuthHeaders;
 
 @Component
 public class TerminologyServer {
+
+    private static final String REF_TERM_PATTERN = "/openmrs/ws/rest/v1/tr/referenceterms/";
+    private static final String CONCEPT_PATTERN = "/openmrs/ws/rest/v1/tr/concepts/";
 
     private final AsyncRestTemplate shrRestTemplate;
     private SHRProperties shrProperties;
@@ -56,7 +60,7 @@ public class TerminologyServer {
     }
 
     public ListenableFuture<Boolean> isValidReferenceTerm(String uri, final String code) {
-        return hasCode(uri, "conceptSource.hl7Code", code);
+        return hasCode(uri, "code", code);
     }
 
     public ListenableFuture<Boolean> isValidConcept(String uri, final String code) {
@@ -64,6 +68,9 @@ public class TerminologyServer {
     }
 
     public ListenableFuture<Boolean> isValid(String uri, String code) {
-        return uri.contains("/conceptreferenceterm/") ? isValidReferenceTerm(uri, code) : isValidConcept(uri, code);
+        if (!uri.contains(REF_TERM_PATTERN) && !uri.contains(CONCEPT_PATTERN)) {
+            throw InvalidEncounter.INVALID_SYSTEM_URI;
+        }
+        return uri.contains(REF_TERM_PATTERN) ? isValidReferenceTerm(uri, code) : isValidConcept(uri, code);
     }
 }

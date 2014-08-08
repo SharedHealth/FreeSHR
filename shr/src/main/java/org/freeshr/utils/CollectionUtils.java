@@ -55,8 +55,21 @@ public class CollectionUtils {
         return result;
     }
 
+    public static <I> I find(List<I> xs, Fn<I, Boolean> fn){
+        for (I x : xs){
+            if (fn.call(x)){
+                return x;
+            }
+        }
+        return null;
+    }
+
     public static <I> boolean isNotEmpty(List<I> xs) {
         return xs != null && xs.size() > 0;
+    }
+
+    public static <I> boolean isEmpty(List<I> xs) {
+        return xs == null || xs.size() == 0;
     }
 
     public static <I> I first(List<I> xs) {
@@ -71,6 +84,26 @@ public class CollectionUtils {
         }
         return true;
     }
+
+    public static <I> Fn<I, Boolean> not(final Fn<I, Boolean> fn){
+        return new Fn<I, Boolean>(){
+            @Override
+            public Boolean call(I input) {
+                return !fn.call(input);
+            }
+        };
+    }
+
+    public static <I> boolean isAny(List<I> xs, Fn<I, Boolean> fn){
+        for (I x : xs){
+            if (fn.call(x)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 
     public static interface Fn<I, O> {
         O call(I input);

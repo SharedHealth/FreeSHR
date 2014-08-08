@@ -152,7 +152,7 @@
                 "code": {
                     "coding": [
                         {
-                            "system": "http://localhost:9997/openmrs/ws/rest/v1/conceptreferenceterm/fa460ea6-04c7-45af-a6fa-5072e7caed40",
+                            "system": "http://localhost:9997/openmrs/ws/rest/v1/tr/referenceterms/fa460ea6-04c7-45af-a6fa-5072e7caed40",
                             "code": "J19.314247",
                             "display": "Viral pneumonia 314247"
                         }

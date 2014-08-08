@@ -29,6 +29,6 @@ public class EncounterBundleMessageConverterTest {
         Assert.assertNull(bundle.getHealthId());
         Assert.assertNull(bundle.getDate());
         String expectedContent = StringUtils.deleteWhitespace(FileUtils.readFileToString(new File(resource.getPath())).replaceAll("\\n", ""));
-        Assert.assertEquals(expectedContent, bundle.getContent().toString());
+        Assert.assertEquals(expectedContent, bundle.getEncounterContent().toString());
     }
 }

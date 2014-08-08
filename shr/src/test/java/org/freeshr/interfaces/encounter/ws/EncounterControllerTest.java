@@ -40,7 +40,7 @@ public class EncounterControllerTest {
     public void shouldSaveEncounter() throws Exception {
         mockMvc.perform(post("/patients/hid-1/encounters")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asString("jsons/encounter.json")))
+                .content(asString("jsons/valid.json")))
                 .andExpect(status().isOk());
 
     }

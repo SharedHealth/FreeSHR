@@ -33,7 +33,7 @@ public class EncounterRepository {
                 + encounterBundle.getEncounterId() + "','"
                 + encounterBundle.getHealthId() + "','"
                 + getCurrentTime() + "','"
-                + encounterBundle.getContent()
+                + encounterBundle.getEncounterContent()
                 + "');");
     }
 
@@ -48,7 +48,7 @@ public class EncounterRepository {
                     bundle.setEncounterId(result.getString("encounter_id"));
                     bundle.setHealthId(result.getString("health_id"));
                     bundle.setDate(result.getString("date"));
-                    bundle.setContent(result.getString("content"));
+                    bundle.setEncounterContent(result.getString("content"));
                     bundles.add(bundle);
                 }
                 return bundles;

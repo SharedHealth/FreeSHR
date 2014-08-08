@@ -1,21 +1,35 @@
 package org.freeshr.application.fhir;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.freeshr.infrastructure.tr.TerminologyServer;
+import org.freeshr.utils.CollectionUtils;
 import org.hl7.fhir.instance.model.Coding;
 import org.hl7.fhir.instance.model.Condition;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
-import static org.freeshr.application.fhir.InvalidEncounter.INVALID_DIAGNOSIS;
+import static org.freeshr.application.fhir.EncounterFunctions.hasSystem;
+import static org.freeshr.application.fhir.InvalidEncounter.DIAGNOSIS_SHOULD_HAVE_SYSTEM;
+import static org.freeshr.application.fhir.InvalidEncounter.SYSTEM_ERROR;
+import static org.freeshr.utils.CollectionUtils.filter;
+import static org.freeshr.utils.CollectionUtils.find;
+import static org.freeshr.utils.CollectionUtils.isEmpty;
+import static org.freeshr.utils.CollectionUtils.not;
+import static org.freeshr.utils.Lambda.throwIf;
 
 public class EncounterBundle {
 
     private String encounterId;
     private String healthId;
     private String date;
-    private EncounterContent content;
+    @JsonIgnore
+    private EncounterContent encounterContent;
 
     public String getEncounterId() {
         return encounterId;
@@ -41,16 +55,21 @@ public class EncounterBundle {
         this.date = date;
     }
 
-    public EncounterContent getContent() {
-        return content;
+    public EncounterContent getEncounterContent() {
+        return encounterContent;
     }
 
-    public void setContent(EncounterContent content) {
-        this.content = content;
+    public void setEncounterContent(String content) {
+        this.encounterContent = new EncounterContent(content);
     }
 
-    public void setContent(String content) {
-        this.content = new EncounterContent(content);
+    @JsonProperty("content")
+    public JsonNode getContent() {
+        try {
+            return new ObjectMapper().readTree(this.encounterContent.toString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -59,24 +78,37 @@ public class EncounterBundle {
         sb.append("encounterId='").append(encounterId).append('\'');
         sb.append(", healthId='").append(healthId).append('\'');
         sb.append(", date='").append(date).append('\'');
-        //sb.append(", content='").append(content).append('\'');
+        sb.append(", encounterContent='").append(encounterContent.toString()).append('\'');
         sb.append('}');
         return sb.toString();
     }
 
-    public void validate(TerminologyServer terminologyServer) throws ExecutionException, InterruptedException {
-        for (Condition condition : content.allDiagnosis()) {
+    public void validate(TerminologyServer terminologyServer) {
+        for (Condition condition : encounterContent.allDiagnosis()) {
             validateDiagnosis(condition, terminologyServer);
         }
     }
 
-    public void validateDiagnosis(Condition condition, TerminologyServer terminologyServer) throws ExecutionException, InterruptedException {
-        for (Coding coding : condition.getCode().getCoding()) {
-            if (coding.getSystem() != null
-                    && isNotEmpty(coding.getSystem().getValue())
-                    && !terminologyServer.isValid(coding.getSystem().getValue(), coding.getCodeSimple()).get()) {
-                throw INVALID_DIAGNOSIS;
-            }
+    private void validateDiagnosis(Condition condition, final TerminologyServer terminologyServer) {
+        List<Coding> codings = filter(condition.getCode().getCoding(), hasSystem);
+        throwIf(isEmpty(codings), DIAGNOSIS_SHOULD_HAVE_SYSTEM);
+        Coding coding = find(codings, not(isValid(terminologyServer)));
+        if (coding != null){
+            throw InvalidEncounter.invalidDiagnosis(coding.getCodeSimple());
         }
+    }
+
+    private CollectionUtils.Fn<Coding, Boolean> isValid(final TerminologyServer terminologyServer) {
+        return new CollectionUtils.Fn<Coding, Boolean>() {
+            public Boolean call(Coding coding) {
+                try {
+                   return terminologyServer.isValid(coding.getSystem().getValue(), coding.getCodeSimple()).get();
+                } catch (InterruptedException e) {
+                    throw SYSTEM_ERROR;
+                } catch (ExecutionException e) {
+                    throw SYSTEM_ERROR;
+                }
+            }
+        };
     }
 }
