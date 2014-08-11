@@ -1,10 +1,10 @@
-#Vagrant directories
+#Vagrant dirs
 .vagrant/
 
-#Gradle directories
+#Gradle dirs
 .gradle/
 
-#Idea directories
+#Idea dirs
 .idea/
 *.iml
 *.ipr
