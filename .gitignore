@@ -15,6 +15,7 @@ build/
 out/
 classes
 target
+node_modules
 
 #Logs
 nohup.out

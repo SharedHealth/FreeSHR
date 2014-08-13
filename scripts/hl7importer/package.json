@@ -1,0 +1,19 @@
+{
+  "name": "hl7importer",
+  "version": "0.0.0",
+  "description": "Imports terminologies from HL7",
+  "main": "hl7import.js",
+  "dependencies": {
+    "simplecrawler": "~0.3.9",
+    "underscore": "~1.6.0",
+    "underscore.string": "~2.3.3",
+    "htmlparser": "~1.7.7",
+    "cheerio": "~0.17.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
