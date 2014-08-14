@@ -7,16 +7,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.freeshr.infrastructure.tr.TerminologyServer;
 import org.freeshr.utils.CollectionUtils;
+import org.hl7.fhir.instance.model.CodeableConcept;
 import org.hl7.fhir.instance.model.Coding;
 import org.hl7.fhir.instance.model.Condition;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static org.freeshr.application.fhir.EncounterFunctions.hasSystem;
-import static org.freeshr.application.fhir.InvalidEncounter.DIAGNOSIS_SHOULD_HAVE_SYSTEM;
-import static org.freeshr.application.fhir.InvalidEncounter.SYSTEM_ERROR;
+import static org.freeshr.application.fhir.InvalidEncounter.invalidDiagnosis;
+import static org.freeshr.application.fhir.InvalidEncounter.missingSystem;
 import static org.freeshr.utils.CollectionUtils.filter;
 import static org.freeshr.utils.CollectionUtils.find;
 import static org.freeshr.utils.CollectionUtils.isEmpty;
@@ -89,12 +89,17 @@ public class EncounterBundle {
         }
     }
 
-    private void validateDiagnosis(Condition condition, final TerminologyServer terminologyServer) {
-        List<Coding> codings = filter(condition.getCode().getCoding(), hasSystem);
-        throwIf(isEmpty(codings), DIAGNOSIS_SHOULD_HAVE_SYSTEM);
-        Coding coding = find(codings, not(isValid(terminologyServer)));
-        if (coding != null){
-            throw InvalidEncounter.invalidDiagnosis(coding.getCodeSimple());
+    private void validateDiagnosis(Condition diagnosis, final TerminologyServer terminologyServer) {
+        validateCode(diagnosis.getCode(), terminologyServer);
+        validateCode(diagnosis.getCategory(), terminologyServer);
+    }
+
+    private void validateCode(CodeableConcept concept, TerminologyServer terminologyServer) {
+        throwIf(isEmpty(filter(concept.getCoding(), hasSystem)), missingSystem(concept.getTextSimple()));
+
+        Coding invalidCategoryCode = find(concept.getCoding(), not(isValid(terminologyServer)));
+        if (invalidCategoryCode != null) {
+            throw invalidDiagnosis(invalidCategoryCode.getCodeSimple());
         }
     }
 
@@ -102,11 +107,11 @@ public class EncounterBundle {
         return new CollectionUtils.Fn<Coding, Boolean>() {
             public Boolean call(Coding coding) {
                 try {
-                   return terminologyServer.isValid(coding.getSystem().getValue(), coding.getCodeSimple()).get();
+                    return terminologyServer.isValid(coding.getSystem().getValue(), coding.getCodeSimple()).get();
                 } catch (InterruptedException e) {
-                    throw SYSTEM_ERROR;
+                    throw InvalidEncounter.systemError();
                 } catch (ExecutionException e) {
-                    throw SYSTEM_ERROR;
+                    throw InvalidEncounter.systemError();
                 }
             }
         };

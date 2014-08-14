@@ -31,12 +31,15 @@ public class EncounterBundleData {
         return encounter(healthId, asString("jsons/encounters/invalid_multiple_ref.json"));
     }
 
+    public static EncounterBundle withInvalidDiagnosisCategory(String healthId) {
+        return encounter(healthId, asString("jsons/encounters/invalid_diagnosis_category.json"));
+    }
+
+
     private static EncounterBundle encounter(String healthId, String content) {
         EncounterBundle encounter = new EncounterBundle();
         encounter.setEncounterContent(content);
         encounter.setHealthId(healthId);
         return encounter;
     }
-
-
 }

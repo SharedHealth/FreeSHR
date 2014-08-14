@@ -5,7 +5,9 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.util.Arrays.asList;
 import static org.freeshr.utils.CollectionUtils.fetch;
+import static org.freeshr.utils.CollectionUtils.toSet;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
@@ -22,5 +24,11 @@ public class CollectionUtilsTest {
         assertThat(fetch(amap, "a.b.c").toString(), is("test"));
     }
 
+    @Test
+    public void shouldConvertCommaSeparetedStringToSet() throws Exception {
+        assertTrue(toSet("sun, moon, star", ",").containsAll(asList("sun", "moon", "star")));
+        assertTrue(toSet("", ",").isEmpty());
+        assertTrue(toSet(null, ",").isEmpty());
+    }
 
 }
