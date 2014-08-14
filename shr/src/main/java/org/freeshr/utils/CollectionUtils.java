@@ -1,13 +1,21 @@
 package org.freeshr.utils;
 
+
+import org.apache.commons.lang.*;
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang.StringUtils.split;
+import static org.apache.commons.lang.StringUtils.strip;
 
 public class CollectionUtils {
 
@@ -19,6 +27,13 @@ public class CollectionUtils {
         return result;
     }
 
+    public static <I, O> Set<O> mapToSet(I[] xs, Fn<I, O> fn){
+        Set<O> result = new HashSet<O>();
+        for (I input : xs){
+            result.add(fn.call(input));
+        }
+        return result;
+    }
 
     public static <I, O> O reduce(I[] xs, O acc, ReduceFn<I, O> fn) {
         return reduce(toList(xs), acc, fn);
@@ -144,6 +159,14 @@ public class CollectionUtils {
             }
         });
 
+    }
+
+    public static Set<String> toSet(String str, String seperator) {
+        return mapToSet(split(defaultIfEmpty(str, EMPTY), seperator), new Fn<String, String>() {
+            public String call(String input) {
+                return strip(input);
+            }
+        });
     }
 
 }
