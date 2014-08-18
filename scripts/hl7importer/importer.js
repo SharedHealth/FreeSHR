@@ -52,6 +52,7 @@ function extractCodes(category, handler) {
 
 
 function handler(category, codes) {
+    category = category.replace(":", "\\:");
     codes && codes.length > 0 ? console.log(category + ' = ' + codes) : null;
 }
 
