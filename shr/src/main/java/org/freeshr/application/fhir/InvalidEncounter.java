@@ -28,4 +28,5 @@ public class InvalidEncounter extends RuntimeException {
         return new InvalidEncounter(new Error("513", "The referencing system path for diagnosis is not valid"));
     }
 
+
 }
