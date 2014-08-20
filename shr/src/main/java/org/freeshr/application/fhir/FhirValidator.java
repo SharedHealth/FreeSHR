@@ -1,7 +1,8 @@
 package org.freeshr.application.fhir;
 
 
-import org.freeshr.application.model.SchemaDefinitions;
+import org.hl7.fhir.instance.model.ValueSet;
+import org.hl7.fhir.instance.utils.ConceptLocator;
 import org.hl7.fhir.instance.validation.InstanceValidator;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.w3c.dom.Document;
@@ -26,7 +27,27 @@ public class FhirValidator {
     }
 
     private List<ValidationMessage> validateDocument(String definitionsZipPath, String sourceXml) throws Exception {
-        return new InstanceValidator(new SchemaDefinitions(definitionsZipPath).value(), null).validateInstance(document(sourceXml).getDocumentElement());
+        return new InstanceValidator(definitionsZipPath, null, new ConceptLocator() {
+            @Override
+            public ValueSet.ValueSetDefineConceptComponent locate(String system, String code) {
+                return null;
+            }
+
+            @Override
+            public ValidationResult validate(String system, String code, String display) {
+                return null;
+            }
+
+            @Override
+            public boolean verifiesSystem(String system) {
+                return false;
+            }
+
+            @Override
+            public List<ValueSet.ValueSetExpansionContainsComponent> expand(ValueSet.ConceptSetComponent inc) throws Exception {
+                return null;
+            }
+        }).validateInstance(document(sourceXml).getDocumentElement());
     }
 
     private Document document(String sourceXml) throws ParserConfigurationException, SAXException, IOException {

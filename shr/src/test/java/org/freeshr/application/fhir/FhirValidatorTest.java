@@ -8,6 +8,6 @@ public class FhirValidatorTest {
     @Test
     public void shouldValidateEncounter() throws Exception {
         FhirValidator validator = new FhirValidator();
-        validator.validate(FileUtil.asString("xmls/encounter.xml"), "validation.zip");
+        validator.validate(FileUtil.asString("xmls/encounter.xml"), "shr/src/main/resources/validation.zip");
     }
 }
