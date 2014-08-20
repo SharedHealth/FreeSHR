@@ -29,16 +29,10 @@
                     <reference value="7e2bd1c6-2370-418c-b2f7-1e46febc4ee0"/>
                 </asserter>
                 <dateAsserted value="2014-07-25T16:51:37+05:30"/>
-                <code>
-                    <coding>
-                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/referenceterms/fa460ea6-04c7-45af-a6fa-5072e7caed40"/>
-                        <code value="S40"/>
-                    </coding>
-                </code>
                 <category>
                     <coding>
-                        <system value="http://hl7.org/fhir/sid/icd-10"/>
-                        <code value="110003"/>
+                        <system value="http://hl7.org/fhir/condition-category"/>
+                        <code value="diagnosis"/>
                     </coding>
                 </category>
                 <status value="confirmed"/>
