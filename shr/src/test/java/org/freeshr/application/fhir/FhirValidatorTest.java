@@ -5,6 +5,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import java.io.File;
+
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class FhirValidatorTest {
@@ -22,6 +24,6 @@ public class FhirValidatorTest {
 
     @Test
     public void shouldValidateEncounter() throws Exception {
-        validator.validate(FileUtil.asString("xmls/encounter.xml"), "shr/src/main/resources/validation.zip");
+        validator.validate(FileUtil.asString("xmls/encounter.xml"), new File(this.getClass().getClassLoader().getResource("validation.zip").toURI()).getAbsolutePath());
     }
 }

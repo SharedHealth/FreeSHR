@@ -2,7 +2,6 @@ package org.freeshr.infrastructure.tr;
 
 
 import org.freeshr.config.SHRProperties;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +21,6 @@ public class HttpCodeValidator implements CodeValidator {
     private final AsyncRestTemplate shrRestTemplate;
     private SHRProperties shrProperties;
 
-
-    @Autowired
     public HttpCodeValidator(AsyncRestTemplate shrRestTemplate, SHRProperties shrProperties, String path) {
         this.shrRestTemplate = shrRestTemplate;
         this.shrProperties = shrProperties;

@@ -10,15 +10,12 @@ public class CodeValidatorFactory {
 
     private static final String REF_TERM_PATTERN = "/openmrs/ws/rest/v1/tr/referenceterms/";
     private static final String CONCEPT_PATTERN = "/openmrs/ws/rest/v1/tr/concepts/";
-    private static final String HL7_PATTERN = "http://hl7.org/fhir/";
 
-    private CodeValidator hl7Validator;
     private CodeValidator refTermValidator;
     private CodeValidator conceptValidator;
 
     @Autowired
-    public CodeValidatorFactory(AsyncRestTemplate shrRestTemplate, SHRProperties shrProperties, CodeValidator hl7Validator) {
-        this.hl7Validator = hl7Validator;
+    public CodeValidatorFactory(AsyncRestTemplate shrRestTemplate, SHRProperties shrProperties) {
         this.refTermValidator = new HttpCodeValidator(shrRestTemplate, shrProperties, "code");
         this.conceptValidator = new HttpCodeValidator(shrRestTemplate, shrProperties, "uuid");
     }
@@ -30,9 +27,6 @@ public class CodeValidatorFactory {
         }
         if (url.contains(CONCEPT_PATTERN)) {
             return conceptValidator;
-        }
-        if (url.contains(HL7_PATTERN)) {
-            return hl7Validator;
         }
         return null;
     }
