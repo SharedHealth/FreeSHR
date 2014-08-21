@@ -19,7 +19,6 @@ public class CodeValidatorFactoryTest {
 
     @Test
     public void shouldIdentifyTheCorrectValidator() throws Exception {
-        assertTrue(factory.getValidator("http://hl7.org/fhir/vs/animal-breeds") instanceof Hl7CodeValidator);
         assertTrue(factory.getValidator("http://tr.shr.com/openmrs/ws/rest/v1/tr/referenceterms/ref1") instanceof HttpCodeValidator);
         assertTrue(factory.getValidator("http://tr.shr.com/openmrs/ws/rest/v1/tr/concepts/ref1") instanceof HttpCodeValidator);
     }
