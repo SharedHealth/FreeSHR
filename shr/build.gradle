@@ -12,7 +12,7 @@ jar {
 }
 
 repositories {
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots"}
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     mavenCentral()
 }
 
@@ -41,39 +41,6 @@ dependencies {
 
 configurations.all {
     exclude group: 'org.jboss.netty', module: 'netty'
-}
-
-
-task migrateDatabase << {
-    tasks.compileMigrateJava.execute()
-    tasks.processMigrateResources.execute()
-    tasks.applyDbMigrations.execute()
-}
-
-configurations {
-    migration {
-        extendsFrom compile
-    }
-}
-
-
-sourceSets {
-    migrate {
-        java {
-            srcDir 'src/main/java/org/freeshr/utils/cassandra'
-        }
-        resources {
-            srcDir 'src/main/resources'
-        }
-        compileClasspath += configurations.migration
-    }
-}
-
-task applyDbMigrations(type: JavaExec) {
-    workingDir=project.sourceSets.migrate.output.classesDir
-    classpath(project.sourceSets.migrate.output.classesDir,project.sourceSets.migrate.output.resourcesDir, sourceSets.main.runtimeClasspath)
-    main  "org.freeshr.utils.cassandra.Migrations"
-    environment(loadConfig())
 }
 
 //build artifact
@@ -136,7 +103,7 @@ task dist(dependsOn: 'exportProperties', type: Rpm) {
 }
 
 war {
-    from sourceSets.migrate.resources
+    from sourceSets.main.resources
     manifest {
         attributes('Main-Class': mainClassName)
     }
