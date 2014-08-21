@@ -8,6 +8,7 @@ import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.persistence.PatientRepository;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,6 +74,7 @@ public class EncounterServiceIntegrationTest {
     }
 
     @Test
+    @Ignore("Since the strategy for validation is changing, this test will not add value")
     public void shouldCaptureAnEncounterAlongWithPatientDetails() throws Exception {
         givenThat(get(urlEqualTo("/api/v1/patients/" + HEALTH_ID))
                 .willReturn(aResponse()
