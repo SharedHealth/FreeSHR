@@ -19,6 +19,20 @@ public class SHREnvironmentMock implements ApplicationContextInitializer<Configu
 
     @Override
     public void initialize(ConfigurableApplicationContext applicationContext) {
+        Map<String, String> env = mockPropertySources(applicationContext);
+        createEmbeddedCassandra(env);
+    }
+
+    private void createEmbeddedCassandra(Map<String, String> env) {
+        try {
+            EmbeddedCassandraServerHelper.startEmbeddedCassandra();
+            new Migrations(env).migrate();
+        } catch (Exception e) {
+            throw new RuntimeException("Error starting embedded server..", e);
+        }
+    }
+
+    private Map<String, String> mockPropertySources(ConfigurableApplicationContext applicationContext) {
         MutablePropertySources propertySources = applicationContext.getEnvironment().getPropertySources();
         MockPropertySource mockEnvVars = new MockPropertySource();
         Map<String, String> env = new HashMap<String, String>();
@@ -32,13 +46,7 @@ public class SHREnvironmentMock implements ApplicationContextInitializer<Configu
             }
             propertySources.replace(StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, mockEnvVars);
         } catch (Exception ignored) {
-            // Do nothing
         }
-        try {
-            EmbeddedCassandraServerHelper.startEmbeddedCassandra();
-            new Migrations(env).migrate();
-        } catch (Exception e) {
-            throw new RuntimeException("Error starting embedded server..", e);
-        }
+        return env;
     }
 }

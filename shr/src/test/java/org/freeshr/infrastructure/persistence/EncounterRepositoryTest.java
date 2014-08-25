@@ -15,7 +15,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static org.apache.commons.lang.StringUtils.deleteWhitespace;
 import static org.freeshr.utils.FileUtil.asString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -40,6 +39,8 @@ public class EncounterRepositoryTest {
         encounterRepository.save(createEncounterBundle("e-1", "h100"));
         encounterRepository.save(createEncounterBundle("e-2", "h100"));
 
+        Thread.sleep(1000);
+
         List<EncounterBundle> encounters = encounterRepository.findAll("h100").get();
         EncounterBundle encounter = encounters.get(0);
 
@@ -47,7 +48,6 @@ public class EncounterRepositoryTest {
         assertThat(encounter.getDate(), is(notNullValue()));
         assertThat(encounter.getEncounterContent().toString(), is(content()));
     }
-
 
     @After
     public void teardown() {
@@ -63,6 +63,6 @@ public class EncounterRepositoryTest {
     }
 
     private String content() {
-        return deleteWhitespace(asString("jsons/encounters/valid.json"));
+        return asString("jsons/encounters/valid.json");
     }
 }

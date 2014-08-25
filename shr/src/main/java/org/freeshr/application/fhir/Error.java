@@ -4,11 +4,11 @@ package org.freeshr.application.fhir;
 import com.google.gson.Gson;
 
 public class Error {
+
     private String code;
     private String reason;
 
-    public Error(){
-
+    public Error() {
     }
 
     public Error(String code, String reason) {
@@ -32,7 +32,7 @@ public class Error {
         this.reason = reason;
     }
 
-    public String toString(){
+    public String toString() {
         return new Gson().toJson(this);
     }
 }

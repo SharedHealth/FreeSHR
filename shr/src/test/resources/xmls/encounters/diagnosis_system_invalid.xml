@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+http://hl7.org/fhir/condition-category<?xml version="1.0" encoding="UTF-8"?>
 
 <feed xmlns="http://www.w3.org/2005/Atom">
     <title>Encounter</title>
@@ -31,7 +31,7 @@
                 <dateAsserted value="2014-07-25T16:51:37+05:30"/>
                 <category>
                     <coding>
-                        <system value="http://hl7.org/fhir/condition-category"/>
+                        <system value="http://hl7.org/fhir/condition-category-invalid"/>
                         <code value="diagnosis"/>
                     </coding>
                 </category>

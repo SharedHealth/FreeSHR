@@ -16,7 +16,8 @@ import org.springframework.web.client.AsyncRestTemplate;
 @ComponentScan(basePackages = {"org.freeshr.config",
         "org.freeshr.infrastructure",
         "org.freeshr.interfaces",
-        "org.freeshr.domain"})
+        "org.freeshr.domain",
+        "org.freeshr.application.fhir"})
 public class SHRConfig {
 
     @Autowired
@@ -37,7 +38,7 @@ public class SHRConfig {
     }
 
     @Bean(name = "hl7CodeProperties")
-    public static PropertiesFactoryBean hl7(){
+    public static PropertiesFactoryBean hl7() {
         PropertiesFactoryBean bean = new PropertiesFactoryBean();
         bean.setLocation(new ClassPathResource("/hl7codes.properties"));
         return bean;

@@ -1,10 +1,9 @@
 package org.freeshr.domain.service;
 
 import org.freeshr.application.fhir.EncounterBundle;
+import org.freeshr.application.fhir.FhirValidator;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
-import org.freeshr.infrastructure.tr.TerminologyServer;
-import org.hl7.fhir.instance.model.Condition;
-import org.hl7.fhir.instance.model.Resource;
+import org.freeshr.utils.concurrent.PreResolvedListenableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -19,28 +18,31 @@ public class EncounterService {
 
     private EncounterRepository encounterRepository;
     private PatientRegistry patientRegistry;
-    private TerminologyServer terminologyServer;
+    private FhirValidator fhirValidator;
 
     @Autowired
-    public EncounterService(EncounterRepository encounterRepository, PatientRegistry patientRegistry, TerminologyServer terminologyServer) {
+    public EncounterService(EncounterRepository encounterRepository, PatientRegistry patientRegistry, FhirValidator fhirValidator) {
         this.encounterRepository = encounterRepository;
         this.patientRegistry = patientRegistry;
-        this.terminologyServer = terminologyServer;
+        this.fhirValidator = fhirValidator;
     }
 
     public ListenableFuture<String> ensureCreated(final EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
-        encounterBundle.validate(terminologyServer);
-        return new ListenableFutureAdapter<String, Boolean>(patientRegistry.ensurePresent(encounterBundle.getHealthId())) {
-            @Override
-            protected String adapt(Boolean result) throws ExecutionException {
-                if (result) {
-                    encounterBundle.setEncounterId(UUID.randomUUID().toString());
-                    encounterRepository.save(encounterBundle);
-                    return encounterBundle.getEncounterId();
+        if (fhirValidator.validate(encounterBundle.getEncounterContent().toString())) {
+            return new ListenableFutureAdapter<String, Boolean>(patientRegistry.ensurePresent(encounterBundle.getHealthId())) {
+                @Override
+                protected String adapt(Boolean result) throws ExecutionException {
+                    if (result) {
+                        encounterBundle.setEncounterId(UUID.randomUUID().toString());
+                        encounterRepository.save(encounterBundle);
+                        return encounterBundle.getEncounterId();
+                    }
+                    return null;
                 }
-                return null;
-            }
-        };
+            };
+        } else {
+            return new PreResolvedListenableFuture<>(null);
+        }
     }
 
     public ListenableFuture<List<EncounterBundle>> findAll(String healthId) {
