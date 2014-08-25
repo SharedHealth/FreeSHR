@@ -1,7 +1,6 @@
 package org.freeshr.domain.service;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import org.freeshr.application.fhir.InvalidEncounter;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.domain.model.patient.Address;
@@ -16,16 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.givenThat;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static org.freeshr.data.EncounterBundleData.withInvalidConcept;
-import static org.freeshr.data.EncounterBundleData.withInvalidReferenceTerm;
-import static org.freeshr.data.EncounterBundleData.withValidEncounter;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.freeshr.data.EncounterBundleData.*;
 import static org.freeshr.utils.FileUtil.asString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -63,18 +58,17 @@ public class EncounterServiceIntegrationTest {
                         .withBody(asString("jsons/concept.json"))));
     }
 
-    @Test(expected = InvalidEncounter.class)
+    @Test
     public void shouldRejectEncounterWithInvalidReferenceCode() throws Exception {
-        encounterService.ensureCreated(withInvalidReferenceTerm("5dd24827-fd5d-4024-9f65-5a3c88a28af5")).get();
-    }
-
-    @Test(expected = InvalidEncounter.class)
-    public void shouldRejectEncounterWithInvalidConceptCode() throws Exception {
-        encounterService.ensureCreated(withInvalidConcept("5dd24827-fd5d-4024-9f65-5a3c88a28af5")).get();
+        assertNull(encounterService.ensureCreated(withInvalidReferenceTerm("5dd24827-fd5d-4024-9f65-5a3c88a28af5")).get());
     }
 
     @Test
-    @Ignore("Since the strategy for validation is changing, this test will not add value")
+    public void shouldRejectEncounterWithInvalidConceptCode() throws Exception {
+        assertNull(encounterService.ensureCreated(withInvalidConcept("5dd24827-fd5d-4024-9f65-5a3c88a28af5")).get());
+    }
+
+    @Test
     public void shouldCaptureAnEncounterAlongWithPatientDetails() throws Exception {
         givenThat(get(urlEqualTo("/api/v1/patients/" + HEALTH_ID))
                 .willReturn(aResponse()
@@ -87,7 +81,6 @@ public class EncounterServiceIntegrationTest {
         assertThat(encounterId, is(notNullValue()));
         assertValidPatient(patientRepository.find(HEALTH_ID).get());
     }
-
 
     private void assertValidPatient(Patient patient) {
         assertThat(patient, is(notNullValue()));

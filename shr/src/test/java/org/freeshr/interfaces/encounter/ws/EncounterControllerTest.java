@@ -1,9 +1,10 @@
 package org.freeshr.interfaces.encounter.ws;
 
+import com.google.common.base.Charsets;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
+import org.freeshr.launch.WebMvcConfig;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.MediaType;
@@ -21,7 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
+@ContextConfiguration(initializers = SHREnvironmentMock.class, classes = {WebMvcConfig.class, SHRConfig.class})
 @WebAppConfiguration
 public class EncounterControllerTest {
 
@@ -36,11 +37,12 @@ public class EncounterControllerTest {
     }
 
     @Test
-    @Ignore
     public void shouldSaveEncounter() throws Exception {
         mockMvc.perform(post("/patients/hid-1/encounters")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asString("jsons/valid.json")))
+                .accept(MediaType.APPLICATION_XML)
+                .contentType(MediaType.APPLICATION_XML)
+                .characterEncoding(Charsets.UTF_8.name())
+                .content(asString("xmls/encounters/encounter.xml")))
                 .andExpect(status().isOk());
 
     }

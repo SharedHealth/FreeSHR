@@ -1,9 +1,9 @@
 package org.freeshr.interfaces.encounter.ws;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpInputMessage;
 
@@ -17,18 +17,30 @@ import static org.mockito.Mockito.when;
 
 public class EncounterBundleMessageConverterTest {
 
+    private HttpInputMessage inputMessage;
+
+    @Before
+    public void setup() {
+        inputMessage = mock(HttpInputMessage.class);
+    }
+
+    private URL mockMessageToReturn(String resourceName) throws IOException {
+        final URL resource = URLClassLoader.getSystemResource(resourceName);
+        when(inputMessage.getBody()).thenReturn(resource.openStream());
+        return resource;
+    }
+
     @Test
     public void shouldCreateEncounterFromHttpInputMessage() throws IOException {
-
-        HttpInputMessage inputMessage = mock(HttpInputMessage.class);
-        final URL resource = URLClassLoader.getSystemResource("encounters.json");
-        when(inputMessage.getBody()).thenReturn(resource.openStream());
+        final URL resource = mockMessageToReturn("xmls/encounters/encounter.xml");
         EncounterBundle bundle = new EncounterBundleMessageConverter().createEncounterBundle(inputMessage);
 
         Assert.assertNull(bundle.getEncounterId());
         Assert.assertNull(bundle.getHealthId());
         Assert.assertNull(bundle.getDate());
-        String expectedContent = StringUtils.deleteWhitespace(FileUtils.readFileToString(new File(resource.getPath())).replaceAll("\\n", ""));
-        Assert.assertEquals(expectedContent, bundle.getEncounterContent().toString());
+
+        String expectedContent = FileUtils.readFileToString(new File(resource.getPath()));
+        String actualContent = bundle.getEncounterContent().toString();
+        Assert.assertEquals(expectedContent, actualContent);
     }
 }

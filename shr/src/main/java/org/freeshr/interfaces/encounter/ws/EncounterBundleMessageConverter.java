@@ -1,10 +1,8 @@
 package org.freeshr.interfaces.encounter.ws;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.freeshr.application.fhir.EncounterBundle;
-import org.freeshr.application.fhir.EncounterContent;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -16,8 +14,6 @@ import java.io.IOException;
 
 public class EncounterBundleMessageConverter extends AbstractHttpMessageConverter<EncounterBundle> {
 
-    private ObjectMapper objectMapper = new ObjectMapper();
-
     @Override
     protected boolean supports(Class<?> clazz) {
         return EncounterBundle.class.equals(clazz);
@@ -25,9 +21,11 @@ public class EncounterBundleMessageConverter extends AbstractHttpMessageConverte
 
     @Override
     protected boolean canRead(MediaType mediaType) {
-        return MediaType.APPLICATION_JSON.getType().equals(mediaType.getType()) &&
-                MediaType.APPLICATION_JSON.getSubtype().equals(mediaType.getSubtype()) &&
-                Charsets.UTF_8.equals(mediaType.getCharSet());
+        return isXML(mediaType) && Charsets.UTF_8.equals(mediaType.getCharSet());
+    }
+
+    private boolean isXML(MediaType mediaType) {
+        return MediaType.APPLICATION_XML.getType().equals(mediaType.getType()) && MediaType.APPLICATION_XML.getSubtype().equals(mediaType.getSubtype());
     }
 
     @Override

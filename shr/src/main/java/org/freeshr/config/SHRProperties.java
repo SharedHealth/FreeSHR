@@ -3,6 +3,9 @@ package org.freeshr.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.net.URISyntaxException;
+
 @Component
 public class SHRProperties {
 
@@ -31,7 +34,7 @@ public class SHRProperties {
     private int restPoolSize;
 
     public String getMCIPatientUrl() {
-        return String.format("http://%s:%s/api/v1/patients",mciHost,mciPort);
+        return String.format("http://%s:%s/api/v1/patients", mciHost, mciPort);
     }
 
     public String getCassandraKeySpace() {
@@ -68,5 +71,9 @@ public class SHRProperties {
 
     public String getTrPassword() {
         return trPassword;
+    }
+
+    public String getValidationFilePath() throws URISyntaxException {
+        return new File(this.getClass().getClassLoader().getResource("validation.zip").toURI()).getAbsolutePath();
     }
 }

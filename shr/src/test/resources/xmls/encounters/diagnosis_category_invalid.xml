@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Encounter</title>
+    <id>http://localhost/encounters/bcf6c340-d04a-4c29-b50c-2552beeee037</id>
+    <updated>2014-07-25T16:50:29+05:30</updated>
+    <author>
+        <name>test author</name>
+        <email>test@test.com</email>
+        <uri>http://localhost/admin/adminid</uri>
+    </author>
+    <entry>
+        <title>Diagnosis</title>
+        <id>http://localhost/diagnosis/5f982a33-4454-4b74-9236-b8157aa8effd</id>
+        <updated>2014-07-25T16:51:37+05:30</updated>
+        <content type="text/xml">
+            <Condition xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="5f982a33-4454-4b74-9236-b8157aa8effd"/>
+                </identifier>
+                <subject>
+                    <reference value="5893922485019082753"/>
+                </subject>
+                <encounter>
+                    <reference value="dfbc9b30-ceef-473e-9q22-4ee31qfceqdd"/>
+                    <display value="encounter"/>
+                </encounter>
+                <asserter>
+                    <reference value="7e2bd1c6-2370-418c-b2f7-1e46febc4ee0"/>
+                </asserter>
+                <dateAsserted value="2014-07-25T16:51:37+05:30"/>
+                <category>
+                    <coding>
+                        <system value="http://hl7.org/fhir/condition-category"/>
+                        <code value="invalid"/>
+                    </coding>
+                </category>
+                <status value="confirmed"/>
+            </Condition>
+        </content>
+    </entry>
+</feed>

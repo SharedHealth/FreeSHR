@@ -44,10 +44,10 @@ public class TRConceptLocator implements ConceptLocator {
 
     @Override
     public ValidationResult validate(String system, String code, String display) {
-        if (locate(system, display) == null) {
+        if (locate(system, code) == null) {
             return new ValidationResult(OperationOutcome.IssueSeverity.error, display);
         }
-        return new ValidationResult(OperationOutcome.IssueSeverity.Null, display);
+        return null;
     }
 
     @Override
