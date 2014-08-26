@@ -1,6 +1,6 @@
 package org.freeshr.infrastructure.tr;
 
-import org.freeshr.application.fhir.InvalidEncounter;
+import org.freeshr.utils.concurrent.PreResolvedListenableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -19,6 +19,6 @@ public class TerminologyServer {
         if (factory.getValidator(uri) != null) {
             return factory.getValidator(uri).isValid(uri, code);
         }
-        throw InvalidEncounter.invalidSystemUri();
+        return new PreResolvedListenableFuture<>(false);
     }
 }

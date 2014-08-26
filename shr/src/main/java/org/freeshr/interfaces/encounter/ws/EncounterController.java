@@ -1,11 +1,12 @@
 package org.freeshr.interfaces.encounter.ws;
 
 import org.freeshr.application.fhir.EncounterBundle;
-import org.freeshr.application.fhir.InvalidEncounter;
+import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.domain.service.EncounterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
@@ -26,26 +27,30 @@ public class EncounterController {
     }
 
     @RequestMapping(value = "/encounters", method = RequestMethod.POST)
-    public DeferredResult<String> create(@PathVariable String healthId, @RequestBody EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
-        encounterBundle.setHealthId(healthId);
+    public DeferredResult<EncounterResponse> create(@PathVariable String healthId, @RequestBody EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
         logger.debug("Create encounter. " + encounterBundle);
+        encounterBundle.setHealthId(healthId);
 
-        final DeferredResult<String> deferredResult = new DeferredResult<String>();
-        try {
-            encounterService.ensureCreated(encounterBundle).addCallback(new ListenableFutureCallback<String>() {
-                @Override
-                public void onSuccess(String result) {
+        final DeferredResult<EncounterResponse> deferredResult = new DeferredResult<>();
+        encounterService.ensureCreated(encounterBundle).addCallback(new ListenableFutureCallback<EncounterResponse>() {
+            @Override
+            public void onSuccess(EncounterResponse result) {
+                if (result.isSuccessful()) {
                     deferredResult.setResult(result);
+                } else {
+                    if (result.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition)) {
+                        deferredResult.setErrorResult(new PreconditionFailed(result));
+                    } else {
+                        deferredResult.setErrorResult(new UnProcessableEntity(result));
+                    }
                 }
+            }
 
-                @Override
-                public void onFailure(Throwable error) {
-                    deferredResult.setErrorResult(error);
-                }
-            });
-        } catch (InvalidEncounter e) {
-            deferredResult.setErrorResult(e.getError());
-        }
+            @Override
+            public void onFailure(Throwable error) {
+                deferredResult.setErrorResult(error);
+            }
+        });
         return deferredResult;
     }
 
@@ -66,5 +71,15 @@ public class EncounterController {
             }
         });
         return deferredResult;
+    }
+
+    @ResponseStatus(value = HttpStatus.PRECONDITION_FAILED)
+    @ExceptionHandler(PreconditionFailed.class)
+    public void preConditionFailed() {
+    }
+
+    @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(UnProcessableEntity.class)
+    public void unProcessableEntity() {
     }
 }

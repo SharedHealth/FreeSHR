@@ -1,8 +1,9 @@
 package org.freeshr.domain.service;
 
+import org.apache.log4j.Logger;
 import org.freeshr.domain.model.patient.Patient;
-import org.freeshr.infrastructure.persistence.PatientRepository;
 import org.freeshr.infrastructure.mci.MasterClientIndexWrapper;
+import org.freeshr.infrastructure.persistence.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -12,6 +13,8 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 public class PatientRegistry {
+
+    private Logger logger = Logger.getLogger(PatientRegistry.class);
 
     private final PatientRepository allPatients;
     private final MasterClientIndexWrapper masterClientIndexWrapper;
@@ -36,7 +39,8 @@ public class PatientRegistry {
                             }
                         }.get();
                     } catch (Exception e) {
-                        throw new ExecutionException(e);
+                        logger.warn(e);
+                        return Boolean.FALSE;
                     }
                 } else {
                     return Boolean.TRUE;
