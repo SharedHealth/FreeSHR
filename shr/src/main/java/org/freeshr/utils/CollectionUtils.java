@@ -1,21 +1,9 @@
 package org.freeshr.utils;
 
 
-import org.apache.commons.lang.*;
-import org.apache.commons.lang.StringUtils;
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
-import static org.apache.commons.lang.StringUtils.split;
-import static org.apache.commons.lang.StringUtils.strip;
+import static org.apache.commons.lang.StringUtils.*;
 
 public class CollectionUtils {
 
@@ -27,9 +15,9 @@ public class CollectionUtils {
         return result;
     }
 
-    public static <I, O> Set<O> mapToSet(I[] xs, Fn<I, O> fn){
+    public static <I, O> Set<O> mapToSet(I[] xs, Fn<I, O> fn) {
         Set<O> result = new HashSet<O>();
-        for (I input : xs){
+        for (I input : xs) {
             result.add(fn.call(input));
         }
         return result;
@@ -70,9 +58,9 @@ public class CollectionUtils {
         return result;
     }
 
-    public static <I> I find(List<I> xs, Fn<I, Boolean> fn){
-        for (I x : xs){
-            if (fn.call(x)){
+    public static <I> I find(List<I> xs, Fn<I, Boolean> fn) {
+        for (I x : xs) {
+            if (fn.call(x)) {
                 return x;
             }
         }
@@ -91,17 +79,23 @@ public class CollectionUtils {
         return isNotEmpty(xs) ? xs.get(0) : null;
     }
 
-    public static <I> boolean isEvery(List<I> xs, Fn<I, Boolean> fn){
-        for (I x : xs){
-            if (!fn.call(x)){
+    public static <I> boolean isEvery(List<I> xs, Fn<I, Boolean> fn) {
+        for (I x : xs) {
+            if (!fn.call(x)) {
                 return false;
             }
         }
         return true;
     }
 
-    public static <I> Fn<I, Boolean> not(final Fn<I, Boolean> fn){
-        return new Fn<I, Boolean>(){
+    public static <I> void forEach(List<I> xs, Fn<I, Boolean> fn) {
+        for (I x : xs) {
+            fn.call(x);
+        }
+    }
+
+    public static <I> Fn<I, Boolean> not(final Fn<I, Boolean> fn) {
+        return new Fn<I, Boolean>() {
             @Override
             public Boolean call(I input) {
                 return !fn.call(input);
@@ -109,15 +103,14 @@ public class CollectionUtils {
         };
     }
 
-    public static <I> boolean isAny(List<I> xs, Fn<I, Boolean> fn){
-        for (I x : xs){
-            if (fn.call(x)){
+    public static <I> boolean isAny(List<I> xs, Fn<I, Boolean> fn) {
+        for (I x : xs) {
+            if (fn.call(x)) {
                 return true;
             }
         }
         return false;
     }
-
 
 
     public static interface Fn<I, O> {

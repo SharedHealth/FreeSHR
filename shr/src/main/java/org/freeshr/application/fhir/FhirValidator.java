@@ -1,7 +1,6 @@
 package org.freeshr.application.fhir;
 
 
-import org.apache.log4j.Logger;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.utils.CollectionUtils;
 import org.hl7.fhir.instance.model.OperationOutcome;
@@ -17,16 +16,15 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.freeshr.utils.CollectionUtils.filter;
-import static org.freeshr.utils.Lambda.throwIfNot;
+import static org.freeshr.utils.CollectionUtils.reduce;
 
 @Component
 public class FhirValidator {
-
-    private Logger logger = Logger.getLogger(FhirValidator.class);
 
     private TRConceptLocator trConceptLocator;
     private SHRProperties shrProperties;
@@ -37,25 +35,26 @@ public class FhirValidator {
         this.shrProperties = shrProperties;
     }
 
-    public boolean validate(String sourceXML) {
+    public EncounterValidationResponse validate(String sourceXML) {
         try {
-            validate(sourceXML, shrProperties.getValidationFilePath());
-            return true;
-        } catch (Exception e) {
-            logger.warn(e);
-            return false;
+            return validate(sourceXML, shrProperties.getValidationFilePath());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private void validate(String sourceXml, String definitionsZipPath) throws Exception {
+    private EncounterValidationResponse validate(String sourceXml, String definitionsZipPath) {
         List<ValidationMessage> outputs = new ArrayList<>();
         outputs.addAll(validateDocument(definitionsZipPath, sourceXml));
-        outputs = filterMessagesHavingPriorityGreaterThan(outputs, OperationOutcome.IssueSeverity.warning);
-        throwIfNot(outputs.isEmpty(), new InvalidEncounter(new Error(null, null)));
+        return filterMessagesSevereThan(outputs, OperationOutcome.IssueSeverity.warning);
     }
 
-    private List<ValidationMessage> validateDocument(String definitionsZipPath, String sourceXml) throws Exception {
-        return new InstanceValidator(definitionsZipPath, null, trConceptLocator).validateInstance(document(sourceXml).getDocumentElement());
+    private List<ValidationMessage> validateDocument(String definitionsZipPath, String sourceXml) {
+        try {
+            return new InstanceValidator(definitionsZipPath, null, trConceptLocator).validateInstance(document(sourceXml).getDocumentElement());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Document document(String sourceXml) throws ParserConfigurationException, SAXException, IOException {
@@ -66,11 +65,20 @@ public class FhirValidator {
         return builder.parse(new ByteArrayInputStream(sourceXml.getBytes()));
     }
 
-    private List<ValidationMessage> filterMessagesHavingPriorityGreaterThan(List<ValidationMessage> outputs, final OperationOutcome.IssueSeverity expectedPriority) {
-        return filter(outputs, new CollectionUtils.Fn<ValidationMessage, Boolean>() {
+    private EncounterValidationResponse filterMessagesSevereThan(List<ValidationMessage> outputs, final OperationOutcome.IssueSeverity severity) {
+        return reduce(filter(outputs, new CollectionUtils.Fn<ValidationMessage, Boolean>() {
             @Override
             public Boolean call(ValidationMessage input) {
-                return expectedPriority.compareTo(input.getLevel()) >= 0;
+                return severity.compareTo(input.getLevel()) >= 0;
+            }
+        }), new EncounterValidationResponse(), new CollectionUtils.ReduceFn<ValidationMessage, EncounterValidationResponse>() {
+            @Override
+            public EncounterValidationResponse call(ValidationMessage input, EncounterValidationResponse acc) {
+                Error error = new Error();
+                error.setField(input.getLocation());
+                error.setReason(input.getType());
+                acc.addError(error);
+                return acc;
             }
         });
     }

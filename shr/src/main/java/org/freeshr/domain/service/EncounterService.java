@@ -1,6 +1,8 @@
 package org.freeshr.domain.service;
 
 import org.freeshr.application.fhir.EncounterBundle;
+import org.freeshr.application.fhir.EncounterResponse;
+import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.application.fhir.FhirValidator;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
 import org.freeshr.utils.concurrent.PreResolvedListenableFuture;
@@ -27,21 +29,25 @@ public class EncounterService {
         this.fhirValidator = fhirValidator;
     }
 
-    public ListenableFuture<String> ensureCreated(final EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
-        if (fhirValidator.validate(encounterBundle.getEncounterContent().toString())) {
-            return new ListenableFutureAdapter<String, Boolean>(patientRegistry.ensurePresent(encounterBundle.getHealthId())) {
+    public ListenableFuture<EncounterResponse> ensureCreated(final EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
+        ListenableFuture<EncounterResponse> validationResult = validate(encounterBundle);
+        if (null == validationResult) {
+            return new ListenableFutureAdapter<EncounterResponse, Boolean>(patientRegistry.ensurePresent(encounterBundle.getHealthId())) {
                 @Override
-                protected String adapt(Boolean result) throws ExecutionException {
+                protected EncounterResponse adapt(Boolean result) throws ExecutionException {
+                    EncounterResponse response = new EncounterResponse();
                     if (result) {
                         encounterBundle.setEncounterId(UUID.randomUUID().toString());
                         encounterRepository.save(encounterBundle);
-                        return encounterBundle.getEncounterId();
+                        response.setEncounterId(encounterBundle.getEncounterId());
+                        return response;
+                    } else {
+                        return response.preconditionFailure("healthId", "Patient not available in patient registry");
                     }
-                    return null;
                 }
             };
         } else {
-            return new PreResolvedListenableFuture<>(null);
+            return validationResult;
         }
     }
 
@@ -52,5 +58,14 @@ public class EncounterService {
                 return bundles;
             }
         };
+    }
+
+    private ListenableFuture<EncounterResponse> validate(EncounterBundle encounterBundle) {
+        final EncounterValidationResponse encounterValidationResponse = fhirValidator.validate(encounterBundle.getEncounterContent().toString());
+        if (!encounterValidationResponse.isSuccessful()) {
+            return new PreResolvedListenableFuture<>(new EncounterResponse().setValidationFailure(encounterValidationResponse));
+        } else {
+            return null;
+        }
     }
 }

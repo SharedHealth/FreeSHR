@@ -21,4 +21,4 @@ node_modules
 nohup.out
 
 #OSX specific files
-**/*.DS_Store
+.DS_Store

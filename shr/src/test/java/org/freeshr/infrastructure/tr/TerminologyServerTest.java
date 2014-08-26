@@ -1,7 +1,6 @@
 package org.freeshr.infrastructure.tr;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import org.freeshr.application.fhir.InvalidEncounter;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.junit.Before;
@@ -65,8 +64,8 @@ public class TerminologyServerTest {
 
     }
 
-    @Test(expected = InvalidEncounter.class)
+    @Test
     public void shouldRejectInvalidSystemPath() throws Exception {
-        trServer.isValid("http://localhost:9997/invalid/path/code", "code").get();
+        assertFalse(trServer.isValid("http://localhost:9997/invalid/path/code", "code").get());
     }
 }
