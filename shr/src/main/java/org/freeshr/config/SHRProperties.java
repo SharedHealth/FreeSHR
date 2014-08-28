@@ -1,5 +1,6 @@
 package org.freeshr.config;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +33,8 @@ public class SHRProperties {
     private int cassandraTimeout;
     @Value("${REST_POOL_SIZE}")
     private int restPoolSize;
+    @Value("${VALIDATION_ZIP_PATH}")
+    private String validationZipPath;
 
     public String getMCIPatientUrl() {
         return String.format("http://%s:%s/api/v1/patients", mciHost, mciPort);
@@ -74,6 +77,10 @@ public class SHRProperties {
     }
 
     public String getValidationFilePath() throws URISyntaxException {
-        return new File(this.getClass().getClassLoader().getResource("validation.zip").toURI()).getAbsolutePath();
+        if (StringUtils.isNotBlank(validationZipPath)) {
+            return validationZipPath;
+        } else {
+            return new File(this.getClass().getClassLoader().getResource("validation.zip").toURI()).getAbsolutePath();
+        }
     }
 }
