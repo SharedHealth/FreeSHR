@@ -1,6 +1,9 @@
 package org.freeshr.application.fhir;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(namespace = "http://www.w3.org/2005/Atom", name = "feed")
@@ -10,6 +13,7 @@ public class EncounterBundle {
     private String healthId;
     private String date;
 
+    @JsonIgnore
     private EncounterContent encounterContent;
 
     public String getEncounterId() {
@@ -42,5 +46,10 @@ public class EncounterBundle {
 
     public void setEncounterContent(String content) {
         this.encounterContent = new EncounterContent(content);
+    }
+
+    @JsonProperty("content")
+    public String getContent() {
+        return this.encounterContent.toString();
     }
 }
