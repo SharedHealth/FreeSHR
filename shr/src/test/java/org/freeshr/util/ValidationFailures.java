@@ -20,7 +20,9 @@ public class ValidationFailures {
         boolean result = expectedErrors.length == response.getErrors().size();
         for (int i = 0; result && i < expectedErrors.length; i++) {
             String[] expectedError = expectedErrors[i];
-            result = StringUtils.equals(expectedError[0], response.getErrors().get(i).getField()) && StringUtils.equals(expectedError[1], response.getErrors().get(i).getReason());
+            result = StringUtils.equals(expectedError[0], response.getErrors().get(i).getField())
+                    && StringUtils.equals(expectedError[1], response.getErrors().get(i).getType())
+                    && StringUtils.equals(expectedError[2], response.getErrors().get(i).getReason());
         }
         return result;
     }

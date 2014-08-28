@@ -6,13 +6,15 @@ import com.google.gson.Gson;
 public class Error {
 
     private String field;
+    private String type;
     private String reason;
 
     public Error() {
     }
 
-    public Error(String field, String reason) {
+    public Error(String field, String type, String reason) {
         this.field = field;
+        this.type = type;
         this.reason = reason;
     }
 
@@ -30,6 +32,14 @@ public class Error {
 
     public void setReason(String reason) {
         this.reason = reason;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String toString() {

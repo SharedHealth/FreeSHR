@@ -71,13 +71,13 @@ public class EncounterServiceIntegrationTest {
     @Test
     public void shouldRejectEncounterWithInvalidReferenceCode() throws Exception {
         EncounterResponse response = encounterService.ensureCreated(withInvalidReferenceTerm(VALID_HEALTH_ID)).get();
-        assertTrue(new ValidationFailures(response).matches(new String[]{"/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "code-unknown"}));
+        assertTrue(new ValidationFailures(response).matches(new String[]{"/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "code-unknown", null}));
     }
 
     @Test
     public void shouldRejectEncounterWithInvalidConceptCode() throws Exception {
         EncounterResponse response = encounterService.ensureCreated(withInvalidConcept(VALID_HEALTH_ID)).get();
-        assertTrue(new ValidationFailures(response).matches(new String[]{"/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "code-unknown"}));
+        assertTrue(new ValidationFailures(response).matches(new String[]{"/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "code-unknown", "Viral pneumonia 314247"}));
     }
 
     @Test

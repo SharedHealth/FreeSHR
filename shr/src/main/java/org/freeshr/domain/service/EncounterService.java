@@ -42,7 +42,7 @@ public class EncounterService {
                         response.setEncounterId(encounterBundle.getEncounterId());
                         return response;
                     } else {
-                        return response.preconditionFailure("healthId", "Patient not available in patient registry");
+                        return response.preconditionFailure("healthId", "invalid", "Patient not available in patient registry");
                     }
                 }
             };
