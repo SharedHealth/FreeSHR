@@ -76,7 +76,8 @@ public class FhirValidator {
             public EncounterValidationResponse call(ValidationMessage input, EncounterValidationResponse acc) {
                 Error error = new Error();
                 error.setField(input.getLocation());
-                error.setReason(input.getType());
+                error.setType(input.getType());
+                error.setReason(input.getMessage());
                 acc.addError(error);
                 return acc;
             }

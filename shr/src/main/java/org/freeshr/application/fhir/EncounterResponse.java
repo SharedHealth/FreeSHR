@@ -49,8 +49,8 @@ public class EncounterResponse {
     }
 
     @JsonIgnore
-    public EncounterResponse preconditionFailure(String field, String message) {
-        this.preconditionFailure = new Error(field, message);
+    public EncounterResponse preconditionFailure(String field, String type, String message) {
+        this.preconditionFailure = new Error(field, type, message);
         this.typeOfFailure = TypeOfFailure.Precondition;
         return this;
     }
