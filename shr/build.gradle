@@ -56,14 +56,12 @@ task assembly(dependsOn: 'build') << {
     new File("${buildDir}/etc/").mkdir();
 }
 
-task copyZip(type: Copy) {
+task copyZip(type: Copy, dependsOn: 'assembly') {
     from 'src/main/resources/validation.zip'
     into 'build/etc/'
 }
 
-assembly.doLast += 'copyZip'
-
-task exportProperties(dependsOn: 'assembly') << {
+task exportProperties(dependsOn: 'copyZip') << {
     PrintStream output = new PrintStream(new FileOutputStream(file("${buildDir}/etc/bdshr")));
     Properties properties = loadConfig()
     properties.each { prop, val ->
