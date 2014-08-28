@@ -74,12 +74,16 @@ public class EncounterController {
     }
 
     @ResponseStatus(value = HttpStatus.PRECONDITION_FAILED)
+    @ResponseBody
     @ExceptionHandler(PreconditionFailed.class)
-    public void preConditionFailed() {
+    public EncounterResponse preConditionFailed(PreconditionFailed preconditionFailed) {
+        return preconditionFailed.getResult();
     }
 
     @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)
+    @ResponseBody
     @ExceptionHandler(UnProcessableEntity.class)
-    public void unProcessableEntity() {
+    public EncounterResponse unProcessableEntity(UnProcessableEntity unProcessableEntity) {
+        return unProcessableEntity.getResult();
     }
 }
