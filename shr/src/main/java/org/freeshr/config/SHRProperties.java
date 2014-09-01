@@ -33,7 +33,7 @@ public class SHRProperties {
     private int cassandraTimeout;
     @Value("${REST_POOL_SIZE}")
     private int restPoolSize;
-    @Value("${VALIDATION_ZIP_PATH}")
+    @Value("${VALIDATION_ZIP_PATH:}")
     private String validationZipPath;
 
     public String getMCIPatientUrl() {
