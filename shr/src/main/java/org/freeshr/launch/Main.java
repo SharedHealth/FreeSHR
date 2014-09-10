@@ -1,8 +1,5 @@
 package org.freeshr.launch;
 
-
-
-
 import org.freeshr.utils.cassandra.Migrations;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
@@ -15,12 +12,17 @@ import org.springframework.web.servlet.DispatcherServlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
+import java.util.Map;
+
+import static java.lang.Integer.valueOf;
+import static java.lang.System.getenv;
 
 @Configuration
 public class Main {
 
     @Bean
     public EmbeddedServletContainerFactory getFactory() {
+        Map<String, String> env = getenv();
         TomcatEmbeddedServletContainerFactory factory = new TomcatEmbeddedServletContainerFactory();
         factory.addInitializers(new ServletContextInitializer() {
             @Override
@@ -32,6 +34,8 @@ public class Main {
                 shr.setAsyncSupported(true);
             }
         });
+        String bdshr_port = env.get("BDSHR_PORT");
+        factory.setPort(valueOf(bdshr_port));
         return factory;
     }
 
