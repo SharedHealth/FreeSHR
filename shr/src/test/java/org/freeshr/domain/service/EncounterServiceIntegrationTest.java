@@ -100,7 +100,7 @@ public class EncounterServiceIntegrationTest {
         Address address = patient.getAddress();
         assertThat(address.getLine(), is("house30"));
         assertThat(address.getDistrict(), is("1004"));
-        assertThat(address.getUnion(), is("10041923"));
+        assertThat(address.getWard(), is("10041923"));
         assertThat(address.getUpazilla(), is("100419"));
         assertThat(address.getDivision(), is("10"));
     }
