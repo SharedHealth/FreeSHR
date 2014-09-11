@@ -51,6 +51,6 @@ public class MasterClientIndexWrapperTest {
         assertThat(adddress.getDistrict(), is("1004"));
         assertThat(adddress.getDivision(), is("10"));
         assertThat(adddress.getUpazilla(), is("100419"));
-        assertThat(adddress.getUnion(), is("10041923"));
+        assertThat(adddress.getWard(), is("10041923"));
     }
 }

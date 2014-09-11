@@ -16,11 +16,15 @@ public class Address {
     @JsonProperty("division_id")
     private String division;
 
-    @JsonProperty("union_id")
-    private String union;
+    @JsonProperty("ward_id")
+    private String ward;
 
     @JsonProperty("upazilla_id")
     private String upazilla;
+
+    @JsonProperty("city_corporation_id")
+    private String cityCorporation;
+
 
     public String getLine() {
         return line;
@@ -46,12 +50,12 @@ public class Address {
         this.division = division;
     }
 
-    public String getUnion() {
-        return union;
+    public String getWard() {
+        return ward;
     }
 
-    public void setUnion(String union) {
-        this.union = union;
+    public void setWard(String ward) {
+        this.ward = ward;
     }
 
     public String getUpazilla() {
@@ -70,5 +74,13 @@ public class Address {
     @Override
     public int hashCode() {
         return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    public String getCityCorporation() {
+        return cityCorporation;
+    }
+
+    public void setCityCorporation(String cityCorporation) {
+        this.cityCorporation = cityCorporation;
     }
 }
