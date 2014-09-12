@@ -58,6 +58,7 @@ public class PatientRepositoryTest {
         address.setLine("line");
         address.setUpazilla("upazilla");
         address.setWard("union");
+        address.setCityCorporation("cityCorporation");
         return address;
     }
 

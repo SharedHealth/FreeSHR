@@ -8,10 +8,11 @@
     "primary_contact": "ssss",
     "present_address": {
         "address_line": "house30",
-        "division_id": "10",
-        "district_id": "1004",
-        "upazilla_id": "100419",
-        "union_id": "10041923"
+        "division_id": "30",
+        "district_id": "56",
+        "upazilla_id": "10",
+        "ward_id": "17",
+        "city_corporation_id": "99"
     },
     "permanent_address": null, "full_name": null
 }
