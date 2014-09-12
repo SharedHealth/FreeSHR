@@ -67,8 +67,8 @@ public class PatientRepository {
         Address address = patient.getAddress();
         String query = query(asList(patient.getHealthId(),
                 patient.getGender(), address.getLine(), address.getDistrict(),
-                address.getDivision(), address.getWard(), address.getUpazilla()));
-        return "INSERT into patient (health_id, gender, address_line, district_id, division_id, union_id, upazilla_id) values  (" + query + ")";
+                address.getDivision(), address.getWard(), address.getUpazilla(), address.getCityCorporation()));
+        return "INSERT into patient (health_id, gender, address_line, district_id, division_id, ward_id, upazilla_id, city_corporation_id) values  (" + query + ")";
     }
 
 
