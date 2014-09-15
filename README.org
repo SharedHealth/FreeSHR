@@ -11,7 +11,7 @@ To build the BDE-SHR artifact, run the gradlew file in the operating system of y
 To run the application execute
 
 #+BEGIN_SRC
-	gradlew :bootRun
+	gradlew :runSHR
 #+END_SRC
 
 To setup your intellij run
