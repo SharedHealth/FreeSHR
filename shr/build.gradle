@@ -7,7 +7,7 @@ apply plugin: 'idea'
 mainClassName = "org.freeshr.launch.Main"
 
 jar {
-    baseName = 'bdeshr'
+    baseName = 'freeshr'
     version = '0.1-SNAPSHOT'
 }
 

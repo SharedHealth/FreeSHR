@@ -1,12 +1,13 @@
-BDE-SHR
+FreeSHR
 -------
   
-BDE-SHR is a free implementation of a shared health record.
+FreeSHR is an implementation of a shared health record, which uses FHIR as encounter contract.
+For more information, please see sharedhealth wiki
 
 Getting started
 ---------------
 
-To build the BDE-SHR artifact, run the gradlew file in the operating system of your choice.
+To build the FreeSHR artifact, run the gradlew file in the operating system of your choice.
 
 To run the application execute
 
@@ -21,3 +22,34 @@ To setup your intellij run
 #+END_SRC
 
 and open the project file it has generated in idea.
+
+
+In dev environment, to run SHR
+
+#+BEGIN_SRC
+	gradlew runSHR
+#+END_SRC
+
+Make sure that you have cassandra running and local.properties have the right configuration
+
+Troubleshooting:
+- If you are getting error while running migrations on cassandra (like duplicate migration file),
+check the classpath passed by gradle, possibly migrations are there in multiple classpaths.
+Possible solution is to put this in shr/build.gradle
+#+BEGIN_SRC
+    sourceSets {
+        main {
+            output.resourcesDir = "build/classes/main"
+        }
+    }
+#+END_SRC
+
+or
+
+#+BEGIN_SRC
+    gradlew runSHR  -x test
+#+END_SRC
+
+
+- the runSHR runs the SHR in debug mode, in which case you have to attach a debugger. Alternatively, you can
+modify the /build.gradle.getProcessBuilder() method to remove the additional options '--debug', '--debug-jvm'.
