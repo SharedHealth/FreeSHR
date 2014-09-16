@@ -49,6 +49,7 @@ public class EncounterRepositoryTest {
         assertThat(encounter.getEncounterContent().toString(), is(content()));
     }
 
+
     @After
     public void teardown() {
         cqlOperations.execute("truncate encounter");
@@ -61,6 +62,7 @@ public class EncounterRepositoryTest {
         bundle.setEncounterContent(asString("jsons/encounters/valid.json"));
         return bundle;
     }
+
 
     private String content() {
         return asString("jsons/encounters/valid.json");

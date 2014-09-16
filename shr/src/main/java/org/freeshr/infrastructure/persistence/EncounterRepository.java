@@ -28,12 +28,17 @@ public class EncounterRepository {
         this.cqlOperations = cassandraTemplate;
     }
 
-    public void save(EncounterBundle encounterBundle) {
-        cqlOperations.executeAsynchronously("INSERT INTO encounter (encounter_id, health_id, date, content) VALUES ('"
+    public void save(EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
+        cqlOperations.executeAsynchronously("INSERT INTO encounter (encounter_id, health_id, date, content,division_id,district_id,upazilla_id,cityCorporation_id,ward_id) VALUES ('"
                 + encounterBundle.getEncounterId() + "','"
                 + encounterBundle.getHealthId() + "','"
                 + getCurrentTime() + "','"
-                + encounterBundle.getEncounterContent()
+                + encounterBundle.getEncounterContent() + "','"
+                + getPatient(encounterBundle.getHealthId()).getAddress().getDivision() + "','"
+                + getPatient(encounterBundle.getHealthId()).getAddress().getDistrict() + "','"
+                + getPatient(encounterBundle.getHealthId()).getAddress().getUpazilla() + "','"
+                + getPatient(encounterBundle.getHealthId()).getAddress().getCityCorporation() + "','"
+                + getPatient(encounterBundle.getHealthId()).getAddress().getWard()
                 + "');");
     }
 
@@ -58,5 +63,11 @@ public class EncounterRepository {
 
     private String getCurrentTime() {
         return String.format("%tFT%<tRZ", new Date());
+    }
+
+    private org.freeshr.domain.model.patient.Patient getPatient(String healthId) throws ExecutionException, InterruptedException {
+        PatientRepository patientRepository = new PatientRepository(cqlOperations);
+        ListenableFuture<org.freeshr.domain.model.patient.Patient> patient=patientRepository.find(healthId);
+        return patient.get();
     }
 }
