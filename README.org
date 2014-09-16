@@ -12,7 +12,7 @@ To build the FreeSHR artifact, run the gradlew file in the operating system of y
 To run the application execute
 
 #+BEGIN_SRC
-	gradlew :runSHR
+	gradlew runSHR
 #+END_SRC
 
 To setup your intellij run
@@ -34,7 +34,7 @@ Make sure that you have cassandra running and local.properties have the right co
 
 Troubleshooting:
 - If you are getting error while running migrations on cassandra (like duplicate migration file),
-check the classpath passed by gradle, possibly migrations are there in multiple classpaths.
+check the classpath passed by gradle, possibly migrations are there in multiple classpath locations.
 Possible solution is to put this in shr/build.gradle
 #+BEGIN_SRC
     sourceSets {
@@ -53,3 +53,13 @@ or
 
 - the runSHR runs the SHR in debug mode, in which case you have to attach a debugger. Alternatively, you can
 modify the /build.gradle.getProcessBuilder() method to remove the additional options '--debug', '--debug-jvm'.
+
+- the current setup assumes that you are running the SHR server on the host and cassandra on guest VM. If you want to run
+SHR on the guest, then cd to /vagrant, and exec ./gradlew runSHR. In that case, ensure that you have the right configurations
+in env/local.properties
+
+vagrant provision runs scripts/provision-local.sh, which updates cassandra configuration to fixed IP address of the guest VM.
+
+- if running SHR from host machine and connecting to the cassandra on vagrant, then in guest's /etc/cassandra/conf/cassandra.yml
+file, ensure "listen_address", "seeds", "rpc_address" are set property to refer to the IP address instead of localhost.
+
