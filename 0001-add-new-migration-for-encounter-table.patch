@@ -1,0 +1,16 @@
+From 4df73a5c160447e74d41e674f8b60ccd1ed5c155 Mon Sep 17 00:00:00 2001
+From: sumitjai <sumitjai@INsumitjai.local>
+Date: Tue, 16 Sep 2014 10:26:44 +0530
+Subject: [PATCH] add new migration for encounter table
+
+---
+ shr/src/main/resources/org/freeshr/cassandra/migrations/V005.cql | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 shr/src/main/resources/org/freeshr/cassandra/migrations/V005.cql
+
+diff --git a/shr/src/main/resources/org/freeshr/cassandra/migrations/V005.cql b/shr/src/main/resources/org/freeshr/cassandra/migrations/V005.cql
+new file mode 100644
+index 0000000..e69de29
+-- 
+2.0.2
+

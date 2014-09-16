@@ -38,7 +38,11 @@ public class EncounterService {
                     EncounterResponse response = new EncounterResponse();
                     if (result) {
                         encounterBundle.setEncounterId(UUID.randomUUID().toString());
-                        encounterRepository.save(encounterBundle);
+                        try {
+                            encounterRepository.save(encounterBundle);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         response.setEncounterId(encounterBundle.getEncounterId());
                         return response;
                     } else {
@@ -49,6 +53,10 @@ public class EncounterService {
         } else {
             return validationResult;
         }
+    }
+
+    private void extractPatientLocation(EncounterBundle encounterBundle) {
+
     }
 
     public ListenableFuture<List<EncounterBundle>> findAll(String healthId) {
