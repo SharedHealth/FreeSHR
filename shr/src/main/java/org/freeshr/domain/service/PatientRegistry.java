@@ -25,25 +25,25 @@ public class PatientRegistry {
         this.masterClientIndexWrapper = masterClientIndexWrapper;
     }
 
-    public ListenableFuture<Boolean> ensurePresent(final String healthId) {
-        return new ListenableFutureAdapter<Boolean, Patient>(allPatients.find(healthId)) {
+    public ListenableFuture<Patient> ensurePresent(final String healthId) {
+        return new ListenableFutureAdapter<Patient, Patient>(allPatients.find(healthId)) {
             @Override
-            protected Boolean adapt(Patient result) throws ExecutionException {
+            protected Patient adapt(Patient result) throws ExecutionException {
                 if (null == result) {
                     try {
-                        return new ListenableFutureAdapter<Boolean, Patient>(masterClientIndexWrapper.getPatient(healthId)) {
+                        return new ListenableFutureAdapter<Patient, Patient>(masterClientIndexWrapper.getPatient(healthId)) {
                             @Override
-                            protected Boolean adapt(Patient result) throws ExecutionException {
+                            protected Patient adapt(Patient result) throws ExecutionException {
                                 allPatients.save(result);
-                                return null != result;
+                                return result;
                             }
                         }.get();
                     } catch (Exception e) {
                         logger.warn(e);
-                        return Boolean.FALSE;
+                        return null;
                     }
                 } else {
-                    return Boolean.TRUE;
+                    return result;
                 }
             }
         };

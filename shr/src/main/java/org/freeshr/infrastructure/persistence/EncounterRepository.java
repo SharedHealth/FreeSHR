@@ -3,6 +3,8 @@ package org.freeshr.infrastructure.persistence;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import org.freeshr.application.fhir.EncounterBundle;
+import org.freeshr.domain.model.patient.Address;
+import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.utils.concurrent.SimpleListenableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,23 +30,32 @@ public class EncounterRepository {
         this.cqlOperations = cassandraTemplate;
     }
 
-    public void save(EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
-        cqlOperations.executeAsynchronously("INSERT INTO encounter (encounter_id, health_id, date, content,division_id,district_id,upazilla_id,cityCorporation_id,ward_id) VALUES ('"
-                + encounterBundle.getEncounterId() + "','"
+    public void save(EncounterBundle encounterBundle, Patient patient) throws ExecutionException, InterruptedException {
+        Address address = patient.getAddress();
+        cqlOperations.executeAsynchronously("INSERT INTO encounter (encounter_id, health_id, date, content,division_id, district_id, upazilla_id, city_corporation_id,ward_id) VALUES ( '"+encounterBundle.getEncounterId() + "','"
                 + encounterBundle.getHealthId() + "','"
                 + getCurrentTime() + "','"
                 + encounterBundle.getEncounterContent() + "','"
-                + getPatient(encounterBundle.getHealthId()).getAddress().getDivision() + "','"
-                + getPatient(encounterBundle.getHealthId()).getAddress().getDistrict() + "','"
-                + getPatient(encounterBundle.getHealthId()).getAddress().getUpazilla() + "','"
-                + getPatient(encounterBundle.getHealthId()).getAddress().getCityCorporation() + "','"
-                + getPatient(encounterBundle.getHealthId()).getAddress().getWard()
-                + "');");
+                + address.getDivision() + "','"
+                + address.getDivision() + address.getDistrict() + "','"
+                + address.getDivision() + address.getDistrict() + address.getUpazilla() + "','"
+                + address.getDivision() + address.getDistrict() + address.getUpazilla() + address.getCityCorporation() + "','"
+                + address.getDivision() + address.getDistrict() + address.getUpazilla() + address.getCityCorporation() + address.getWard() +
+                "');");
     }
 
     public ListenableFuture<List<EncounterBundle>> findAll(String healthId) {
+        return executeFindQuery("SELECT * FROM encounter WHERE health_id='" + healthId + "';");
+    }
+
+    public ListenableFuture<List<EncounterBundle>> findAllEncountersByCatchment(String columnValue , String columnName) {
+        return executeFindQuery("SELECT * FROM encounter WHERE " + columnName + "='" + columnValue + "';");
+    }
+
+
+    private ListenableFuture<List<EncounterBundle>> executeFindQuery(final String cql) {
         return new SimpleListenableFuture<List<EncounterBundle>, ResultSet>(
-                cqlOperations.queryAsynchronously("SELECT * FROM encounter WHERE health_id='" + healthId + "';")) {
+                cqlOperations.queryAsynchronously(cql)) {
             @Override
             protected List<EncounterBundle> adapt(ResultSet resultSet) throws ExecutionException {
                 List<EncounterBundle> bundles = new ArrayList<EncounterBundle>();
@@ -60,6 +71,7 @@ public class EncounterRepository {
             }
         };
     }
+
 
     private String getCurrentTime() {
         return String.format("%tFT%<tRZ", new Date());

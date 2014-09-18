@@ -25,6 +25,18 @@ public class Address {
     @JsonProperty("city_corporation_id")
     private String cityCorporation;
 
+    public Address(){
+
+    }
+
+    public Address(String division, String district, String upazilla, String cityCorporation, String ward) {
+        this.division = division;
+        this.district = district;
+        this.upazilla = upazilla;
+        this.cityCorporation = cityCorporation;
+        this.ward = ward;
+    }
+
 
     public String getLine() {
         return line;

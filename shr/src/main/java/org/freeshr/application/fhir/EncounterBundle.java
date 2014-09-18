@@ -36,6 +36,28 @@ public class EncounterBundle {
         return date;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        EncounterBundle that = (EncounterBundle) o;
+
+        if (date != null ? !date.equals(that.date) : that.date != null) return false;
+        if (encounterId != null ? !encounterId.equals(that.encounterId) : that.encounterId != null) return false;
+        if (healthId != null ? !healthId.equals(that.healthId) : that.healthId != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = encounterId != null ? encounterId.hashCode() : 0;
+        result = 31 * result + (healthId != null ? healthId.hashCode() : 0);
+        result = 31 * result + (date != null ? date.hashCode() : 0);
+        return result;
+    }
+
     public void setDate(String date) {
         this.date = date;
     }
