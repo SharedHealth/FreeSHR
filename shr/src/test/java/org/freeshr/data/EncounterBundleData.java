@@ -10,6 +10,9 @@ public class EncounterBundleData {
     public static EncounterBundle withValidEncounter(String healthId) {
         return encounter(healthId, asString("xmls/encounters/encounter.xml"));
     }
+    public static EncounterBundle withNewValidEncounter(String healthId) {
+        return encounter(healthId, asString("xmls/encounters/encounter_new.xml"));
+    }
 
     public static EncounterBundle withInvalidConcept(String healthId) {
         return encounter(healthId, asString("xmls/encounters/invalid_concept.xml"));

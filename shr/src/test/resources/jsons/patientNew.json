@@ -1,0 +1,18 @@
+{
+    "hid": "44e24827-fd5d-4024-9f65-5a3c88a28af5",
+    "first_name": "amar",
+    "middle_name": "akbar",
+    "last_name": "anthony",
+    "date_of_birth": "2000-12-12",
+    "gender": "1",
+    "primary_contact": "ssss",
+    "present_address": {
+        "address_line": "house30",
+        "division_id": "30",
+        "district_id": "56",
+        "upazilla_id": "50",
+        "ward_id": "17",
+        "city_corporation_id": "99"
+    },
+    "permanent_address": null, "full_name": null
+}

@@ -3,6 +3,8 @@ package org.freeshr.infrastructure.persistence;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
+import org.freeshr.domain.model.patient.Address;
+import org.freeshr.domain.model.patient.Patient;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,21 +36,22 @@ public class EncounterRepositoryTest {
     CqlOperations cqlOperations;
 
     @Test
-    public void shouldFetchAllEncounters() throws InterruptedException, ExecutionException {
-        encounterRepository.save(createEncounterBundle("e-0", "h100"));
-        encounterRepository.save(createEncounterBundle("e-1", "h100"));
-        encounterRepository.save(createEncounterBundle("e-2", "h100"));
+    public void shouldFetchEncounterByHealthId() throws InterruptedException, ExecutionException {
+        Patient patient1 = new Patient();
+        patient1.setHealthId("h100");
+        patient1.setAddress(new Address("01", "02", "03", "04", "05"));
+        encounterRepository.save(createEncounterBundle("e-0", "h100"), patient1);
+        encounterRepository.save(createEncounterBundle("e-1", "h100"), patient1);
+        encounterRepository.save(createEncounterBundle("e-2", "h100"), patient1);
 
         Thread.sleep(1000);
 
         List<EncounterBundle> encounters = encounterRepository.findAll("h100").get();
         EncounterBundle encounter = encounters.get(0);
-
         assertEquals(3, encounters.size());
         assertThat(encounter.getDate(), is(notNullValue()));
         assertThat(encounter.getEncounterContent().toString(), is(content()));
     }
-
 
     @After
     public void teardown() {
