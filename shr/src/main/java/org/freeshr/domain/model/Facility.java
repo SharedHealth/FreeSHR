@@ -55,4 +55,26 @@ public class Facility {
     public String getCatchmentsInCommaSeparatedString() {
         return join(catchments, ",");
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Facility facility = (Facility) o;
+
+        if (!catchments.equals(facility.catchments)) return false;
+        if (!facilityId.equals(facility.facilityId)) return false;
+        if (!facilityName.equals(facility.facilityName)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = facilityId.hashCode();
+        result = 31 * result + facilityName.hashCode();
+        result = 31 * result + catchments.hashCode();
+        return result;
+    }
 }
