@@ -1,0 +1,1 @@
+CREATE INDEX encounter_date_time_index ON encounter (date);

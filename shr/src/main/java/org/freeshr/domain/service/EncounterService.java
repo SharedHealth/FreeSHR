@@ -4,6 +4,7 @@ import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.application.fhir.FhirValidator;
+import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
 import org.freeshr.utils.concurrent.PreResolvedListenableFuture;
@@ -21,12 +22,15 @@ public class EncounterService {
     private EncounterRepository encounterRepository;
     private PatientRegistry patientRegistry;
     private FhirValidator fhirValidator;
+    private FacilityRegistry facilityRegistry;
+
 
     @Autowired
-    public EncounterService(EncounterRepository encounterRepository, PatientRegistry patientRegistry, FhirValidator fhirValidator) {
+    public EncounterService(EncounterRepository encounterRepository, PatientRegistry patientRegistry, FhirValidator fhirValidator, FacilityRegistry facilityRegistry) {
         this.encounterRepository = encounterRepository;
         this.patientRegistry = patientRegistry;
         this.fhirValidator = fhirValidator;
+        this.facilityRegistry = facilityRegistry;
     }
 
     public ListenableFuture<EncounterResponse> ensureCreated(final EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
@@ -84,7 +88,22 @@ public class EncounterService {
     }};
 
 
-    public Set<EncounterBundle> findAllEncountersByCatchments(List<String> catchments) throws ExecutionException, InterruptedException {
+    public ListenableFuture<List<EncounterBundle>> findAllEncountersByCatchments(String facilityId) {
+        return new ListenableFutureAdapter<List<EncounterBundle>, Facility>(facilityRegistry.ensurePresent(facilityId)) {
+
+            @Override
+            protected List<EncounterBundle> adapt(Facility facility) throws ExecutionException {
+                try {
+                    return new ArrayList<>(findAllEncountersByCatchments(facility.getCatchments()));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        };
+    }
+
+    private Set<EncounterBundle> findAllEncountersByCatchments(List<String> catchments) throws ExecutionException, InterruptedException {
         final Set<EncounterBundle> bundles = new HashSet<>();
         for (String catchment : catchments) {
             int length = catchment.length();
@@ -95,4 +114,6 @@ public class EncounterService {
         }
         return bundles;
     }
+
+
 }

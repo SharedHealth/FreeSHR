@@ -37,10 +37,10 @@ public class EncounterRepository {
                 + getCurrentTime() + "','"
                 + encounterBundle.getEncounterContent() + "','"
                 + address.getDivision() + "','"
-                + address.getDivision() + address.getDistrict() + "','"
-                + address.getDivision() + address.getDistrict() + address.getUpazilla() + "','"
-                + address.getDivision() + address.getDistrict() + address.getUpazilla() + address.getCityCorporation() + "','"
-                + address.getDivision() + address.getDistrict() + address.getUpazilla() + address.getCityCorporation() + address.getWard() +
+                + address.getConcatenatedDistrictId() + "','"
+                + address.getConcatenatedUpazillaId() + "','"
+                + address.getConcatenatedCityCorporationId() + "','"
+                + address.getConcatenatedWardId() +
                 "');");
     }
 
@@ -77,9 +77,4 @@ public class EncounterRepository {
         return String.format("%tFT%<tRZ", new Date());
     }
 
-    private org.freeshr.domain.model.patient.Patient getPatient(String healthId) throws ExecutionException, InterruptedException {
-        PatientRepository patientRepository = new PatientRepository(cqlOperations);
-        ListenableFuture<org.freeshr.domain.model.patient.Patient> patient=patientRepository.find(healthId);
-        return patient.get();
-    }
 }

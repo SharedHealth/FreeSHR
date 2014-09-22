@@ -25,7 +25,7 @@ public class Address {
     @JsonProperty("city_corporation_id")
     private String cityCorporation;
 
-    public Address(){
+    public Address() {
 
     }
 
@@ -77,6 +77,23 @@ public class Address {
     public void setUpazilla(String upazilla) {
         this.upazilla = upazilla;
     }
+
+    public String getConcatenatedDistrictId() {
+        return division + district;
+    }
+
+    public String getConcatenatedUpazillaId() {
+        return division + district + upazilla;
+    }
+
+    public String getConcatenatedCityCorporationId() {
+        return cityCorporation != null ? division + district + upazilla + cityCorporation : null;
+    }
+
+    public String getConcatenatedWardId() {
+        return ward != null ? division + district + upazilla + cityCorporation + ward : null;
+    }
+
 
     @Override
     public boolean equals(Object rhs) {

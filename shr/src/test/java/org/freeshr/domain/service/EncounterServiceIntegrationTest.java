@@ -5,8 +5,10 @@ import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
+import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
+import org.freeshr.infrastructure.persistence.FacilityRepository;
 import org.freeshr.infrastructure.persistence.PatientRepository;
 import org.freeshr.util.ValidationFailures;
 import org.junit.After;
@@ -29,7 +31,6 @@ import static org.freeshr.utils.FileUtil.asString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
@@ -43,6 +44,9 @@ public class EncounterServiceIntegrationTest {
 
     @Autowired
     private PatientRepository patientRepository;
+
+    @Autowired
+    private FacilityRepository facilityRepository;
 
     @Autowired
     @Qualifier("SHRCassandraTemplate")
@@ -116,23 +120,27 @@ public class EncounterServiceIntegrationTest {
 
     }
 
-    //Single test to test different scenarios because db teardown not happening after every test.
-
     @Test
     public void shouldReturnTheListOfEncountersForGivenListOfCatchments() throws ExecutionException, InterruptedException {
+        Facility facility1 = new Facility("1", "far", "3056");
+        Facility facility2 = new Facility("2", "foo", "305650");
+        facilityRepository.save(facility1);
+        facilityRepository.save(facility2);
+
         // Two unique encounters found in same catchment for 2 different patients
         encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID)).get();
         encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID_NEW)).get();
+
         Thread.sleep(2000);
-        List<String> catchments= Arrays.asList("3056");
-        Set<EncounterBundle> encounterBundles = encounterService.findAllEncountersByCatchments(catchments);
+//        List<String> catchments= Arrays.asList("3056");
+        List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByCatchments("1").get();
         List<String> healthIds = extractListOfHealthIds(encounterBundles);
         assertEquals(2, healthIds.size());
         assertTrue(healthIds.containsAll(Arrays.asList(VALID_HEALTH_ID, VALID_HEALTH_ID_NEW)));
 
         //Only one encounter found in a given catchment
-        catchments= Arrays.asList("305650");
-        encounterBundles = encounterService.findAllEncountersByCatchments(catchments);
+        //catchments= Arrays.asList("305650");
+        encounterBundles = encounterService.findAllEncountersByCatchments("2").get();
         healthIds = extractListOfHealthIds(encounterBundles);
         assertEquals(1, healthIds.size());
         assertTrue(healthIds.containsAll(Arrays.asList(VALID_HEALTH_ID_NEW)));
@@ -142,11 +150,12 @@ public class EncounterServiceIntegrationTest {
 
     @Test
     public void shouldReturnUniqueListOfEncountersForSameHealthIdGivenListOfCatchments() throws ExecutionException, InterruptedException {
-        List<String> catchments= Arrays.asList("30", "3056");
+        Facility facility1 = new Facility("1", "far", "3056");
+        facilityRepository.save(facility1);
         encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID)).get();
         encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID)).get();
 
-        Set<EncounterBundle> encounterBundles = encounterService.findAllEncountersByCatchments(catchments);
+        List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByCatchments("1").get();
         ArrayList<String> healthIds = extractListOfHealthIds(encounterBundles);
         Collections.sort(healthIds);
         assertEquals(2, healthIds.size());
@@ -155,15 +164,16 @@ public class EncounterServiceIntegrationTest {
 
     @Test
     public void shouldReturnUniqueListOfEncountersForGivenListOfCatchments() throws ExecutionException, InterruptedException {
-        List<String> catchments= Arrays.asList("30", "3056", "305610");
+        Facility facility2 = new Facility("2", "foo", "3056,10");
+        facilityRepository.save(facility2);
         encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID)).get();
 
-        Set<EncounterBundle> encounterBundles = encounterService.findAllEncountersByCatchments(catchments);
+        List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByCatchments("2").get();
         assertEquals(1, encounterBundles.size());
         assertEquals(VALID_HEALTH_ID,encounterBundles.iterator().next().getHealthId());
     }
 
-    private ArrayList<String> extractListOfHealthIds(Set<EncounterBundle> encounterBundles) {
+    private ArrayList<String> extractListOfHealthIds(List<EncounterBundle> encounterBundles) {
         ArrayList<String> healthIds = new ArrayList<>();
         for (EncounterBundle encounterBundle : encounterBundles) {
             healthIds.add(encounterBundle.getHealthId());
