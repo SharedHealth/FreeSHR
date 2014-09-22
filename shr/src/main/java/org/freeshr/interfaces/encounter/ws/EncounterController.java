@@ -73,6 +73,26 @@ public class EncounterController {
         return deferredResult;
     }
 
+    @RequestMapping(value = "/encounters/bycatchments",method = RequestMethod.GET)
+    public DeferredResult<List<EncounterBundle>> findAllByCatchment(@PathVariable String facilityId){
+        logger.debug(" Find all encounters by facility id:" + facilityId);
+        final DeferredResult<List<EncounterBundle>> deferredResult = new DeferredResult<>();
+
+        encounterService.findAllEncountersByCatchments(facilityId).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
+            @Override
+            public void onSuccess(List<EncounterBundle> result) {
+                deferredResult.setResult(result);
+            }
+
+            @Override
+            public void onFailure(Throwable error) {
+                deferredResult.setErrorResult(error);
+            }
+        });
+        return deferredResult;
+
+    }
+
     @ResponseStatus(value = HttpStatus.PRECONDITION_FAILED)
     @ResponseBody
     @ExceptionHandler(PreconditionFailed.class)
