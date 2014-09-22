@@ -164,7 +164,7 @@ public class EncounterServiceIntegrationTest {
 
     @Test
     public void shouldReturnUniqueListOfEncountersForGivenListOfCatchments() throws ExecutionException, InterruptedException {
-        Facility facility2 = new Facility("2", "foo", "3056,10");
+        Facility facility2 = new Facility("2", "foo", "305610");
         facilityRepository.save(facility2);
         encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID)).get();
 
