@@ -73,12 +73,13 @@ public class EncounterController {
         return deferredResult;
     }
 
-    @RequestMapping(value = "/encounters/bycatchments",method = RequestMethod.GET)
-    public DeferredResult<List<EncounterBundle>> findAllByCatchment(@PathVariable String facilityId){
+
+    @RequestMapping(value = "/encounters/bycatchments/{facilityId}/{time}",method = RequestMethod.GET)
+    public DeferredResult<List<EncounterBundle>> findAllByCatchment(@PathVariable String facilityId,@PathVariable String time){
         logger.debug(" Find all encounters by facility id:" + facilityId);
         final DeferredResult<List<EncounterBundle>> deferredResult = new DeferredResult<>();
 
-        encounterService.findAllEncountersByCatchments(facilityId).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
+        encounterService.findAllEncountersByCatchments(facilityId,time).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
             @Override
             public void onSuccess(List<EncounterBundle> result) {
                 deferredResult.setResult(result);
