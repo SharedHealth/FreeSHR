@@ -171,7 +171,6 @@ public class EncounterServiceIntegrationTest {
         assertTrue(healthIds.containsAll(Arrays.asList(VALID_HEALTH_ID, VALID_HEALTH_ID)));
     }
 
-
     @Test
     public void shouldReturnUniqueListOfEncountersForGivenListOfCatchments() throws ExecutionException, InterruptedException {
         Facility facility2 = new Facility("2", "foo", "305610");
@@ -182,6 +181,7 @@ public class EncounterServiceIntegrationTest {
         assertEquals(1, encounterBundles.size());
         assertEquals(VALID_HEALTH_ID,encounterBundles.iterator().next().getHealthId());
     }
+
 
     private ArrayList<String> extractListOfHealthIds(List<EncounterBundle> encounterBundles) {
         ArrayList<String> healthIds = new ArrayList<>();
