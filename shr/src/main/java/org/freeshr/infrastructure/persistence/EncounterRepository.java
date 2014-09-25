@@ -14,6 +14,8 @@ import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -34,7 +36,7 @@ public class EncounterRepository {
         Address address = patient.getAddress();
         cqlOperations.executeAsynchronously("INSERT INTO encounter (encounter_id, health_id, date, content,division_id, district_id, upazilla_id, city_corporation_id,ward_id) VALUES ( '"+encounterBundle.getEncounterId() + "','"
                 + encounterBundle.getHealthId() + "','"
-                + getCurrentTime() + "','"
+                + getCurrentTimeInUTC() + "','"
                 + encounterBundle.getEncounterContent() + "','"
                 + address.getDivision() + "','"
                 + address.getConcatenatedDistrictId() + "','"
@@ -48,8 +50,10 @@ public class EncounterRepository {
         return executeFindQuery("SELECT * FROM encounter WHERE health_id='" + healthId + "';");
     }
 
-    public ListenableFuture<List<EncounterBundle>> findAllEncountersByCatchment(String columnValue , String columnName) {
-        return executeFindQuery("SELECT * FROM encounter WHERE " + columnName + "='" + columnValue + "';");
+    public ListenableFuture<List<EncounterBundle>> findAllEncountersByCatchment(String columnValue , String columnName,String date ,String currentTime) throws ParseException {
+        String query = String.format("SELECT * FROM encounter WHERE %s = ' %s ' and date > %s and date < %s ; ", columnName, columnValue, date, getCurrentTimeInUTC());
+        System.out.println("executing query:" + query);
+        return executeFindQuery(query);
     }
 
 
@@ -63,7 +67,7 @@ public class EncounterRepository {
                     EncounterBundle bundle = new EncounterBundle();
                     bundle.setEncounterId(result.getString("encounter_id"));
                     bundle.setHealthId(result.getString("health_id"));
-                    bundle.setDate(result.getString("date"));
+                    bundle.setDate(fromUTCDate(result.getDate("date")));
                     bundle.setEncounterContent(result.getString("content"));
                     bundles.add(bundle);
                 }
@@ -72,9 +76,25 @@ public class EncounterRepository {
         };
     }
 
-
-    private String getCurrentTime() {
-        return String.format("%tFT%<tRZ", new Date());
+    public String fromUTCDate(Date aDate) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd HH:mm:ssZ");
+        return dateFormat.format(aDate);
     }
 
+    public Date fromUTCDate(String aDate) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd HH:mm:ssZ");
+        return dateFormat.parse(aDate);
+    }
+
+
+    public String getCurrentTimeInUTC() {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd HH:mm:ssZ");
+        return format.format(new Date());
+    }
+
+    public static void main(String[] args) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd HH:mm:ssZ");
+
+        System.out.println(format.format(new Date()));
+    }
 }

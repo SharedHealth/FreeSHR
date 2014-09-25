@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureAdapter;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -88,14 +90,16 @@ public class EncounterService {
     }};
 
 
-    public ListenableFuture<List<EncounterBundle>> findAllEncountersByCatchments(String facilityId) {
+    public ListenableFuture<List<EncounterBundle>> findAllEncountersByCatchments(String facilityId,final String date) {
         return new ListenableFutureAdapter<List<EncounterBundle>, Facility>(facilityRegistry.ensurePresent(facilityId)) {
 
             @Override
             protected List<EncounterBundle> adapt(Facility facility) throws ExecutionException {
                 try {
-                    return new ArrayList<>(findAllEncountersByCatchments(facility.getCatchments()));
+                    return new ArrayList<>(findAllEncountersByCatchments(facility.getCatchments(), date));
                 } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ParseException e) {
                     e.printStackTrace();
                 }
                 return null;
@@ -103,16 +107,20 @@ public class EncounterService {
         };
     }
 
-    private Set<EncounterBundle> findAllEncountersByCatchments(List<String> catchments) throws ExecutionException, InterruptedException {
+    private Set<EncounterBundle> findAllEncountersByCatchments(List<String> catchments,String date) throws ExecutionException, InterruptedException, ParseException {
         final Set<EncounterBundle> bundles = new HashSet<>();
         for (String catchment : catchments) {
             int length = catchment.length();
-
-            ListenableFuture<List<EncounterBundle>> allEncountersByCatchment = encounterRepository.findAllEncountersByCatchment(catchment, AddressHierarchy.get(length));
+            String currentTime=getCurrentTimeInUTC();
+            ListenableFuture<List<EncounterBundle>> allEncountersByCatchment = encounterRepository.findAllEncountersByCatchment(catchment, AddressHierarchy.get(length),date,currentTime);
             bundles.addAll(allEncountersByCatchment.get());
 
         }
         return bundles;
+    }
+    private String getCurrentTimeInUTC() {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd HH:mm:ssZ");
+        return format.format(new Date());
     }
 
 
