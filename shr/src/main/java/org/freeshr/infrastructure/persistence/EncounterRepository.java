@@ -5,6 +5,7 @@ import com.datastax.driver.core.Row;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
+import org.freeshr.utils.DateUtil;
 import org.freeshr.utils.concurrent.SimpleListenableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
 @Component
@@ -26,17 +28,23 @@ public class EncounterRepository {
     private static final Logger logger = LoggerFactory.getLogger(EncounterRepository.class);
 
     private CqlOperations cqlOperations;
+    private DateUtil dateUtil;
 
     @Autowired
     public EncounterRepository(@Qualifier("SHRCassandraTemplate") CqlOperations cassandraTemplate) {
         this.cqlOperations = cassandraTemplate;
+        setDateUtil(new DateUtil());
+    }
+
+    void setDateUtil(DateUtil dateUtil) {
+        this.dateUtil = dateUtil;
     }
 
     public void save(EncounterBundle encounterBundle, Patient patient) throws ExecutionException, InterruptedException {
         Address address = patient.getAddress();
-        cqlOperations.executeAsynchronously("INSERT INTO encounter (encounter_id, health_id, date, content,division_id, district_id, upazilla_id, city_corporation_id,ward_id) VALUES ( '"+encounterBundle.getEncounterId() + "','"
+        cqlOperations.executeAsynchronously("INSERT INTO encounter (encounter_id, health_id, date, content,division_id, district_id, upazilla_id, city_corporation_id,ward_id) VALUES ( '" + encounterBundle.getEncounterId() + "','"
                 + encounterBundle.getHealthId() + "','"
-                + getCurrentTimeInUTC() + "','"
+                + dateUtil.getCurrentTimeInUTC() + "','"
                 + encounterBundle.getEncounterContent() + "','"
                 + address.getDivision() + "','"
                 + address.getConcatenatedDistrictId() + "','"
@@ -50,9 +58,8 @@ public class EncounterRepository {
         return executeFindQuery("SELECT * FROM encounter WHERE health_id='" + healthId + "';");
     }
 
-    public ListenableFuture<List<EncounterBundle>> findAllEncountersByCatchment(String columnValue , String columnName,String date ,String currentTime) throws ParseException {
-        String query = String.format("SELECT * FROM encounter WHERE %s = ' %s ' and date > %s and date < %s ; ", columnName, columnValue, date, getCurrentTimeInUTC());
-        System.out.println("executing query:" + query);
+    public ListenableFuture<List<EncounterBundle>> findAllEncountersByCatchment(String columnValue , String columnName, String date) throws ParseException {
+        String query = String.format("SELECT * FROM encounter WHERE %s = '%s' and date > '%s'; ", columnName, columnValue, date);
         return executeFindQuery(query);
     }
 
@@ -67,7 +74,7 @@ public class EncounterRepository {
                     EncounterBundle bundle = new EncounterBundle();
                     bundle.setEncounterId(result.getString("encounter_id"));
                     bundle.setHealthId(result.getString("health_id"));
-                    bundle.setDate(fromUTCDate(result.getDate("date")));
+                    bundle.setDate(dateUtil.fromUTCDate(result.getDate("date")));
                     bundle.setEncounterContent(result.getString("content"));
                     bundles.add(bundle);
                 }
@@ -76,25 +83,6 @@ public class EncounterRepository {
         };
     }
 
-    public String fromUTCDate(Date aDate) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd HH:mm:ssZ");
-        return dateFormat.format(aDate);
-    }
-
-    public Date fromUTCDate(String aDate) throws ParseException {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd HH:mm:ssZ");
-        return dateFormat.parse(aDate);
-    }
 
 
-    public String getCurrentTimeInUTC() {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd HH:mm:ssZ");
-        return format.format(new Date());
-    }
-
-    public static void main(String[] args) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd HH:mm:ssZ");
-
-        System.out.println(format.format(new Date()));
-    }
 }

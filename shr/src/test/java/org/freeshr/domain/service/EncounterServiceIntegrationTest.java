@@ -21,6 +21,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -120,68 +122,121 @@ public class EncounterServiceIntegrationTest {
         assertThat(response, is(notNullValue()));
         assertTrue(response.isSuccessful());
         assertValidPatient(patientRepository.find(VALID_HEALTH_ID).get());
+        encounterService.findAll(VALID_HEALTH_ID).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
+            @Override
+            public void onSuccess(List<EncounterBundle> encounterBundles) {
+                assertThat(encounterBundles.size(), is(1));
+                assertThat(encounterBundles.get(0).getHealthId(), is(VALID_HEALTH_ID));
+            }
+            @Override
+            public void onFailure(Throwable t) {
+
+            }
+        });
 
     }
 
-//    @Test
-//    public void shouldReturnTheListOfEncountersForGivenListOfCatchments() throws ExecutionException, InterruptedException {
-//        Facility facility1 = new Facility("1", "far", "3056");
-//        Facility facility2 = new Facility("2", "foo", "305650");
-//        facilityRepository.save(facility1);
-//        facilityRepository.save(facility2);
-//
-//        // Two unique encounters found in same catchment for 2 different patients
-//        encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID)).get();
-//        encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID_NEW)).get();
-//
-//        Thread.sleep(2000);
-////        List<String> catchments= Arrays.asList("3056");
-//        List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByCatchments("1").get();
-//        List<String> healthIds = extractListOfHealthIds(encounterBundles);
-//        assertEquals(2, healthIds.size());
-//        assertTrue(healthIds.containsAll(Arrays.asList(VALID_HEALTH_ID, VALID_HEALTH_ID_NEW)));
-//
-//        //Only one encounter found in a given catchment
-//        //catchments= Arrays.asList("305650");
-//        encounterBundles = encounterService.findAllEncountersByCatchments("2").get();
-//        healthIds = extractListOfHealthIds(encounterBundles);
-//        assertEquals(1, healthIds.size());
-//        assertTrue(healthIds.containsAll(Arrays.asList(VALID_HEALTH_ID_NEW)));
-//
-//    }
+
+    @Test
+    public void shouldReturnEmptyListOfEncountersWhenGivenFacilityNotFound() throws ExecutionException, InterruptedException {
+        final String date = "2014-09-10";
+
+        encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID_NEW)).get();
+
+        List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByCatchments("1", date).get();
+
+        assertTrue(encounterBundles.isEmpty());
+    }
+
+
+    @Test
+    public void shouldReturnTheListOfEncountersForGivenListOfCatchments() throws ExecutionException, InterruptedException {
+        Facility facility1 = new Facility("1", "facility1", "3056");
+        Facility facility2 = new Facility("2", "facility2", "305650");
+        facilityRepository.save(facility1);
+        facilityRepository.save(facility2);
+        final String date = "2014-09-10";
+
+        // Two unique encounters found in same catchment for 2 different patients
+        encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID)).get();
+        encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID_NEW)).get();
+
+        encounterService.findAllEncountersByCatchments("1", date).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
+            @Override
+            public void onSuccess(List<EncounterBundle> encounterBundles) {
+                List<String> healthIds = extractListOfHealthIds(encounterBundles);
+                assertEquals(2, healthIds.size());
+                assertTrue(healthIds.containsAll(Arrays.asList(VALID_HEALTH_ID, VALID_HEALTH_ID_NEW)));
+            }
+            @Override
+            public void onFailure(Throwable t) {
+
+            }
+        });
+
+        //Only one encounter found in a given catchment
+
+        encounterService.findAllEncountersByCatchments("2", date).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
+            @Override
+            public void onSuccess(List<EncounterBundle> encounterBundles) {
+                List<String> healthIds = extractListOfHealthIds(encounterBundles);
+                assertEquals(1, healthIds.size());
+                assertTrue(healthIds.containsAll(Arrays.asList(VALID_HEALTH_ID_NEW)));
+            }
+            @Override
+            public void onFailure(Throwable t) {
+
+            }
+        });
+
+
+    }
 
 
     @Test
     public void shouldReturnUniqueListOfEncountersForSameHealthIdGivenListOfCatchments() throws ExecutionException, InterruptedException {
-        Facility facility1 = new Facility("1", "far", "3056");
+        Facility facility1 = new Facility("1", "facility1", "3056,30");
         facilityRepository.save(facility1);
         encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID)).get();
         encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID)).get();
 
-        Thread.sleep(2000);
-
-
-        List<EncounterBundle> fooBundles2 = encounterService.findAll(VALID_HEALTH_ID).get();
-        System.out.println(fooBundles2.size());
-        String time="2014-09-10 22:09:55";
-        List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByCatchments("1",time).get();
-        ArrayList<String> healthIds = extractListOfHealthIds(encounterBundles);
-        Collections.sort(healthIds);
-        assertEquals(2, healthIds.size());
-        assertTrue(healthIds.containsAll(Arrays.asList(VALID_HEALTH_ID, VALID_HEALTH_ID)));
+        String date = "2014-09-10";
+        encounterService.findAllEncountersByCatchments("1", date).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
+            @Override
+            public void onSuccess(List<EncounterBundle> encounterBundles) {
+                ArrayList<String> healthIds = extractListOfHealthIds(encounterBundles);
+                Collections.sort(healthIds);
+                assertEquals(2, healthIds.size());
+                assertTrue(healthIds.containsAll(Arrays.asList(VALID_HEALTH_ID, VALID_HEALTH_ID)));
+            }
+            @Override
+            public void onFailure(Throwable t) {
+                fail("Shouldnt have failed");
+            }
+        });
     }
+
 
     @Test
     public void shouldReturnUniqueListOfEncountersForGivenListOfCatchments() throws ExecutionException, InterruptedException {
-        Facility facility2 = new Facility("2", "foo", "305610");
+        Facility facility2 = new Facility("1", "facility1", "305610");
         facilityRepository.save(facility2);
         encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID)).get();
 
-        List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByCatchments("2", "").get();
-        assertEquals(1, encounterBundles.size());
-        assertEquals(VALID_HEALTH_ID,encounterBundles.iterator().next().getHealthId());
-    }
+        String date = "2014-09-10";
+        encounterService.findAllEncountersByCatchments("2", date).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
+            @Override
+            public void onSuccess(List<EncounterBundle> encounterBundles) {
+                assertEquals(1, encounterBundles.size());
+                assertEquals(VALID_HEALTH_ID,encounterBundles.iterator().next().getHealthId());
+            }
+            @Override
+            public void onFailure(Throwable t) {
 
+            }
+        });
+
+    }
 
     private ArrayList<String> extractListOfHealthIds(List<EncounterBundle> encounterBundles) {
         ArrayList<String> healthIds = new ArrayList<>();
