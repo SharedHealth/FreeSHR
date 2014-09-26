@@ -77,7 +77,7 @@ public class XMLWriter extends OutputStreamWriter implements IXMLWriter {
 	 * 
 	 * @param charset
 	 * @return encoding
-	 * @throws java.io.IOException
+	 * @throws IOException
 	 */
 	public static String getXMLCharsetName(String charset) throws IOException {
 		if (charset == null || charset.equals(""))

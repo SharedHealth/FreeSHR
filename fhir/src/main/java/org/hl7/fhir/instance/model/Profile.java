@@ -1256,12 +1256,12 @@ public class Profile extends Resource {
         /**
          * Specifies a primitive value that SHALL hold for this element in the instance.
          */
-        protected Type value;
+        protected org.hl7.fhir.instance.model.Type value;
 
         /**
          * An example value for this element.
          */
-        protected Type example;
+        protected org.hl7.fhir.instance.model.Type example;
 
         /**
          * Indicates the shortest length that SHALL be supported by conformant instances without truncation.
@@ -1594,14 +1594,14 @@ public class Profile extends Resource {
         /**
          * @return {@link #value} (Specifies a primitive value that SHALL hold for this element in the instance.)
          */
-        public Type getValue() {
+        public org.hl7.fhir.instance.model.Type getValue() { 
           return this.value;
         }
 
         /**
          * @param value {@link #value} (Specifies a primitive value that SHALL hold for this element in the instance.)
          */
-        public ElementDefinitionComponent setValue(Type value) {
+        public ElementDefinitionComponent setValue(org.hl7.fhir.instance.model.Type value) { 
           this.value = value;
           return this;
         }
@@ -1609,14 +1609,14 @@ public class Profile extends Resource {
         /**
          * @return {@link #example} (An example value for this element.)
          */
-        public Type getExample() {
+        public org.hl7.fhir.instance.model.Type getExample() { 
           return this.example;
         }
 
         /**
          * @param value {@link #example} (An example value for this element.)
          */
-        public ElementDefinitionComponent setExample(Type value) {
+        public ElementDefinitionComponent setExample(org.hl7.fhir.instance.model.Type value) { 
           this.example = value;
           return this;
         }

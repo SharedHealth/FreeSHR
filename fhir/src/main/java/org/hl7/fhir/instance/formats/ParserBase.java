@@ -43,10 +43,10 @@ public abstract class ParserBase extends FormatUtilities {
   protected int parseIntegerPrimitive(String value) {
     if (value.startsWith("+") && Utilities.IsInteger(value.substring(1)))
       value = value.substring(1);
-	return Integer.parseInt(value);
+	return java.lang.Integer.parseInt(value);
   }
-  protected int parseIntegerPrimitive(Long value) {
-    if (value < Integer.MIN_VALUE || value > Integer.MAX_VALUE) {
+  protected int parseIntegerPrimitive(java.lang.Long value) {
+    if (value < java.lang.Integer.MIN_VALUE || value > java.lang.Integer.MAX_VALUE) {
         throw new IllegalArgumentException
             (value + " cannot be cast to int without changing its value.");
     }
@@ -88,11 +88,11 @@ public abstract class ParserBase extends FormatUtilities {
   }
 
   protected Boolean parseBooleanPrimitive(String value) {
-    return Boolean.valueOf(value);
+    return java.lang.Boolean.valueOf(value);
   }
   
   protected Boolean parseBooleanPrimitive(Boolean value) {
-    return Boolean.valueOf(value);
+    return java.lang.Boolean.valueOf(value);
   }
   
   protected DateAndTime parseInstantPrimitive(String value) throws Exception {

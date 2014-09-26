@@ -46,7 +46,7 @@ public class Extension extends Element {
     /**
      * Value of extension - may be a resource or one of a constrained set of the data types (see Extensibility in the spec for list).
      */
-    protected Type value;
+    protected org.hl7.fhir.instance.model.Type value;
 
     public Extension() {
       super();
@@ -92,14 +92,14 @@ public class Extension extends Element {
     /**
      * @return {@link #value} (Value of extension - may be a resource or one of a constrained set of the data types (see Extensibility in the spec for list).)
      */
-    public Type getValue() {
+    public org.hl7.fhir.instance.model.Type getValue() { 
       return this.value;
     }
 
     /**
      * @param value {@link #value} (Value of extension - may be a resource or one of a constrained set of the data types (see Extensibility in the spec for list).)
      */
-    public Extension setValue(Type value) {
+    public Extension setValue(org.hl7.fhir.instance.model.Type value) { 
       this.value = value;
       return this;
     }

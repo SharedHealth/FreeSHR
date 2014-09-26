@@ -243,7 +243,7 @@ public abstract class JsonComposerBase extends FormatUtilities implements Compos
 		json.value(value);
 	}
 
-  protected void prop(String name, Boolean value) throws Exception {
+  protected void prop(String name, java.lang.Boolean value) throws Exception {
     if (name != null)
       json.name(name);
     json.value(value);
@@ -255,7 +255,7 @@ public abstract class JsonComposerBase extends FormatUtilities implements Compos
     json.value(value);
   }
 
-  protected void prop(String name, Integer value) throws Exception {
+  protected void prop(String name, java.lang.Integer value) throws Exception {
     if (name != null)
       json.name(name);
     json.value(value);

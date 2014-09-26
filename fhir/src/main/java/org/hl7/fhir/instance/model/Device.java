@@ -472,7 +472,7 @@ public class Device extends Resource {
         childrenList.add(new Property("location", "Resource(Location)", "The resource may be found in a literal location (i.e. GPS coordinates), a logical place (i.e. 'in/with the patient'), or a coded location.", 0, java.lang.Integer.MAX_VALUE, location));
         childrenList.add(new Property("patient", "Resource(Patient)", "Patient information, if the resource is affixed to a person.", 0, java.lang.Integer.MAX_VALUE, patient));
         childrenList.add(new Property("contact", "Contact", "Contact details for an organization or a particular human that is responsible for the device.", 0, java.lang.Integer.MAX_VALUE, contact));
-        childrenList.add(new Property("url", "uri", "A network address on which the device may be contacted directly.", 0,  java.lang.Integer.MAX_VALUE, url));
+        childrenList.add(new Property("url", "uri", "A network address on which the device may be contacted directly.", 0, java.lang.Integer.MAX_VALUE, url));
       }
 
       public Device copy() {

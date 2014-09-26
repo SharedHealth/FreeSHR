@@ -46,11 +46,11 @@ public abstract class FormatUtilities {
   }
   
   protected String toString(int value) {
-    return Integer.toString(value);
+    return java.lang.Integer.toString(value);
   }
   
   protected String toString(boolean value) {
-    return Boolean.toString(value);
+    return java.lang.Boolean.toString(value);
   }
   
   protected String toString(BigDecimal value) {

@@ -39,13 +39,13 @@ public interface IXMLWriter {
 	public abstract void start() throws IOException;
 
 	public abstract void attribute(String namespace, String name, String value,
-                                   boolean onlyIfNotEmpty) throws IOException;
+			boolean onlyIfNotEmpty) throws IOException;
 
 	public abstract void attribute(String namespace, String name, String value)
 			throws IOException;
 
 	public abstract void attribute(String name, String value,
-                                   boolean onlyIfNotEmpty) throws IOException;
+			boolean onlyIfNotEmpty) throws IOException;
 
 	public abstract void attribute(String name, String value)
 			throws IOException;
@@ -92,16 +92,16 @@ public interface IXMLWriter {
 	public abstract void open(String name) throws IOException;
 
 	public abstract void element(String namespace, String name, String content,
-                                 boolean onlyIfNotEmpty) throws IOException;
+			boolean onlyIfNotEmpty) throws IOException;
 
 	public abstract void element(String namespace, String name, String content,
-                                 String comment) throws IOException;
+			String comment) throws IOException;
 
 	public abstract void element(String namespace, String name, String content)
 			throws IOException;
 
 	public abstract void element(String name, String content,
-                                 boolean onlyIfNotEmpty) throws IOException;
+			boolean onlyIfNotEmpty) throws IOException;
 
 	public abstract void element(String name, String content)
 			throws IOException;
@@ -123,7 +123,7 @@ public interface IXMLWriter {
 	 * go on creating xml content as usual, with proper formatting applied etc.
 	 * Any comments inserted inside a comment will be terminated with -- > instead of -->
 	 * so the comment doesn't close prematurely.
-	 * @throws java.io.IOException
+	 * @throws IOException 
 	 */
 	public abstract void startCommentBlock() throws IOException;
 

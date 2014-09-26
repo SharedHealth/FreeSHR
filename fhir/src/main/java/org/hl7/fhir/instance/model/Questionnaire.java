@@ -339,7 +339,7 @@ public class Questionnaire extends Resource {
         /**
          * Structured answer in the form of a FHIR Resource or datatype.
          */
-        protected Type data;
+        protected org.hl7.fhir.instance.model.Type data;
 
         /**
          * The remark contains information about the answer given. This is additional information about the answer the author wishes to convey, but should not be used to contain information that is part of the answer itself.
@@ -456,14 +456,14 @@ public class Questionnaire extends Resource {
         /**
          * @return {@link #data} (Structured answer in the form of a FHIR Resource or datatype.)
          */
-        public Type getData() {
+        public org.hl7.fhir.instance.model.Type getData() { 
           return this.data;
         }
 
         /**
          * @param value {@link #data} (Structured answer in the form of a FHIR Resource or datatype.)
          */
-        public QuestionComponent setData(Type value) {
+        public QuestionComponent setData(org.hl7.fhir.instance.model.Type value) { 
           this.data = value;
           return this;
         }

@@ -356,7 +356,7 @@ public abstract class XmlParserBase extends ParserBase implements Parser {
   private int parseInt(XmlPullParser xpp) throws Exception {
     int res = -1;
     String textNode = parseString(xpp);
-    res = Integer.parseInt(textNode);
+    res = java.lang.Integer.parseInt(textNode);
     return res;
   }
   
