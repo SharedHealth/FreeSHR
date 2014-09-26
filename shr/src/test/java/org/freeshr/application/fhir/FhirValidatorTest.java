@@ -19,6 +19,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -34,13 +36,16 @@ public class FhirValidatorTest {
     @Autowired
     private SHRProperties shrProperties;
 
+    @Autowired
+    private FhirMessageFilter fhirMessageFilter;
+
     EncounterBundle encounterBundle;
 
     @Before
     public void setup() {
         initMocks(this);
 
-        validator = new FhirValidator(trConceptLocator, shrProperties);
+        validator = new FhirValidator(trConceptLocator, shrProperties,fhirMessageFilter);
         encounterBundle = EncounterBundleData.withValidEncounter("health-id");
     }
 
@@ -77,13 +82,30 @@ public class FhirValidatorTest {
     @Test
     public void shouldRejectEncountersWithDiagnosisHavingAllInvalidSystems() {
         encounterBundle = EncounterBundleData.encounter("healthId", FileUtil.asString("xmls/encounters/diagnosis_system_invalid.xml"));
-        final EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle.getEncounterContent().toString());
+        EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle.getEncounterContent().toString());
+        assertFalse(encounterValidationResponse.isSuccessful());
+    }
+
+    @Test
+    public void shouldTreatFHIRWarningAsError() {
+        encounterBundle = EncounterBundleData.encounter("healthId", FileUtil.asString("xmls/encounters/diagnosis_system_invalid.xml"));
+        EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle.getEncounterContent().toString());
         assertFalse(encounterValidationResponse.isSuccessful());
     }
 
     @Test
     public void shouldRejectInvalidDiagnosisCategory() {
         encounterBundle = EncounterBundleData.encounter("healthId", FileUtil.asString("xmls/encounters/diagnosis_category_invalid.xml"));
-        assertFalse(validator.validate(encounterBundle.getEncounterContent().toString()).isSuccessful());
+        EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle.getEncounterContent().toString());
+        assertFalse(encounterValidationResponse.isSuccessful());
+    }
+
+    @Test
+    public void shouldValidateDiagnosticOrder() throws Exception {
+        encounterBundle = EncounterBundleData.encounter("healthId", FileUtil.asString("xmls/encounters/diagnostic_order_valid.xml"));
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+        EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle.getEncounterContent().toString());
+        verify(trConceptLocator, times(1)).verifiesSystem(anyString());
+        assertTrue(encounterValidationResponse.isSuccessful());
     }
 }

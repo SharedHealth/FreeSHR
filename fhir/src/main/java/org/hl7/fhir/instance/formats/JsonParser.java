@@ -83,7 +83,7 @@ public class JsonParser extends JsonParserBase {
     return res;
   }
 
-  private Integer parseInteger(Long v) throws Exception {
+  private Integer parseInteger(java.lang.Long v) throws Exception {
     Integer res = new Integer();
     if (v != null)
       res.setValue(parseIntegerPrimitive(v));

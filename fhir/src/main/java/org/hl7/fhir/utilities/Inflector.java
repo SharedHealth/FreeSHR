@@ -517,7 +517,7 @@ public class Inflector {
      * Utility method to replace all occurrences given by the specific backreference with its uppercased form, and remove all
      * other backreferences.
      * 
-     * The Java {@link java.util.regex.Pattern regular expression processing} does not use the preprocessing directives <code>\l</code>,
+     * The Java {@link Pattern regular expression processing} does not use the preprocessing directives <code>\l</code>,
      * <code>&#92;u</code>, <code>\L</code>, and <code>\U</code>. If so, such directives could be used in the replacement string
      * to uppercase or lowercase the backreferences. For example, <code>\L1</code> would lowercase the first backreference, and
      * <code>&#92;u3</code> would uppercase the 3rd backreference.

@@ -1,12 +1,14 @@
 package org.hl7.fhir.instance.model;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.ParseException;
+import java.util.Calendar;
+
 import org.hl7.fhir.instance.model.Contact.ContactSystem;
 import org.hl7.fhir.instance.model.Narrative.NarrativeStatus;
 import org.hl7.fhir.utilities.Utilities;
 import org.hl7.fhir.utilities.xhtml.XhtmlParser;
-
-import java.net.URISyntaxException;
-import java.text.ParseException;
 
 /*
 Copyright (c) 2011-2013, HL7, Inc
@@ -94,8 +96,16 @@ public class Factory {
     res.setValue(value);
     return res;
   }
-
-    public static Boolean newBoolean(boolean value) {
+  
+  public static Integer newInteger(java.lang.Integer value) {
+    if (value == null)
+      return null;
+    Integer res = new Integer();
+    res.setValue(value);
+    return res;
+  }
+  
+  public static Boolean newBoolean(boolean value) {
     Boolean res = new Boolean();
     res.setValue(value);
     return res;

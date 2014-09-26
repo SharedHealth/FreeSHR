@@ -2,6 +2,7 @@ package org.hl7.fhir.instance.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 /*
 Copyright (c) 2011-2013, HL7, Inc
@@ -116,7 +117,7 @@ public abstract class Element implements Serializable {
    * 
    * Note that the actual content of primitive or xhtml elements is not iterated explicitly.
    * To find these, the processing code must recognise the element as a primitive, typecast
-   * the value to a {@link org.hl7.fhir.instance.model.Type}, and examine the value
+   * the value to a {@link Type}, and examine the value
    *  
    * @return a list of all the children defined for this element
    */
@@ -131,7 +132,7 @@ public abstract class Element implements Serializable {
    */
 	protected void listChildren(List<Property> result) {
 	// not an element  result.add(new Property("xml:id", "XML Identifier - target for an id ref", 0, 1, )))
-		result.add(new Property("extension", "Extension", "XML Identifier - target for an id ref", 0, java.lang.Integer.MAX_VALUE, extensions));
+		result.add(new Property("extension", "Extension", "XML Identifier - target for an id ref", 0, java.lang.Integer.MAX_VALUE, extensions));	  
   }
 
   public Property getChildByName(String name) {
