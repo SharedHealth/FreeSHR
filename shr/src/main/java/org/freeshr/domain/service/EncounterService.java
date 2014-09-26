@@ -12,9 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureAdapter;
+import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -90,15 +90,30 @@ public class EncounterService {
     }};
 
 
-    public ListenableFuture<List<EncounterBundle>> findAllEncountersByCatchments(String facilityId,final String date) {
+    public ListenableFuture<List<EncounterBundle>> findAllEncountersByCatchments(String facilityId, final String date) {
         return new ListenableFutureAdapter<List<EncounterBundle>, Facility>(facilityRegistry.ensurePresent(facilityId)) {
-
             @Override
             protected List<EncounterBundle> adapt(Facility facility) throws ExecutionException {
                 try {
-                    return new ArrayList<>(findAllEncountersByCatchments(facility.getCatchments(), date));
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    if(null != facility) {
+                        final Set<EncounterBundle> bundles = new HashSet<>();
+                        for (String catchment : facility.getCatchments()) {
+                            int length = catchment.length();
+                            encounterRepository.findAllEncountersByCatchment(catchment, AddressHierarchy.get(length), date).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
+                                @Override
+                                public void onSuccess(List<EncounterBundle> result) {
+                                    bundles.addAll(result);
+                                }
+
+                                @Override
+                                public void onFailure(Throwable t) {
+
+                                }
+                            });
+                        }
+                        return new ArrayList<>(bundles);
+                    }
+                    return new ArrayList<>();
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -107,21 +122,25 @@ public class EncounterService {
         };
     }
 
-    private Set<EncounterBundle> findAllEncountersByCatchments(List<String> catchments,String date) throws ExecutionException, InterruptedException, ParseException {
-        final Set<EncounterBundle> bundles = new HashSet<>();
-        for (String catchment : catchments) {
-            int length = catchment.length();
-            String currentTime=getCurrentTimeInUTC();
-            ListenableFuture<List<EncounterBundle>> allEncountersByCatchment = encounterRepository.findAllEncountersByCatchment(catchment, AddressHierarchy.get(length),date,currentTime);
-            bundles.addAll(allEncountersByCatchment.get());
-
-        }
-        return bundles;
-    }
-    private String getCurrentTimeInUTC() {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd HH:mm:ssZ");
-        return format.format(new Date());
-    }
+//    private Set<EncounterBundle> findAllEncountersByCatchments(List<String> catchments,String date) throws ExecutionException, InterruptedException, ParseException {
+//        final Set<EncounterBundle> bundles = new HashSet<>();
+//        for (String catchment : catchments) {
+//            int length = catchment.length();
+//            encounterRepository.findAllEncountersByCatchment(catchment, AddressHierarchy.get(length),date).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
+//                @Override
+//                public void onSuccess(List<EncounterBundle> result) {
+//                    bundles.addAll(result);
+//                }
+//
+//                @Override
+//                public void onFailure(Throwable t) {
+//
+//                }
+//            });
+//
+//        }
+//        return bundles;
+//    }
 
 
 }
