@@ -19,4 +19,13 @@ public class HttpUtil {
         return headers;
     }
 
+    public static MultiValueMap<String, String> basicHeaders( String password) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        String auth =   password;
+        headers.add("X-Auth-Token",  auth);
+        return headers;
+    }
+
+
 }

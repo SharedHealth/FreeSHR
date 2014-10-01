@@ -8,15 +8,23 @@ import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
 import org.freeshr.utils.concurrent.PreResolvedListenableFuture;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureAdapter;
-import org.springframework.util.concurrent.ListenableFutureCallback;
+import rx.Observable;
+import rx.exceptions.CompositeException;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.functions.FuncN;
 
-import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+
+import static org.freeshr.utils.concurrent.FutureConverter.toListenableFuture;
+import static org.freeshr.utils.concurrent.FutureConverter.toObservable;
 
 @Service
 public class EncounterService {
@@ -26,6 +34,7 @@ public class EncounterService {
     private FhirValidator fhirValidator;
     private FacilityRegistry facilityRegistry;
 
+    private static final Logger logger = LoggerFactory.getLogger(EncounterService.class);
 
     @Autowired
     public EncounterService(EncounterRepository encounterRepository, PatientRegistry patientRegistry, FhirValidator fhirValidator, FacilityRegistry facilityRegistry) {
@@ -89,58 +98,50 @@ public class EncounterService {
         put(10, "ward_id");
     }};
 
+    public ListenableFuture<List<EncounterBundle>> findEncountersByCatchments(String facilityId, final String date) throws ExecutionException, InterruptedException {
 
-    public ListenableFuture<List<EncounterBundle>> findAllEncountersByCatchments(String facilityId, final String date) {
-        return new ListenableFutureAdapter<List<EncounterBundle>, Facility>(facilityRegistry.ensurePresent(facilityId)) {
+        final Observable<List<EncounterBundle>> emptyPromise = toObservable(new PreResolvedListenableFuture<List<EncounterBundle>>(new ArrayList<EncounterBundle>()));
+
+        Observable<Facility> facility = toObservable(facilityRegistry.ensurePresent(facilityId));
+
+        Observable<List<EncounterBundle>> encounterBundles = facility.flatMap(new Func1<Facility, Observable<List<EncounterBundle>>>() {
             @Override
-            protected List<EncounterBundle> adapt(Facility facility) throws ExecutionException {
-                try {
-                    if(null != facility) {
-                        final Set<EncounterBundle> bundles = new HashSet<>();
-                        for (String catchment : facility.getCatchments()) {
-                            int length = catchment.length();
-                            encounterRepository.findAllEncountersByCatchment(catchment, AddressHierarchy.get(length), date).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
-                                @Override
-                                public void onSuccess(List<EncounterBundle> result) {
-                                    bundles.addAll(result);
-                                }
-
-                                @Override
-                                public void onFailure(Throwable t) {
-
-                                }
-                            });
-                        }
-                        return new ArrayList<>(bundles);
-                    }
-                    return new ArrayList<>();
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                return null;
+            public Observable<List<EncounterBundle>> call(Facility facility) {
+                if (null == facility) return emptyPromise;
+                return findEncountersByFacility(date, facility);
             }
-        };
+        });
+        return toListenableFuture(encounterBundles);
     }
 
-//    private Set<EncounterBundle> findAllEncountersByCatchments(List<String> catchments,String date) throws ExecutionException, InterruptedException, ParseException {
-//        final Set<EncounterBundle> bundles = new HashSet<>();
-//        for (String catchment : catchments) {
-//            int length = catchment.length();
-//            encounterRepository.findAllEncountersByCatchment(catchment, AddressHierarchy.get(length),date).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
-//                @Override
-//                public void onSuccess(List<EncounterBundle> result) {
-//                    bundles.addAll(result);
-//                }
-//
-//                @Override
-//                public void onFailure(Throwable t) {
-//
-//                }
-//            });
-//
-//        }
-//        return bundles;
-//    }
+    private Observable<List<EncounterBundle>> findEncountersByFacility(String date, Facility facility) {
+        List<Observable<List<EncounterBundle>>> observables = new ArrayList<>();
+        for (String catchment : facility.getCatchments()) {
+            int length = catchment.length();
+            final ListenableFuture<List<EncounterBundle>> allEncountersByCatchment = encounterRepository.findAllEncountersByCatchment(catchment, AddressHierarchy.get(length), date);
+            Observable<List<EncounterBundle>> observable = toObservable(allEncountersByCatchment);
+            observables.add(observable);
+        }
+        Observable<List<EncounterBundle>> observable = Observable.zip(observables, new FuncN<List<EncounterBundle>>() {
+            @Override
+            public List<EncounterBundle> call(Object... args) {
+                final Set<EncounterBundle> bundles = new HashSet<>();
+                for (Object arg : args) {
+                    bundles.addAll((List<EncounterBundle>) arg);
+                }
+                return new ArrayList<EncounterBundle>(bundles);
+            }
+        });
+        observable.doOnError(new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                ArrayList<Throwable> errors = new ArrayList<>();
+                errors.add(throwable);
+                throw new CompositeException(errors);
+            }
+        });
+        return observable;
+    }
 
 
 }

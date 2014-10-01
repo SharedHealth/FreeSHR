@@ -8,14 +8,13 @@ public class DateUtil {
 
 
     public String fromUTCDate(Date aDate) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd HH:mm:ssZ");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         return dateFormat.format(aDate);
     }
 
     public String getCurrentTimeInUTC() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd HH:mm:ssZ");
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
         return dateFormat.format(new Date());
     }
 }

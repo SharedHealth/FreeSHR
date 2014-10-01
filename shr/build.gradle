@@ -30,7 +30,7 @@ dependencies {
     }
     compile libraries.snappy, libraries.spring_data_cassandra, libraries.spring_boot_logging,
             libraries.apache_commons_io, libraries.spring_framework, libraries.fhir_validator,
-            libraries.jackson, libraries.saxon
+            libraries.jackson, libraries.saxon, libraries.rxjava, libraries.future_converter
     compile('io.netty:netty:3.9.0.Final') {
         force = 'true'
     }

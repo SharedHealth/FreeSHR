@@ -19,7 +19,7 @@ public class FacilityTest {
     @Test
     public void shouldGetCatchmentsAsCommaSeparatedListOfCatchments(){
         Facility facility = new Facility();
-        facility.setCatchments(Arrays.asList("09", "0989"));
+        facility.setCatchments("09,0989");
         assertThat(facility.getCatchmentsInCommaSeparatedString(), is("09,0989"));
     }
 
