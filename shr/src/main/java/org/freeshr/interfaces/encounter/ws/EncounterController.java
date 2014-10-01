@@ -11,11 +11,11 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @RestController
-@RequestMapping("/patients/{healthId}")
 public class EncounterController {
     private static final Logger logger = LoggerFactory.getLogger(EncounterController.class);
 
@@ -26,7 +26,7 @@ public class EncounterController {
         this.encounterService = encounterService;
     }
 
-    @RequestMapping(value = "/encounters", method = RequestMethod.POST)
+    @RequestMapping(value = "/patients/{healthId}/encounters", method = RequestMethod.POST)
     public DeferredResult<EncounterResponse> create(@PathVariable String healthId, @RequestBody EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
         logger.debug("Create encounter. " + encounterBundle);
         encounterBundle.setHealthId(healthId);
@@ -54,7 +54,7 @@ public class EncounterController {
         return deferredResult;
     }
 
-    @RequestMapping(value = "/encounters", method = RequestMethod.GET)
+    @RequestMapping(value = "/patients/{healthId}/encounters", method = RequestMethod.GET)
     public DeferredResult<List<EncounterBundle>> findAll(@PathVariable String healthId) {
         logger.debug("Find all encounters by health id: " + healthId);
         final DeferredResult<List<EncounterBundle>> deferredResult = new DeferredResult<List<EncounterBundle>>();
@@ -75,19 +75,18 @@ public class EncounterController {
 
 
     @RequestMapping(value = "/encounters/bycatchments", method = RequestMethod.GET)
-    public DeferredResult<List<EncounterBundle>> findAllByCatchment(@RequestHeader String facilityId, @RequestParam String date) {
+    public DeferredResult<List<EncounterBundle>> findAllByCatchment(@RequestHeader String facilityId, @RequestParam(value = "facilityDate",required = false) String facilityDate) throws ExecutionException, InterruptedException, ParseException {
         logger.debug(" Find all encounters by facility id:" + facilityId);
         final DeferredResult<List<EncounterBundle>> deferredResult = new DeferredResult<>();
-
-        encounterService.findAllEncountersByCatchments(facilityId, date).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
+        encounterService.findEncountersByCatchments(facilityId, facilityDate).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
             @Override
-            public void onSuccess(List<EncounterBundle> result) {
-                deferredResult.setResult(result);
+            public void onFailure(Throwable t) {
+                deferredResult.setErrorResult(t);
             }
 
             @Override
-            public void onFailure(Throwable error) {
-                deferredResult.setErrorResult(error);
+            public void onSuccess(List<EncounterBundle> result) {
+                deferredResult.setResult(result);
             }
         });
         return deferredResult;

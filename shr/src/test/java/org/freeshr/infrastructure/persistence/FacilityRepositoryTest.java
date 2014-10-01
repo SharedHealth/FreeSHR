@@ -3,6 +3,7 @@ package org.freeshr.infrastructure.persistence;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.domain.model.Facility;
+import org.freeshr.domain.model.patient.Address;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,9 @@ public class FacilityRepositoryTest {
         Facility facility = new Facility();
         facility.setFacilityId("10101");
         facility.setFacilityName("Foo");
+        facility.setFacilityType("Village Hospital");
         facility.setCatchments("10,1020,102030");
+        facility.setFacilityLocation(new Address("10","11", "32", "45", "67"));
         facilityRepository.save(facility);
         Facility actualFacility = facilityRepository.find("10101").get();
         assertThat(actualFacility, is(facility));

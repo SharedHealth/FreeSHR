@@ -1,22 +1,58 @@
 package org.freeshr.domain.model;
 
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.freeshr.domain.model.patient.Address;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.apache.commons.lang.StringUtils.join;
+import static org.apache.commons.lang3.StringUtils.join;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Facility {
+
     private String facilityId;
+
     private String facilityName;
-    private List<String> catchments=new ArrayList<>();
+
+    private List<String> catchments = new ArrayList<>();
+
+    private String facilityType;
+
+    private Address facilityLocation;
+
+    public String getFacilityType() {
+        return facilityType;
+    }
+
+    public void setFacilityType(String facilityType) {
+        this.facilityType = facilityType;
+    }
+
+    public Address getFacilityLocation() {
+        return facilityLocation;
+    }
+
+    public void setFacilityLocation(Address facilityLocation) {
+        this.facilityLocation = facilityLocation;
+    }
+
+    public void setCatchments(String commaSeparatedCatchments) {
+        String[] catchments = commaSeparatedCatchments.split(",");
+        for (String catchment : catchments) {
+            this.catchments.add(catchment.trim());
+        }
+    }
 
     public Facility(){}
 
     //Only for tests
-    public Facility(String facilityId, String facilityName, String catchments) {
+    public Facility(String facilityId, String facilityName, String facilityType, String catchments, Address location) {
         this.facilityId = facilityId;
         this.facilityName = facilityName;
+        this.facilityType = facilityType;
+        this.setFacilityLocation(location);
         setCatchments(catchments);
     }
 
@@ -28,17 +64,6 @@ public class Facility {
         this.facilityName = facilityName;
     }
 
-    public void setCatchments(List<String> catchments) {
-        this.catchments = catchments;
-    }
-
-    public void setCatchments(String catchments) {
-        String[] split = catchments.split(",");
-        for (String s : split) {
-            this.catchments.add(s.trim());
-        }
-
-    }
 
     public String getFacilityId() {
         return facilityId;
@@ -48,12 +73,12 @@ public class Facility {
         return facilityName;
     }
 
-    public List<String> getCatchments() {
-        return catchments;
-    }
-
     public String getCatchmentsInCommaSeparatedString() {
         return join(catchments, ",");
+    }
+
+    public List<String> getCatchments() {
+        return this.catchments;
     }
 
     @Override
@@ -65,7 +90,9 @@ public class Facility {
 
         if (!catchments.equals(facility.catchments)) return false;
         if (!facilityId.equals(facility.facilityId)) return false;
+        if (!facilityLocation.equals(facility.facilityLocation)) return false;
         if (!facilityName.equals(facility.facilityName)) return false;
+        if (!facilityType.equals(facility.facilityType)) return false;
 
         return true;
     }
@@ -75,6 +102,8 @@ public class Facility {
         int result = facilityId.hashCode();
         result = 31 * result + facilityName.hashCode();
         result = 31 * result + catchments.hashCode();
+        result = 31 * result + facilityType.hashCode();
+        result = 31 * result + facilityLocation.hashCode();
         return result;
     }
 }

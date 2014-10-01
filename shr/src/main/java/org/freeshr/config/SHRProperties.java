@@ -36,6 +36,11 @@ public class SHRProperties {
     @Value("${VALIDATION_ZIP_PATH:}")
     private String validationZipPath;
 
+    @Value("${FACILITY_REGISTRY_URL}")
+    private String facilityRegistryUrl;
+    @Value("${FACILITY_REGISTRY_AUTH_TOKEN}")
+    private String facilityRegistryAuthToken;
+
     public String getMCIPatientUrl() {
         return String.format("http://%s:%s/api/v1/patients", mciHost, mciPort);
     }
@@ -76,6 +81,14 @@ public class SHRProperties {
         return trPassword;
     }
 
+    public String getFacilityRegistryUrl() {
+        return facilityRegistryUrl;
+    }
+
+    public String getFacilityRegistryAuthToken() {
+        return facilityRegistryAuthToken;
+    }
+
     public String getValidationFilePath() throws URISyntaxException {
         if (StringUtils.isNotBlank(validationZipPath)) {
             return validationZipPath;
@@ -83,4 +96,5 @@ public class SHRProperties {
             return new File(this.getClass().getClassLoader().getResource("validation.zip").toURI()).getAbsolutePath();
         }
     }
+
 }

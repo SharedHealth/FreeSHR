@@ -15,12 +15,8 @@ import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
 @Component
@@ -58,7 +54,7 @@ public class EncounterRepository {
         return executeFindQuery("SELECT * FROM encounter WHERE health_id='" + healthId + "';");
     }
 
-    public ListenableFuture<List<EncounterBundle>> findAllEncountersByCatchment(String columnValue , String columnName, String date) throws ParseException {
+    public ListenableFuture<List<EncounterBundle>> findAllEncountersByCatchment(String columnValue , String columnName, String date){
         String query = String.format("SELECT * FROM encounter WHERE %s = '%s' and date > '%s'; ", columnName, columnValue, date);
         return executeFindQuery(query);
     }

@@ -5,6 +5,7 @@ import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
+import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
@@ -21,13 +22,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.text.ParseException;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -41,6 +39,7 @@ import static org.junit.Assert.*;
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
 public class EncounterServiceIntegrationTest {
 
+    private static final String VALID_FACILITY_ID = "10000001";
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(9997);
 
@@ -52,6 +51,9 @@ public class EncounterServiceIntegrationTest {
 
     @Autowired
     private FacilityRepository facilityRepository;
+
+    @Autowired
+    private SHRProperties shrProperties;
 
     @Autowired
     @Qualifier("SHRCassandraTemplate")
@@ -69,11 +71,19 @@ public class EncounterServiceIntegrationTest {
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/patient.json"))));
+
         givenThat(get(urlEqualTo("/api/v1/patients/" + VALID_HEALTH_ID_NEW))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/patientNew.json"))));
+
+        givenThat(get(urlEqualTo(shrProperties.getFacilityRegistryUrl() + "/" + VALID_FACILITY_ID + ".json"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withHeader("X-Auth-Token", shrProperties.getFacilityRegistryAuthToken())
+                        .withBody(asString("jsons/Facility.json"))));
 
         givenThat(get(urlEqualTo("/api/v1/patients/" + INVALID_HEALTH_ID))
                 .willReturn(aResponse()
@@ -90,6 +100,8 @@ public class EncounterServiceIntegrationTest {
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/concept.json"))));
+
+
     }
 
     @After
@@ -128,6 +140,7 @@ public class EncounterServiceIntegrationTest {
                 assertThat(encounterBundles.size(), is(1));
                 assertThat(encounterBundles.get(0).getHealthId(), is(VALID_HEALTH_ID));
             }
+
             @Override
             public void onFailure(Throwable t) {
 
@@ -138,21 +151,50 @@ public class EncounterServiceIntegrationTest {
 
 
     @Test
-    public void shouldReturnEmptyListOfEncountersWhenGivenFacilityNotFound() throws ExecutionException, InterruptedException {
+    public void shouldReturnEmptyListOfEncountersWhenGivenFacilityNotFound() throws ExecutionException, InterruptedException, ParseException {
         final String date = "2014-09-10";
 
         encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID_NEW)).get();
 
-        List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByCatchments("1", date).get();
+        encounterService.findEncountersByCatchments("1", date).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
+            @Override
+            public void onFailure(Throwable t) {
 
-        assertTrue(encounterBundles.isEmpty());
+            }
+
+            @Override
+            public void onSuccess(List<EncounterBundle> result) {
+                assertTrue(result.isEmpty());
+            }
+        });
+
+
     }
 
+    @Test
+    public void shouldReturnEmptyListOfEncountersIfFacilityIsNotPresent() throws ExecutionException, InterruptedException, ParseException {
+        final String date = "2014-09-10";
+
+        encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID_NEW)).get();
+
+        encounterService.findEncountersByCatchments("9999999999", date).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
+            @Override
+            public void onFailure(Throwable t) {
+
+            }
+
+            @Override
+            public void onSuccess(List<EncounterBundle> result) {
+                assertTrue(result.isEmpty());
+            }
+        });
+
+    }
 
     @Test
-    public void shouldReturnTheListOfEncountersForGivenListOfCatchments() throws ExecutionException, InterruptedException {
-        Facility facility1 = new Facility("1", "facility1", "3056");
-        Facility facility2 = new Facility("2", "facility2", "305650");
+    public void shouldReturnTheListOfEncountersForGivenListOfCatchments() throws ExecutionException, InterruptedException, ParseException {
+        Facility facility1 = new Facility("1", "facility1", "Main hospital", "3056", new Address("1", "2", "3", null, null));
+        Facility facility2 = new Facility("2", "facility2", "Trivial hospital", "305650", new Address("11", "22", "33", null, null));
         facilityRepository.save(facility1);
         facilityRepository.save(facility2);
         final String date = "2014-09-10";
@@ -161,13 +203,14 @@ public class EncounterServiceIntegrationTest {
         encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID)).get();
         encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID_NEW)).get();
 
-        encounterService.findAllEncountersByCatchments("1", date).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
+        encounterService.findEncountersByCatchments("1", date).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
             @Override
             public void onSuccess(List<EncounterBundle> encounterBundles) {
                 List<String> healthIds = extractListOfHealthIds(encounterBundles);
                 assertEquals(2, healthIds.size());
                 assertTrue(healthIds.containsAll(Arrays.asList(VALID_HEALTH_ID, VALID_HEALTH_ID_NEW)));
             }
+
             @Override
             public void onFailure(Throwable t) {
 
@@ -176,13 +219,14 @@ public class EncounterServiceIntegrationTest {
 
         //Only one encounter found in a given catchment
 
-        encounterService.findAllEncountersByCatchments("2", date).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
+        encounterService.findEncountersByCatchments("2", date).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
             @Override
             public void onSuccess(List<EncounterBundle> encounterBundles) {
                 List<String> healthIds = extractListOfHealthIds(encounterBundles);
                 assertEquals(1, healthIds.size());
                 assertTrue(healthIds.containsAll(Arrays.asList(VALID_HEALTH_ID_NEW)));
             }
+
             @Override
             public void onFailure(Throwable t) {
 
@@ -194,14 +238,14 @@ public class EncounterServiceIntegrationTest {
 
 
     @Test
-    public void shouldReturnUniqueListOfEncountersForSameHealthIdGivenListOfCatchments() throws ExecutionException, InterruptedException {
-        Facility facility1 = new Facility("1", "facility1", "3056,30");
-        facilityRepository.save(facility1);
+    public void shouldReturnUniqueListOfEncountersForSameHealthIdGivenListOfCatchments() throws ExecutionException, InterruptedException, ParseException {
+        Facility facility = new Facility("1", "facility", "Main hospital", "3056,30", new Address("1", "2", "3", null, null));
+        facilityRepository.save(facility);
         encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID)).get();
         encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID)).get();
 
         String date = "2014-09-10";
-        encounterService.findAllEncountersByCatchments("1", date).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
+        encounterService.findEncountersByCatchments("1", date).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
             @Override
             public void onSuccess(List<EncounterBundle> encounterBundles) {
                 ArrayList<String> healthIds = extractListOfHealthIds(encounterBundles);
@@ -209,6 +253,7 @@ public class EncounterServiceIntegrationTest {
                 assertEquals(2, healthIds.size());
                 assertTrue(healthIds.containsAll(Arrays.asList(VALID_HEALTH_ID, VALID_HEALTH_ID)));
             }
+
             @Override
             public void onFailure(Throwable t) {
                 fail("Shouldnt have failed");
@@ -218,23 +263,50 @@ public class EncounterServiceIntegrationTest {
 
 
     @Test
-    public void shouldReturnUniqueListOfEncountersForGivenListOfCatchments() throws ExecutionException, InterruptedException {
-        Facility facility2 = new Facility("1", "facility1", "305610");
-        facilityRepository.save(facility2);
+    public void shouldReturnUniqueListOfEncountersForGivenListOfCatchments() throws ExecutionException, InterruptedException, ParseException {
+        Facility facility = new Facility("1", "facility1", "Main hospital", "305610", new Address("1", "2", "3", null, null));
+        facilityRepository.save(facility);
         encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID)).get();
 
         String date = "2014-09-10";
-        encounterService.findAllEncountersByCatchments("2", date).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
+        encounterService.findEncountersByCatchments("1", date).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
             @Override
             public void onSuccess(List<EncounterBundle> encounterBundles) {
                 assertEquals(1, encounterBundles.size());
-                assertEquals(VALID_HEALTH_ID,encounterBundles.iterator().next().getHealthId());
+                assertEquals(VALID_HEALTH_ID, encounterBundles.iterator().next().getHealthId());
             }
+
             @Override
             public void onFailure(Throwable t) {
 
             }
         });
+
+    }
+
+    @Test
+    public void shouldReturnSetOfEncounterByCatchment() throws ExecutionException, InterruptedException, ParseException {
+        Facility facility1 = new Facility("1", "facility1", "Main hospital", "3056,30", new Address("1", "2", "3", null, null));
+        facilityRepository.save(facility1);
+        encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID)).get();
+        encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID)).get();
+
+        String date = "2014-09-10";
+        encounterService.findEncountersByCatchments("1", date).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
+            @Override
+            public void onFailure(Throwable t) {
+
+            }
+
+            @Override
+            public void onSuccess(List<EncounterBundle> result) {
+                ArrayList<String> healthIds = extractListOfHealthIds(result);
+                Collections.sort(healthIds);
+                assertEquals(2, healthIds.size());
+                assertTrue(healthIds.containsAll(Arrays.asList(VALID_HEALTH_ID, VALID_HEALTH_ID)));
+            }
+        });
+
 
     }
 

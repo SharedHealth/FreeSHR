@@ -1,0 +1,42 @@
+{
+    "name": "Dhaka Divisional Health Office",
+    "url": "",
+    "id": "10000001",
+    "active": "1",
+    "createdAt": "",
+    "updatedAt": "2014-06-03 18:44:58",
+    "coordinates": [
+        "90.39659940000001",
+        "23.742545"
+    ],
+    "identifiers": {
+        "agency": "DGHS",
+        "context": "HRM",
+        "id": "1"
+    },
+    "properties": {
+        "ownership": "Fully Government-owned",
+        "org_type": "Divisional Level Office",
+        "org_level": "National",
+        "care_level": "Not Applicable",
+        "services": [],
+        "locations": {
+            "division_code": "30",
+            "district_code": "26",
+            "upazila_code": "01",
+            "paurasava_code": "",
+            "union_code": "",
+            "ward_code": ""
+        },
+        "contacts": {
+            "name": "",
+            "email": "ddho@ld.dghs.gov.bd",
+            "phone": "9560909",
+            "mobile": "001711956722",
+            "fax": "9561531"
+        },
+        "catchment": [
+            "302601"
+        ]
+    }
+}

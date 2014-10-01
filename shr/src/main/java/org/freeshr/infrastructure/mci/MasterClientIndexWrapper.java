@@ -1,20 +1,15 @@
 package org.freeshr.infrastructure.mci;
 
-import org.apache.commons.codec.binary.Base64;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.patient.Patient;
-import org.freeshr.utils.HttpUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
-import org.springframework.util.MultiValueMap;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureAdapter;
 import org.springframework.web.client.AsyncRestTemplate;
 
-import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 
 import static org.freeshr.utils.HttpUtil.basicAuthHeaders;
