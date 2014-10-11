@@ -22,7 +22,7 @@ import static java.lang.System.getenv;
 public class Migrations {
 
     private static final String MUTAGEN_CONNECTION_POOL_NAME = "shrMigrationConnectionPool";
-    private final Map<String, String> env;
+    protected final Map<String, String> env;
 
     public Migrations() {
         this(getenv());
@@ -50,7 +50,7 @@ public class Migrations {
         return createKeyspaceIfNoneExist(context);
     }
 
-    private AstyanaxContext<Keyspace> buildContext() {
+    protected AstyanaxContext<Keyspace> buildContext() {
         return new AstyanaxContext.Builder()
                 .forKeyspace(env.get("CASSANDRA_KEYSPACE"))
                 .withAstyanaxConfiguration(new AstyanaxConfigurationImpl()
@@ -63,10 +63,10 @@ public class Migrations {
                                 .setSeeds(env.get("MUTAGEN_SEEDS"))
                 )
                 .withConnectionPoolMonitor(new CountingConnectionPoolMonitor())
-                .buildKeyspace(ThriftFamilyFactory.getInstance());
+                .buildKeyspace( ThriftFamilyFactory.getInstance());
     }
 
-    private Keyspace createKeyspaceIfNoneExist(AstyanaxContext<Keyspace> context) throws ConnectionException {
+    protected Keyspace createKeyspaceIfNoneExist(AstyanaxContext<Keyspace> context) throws ConnectionException {
         Keyspace keyspace = context.getClient();
         try {
             keyspace.describeKeyspace();
