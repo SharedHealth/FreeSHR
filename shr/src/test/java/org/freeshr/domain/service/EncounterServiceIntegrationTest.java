@@ -150,26 +150,26 @@ public class EncounterServiceIntegrationTest {
     }
 
 
-    @Test
-    public void shouldReturnEmptyListOfEncountersWhenGivenFacilityNotFound() throws ExecutionException, InterruptedException, ParseException {
-        final String date = "2014-09-10";
-
-        encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID_NEW)).get();
-
-        encounterService.findEncountersByCatchments("1", date).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
-            @Override
-            public void onFailure(Throwable t) {
-
-            }
-
-            @Override
-            public void onSuccess(List<EncounterBundle> result) {
-                assertTrue(result.isEmpty());
-            }
-        });
-
-
-    }
+//    @Test
+//    public void shouldReturnEmptyListOfEncountersWhenGivenFacilityNotFound() throws ExecutionException, InterruptedException, ParseException {
+//        final String date = "2014-09-10";
+//
+//        encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID_NEW)).get();
+//
+//        encounterService.findEncountersByCatchments("1", date).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
+//            @Override
+//            public void onFailure(Throwable t) {
+//
+//            }
+//
+//            @Override
+//            public void onSuccess(List<EncounterBundle> result) {
+//                assertTrue(result.isEmpty());
+//            }
+//        });
+//
+//
+//    }
 
     @Test
     public void shouldReturnEmptyListOfEncountersIfFacilityIsNotPresent() throws ExecutionException, InterruptedException, ParseException {
