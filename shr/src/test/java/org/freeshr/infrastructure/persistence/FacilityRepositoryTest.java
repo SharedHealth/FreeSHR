@@ -25,10 +25,6 @@ public class FacilityRepositoryTest {
     @Autowired
     private FacilityRepository facilityRepository;
 
-    @Autowired
-    @Qualifier("SHRCassandraTemplate")
-    private CqlOperations cqlTemplate;
-
     @Test
     public void returnFacilityByFacilityId() throws ExecutionException, InterruptedException {
         Facility facility = new Facility();
