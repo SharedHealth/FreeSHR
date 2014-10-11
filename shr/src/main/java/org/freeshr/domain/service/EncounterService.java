@@ -90,14 +90,6 @@ public class EncounterService {
         }
     }
 
-    private Map<Integer, String> AddressHierarchy = new HashMap<Integer, String>() {{
-        put(2, "division_id");
-        put(4, "district_id");
-        put(6, "upazilla_id");
-        put(8, "city_corporation_id");
-        put(10, "ward_id");
-    }};
-
     public ListenableFuture<List<EncounterBundle>> findEncountersByCatchments(String facilityId, final String date) throws ExecutionException, InterruptedException {
 
         final Observable<List<EncounterBundle>> emptyPromise = toObservable(new PreResolvedListenableFuture<List<EncounterBundle>>(new ArrayList<EncounterBundle>()));
@@ -117,8 +109,9 @@ public class EncounterService {
     private Observable<List<EncounterBundle>> findEncountersByFacility(String date, Facility facility) {
         List<Observable<List<EncounterBundle>>> observables = new ArrayList<>();
         for (String catchment : facility.getCatchments()) {
-            int length = catchment.length();
-            final ListenableFuture<List<EncounterBundle>> allEncountersByCatchment = encounterRepository.findAllEncountersByCatchment(catchment, AddressHierarchy.get(length), date);
+            FacilityCatchment facilityCatchment = new FacilityCatchment(catchment);
+            final ListenableFuture<List<EncounterBundle>> allEncountersByCatchment =
+                    encounterRepository.findAllEncountersByCatchment(facilityCatchment.getCatchment(), facilityCatchment.getCatchmentType(), date);
             Observable<List<EncounterBundle>> observable = toObservable(allEncountersByCatchment);
             observables.add(observable);
         }
@@ -141,6 +134,33 @@ public class EncounterService {
             }
         });
         return observable;
+    }
+
+    private Map<Integer, String> AddressHierarchy = new HashMap<Integer, String>() {{
+        put(2, "division_id");
+        put(4, "district_id");
+        put(6, "upazilla_id");
+        put(8, "city_corporation_id");
+        put(10, "ward_id");
+    }};
+
+    private class FacilityCatchment {
+        private final String catchment;
+
+        public FacilityCatchment(String catchment) {
+            this.catchment = catchment;
+        }
+
+        public String getCatchment() {
+            return this.catchment;
+        }
+
+        public String getCatchmentType() {
+            int length = this.catchment.length();
+            return AddressHierarchy.get(length);
+        }
+
+
     }
 
 

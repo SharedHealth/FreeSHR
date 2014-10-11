@@ -51,11 +51,11 @@ public class EncounterRepository {
     }
 
     public ListenableFuture<List<EncounterBundle>> findAll(String healthId) {
-        return executeFindQuery("SELECT * FROM encounter WHERE health_id='" + healthId + "';");
+        return executeFindQuery("SELECT encounter_id, health_id, date, content FROM encounter WHERE health_id='" + healthId + "';");
     }
 
-    public ListenableFuture<List<EncounterBundle>> findAllEncountersByCatchment(String columnValue , String columnName, String date){
-        String query = String.format("SELECT * FROM encounter WHERE %s = '%s' and date > '%s'; ", columnName, columnValue, date);
+    public ListenableFuture<List<EncounterBundle>> findAllEncountersByCatchment(String catchment , String catchmentType, String date){
+        String query = String.format("SELECT encounter_id, health_id, date, content FROM encounter WHERE %s = '%s' and date > '%s'; ", catchmentType, catchment, date);
         return executeFindQuery(query);
     }
 
