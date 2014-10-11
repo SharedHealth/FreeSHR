@@ -33,7 +33,7 @@ import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
-public class EncounterRepositoryTest {
+public class EncounterRepositoryIntegrationTest {
 
     @Autowired
     private EncounterRepository encounterRepository;

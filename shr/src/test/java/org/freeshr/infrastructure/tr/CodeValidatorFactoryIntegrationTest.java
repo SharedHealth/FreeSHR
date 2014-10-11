@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
-public class CodeValidatorFactoryTest {
+public class CodeValidatorFactoryIntegrationTest {
 
     @Autowired
     private CodeValidatorFactory factory;

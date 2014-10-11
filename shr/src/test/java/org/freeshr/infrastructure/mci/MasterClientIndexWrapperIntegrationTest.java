@@ -25,7 +25,7 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
-public class MasterClientIndexWrapperTest {
+public class MasterClientIndexWrapperIntegrationTest {
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(9997);
 

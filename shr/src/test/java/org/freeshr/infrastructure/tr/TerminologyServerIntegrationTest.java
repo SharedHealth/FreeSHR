@@ -22,7 +22,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
-public class TerminologyServerTest {
+public class TerminologyServerIntegrationTest {
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(9997);

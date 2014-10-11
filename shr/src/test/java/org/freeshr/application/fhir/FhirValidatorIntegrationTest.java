@@ -26,7 +26,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
-public class FhirValidatorTest {
+public class FhirValidatorIntegrationTest {
 
     private FhirValidator validator;
 

@@ -22,7 +22,7 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
-public class PatientRepositoryTest {
+public class PatientRepositoryIntegrationTest {
 
     private final String healthId = "testHealthId";
 

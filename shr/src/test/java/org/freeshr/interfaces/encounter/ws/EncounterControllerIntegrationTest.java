@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = {WebMvcConfig.class, SHRConfig.class})
 @WebAppConfiguration
-public class EncounterControllerTest {
+public class EncounterControllerIntegrationTest {
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(9997);
