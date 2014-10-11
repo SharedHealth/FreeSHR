@@ -1,7 +1,6 @@
 package org.freeshr.config;
 
 import org.cassandraunit.utils.EmbeddedCassandraServerHelper;
-import org.freeshr.utils.cassandra.Migrations;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
@@ -25,8 +24,8 @@ public class SHREnvironmentMock implements ApplicationContextInitializer<Configu
 
     private void createEmbeddedCassandra(Map<String, String> env) {
         try {
-            EmbeddedCassandraServerHelper.startEmbeddedCassandra();
-            new Migrations(env).migrate();
+            EmbeddedCassandraServerHelper.startEmbeddedCassandra("cassandra-template.yaml");
+            new TestMigrations(env).migrate();
         } catch (Exception e) {
             throw new RuntimeException("Error starting embedded server..", e);
         }
