@@ -20,7 +20,7 @@ import static org.hamcrest.core.Is.is;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
-public class FacilityRepositoryTest {
+public class FacilityRepositoryIntegrationTest {
 
     @Autowired
     private FacilityRepository facilityRepository;
