@@ -20,6 +20,12 @@ test {
     testLogging {
         exceptionFormat "full" // default is "short"
     }
+
+    // exclude '**/*IntegrationTest.class'
+
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }
 
 test.finalizedBy(stopMockClientIndex)
@@ -38,7 +44,7 @@ dependencies {
         exclude group: 'org.slf4j', module: 'slf4j-log4j12'
     }
     compile project(":fhir")
-    testCompile testLibraries.mockito, testLibraries.junit, testLibraries.spring_test, testLibraries.cassandra_unit, testLibraries.wiremock
+    testCompile testLibraries.mockito, testLibraries.junit, testLibraries.spring_test, testLibraries.cassandra_unit, testLibraries.wiremock, testLibraries.netflix_astyanax
 }
 
 configurations.all {
