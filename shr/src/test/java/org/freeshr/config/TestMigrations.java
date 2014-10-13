@@ -56,7 +56,7 @@ public class TestMigrations extends Migrations {
                 )
                 .withConnectionPoolConfiguration(new ConnectionPoolConfigurationImpl(MUTAGEN_CONNECTION_POOL_NAME)
                                 .setPort(valueOf(env.get("MUTAGEN_CONNECTION_POOL_PORT")))
-                                .setMaxConnsPerHost(100)
+                                .setMaxConnsPerHost(1)
                                 .setSeeds(env.get("MUTAGEN_SEEDS"))
                 )
                 .withConnectionPoolMonitor(new CountingConnectionPoolMonitor())

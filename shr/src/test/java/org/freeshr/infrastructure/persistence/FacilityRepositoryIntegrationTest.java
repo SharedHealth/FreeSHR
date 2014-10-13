@@ -7,6 +7,8 @@ import org.freeshr.domain.model.patient.Address;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -22,6 +24,10 @@ public class FacilityRepositoryIntegrationTest {
 
     @Autowired
     private FacilityRepository facilityRepository;
+
+    @Autowired
+    @Qualifier("SHRCassandraTemplate")
+    private CqlOperations cqlTemplate;
 
     @Test
     public void returnFacilityByFacilityId() throws ExecutionException, InterruptedException {
