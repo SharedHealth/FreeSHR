@@ -27,7 +27,10 @@ public class FacilityRepository {
     }
 
     public Facility find(String facilityId) throws ExecutionException {
-        ResultSet resultSet = cqlOperations.query("SELECT * FROM facilities WHERE facility_id='" + facilityId + "';");
+        ResultSet resultSet = cqlOperations.query(
+                "SELECT facility_id, facility_name, facility_type, catchments, " +
+                        "division_id, district_id, upazilla_id, city_corporation_id, " +
+                        "ward_id FROM facilities WHERE facility_id='" + facilityId + "';");
         return read(resultSet);
     }
 
@@ -51,15 +54,17 @@ public class FacilityRepository {
             return null;
         }
     }
+
     public void save(Facility facility) {
         cqlOperations.execute(toCQL(facility));
     }
 
     private String toCQL(Facility facility) {
         String query = query(asList(facility.getFacilityId(), facility.getFacilityName(), facility.getFacilityType(),
-                facility.getFacilityLocation().getDivision(), facility.getFacilityLocation().getDistrict(), facility.getFacilityLocation().getUpazilla(), facility.getFacilityLocation().getCityCorporation(),facility.getFacilityLocation().getWard(),
+                facility.getFacilityLocation().getDivision(), facility.getFacilityLocation().getDistrict(), facility.getFacilityLocation().getUpazilla(), facility.getFacilityLocation().getCityCorporation(), facility.getFacilityLocation().getWard(),
                 facility.getCatchmentsInCommaSeparatedString()));
-        return "INSERT into facilities (facility_id, facility_name, facility_type, division_id, district_id, upazilla_id, city_corporation_id,ward_id, catchments) values  (" + query + ")";
+        return "INSERT into facilities (facility_id, facility_name, facility_type, division_id, district_id, " +
+                "upazilla_id, city_corporation_id, ward_id, catchments) values  (" + query + ")";
     }
 
     private String query(List<String> values) {

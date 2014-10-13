@@ -25,6 +25,7 @@ public class FacilityService {
     public Facility ensurePresent(final String facilityId) throws ExecutionException, InterruptedException {
         Facility facility = facilityRepository.find(facilityId);
         if (facility != null) return facility;
+        logger.debug("FACILITY NOT FOUND LOCALLY. INITIATING REMOTE FIND");
         return findRemote(facilityId);
     }
 
