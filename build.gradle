@@ -42,6 +42,7 @@ subprojects {
                     , 'org.slf4j:slf4j-log4j12:1.7.7'
                     , 'commons-cli:commons-cli:1.2'
                     , 'com.netflix.astyanax:astyanax:1.56.48'
+                    , 'org.apache.ant:ant:1.7.1'
             ]
         }
     }
@@ -140,6 +141,10 @@ idea {
                 it.@default == 'true' && it.@type == 'Application'
             });
         }
+    }
+    project {
+        jdkName = '1.7'
+        languageLevel = '1.7'
     }
 }
 

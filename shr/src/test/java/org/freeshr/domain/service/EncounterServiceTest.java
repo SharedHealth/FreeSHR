@@ -39,9 +39,10 @@ public class EncounterServiceTest {
 
 
     @Test
+    @SuppressWarnings("unchecked")
     public void shouldReturnErrorEvenIfOneGetEncounterFails() throws ExecutionException, InterruptedException, ParseException {
         String date = "2014-09-10";
-        ListenableFuture facilityListenableFuture = mock(ListenableFuture.class);
+        ListenableFuture<Facility> facilityListenableFuture = (ListenableFuture<Facility>)mock(ListenableFuture.class);
         when(facilityListenableFuture.get()).thenReturn(new Facility("1", "facility1", "Main hospital", "3056,30", new Address("1", "2", "3", null, null)));
         when(facilityRegistry.ensurePresent("1")).thenReturn(facilityListenableFuture);
 

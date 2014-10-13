@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("unchecked")
 public class FacilityMessageConverter  extends AbstractHttpMessageConverter<Facility> {
 
     public FacilityMessageConverter() {
@@ -46,14 +47,16 @@ public class FacilityMessageConverter  extends AbstractHttpMessageConverter<Faci
 
     Facility createFacility(HttpInputMessage inputMessage) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, Object> facilityMapper = objectMapper.readValue(inputMessage.getBody(), Map.class);
+        Map facilityMapper = objectMapper.readValue(inputMessage.getBody(), Map.class);
         Facility facility = new Facility();
         facility.setFacilityId((String) facilityMapper.get("id"));
         facility.setFacilityName((String) facilityMapper.get("name"));
-        facility.setFacilityType((String) ((LinkedHashMap) facilityMapper.get("properties")).get("org_type"));
-        String catchments = Joiner.on(",").join((List<String>) ((LinkedHashMap) facilityMapper.get("properties")).get("catchment"));
-        facility.setCatchments(catchments);
-        facility.setFacilityLocation(getAddress(((LinkedHashMap) ((LinkedHashMap) facilityMapper.get("properties")).get("locations"))));
+        LinkedHashMap properties = (LinkedHashMap) facilityMapper.get("properties");
+        facility.setFacilityType((String) properties.get("org_type"));
+        List<String> catchments = (List<String>)properties.get("catchment");
+        String catchmentsString = Joiner.on(",").join(catchments);
+        facility.setCatchments(catchmentsString);
+        facility.setFacilityLocation(getAddress(((LinkedHashMap) properties.get("locations"))));
         return  facility;
     }
 

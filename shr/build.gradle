@@ -95,20 +95,17 @@ task dist(dependsOn: 'exportProperties', type: Rpm) {
 
     from("scripts/rpm") {
         fileMode = 0755
-        createDirectoryEntry = true
         exclude 'placeholder'
         into 'bin'
     }
 
     from("${buildDir}/libs") {
         fileMode = 0755
-        createDirectoryEntry = true
         into 'lib'
     }
 
     from("scripts/rpm") {
         fileMode = 0755
-        createDirectoryEntry = true
         exclude 'bdshr'
         into 'var'
     }

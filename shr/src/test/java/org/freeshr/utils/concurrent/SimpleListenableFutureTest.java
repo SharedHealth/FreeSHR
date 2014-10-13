@@ -7,8 +7,9 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import java.util.concurrent.ExecutionException;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 
 public class SimpleListenableFutureTest {
 
@@ -31,6 +32,8 @@ public class SimpleListenableFutureTest {
         assertTrue(listenableFuture.get());
         assertTrue(resultHolder.getCalled());
     }
+
+
 
     @Test
     public void shouldInvokeTheCallbackWhenTheFutureValueIsResolved() throws ExecutionException, InterruptedException {
