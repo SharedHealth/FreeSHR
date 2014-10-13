@@ -188,13 +188,16 @@ public class EncounterServiceIntegrationTest {
     public void shouldReturnUniqueListOfEncountersForSameHealthIdGivenListOfCatchments() throws ExecutionException, InterruptedException, ParseException {
         Facility facility = new Facility("3", "facility", "Main hospital", "3056,30", new Address("1", "2", "3", null, null));
         facilityRepository.save(facility);
-        encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID));
-        encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID));
+
+        assertNotNull(facilityRepository.find("3"));
+        assertTrue(encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID)).isSuccessful());
+        assertTrue(encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID)).isSuccessful());
 
         String date = "2014-09-10";
         List<EncounterBundle> encounterBundles = encounterService.findEncountersByCatchments("3", date);
+        assertEquals(2, encounterBundles.size());
+
         ArrayList<String> healthIds = extractListOfHealthIds(encounterBundles);
-        Collections.sort(healthIds);
         assertEquals(2, healthIds.size());
         assertTrue(healthIds.containsAll(Arrays.asList(VALID_HEALTH_ID, VALID_HEALTH_ID)));
     }
