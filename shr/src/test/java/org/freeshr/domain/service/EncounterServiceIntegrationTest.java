@@ -1,6 +1,5 @@
 package org.freeshr.domain.service;
 
-import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
@@ -109,6 +108,8 @@ public class EncounterServiceIntegrationTest {
     @After
     public void teardown() {
         cqlOperations.execute("truncate encounter");
+        cqlOperations.execute("truncate facility");
+        cqlOperations.execute("truncate patient");
     }
 
     @Test
