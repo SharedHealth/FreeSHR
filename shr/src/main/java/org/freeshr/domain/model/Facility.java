@@ -73,7 +73,7 @@ public class Facility {
         return facilityName;
     }
 
-    public String getCatchmentsInCommaSeparatedString() {
+    public String getCatchmentsAsCommaSeparatedString() {
         return join(catchments, ",");
     }
 

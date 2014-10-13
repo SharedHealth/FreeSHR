@@ -61,8 +61,9 @@ public class FacilityRepository {
 
     private String toCQL(Facility facility) {
         String query = query(asList(facility.getFacilityId(), facility.getFacilityName(), facility.getFacilityType(),
-                facility.getFacilityLocation().getDivision(), facility.getFacilityLocation().getDistrict(), facility.getFacilityLocation().getUpazilla(), facility.getFacilityLocation().getCityCorporation(), facility.getFacilityLocation().getWard(),
-                facility.getCatchmentsInCommaSeparatedString()));
+                facility.getFacilityLocation().getDivision(), facility.getFacilityLocation().getDistrict(),
+                facility.getFacilityLocation().getUpazilla(), facility.getFacilityLocation().getCityCorporation(),
+                facility.getFacilityLocation().getWard(), facility.getCatchmentsAsCommaSeparatedString()));
         return "INSERT into facilities (facility_id, facility_name, facility_type, division_id, district_id, " +
                 "upazilla_id, city_corporation_id, ward_id, catchments) values  (" + query + ")";
     }

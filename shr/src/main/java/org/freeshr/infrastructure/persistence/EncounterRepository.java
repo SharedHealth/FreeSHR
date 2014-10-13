@@ -36,7 +36,9 @@ public class EncounterRepository {
 
     public void save(EncounterBundle encounterBundle, Patient patient) throws ExecutionException, InterruptedException {
         Address address = patient.getAddress();
-        cqlOperations.execute("INSERT INTO encounter (encounter_id, health_id, date, content,division_id, district_id, upazilla_id, city_corporation_id,ward_id) VALUES ( '" + encounterBundle.getEncounterId() + "','"
+        cqlOperations.execute("INSERT INTO encounter (encounter_id, health_id, date, content,division_id, " +
+                "district_id, upazilla_id, city_corporation_id,ward_id) VALUES ( '"
+                + encounterBundle.getEncounterId() + "','"
                 + encounterBundle.getHealthId() + "','"
                 + dateUtil.getCurrentTimeInUTC() + "','"
                 + encounterBundle.getEncounterContent() + "','"
@@ -49,7 +51,8 @@ public class EncounterRepository {
     }
 
     public List<EncounterBundle> findAllEncountersByCatchment(String catchment, String catchmentType, String date) throws ExecutionException, InterruptedException {
-        String query = String.format("SELECT encounter_id, health_id, date, content FROM encounter WHERE %s = '%s' and date > '%s'; ", catchmentType, catchment, date);
+        String query = String.format("SELECT encounter_id, health_id, date, content " +
+                "FROM encounter WHERE %s = '%s' and date > '%s'; ", catchmentType, catchment, date);
         return executeFindQuery(query);
     }
 
@@ -59,7 +62,7 @@ public class EncounterRepository {
     }
 
     private List<EncounterBundle> read(ResultSet resultSet) throws ExecutionException {
-        List<EncounterBundle> bundles = new ArrayList<EncounterBundle>();
+        List<EncounterBundle> bundles = new ArrayList<>();
         for (Row result : resultSet.all()) {
             EncounterBundle bundle = new EncounterBundle();
             bundle.setEncounterId(result.getString("encounter_id"));
@@ -72,7 +75,8 @@ public class EncounterRepository {
     }
 
     public List<EncounterBundle> findAll(String healthId) throws ExecutionException, InterruptedException {
-        return executeFindQuery("SELECT encounter_id, health_id, date, content FROM encounter WHERE health_id='" + healthId + "';");
+        return executeFindQuery("SELECT encounter_id, health_id, date, content " +
+                "FROM encounter WHERE health_id='" + healthId + "';");
     }
 
 

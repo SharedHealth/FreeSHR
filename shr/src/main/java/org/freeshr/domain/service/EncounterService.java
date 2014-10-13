@@ -68,19 +68,16 @@ public class EncounterService {
     }
 
     public List<EncounterBundle> findEncountersByCatchments(String facilityId, final String date) throws ExecutionException, InterruptedException {
-
         List<EncounterBundle> encounterBundles = new ArrayList<>();
         Facility facility = facilityService.ensurePresent(facilityId);
-
         if (null == facility) return encounterBundles;
-        return findEncountersByFacility(date, facility);
+        return findEncountersByFacility(facility, date);
     }
 
-    private List<EncounterBundle> findEncountersByFacility(String date, Facility facility) throws ExecutionException, InterruptedException {
+    private List<EncounterBundle> findEncountersByFacility(Facility facility, String date) throws ExecutionException, InterruptedException {
         Set<EncounterBundle> encounters = new HashSet<>();
         for (String catchment : facility.getCatchments()) {
             FacilityCatchment facilityCatchment = new FacilityCatchment(catchment);
-
             encounters.addAll(encounterRepository.findAllEncountersByCatchment(facilityCatchment.getCatchment(),
                     facilityCatchment.getCatchmentType(), date));
         }

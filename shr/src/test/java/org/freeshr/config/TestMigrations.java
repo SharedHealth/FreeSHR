@@ -36,9 +36,9 @@ public class TestMigrations extends Migrations {
                             .put("replication_factor", "1")
                             .build())
                     .put("strategy_class", "SimpleStrategy")
-//                    .put("durable_writes", false)
-//                    .put("key_cache_save_period", 0)
-//                    .put("row_cache_save_period", 0)
+                    .put("durable_writes", false)
+                    .put("key_cache_save_period", 0)
+                    .put("row_cache_save_period", 0)
                     .build());
 
         }

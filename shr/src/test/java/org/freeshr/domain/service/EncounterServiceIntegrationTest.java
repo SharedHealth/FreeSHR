@@ -1,5 +1,6 @@
 package org.freeshr.domain.service;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
@@ -103,7 +104,6 @@ public class EncounterServiceIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/concept.json"))));
 
-
     }
 
     @After
@@ -164,6 +164,7 @@ public class EncounterServiceIntegrationTest {
         facilityRepository.save(facility1);
         facilityRepository.save(facility2);
         final String date = "2014-09-10";
+
 
         // Two unique encounters found in same catchment for 2 different patients
         encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID));
