@@ -36,7 +36,6 @@ public class PatientRepositoryIntegrationTest {
     @Test
     public void shouldFindPatientWithMatchingHealthId() throws ExecutionException, InterruptedException {
         patientRepository.saveSynchronously(patient(healthId));
-
         Patient patient = patientRepository.find(healthId).get();
         assertNotNull(patient);
         assertThat(patient, is(patient(healthId)));

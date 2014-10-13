@@ -38,7 +38,7 @@ public class EncounterRepository {
 
     public void save(EncounterBundle encounterBundle, Patient patient) throws ExecutionException, InterruptedException {
         Address address = patient.getAddress();
-        cqlOperations.executeAsynchronously("INSERT INTO encounter (encounter_id, health_id, date, content,division_id, district_id, upazilla_id, city_corporation_id,ward_id) VALUES ( '" + encounterBundle.getEncounterId() + "','"
+        cqlOperations.execute("INSERT INTO encounter (encounter_id, health_id, date, content,division_id, district_id, upazilla_id, city_corporation_id,ward_id) VALUES ( '" + encounterBundle.getEncounterId() + "','"
                 + encounterBundle.getHealthId() + "','"
                 + dateUtil.getCurrentTimeInUTC() + "','"
                 + encounterBundle.getEncounterContent() + "','"

@@ -1,7 +1,6 @@
 package org.freeshr.infrastructure.persistence;
 
 import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.ResultSetFuture;
 import com.datastax.driver.core.Row;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Address;
@@ -9,7 +8,6 @@ import org.freeshr.utils.CollectionUtils;
 import org.freeshr.utils.concurrent.SimpleListenableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cassandra.core.AsynchronousQueryListener;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -57,12 +55,7 @@ public class FacilityRepository {
     }
 
     public void save(Facility facility) {
-        cqlOperations.executeAsynchronously(toCQL(facility), new AsynchronousQueryListener() {
-            @Override
-            public void onQueryComplete(ResultSetFuture rsf) {
-                //make sure result set is checked to see if the facility is saved, if not throw an exception
-            }
-        });
+        cqlOperations.execute(toCQL(facility));
     }
 
     private String toCQL(Facility facility) {

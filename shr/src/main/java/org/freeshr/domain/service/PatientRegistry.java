@@ -16,17 +16,17 @@ public class PatientRegistry {
 
     private Logger logger = Logger.getLogger(PatientRegistry.class);
 
-    private final PatientRepository allPatients;
+    private final PatientRepository patientRepository;
     private final MasterClientIndexWrapper masterClientIndexWrapper;
 
     @Autowired
-    public PatientRegistry(PatientRepository allPatients, MasterClientIndexWrapper masterClientIndexWrapper) {
-        this.allPatients = allPatients;
+    public PatientRegistry(PatientRepository patientRepository, MasterClientIndexWrapper masterClientIndexWrapper) {
+        this.patientRepository = patientRepository;
         this.masterClientIndexWrapper = masterClientIndexWrapper;
     }
 
     public ListenableFuture<Patient> ensurePresent(final String healthId) {
-        return new ListenableFutureAdapter<Patient, Patient>(allPatients.find(healthId)) {
+        return new ListenableFutureAdapter<Patient, Patient>(patientRepository.find(healthId)) {
             @Override
             protected Patient adapt(Patient result) throws ExecutionException {
                 if (null == result) {
@@ -34,7 +34,7 @@ public class PatientRegistry {
                         return new ListenableFutureAdapter<Patient, Patient>(masterClientIndexWrapper.getPatient(healthId)) {
                             @Override
                             protected Patient adapt(Patient result) throws ExecutionException {
-                                allPatients.save(result);
+                                patientRepository.save(result);
                                 return result;
                             }
                         }.get();

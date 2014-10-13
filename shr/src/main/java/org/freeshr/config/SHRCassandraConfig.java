@@ -1,7 +1,6 @@
 package org.freeshr.config;
 
 import com.datastax.driver.core.SocketOptions;
-import org.freeshr.config.SHRProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.cassandra.core.CqlTemplate;
@@ -42,7 +41,8 @@ public class SHRCassandraConfig extends AbstractCassandraConfiguration {
 
     @Bean(name = "SHRCassandraTemplate")
     public CqlOperations CassandraTemplate() throws Exception {
-        return new CqlTemplate(session().getObject());
+        CqlTemplate cqlTemplate = new CqlTemplate(session().getObject());
+        return cqlTemplate;
     }
 
 }
