@@ -32,7 +32,7 @@ public class FacilityService {
         try{
             Facility facility = facilityRegistryClient.getFacility(facilityId).get();
             facilityRepository.save(facility);
-            return  facility;
+            return facility;
         }
         catch(Exception e){
             logger.warn(e);

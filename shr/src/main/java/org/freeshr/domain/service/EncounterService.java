@@ -43,9 +43,10 @@ public class EncounterService {
                 try {
                     encounterRepository.save(encounterBundle, patient);
                 } catch (InterruptedException e) {
+                    logger.warn(e.getMessage());
                     e.printStackTrace();
                 } catch (Exception e) {
-                    System.out.println(e);
+                    logger.warn(e.getMessage());
                 }
                 response.setEncounterId(encounterBundle.getEncounterId());
                 return response;

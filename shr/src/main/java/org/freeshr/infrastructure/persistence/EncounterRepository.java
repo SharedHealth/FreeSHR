@@ -54,7 +54,7 @@ public class EncounterRepository {
     }
 
     private List<EncounterBundle> executeFindQuery(final String cql) throws ExecutionException, InterruptedException {
-        ResultSet resultSet = cqlOperations.queryAsynchronously(cql).get();
+        ResultSet resultSet = cqlOperations.query(cql);
         return read(resultSet);
     }
 
