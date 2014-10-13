@@ -193,8 +193,8 @@ public class EncounterServiceIntegrationTest {
         assertTrue(encounterService.ensureCreated(withValidEncounter(VALID_HEALTH_ID)).isSuccessful());
         assertTrue(encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID)).isSuccessful());
 
-        String date = "2014-09-10";
-        List<EncounterBundle> encounterBundles = encounterService.findEncountersByCatchments("3", date);
+        assertEquals(2, encounterService.findAll(VALID_HEALTH_ID).size());
+        List<EncounterBundle> encounterBundles = encounterService.findEncountersByCatchments("3", "2014-09-10");
         assertEquals(2, encounterBundles.size());
 
         ArrayList<String> healthIds = extractListOfHealthIds(encounterBundles);
