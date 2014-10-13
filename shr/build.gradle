@@ -90,7 +90,6 @@ task dist(dependsOn: 'exportProperties', type: Rpm) {
 
     from("${buildDir}/etc") {
         fileMode = 0755
-        createDirectoryEntry = true
         into 'etc'
     }
 
