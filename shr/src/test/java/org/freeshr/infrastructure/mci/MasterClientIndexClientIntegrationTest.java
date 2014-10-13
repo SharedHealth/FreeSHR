@@ -25,12 +25,12 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
-public class MasterClientIndexWrapperIntegrationTest {
+public class MasterClientIndexClientIntegrationTest {
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(9997);
 
     @Autowired
-    private MasterClientIndexWrapper mci;
+    private MasterClientIndexClient mci;
 
     @Test
     public void shouldFetchAPatientByHealthId() throws ExecutionException, InterruptedException {

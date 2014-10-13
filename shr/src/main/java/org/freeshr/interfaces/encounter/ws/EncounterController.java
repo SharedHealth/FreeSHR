@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
@@ -32,25 +31,16 @@ public class EncounterController {
         encounterBundle.setHealthId(healthId);
 
         final DeferredResult<EncounterResponse> deferredResult = new DeferredResult<>();
-        encounterService.ensureCreated(encounterBundle).addCallback(new ListenableFutureCallback<EncounterResponse>() {
-            @Override
-            public void onSuccess(EncounterResponse result) {
-                if (result.isSuccessful()) {
-                    deferredResult.setResult(result);
-                } else {
-                    if (result.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition)) {
-                        deferredResult.setErrorResult(new PreconditionFailed(result));
-                    } else {
-                        deferredResult.setErrorResult(new UnProcessableEntity(result));
-                    }
-                }
+        EncounterResponse encounterResponse = encounterService.ensureCreated(encounterBundle);
+        if (encounterResponse.isSuccessful()) {
+            deferredResult.setResult(encounterResponse);
+        } else {
+            if (encounterResponse.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition)) {
+                deferredResult.setErrorResult(new PreconditionFailed(encounterResponse));
+            } else {
+                deferredResult.setErrorResult(new UnProcessableEntity(encounterResponse));
             }
-
-            @Override
-            public void onFailure(Throwable error) {
-                deferredResult.setErrorResult(error);
-            }
-        });
+        }
         return deferredResult;
     }
 
@@ -58,18 +48,13 @@ public class EncounterController {
     public DeferredResult<List<EncounterBundle>> findAll(@PathVariable String healthId) {
         logger.debug("Find all encounters by health id: " + healthId);
         final DeferredResult<List<EncounterBundle>> deferredResult = new DeferredResult<List<EncounterBundle>>();
-
-        encounterService.findAll(healthId).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
-            @Override
-            public void onSuccess(List<EncounterBundle> result) {
-                deferredResult.setResult(result);
-            }
-
-            @Override
-            public void onFailure(Throwable error) {
-                deferredResult.setErrorResult(error);
-            }
-        });
+        try {
+            List<EncounterBundle> encounterBundles = encounterService.findAll(healthId);
+            deferredResult.setResult(encounterBundles);
+        }
+        catch (Exception e){
+            deferredResult.setErrorResult(e);
+        }
         return deferredResult;
     }
 
@@ -78,17 +63,13 @@ public class EncounterController {
     public DeferredResult<List<EncounterBundle>> findAllByCatchment(@RequestHeader String facilityId, @RequestParam(value = "facilityDate",required = false) String facilityDate) throws ExecutionException, InterruptedException, ParseException {
         logger.debug(" Find all encounters by facility id:" + facilityId);
         final DeferredResult<List<EncounterBundle>> deferredResult = new DeferredResult<>();
-        encounterService.findEncountersByCatchments(facilityId, facilityDate).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
-            @Override
-            public void onFailure(Throwable t) {
-                deferredResult.setErrorResult(t);
-            }
-
-            @Override
-            public void onSuccess(List<EncounterBundle> result) {
-                deferredResult.setResult(result);
-            }
-        });
+        try {
+            List<EncounterBundle> encountersByCatchments = encounterService.findEncountersByCatchments(facilityId, facilityDate);
+            deferredResult.setResult(encountersByCatchments);
+        }
+        catch (Exception e){
+            deferredResult.setErrorResult(e);
+        }
         return deferredResult;
 
     }

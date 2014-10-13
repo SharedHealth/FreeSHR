@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -26,7 +25,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
@@ -51,24 +49,11 @@ public class EncounterRepositoryIntegrationTest {
         encounterRepository.save(createEncounterBundle("e-1", "h100"), patient1);
         encounterRepository.save(createEncounterBundle("e-2", "h100"), patient1);
 
-        Thread.sleep(5000);
-
-        encounterRepository.findAll("h100").addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
-            @Override
-            public void onSuccess(List<EncounterBundle> encounters) {
-                EncounterBundle encounter = encounters.get(0);
-                assertEquals(3, encounters.size());
-                assertThat(encounter.getDate(), is(notNullValue()));
-                assertThat(encounter.getEncounterContent().toString(), is(content()));
-            }
-
-            @Override
-            public void onFailure(Throwable error) {
-               fail("Shouldnt have failed");
-            }
-        });
-
-
+        List<EncounterBundle> encounterBundles = encounterRepository.findAll("h100");
+        EncounterBundle encounter = encounterBundles.get(0);
+        assertEquals(3, encounterBundles.size());
+        assertThat(encounter.getDate(), is(notNullValue()));
+        assertThat(encounter.getEncounterContent().toString(), is(content()));
     }
 
     @Test
@@ -84,21 +69,12 @@ public class EncounterRepositoryIntegrationTest {
         encounterRepository.save(createEncounterBundle("e-0", "h100"), patient1);
         encounterRepository.save(createEncounterBundle("e-2", "h100"), patient1);
 
-        encounterRepository.findAllEncountersByCatchment("0102", "district_id", "2011-09-10").addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
-            @Override
-            public void onSuccess(List<EncounterBundle> encounters) {
-                EncounterBundle encounter = encounters.get(0);
-                assertEquals(1, encounters.size());
-                assertThat(encounter.getDate(), is(notNullValue()));
-                assertThat(encounter.getEncounterId(), is("e-2"));
-                verify(dateUtil, times(1)).fromUTCDate(any(Date.class));
-            }
-
-            @Override
-            public void onFailure(Throwable error) {
-                fail("Shouldnt have failed");
-            }
-        });
+        List<EncounterBundle> encounters = encounterRepository.findAllEncountersByCatchment("0102", "district_id", "2011-09-10");
+        EncounterBundle encounter = encounters.get(0);
+        assertEquals(1, encounters.size());
+        assertThat(encounter.getDate(), is(notNullValue()));
+        assertThat(encounter.getEncounterId(), is("e-2"));
+        verify(dateUtil, times(1)).fromUTCDate(any(Date.class));
 
     }
 
@@ -110,20 +86,11 @@ public class EncounterRepositoryIntegrationTest {
         encounterRepository.save(createEncounterBundle("e-0", "h100"), patient1);
         encounterRepository.save(createEncounterBundle("e-2", "h100"), patient1);
 
-        encounterRepository.findAllEncountersByCatchment("0102", "district_id", null).addCallback(new ListenableFutureCallback<List<EncounterBundle>>() {
-            @Override
-            public void onSuccess(List<EncounterBundle> encounters) {
-                EncounterBundle encounter = encounters.get(0);
-                assertEquals(2, encounters.size());
-                assertThat(encounter.getDate(), is(notNullValue()));
-            }
-
-            @Override
-            public void onFailure(Throwable error) {
-                fail("Shouldnt have failed");
-            }
-        });
-
+        String date = "2014-09-10";
+        List<EncounterBundle> encounters = encounterRepository.findAllEncountersByCatchment("0102", "district_id", date);
+        EncounterBundle encounter = encounters.get(0);
+        assertEquals(2, encounters.size());
+        assertThat(encounter.getDate(), is(notNullValue()));
     }
 
 

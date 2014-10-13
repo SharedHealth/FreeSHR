@@ -6,14 +6,12 @@ import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.utils.DateUtil;
-import org.freeshr.utils.concurrent.SimpleListenableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.stereotype.Component;
-import org.springframework.util.concurrent.ListenableFuture;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,35 +48,32 @@ public class EncounterRepository {
                 "');");
     }
 
-    public ListenableFuture<List<EncounterBundle>> findAll(String healthId) {
-        return executeFindQuery("SELECT encounter_id, health_id, date, content FROM encounter WHERE health_id='" + healthId + "';");
-    }
-
-    public ListenableFuture<List<EncounterBundle>> findAllEncountersByCatchment(String catchment , String catchmentType, String date){
+    public List<EncounterBundle> findAllEncountersByCatchment(String catchment, String catchmentType, String date) throws ExecutionException, InterruptedException {
         String query = String.format("SELECT encounter_id, health_id, date, content FROM encounter WHERE %s = '%s' and date > '%s'; ", catchmentType, catchment, date);
         return executeFindQuery(query);
     }
 
-
-    private ListenableFuture<List<EncounterBundle>> executeFindQuery(final String cql) {
-        return new SimpleListenableFuture<List<EncounterBundle>, ResultSet>(
-                cqlOperations.queryAsynchronously(cql)) {
-            @Override
-            protected List<EncounterBundle> adapt(ResultSet resultSet) throws ExecutionException {
-                List<EncounterBundle> bundles = new ArrayList<EncounterBundle>();
-                for (Row result : resultSet.all()) {
-                    EncounterBundle bundle = new EncounterBundle();
-                    bundle.setEncounterId(result.getString("encounter_id"));
-                    bundle.setHealthId(result.getString("health_id"));
-                    bundle.setDate(dateUtil.fromUTCDate(result.getDate("date")));
-                    bundle.setEncounterContent(result.getString("content"));
-                    bundles.add(bundle);
-                }
-                return bundles;
-            }
-        };
+    private List<EncounterBundle> executeFindQuery(final String cql) throws ExecutionException, InterruptedException {
+        ResultSet resultSet = cqlOperations.queryAsynchronously(cql).get();
+        return read(resultSet);
     }
 
+    private List<EncounterBundle> read(ResultSet resultSet) throws ExecutionException {
+        List<EncounterBundle> bundles = new ArrayList<EncounterBundle>();
+        for (Row result : resultSet.all()) {
+            EncounterBundle bundle = new EncounterBundle();
+            bundle.setEncounterId(result.getString("encounter_id"));
+            bundle.setHealthId(result.getString("health_id"));
+            bundle.setDate(dateUtil.fromUTCDate(result.getDate("date")));
+            bundle.setEncounterContent(result.getString("content"));
+            bundles.add(bundle);
+        }
+        return bundles;
+    }
+
+    public List<EncounterBundle> findAll(String healthId) throws ExecutionException, InterruptedException {
+        return executeFindQuery("SELECT encounter_id, health_id, date, content FROM encounter WHERE health_id='" + healthId + "';");
+    }
 
 
 }

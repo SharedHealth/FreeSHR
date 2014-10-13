@@ -20,14 +20,14 @@ import static org.freeshr.utils.concurrent.FutureConverter.toListenableFuture;
 import static org.freeshr.utils.concurrent.FutureConverter.toObservable;
 
 @Component
-public class FacilityRegistryWrapper {
+public class FacilityRegistryClient {
 
     private AsyncRestTemplate shrRestTemplate;
     private SHRProperties shrProperties;
-    private Logger logger = Logger.getLogger(FacilityRegistryWrapper.class);
+    private Logger logger = Logger.getLogger(FacilityRegistryClient.class);
 
     @Autowired
-    public FacilityRegistryWrapper(@Qualifier("SHRRestTemplate") AsyncRestTemplate shrRestTemplate, SHRProperties shrProperties) {
+    public FacilityRegistryClient(@Qualifier("SHRRestTemplate") AsyncRestTemplate shrRestTemplate, SHRProperties shrProperties) {
         this.shrRestTemplate = shrRestTemplate;
         this.shrRestTemplate.getMessageConverters().add(0, new FacilityMessageConverter());
         this.shrProperties = shrProperties;

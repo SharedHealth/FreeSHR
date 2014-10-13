@@ -7,8 +7,6 @@ import org.freeshr.domain.model.patient.Address;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -34,7 +32,7 @@ public class FacilityRepositoryIntegrationTest {
         facility.setCatchments("10,1020,102030");
         facility.setFacilityLocation(new Address("10","11", "32", "45", "67"));
         facilityRepository.save(facility);
-        Facility actualFacility = facilityRepository.find("10101").get();
+        Facility actualFacility = facilityRepository.find("10101");
         assertThat(actualFacility, is(facility));
     }
 

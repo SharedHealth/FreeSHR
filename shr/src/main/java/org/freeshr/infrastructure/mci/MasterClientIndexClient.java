@@ -15,13 +15,13 @@ import java.util.concurrent.ExecutionException;
 import static org.freeshr.utils.HttpUtil.basicAuthHeaders;
 
 @Component
-public class MasterClientIndexWrapper {
+public class MasterClientIndexClient {
 
     private AsyncRestTemplate shrRestTemplate;
     private SHRProperties shrProperties;
 
     @Autowired
-    public MasterClientIndexWrapper(@Qualifier("SHRRestTemplate") AsyncRestTemplate shrRestTemplate, SHRProperties shrProperties) {
+    public MasterClientIndexClient(@Qualifier("SHRRestTemplate") AsyncRestTemplate shrRestTemplate, SHRProperties shrProperties) {
         this.shrRestTemplate = shrRestTemplate;
         this.shrProperties = shrProperties;
     }
