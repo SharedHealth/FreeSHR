@@ -108,8 +108,8 @@ public class EncounterServiceIntegrationTest {
     @After
     public void teardown() {
         cqlOperations.execute("truncate encounter");
-        cqlOperations.execute("truncate facility");
         cqlOperations.execute("truncate patient");
+        cqlOperations.execute("truncate FACILITIES");
     }
 
     @Test
