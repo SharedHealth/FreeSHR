@@ -76,6 +76,9 @@ public class EncounterRepositoryIntegrationTest {
         assertThat(encounter.getEncounterId(), is("e-2"));
         verify(dateUtil, times(1)).fromUTCDate(any(Date.class));
 
+        //hack to fix the build. will not work if this test fails. do not set
+        // a mock dateutil into a singleton registry object
+        encounterRepository.setDateUtil(new DateUtil());
     }
 
     @Test
