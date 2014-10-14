@@ -24,7 +24,7 @@ public class SHREnvironmentMock implements ApplicationContextInitializer<Configu
 
     private void createEmbeddedCassandra(Map<String, String> env) {
         try {
-            EmbeddedCassandraServerHelper.startEmbeddedCassandra("cassandra-template.yaml");
+            EmbeddedCassandraServerHelper.startEmbeddedCassandra("cassandra-template.yaml", 60000);
             new TestMigrations(env).migrate();
         } catch (Exception e) {
             throw new RuntimeException("Error starting embedded server..", e);
