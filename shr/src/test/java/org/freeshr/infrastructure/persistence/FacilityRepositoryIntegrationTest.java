@@ -4,6 +4,7 @@ import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Address;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,12 @@ public class FacilityRepositoryIntegrationTest {
     @Autowired
     @Qualifier("SHRCassandraTemplate")
     private CqlOperations cqlTemplate;
+
+    @After
+    public void teardown() {
+        cqlTemplate.execute("truncate facilities");
+    }
+
 
     @Test
     public void returnFacilityByFacilityId() throws ExecutionException, InterruptedException {
