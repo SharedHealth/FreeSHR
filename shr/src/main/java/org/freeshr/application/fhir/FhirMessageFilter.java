@@ -5,11 +5,18 @@ import org.hl7.fhir.instance.model.OperationOutcome;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class FhirMessageFilter {
+
+    private ArrayList<String> ignoreList;
+
     public FhirMessageFilter() {
+        ignoreList = new ArrayList<>();
+        ignoreList.add("f:DiagnosticOrder/f:item");
+        ignoreList.add("f:DiagnosticReport/f:name");
     }
 
     public EncounterValidationResponse filterMessagesSevereThan(List<ValidationMessage> outputs, final OperationOutcome.IssueSeverity severity) {
@@ -20,7 +27,7 @@ public class FhirMessageFilter {
                 boolean possibleError = severity.compareTo(input.getLevel()) >= 0;
                 // TODO :  remove the following if condition once the validation mechanism is finalised for DiagnosticOrder
                 if (possibleError) {
-                    if (input.getType().equalsIgnoreCase("code-unknown") && input.getLocation().contains("f:DiagnosticOrder/f:item")) {
+                    if (shouldFilterMessagesOfType(input)) {
                         possibleError = false;
                     }
                 }
@@ -38,5 +45,16 @@ public class FhirMessageFilter {
                 return acc;
             }
         });
+    }
+
+    private boolean shouldFilterMessagesOfType(ValidationMessage input) {
+        if (input.getType().equalsIgnoreCase("code-unknown") ) {
+            for (String ignoreString : ignoreList) {
+                if (input.getLocation().contains(ignoreString)){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

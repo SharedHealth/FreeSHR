@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Encounter</title>
+    <id>urn:41cf285f-6175-4959-b657-407fef53129d</id>
+    <updated>2014-10-13T14:38:22+05:30</updated>
+    <entry>
+        <title>Composition</title>
+        <id>urn:Encounter - d3cc23c3-1f12-4b89-a415-356feeba0690</id>
+        <updated>2014-10-14T12:29:14.212+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <Composition xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="Encounter - d3cc23c3-1f12-4b89-a415-356feeba0690"/>
+                </identifier>
+                <date value="2014-10-13T14:38:22+05:30"/>
+                <status value="final"/>
+                <encounter>
+                    <reference value="d3cc23c3-1f12-4b89-a415-356feeba0690"/>
+                    <display value="encounter"/>
+                </encounter>
+                <section>
+                    <content>
+                        <reference value="d3cc23c3-1f12-4b89-a415-356feeba0690"/>
+                        <display value="Encounter"/>
+                    </content>
+                </section>
+                <section>
+                    <content>
+                        <reference value="ce6c6ac9-ca55-44a2-9c41-c1227d55c730"/>
+                        <display value="Hemoglobin"/>
+                    </content>
+                </section>
+                <section>
+                    <content>
+                        <reference value="24030c01-f6dd-42a1-a7d9-acb5dc5d04d1"/>
+                        <display value="Diagnostic Report"/>
+                    </content>
+                </section>
+            </Composition>
+        </content>
+    </entry>
+    <entry>
+        <title>Encounter</title>
+        <id>urn:d3cc23c3-1f12-4b89-a415-356feeba0690</id>
+        <updated>2014-10-14T12:29:14.212+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <Encounter xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="d3cc23c3-1f12-4b89-a415-356feeba0690"/>
+                </identifier>
+                <status value="finished"/>
+                <class value="outpatient"/>
+                <type>
+                    <text value="LAB_RESULT"/>
+                </type>
+                <subject>
+                    <reference value="5920342892886360065"/>
+                </subject>
+                <participant>
+                    <individual>
+                        <reference value="456e6c79-35be-11e4-9d09-08002773bf1c"/>
+                    </individual>
+                </participant>
+                <indication>
+                    <reference value="d3cc23c3-1f12-4b89-a415-356feeba0690"/>
+                    <display value="encounter"/>
+                </indication>
+                <serviceProvider>
+                    <reference value="Bahmni"/>
+                </serviceProvider>
+            </Encounter>
+        </content>
+    </entry>
+    <entry>
+        <title>Hemoglobin</title>
+        <id>urn:ce6c6ac9-ca55-44a2-9c41-c1227d55c730</id>
+        <updated>2014-10-14T12:29:14.421+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <Observation xmlns="http://hl7.org/fhir">
+                <name>
+                    <coding>
+                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba"/>
+                        <code value="79647ed4-a60e-4cf5-ba68-cf4d55956cba"/>
+                        <display value="Hemoglobin"/>
+                    </coding>
+                </name>
+                <valueDecimal value="400"/>
+                <status value="final"/>
+                <reliability value="ok"/>
+                <identifier>
+                    <value value="ce6c6ac9-ca55-44a2-9c41-c1227d55c730"/>
+                </identifier>
+                <subject>
+                    <reference value="5920342892886360065"/>
+                </subject>
+            </Observation>
+        </content>
+    </entry>
+    <entry>
+        <title>Diagnostic Report</title>
+        <id>urn:24030c01-f6dd-42a1-a7d9-acb5dc5d04d1</id>
+        <updated>2014-10-14T12:29:14.421+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <DiagnosticReport xmlns="http://hl7.org/fhir">
+                <name>
+                    <coding>
+                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/referenceterms/94f5e936-1b2d-421d-8f83-21048270bf32"/>
+                        <code value="20563-3"/>
+                        <display value="Hemoglobin"/>
+                    </coding>
+                    <coding>
+                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba"/>
+                        <code value="79647ed4-a60e-4cf5-ba68-cf4d55956cba"/>
+                        <display value="Hemoglobin"/>
+                    </coding>
+                </name>
+                <status value="final"/>
+                <issued value="2014-10-13T15:04:30+05:30"/>
+                <subject>
+                    <reference value="5920342892886360065"/>
+                </subject>
+                <performer>
+                    <reference value="456e6c79-35be-11e4-9d09-08002773bf1c"/>
+                </performer>
+                <identifier>
+                    <value value="24030c01-f6dd-42a1-a7d9-acb5dc5d04d1"/>
+                </identifier>
+                <requestDetail>
+                    <reference value="urn:encounter/781e2b52-ad92-411c-a7c6-eb3fea53e566orders"/>
+                </requestDetail>
+                <diagnosticDateTime value="2014-10-13T14:38:22+05:30"/>
+                <result>
+                    <reference value="ce6c6ac9-ca55-44a2-9c41-c1227d55c730"/>
+                </result>
+            </DiagnosticReport>
+        </content>
+    </entry>
+</feed>

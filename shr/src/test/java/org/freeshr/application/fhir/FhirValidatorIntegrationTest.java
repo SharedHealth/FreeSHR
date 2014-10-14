@@ -19,9 +19,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -45,7 +43,7 @@ public class FhirValidatorIntegrationTest {
     public void setup() {
         initMocks(this);
 
-        validator = new FhirValidator(trConceptLocator, shrProperties,fhirMessageFilter);
+        validator = new FhirValidator(trConceptLocator, shrProperties, fhirMessageFilter);
         encounterBundle = EncounterBundleData.withValidEncounter("health-id");
     }
 
@@ -106,6 +104,15 @@ public class FhirValidatorIntegrationTest {
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle.getEncounterContent().toString());
         verify(trConceptLocator, times(1)).verifiesSystem(anyString());
+        assertTrue(encounterValidationResponse.isSuccessful());
+    }
+
+    @Test
+    public void shouldValidateDiagnosticReport() {
+        encounterBundle = EncounterBundleData.encounter("healthId", FileUtil.asString("xmls/encounters/diagnostic_report.xml"));
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+        EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle.getEncounterContent().toString());
+        verify(trConceptLocator, times(3)).verifiesSystem(anyString());
         assertTrue(encounterValidationResponse.isSuccessful());
     }
 }
