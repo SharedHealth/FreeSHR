@@ -22,16 +22,10 @@ public class EncounterRepository {
     private static final Logger logger = LoggerFactory.getLogger(EncounterRepository.class);
 
     private CqlOperations cqlOperations;
-    private DateUtil dateUtil;
 
     @Autowired
     public EncounterRepository(@Qualifier("SHRCassandraTemplate") CqlOperations cassandraTemplate) {
         this.cqlOperations = cassandraTemplate;
-        setDateUtil(new DateUtil());
-    }
-
-    void setDateUtil(DateUtil dateUtil) {
-        this.dateUtil = dateUtil;
     }
 
     public void save(EncounterBundle encounterBundle, Patient patient) throws ExecutionException, InterruptedException {
@@ -40,7 +34,7 @@ public class EncounterRepository {
                 "district_id, upazilla_id, city_corporation_id,ward_id) VALUES ( '"
                 + encounterBundle.getEncounterId() + "','"
                 + encounterBundle.getHealthId() + "','"
-                + dateUtil.getCurrentTimeInUTC() + "','"
+                + DateUtil.getCurrentTimeInUTC() + "','"
                 + encounterBundle.getEncounterContent() + "','"
                 + address.getDivision() + "','"
                 + address.getConcatenatedDistrictId() + "','"
@@ -67,7 +61,7 @@ public class EncounterRepository {
             EncounterBundle bundle = new EncounterBundle();
             bundle.setEncounterId(result.getString("encounter_id"));
             bundle.setHealthId(result.getString("health_id"));
-            bundle.setDate(dateUtil.fromUTCDate(result.getDate("date")));
+            bundle.setDate(DateUtil.fromUTCDate(result.getDate("date")));
             bundle.setEncounterContent(result.getString("content"));
             bundles.add(bundle);
         }
