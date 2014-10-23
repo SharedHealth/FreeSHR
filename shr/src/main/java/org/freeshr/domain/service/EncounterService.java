@@ -96,7 +96,6 @@ public class EncounterService {
      * @return list of encounters. limited to 20
      * @throws ExecutionException
      * @throws InterruptedException
-     * @deprecated Don't use this method. Can't gaurantee order over paged requests.
      */
     public List<EncounterBundle> findEncountersForFacilityCatchment(String facilityId, String catchment, final String sinceDate) throws ExecutionException, InterruptedException {
         Date updateSince = parseDate(sinceDate);
