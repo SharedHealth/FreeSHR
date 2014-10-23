@@ -1,43 +1,29 @@
 package org.freeshr.interfaces.encounter.ws;
 
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.common.base.Charsets;
+import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
-import org.freeshr.config.SHRConfig;
-import org.freeshr.config.SHREnvironmentMock;
-import org.freeshr.launch.WebMvcConfig;
+import org.freeshr.domain.model.Facility;
+import org.freeshr.domain.model.patient.Address;
+import org.freeshr.domain.model.patient.Patient;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.internal.matchers.InstanceOf;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.freeshr.utils.FileUtil.asString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(initializers = SHREnvironmentMock.class, classes = {WebMvcConfig.class, SHRConfig.class})
-@WebAppConfiguration
-public class EncounterControllerIntegrationTest {
-
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(9997);
-
-    @Resource
-    private WebApplicationContext webApplicationContext;
-
-    private MockMvc mockMvc;
+public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
 
     private static final String VALID_HEALTH_ID = "5dd24827-fd5d-4024-9f65-5a3c88a28af5";
 
@@ -45,8 +31,6 @@ public class EncounterControllerIntegrationTest {
 
     @Before
     public void setUp() throws Exception {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-
         givenThat(get(urlEqualTo("/api/v1/patients/" + VALID_HEALTH_ID))
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -101,4 +85,77 @@ public class EncounterControllerIntegrationTest {
                 .content(asString("xmls/encounters/diagnosis_category_invalid.xml")))
                 .andExpect(request().asyncResult(new InstanceOf(UnProcessableEntity.class)));
     }
+
+    @Test
+    public void shouldGetEncountersForPatient() throws Exception {
+        Patient patient = new Patient();
+        String healthId = generateHealthId();
+        patient.setHealthId(healthId);
+        patient.setAddress(new Address("01", "02", "03", "04", "05"));
+
+        createEncounter(createEncounterBundle("e-0-"+healthId, healthId), patient);
+        createEncounter(createEncounterBundle("e-1-"+healthId, healthId), patient);
+        createEncounter(createEncounterBundle("e-2-"+healthId, healthId), patient);
+        mockMvc.perform(MockMvcRequestBuilders.get(
+                String.format("/patients/%s/encounters", healthId))
+                .accept(MediaType.APPLICATION_XML))
+                .andExpect(request().asyncResult(IsCollectionWithSize.hasSize(3)));
+    }
+
+    @Test
+    public void shouldGetEncountersForCatchment() throws Exception {
+        Patient patient1 = new Patient();
+        String healthId1 = generateHealthId();
+        patient1.setHealthId(healthId1);
+        patient1.setAddress(new Address("30", "26", "18", "01", "02"));
+        createEncounter(createEncounterBundle("e-0100-"+healthId1, healthId1), patient1);
+        createEncounter(createEncounterBundle("e-1100-"+healthId1, healthId1), patient1);
+        createEncounter(createEncounterBundle("e-2100-"+healthId1, healthId1), patient1);
+
+        Patient patient2 = new Patient();
+        String healthId2 = generateHealthId();
+        patient2.setHealthId(healthId2);
+        patient2.setAddress(new Address("30", "26", "18", "02", "02"));
+        createEncounter(createEncounterBundle("e-0200-"+healthId2, healthId2), patient2);
+        createEncounter(createEncounterBundle("e-1200-"+healthId2, healthId2), patient2);
+        createEncounter(createEncounterBundle("e-2200-"+healthId2, healthId2), patient2);
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String today = dateFormat.format(new Date());
+
+        //mockFacility("10000069");
+        Facility facility = new Facility("10000069", "facility1", "Main hospital", "3026, 30261801", new Address("30", "26", "18", null, null));
+        createFacility(facility);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/catchments/" + "3026" + "/encounters?updatedSince="+today)
+                .header("facilityId", "10000069")
+                .accept(MediaType.APPLICATION_XML))
+                .andExpect(request().asyncResult(hasEncountersOfSize(6)));
+
+
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/catchments/" + "30261801" + "/encounters?updatedSince="+today)
+                .header("facilityId", "10000069")
+                .accept(MediaType.APPLICATION_XML))
+                .andExpect(request().asyncResult(hasEncountersOfSize(3)));
+    }
+
+    private void mockFacility(String facilityId) {
+        givenThat(get(urlEqualTo(shrProperties.getFacilityRegistryUrl() + "/" + facilityId + ".json"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("X-Auth-Token", shrProperties.getFacilityRegistryAuthToken())
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/F" + facilityId + ".json"))));
+    }
+
+
+    private EncounterBundle createEncounterBundle(String encounterId, String healthId) {
+        EncounterBundle bundle = new EncounterBundle();
+        bundle.setEncounterId(encounterId);
+        bundle.setHealthId(healthId);
+        bundle.setEncounterContent(asString("jsons/encounters/valid.json"));
+        return bundle;
+    }
+
 }

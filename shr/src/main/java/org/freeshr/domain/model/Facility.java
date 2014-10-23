@@ -106,4 +106,9 @@ public class Facility {
         result = 31 * result + facilityLocation.hashCode();
         return result;
     }
+
+    public boolean has(String catchment) {
+        //rule check if the given catchment is within a facilities catchment's hierarchy
+        return getCatchments().contains(catchment);
+    }
 }

@@ -37,7 +37,7 @@ public class EncounterBundleMessageConverterTest {
 
         Assert.assertNull(bundle.getEncounterId());
         Assert.assertNull(bundle.getHealthId());
-        Assert.assertNull(bundle.getDate());
+        Assert.assertNull(bundle.getReceivedDate());
 
         String expectedContent = FileUtils.readFileToString(new File(resource.getPath()));
         String actualContent = bundle.getEncounterContent().toString();

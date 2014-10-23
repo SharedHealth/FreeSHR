@@ -10,10 +10,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -37,10 +40,12 @@ public class EncounterServiceTest {
         when(facilityService.ensurePresent("1")).thenReturn(new Facility("1", "facility1", "Main hospital", "3056,30", new Address("1", "2", "3", null, null)));
 
         final String exceptionMessage = "I bombed";
-        when(encounterRepository.findAllEncountersByCatchment("9999", "district_id", date)).thenThrow(new ExecutionException(exceptionMessage, null));
+
+        when(encounterRepository.findEncountersForCatchment(eq(new FacilityCatchment("30")),  org.mockito.Matchers.any(Date.class), eq(20))).thenThrow(new ExecutionException(exceptionMessage, null));
 
         try {
-            List<EncounterBundle> encountersByCatchments = encounterService.findEncountersByCatchments("1", date);
+            //encounterRepository.findEncountersForCatchment(facilityCatchment, updateSince, DEFAULT_FETCH_LIMIT)
+            List<EncounterBundle> encountersByCatchments = encounterService.findAllEncountersByFacilityCatchments("1", date);
         } catch (Exception e) {
             assertEquals(e.getMessage(), exceptionMessage);
         }

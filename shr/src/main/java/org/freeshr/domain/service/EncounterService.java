@@ -1,5 +1,6 @@
 package org.freeshr.domain.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.application.fhir.EncounterValidationResponse;
@@ -7,17 +8,19 @@ import org.freeshr.application.fhir.FhirValidator;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
+import org.freeshr.utils.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 @Service
 public class EncounterService {
-
+    private static final int DEFAULT_FETCH_LIMIT = 20;
     private EncounterRepository encounterRepository;
     private PatientService patientService;
     private FhirValidator fhirValidator;
@@ -67,48 +70,61 @@ public class EncounterService {
         return encounterValidationResponse.isSuccessful() ? null : encounterValidationResponse;
     }
 
-    public List<EncounterBundle> findEncountersByCatchments(String facilityId, final String date) throws ExecutionException, InterruptedException {
+    /**
+     *
+     * @param facilityId
+     * @param date
+     * @return
+     * @throws ExecutionException
+     * @throws InterruptedException
+     *
+     * @deprecated do not use this. can not gaurantee order of encounters across all catchments.
+     */
+    public List<EncounterBundle> findAllEncountersByFacilityCatchments(String facilityId, final String date) throws ExecutionException, InterruptedException {
         List<EncounterBundle> encounterBundles = new ArrayList<>();
         Facility facility = facilityService.ensurePresent(facilityId);
         if (null == facility) return encounterBundles;
-        return findEncountersByFacility(facility, date);
+        return findEncountersForCatchments(facility.getCatchments(), date);
     }
 
-    private List<EncounterBundle> findEncountersByFacility(Facility facility, String date) throws ExecutionException, InterruptedException {
+    /**
+     *
+     * @param facilityId
+     * @param catchment
+     * @param sinceDate
+     * @return list of encounters. limited to 20
+     * @throws ExecutionException
+     * @throws InterruptedException
+     * @deprecated Don't use this method. Can't gaurantee order over paged requests.
+     */
+    public List<EncounterBundle> findEncountersForFacilityCatchment(String facilityId, String catchment, final String sinceDate) throws ExecutionException, InterruptedException {
+        Date updateSince = parseDate(sinceDate);
+
+        List<EncounterBundle> encounterBundles = new ArrayList<>();
+        Facility facility = facilityService.ensurePresent(facilityId);
+
+        if (null == facility) return encounterBundles;
+        if (StringUtils.isBlank(catchment)) return encounterBundles;
+        if (!facility.has(catchment)) return encounterBundles; //TODO rule check if we throw error!
+        return encounterRepository.findEncountersForCatchment(new FacilityCatchment(catchment), updateSince, DEFAULT_FETCH_LIMIT);
+    }
+
+    private Date parseDate(final String sinceDate) {
+        try {
+            return DateUtil.parseDate(sinceDate, DateUtil.DATE_FORMATS);
+        } catch (ParseException e) {
+            throw new RuntimeException("invalid date:" + sinceDate);
+        }
+    }
+
+    private List<EncounterBundle> findEncountersForCatchments(final List<String> catchments, String sinceDate) throws ExecutionException, InterruptedException {
         Set<EncounterBundle> encounters = new HashSet<>();
-        for (String catchment : facility.getCatchments()) {
+        Date updateSince = parseDate(sinceDate);
+        for (String catchment : catchments) {
             FacilityCatchment facilityCatchment = new FacilityCatchment(catchment);
-            encounters.addAll(encounterRepository.findAllEncountersByCatchment(facilityCatchment.getCatchment(),
-                    facilityCatchment.getCatchmentType(), date));
+            encounters.addAll(encounterRepository.findEncountersForCatchment(facilityCatchment, updateSince, DEFAULT_FETCH_LIMIT));
         }
         return new ArrayList<>(encounters);
-    }
-
-    private Map<Integer, String> AddressHierarchy = new HashMap<Integer, String>() {{
-        put(2, "division_id");
-        put(4, "district_id");
-        put(6, "upazilla_id");
-        put(8, "city_corporation_id");
-        put(10, "ward_id");
-    }};
-
-    private class FacilityCatchment {
-        private final String catchment;
-
-        public FacilityCatchment(String catchment) {
-            this.catchment = catchment;
-        }
-
-        public String getCatchment() {
-            return this.catchment;
-        }
-
-        public String getCatchmentType() {
-            int length = this.catchment.length();
-            return AddressHierarchy.get(length);
-        }
-
-
     }
 
 

@@ -1,5 +1,6 @@
 package org.freeshr.interfaces.encounter.ws;
 
+import org.apache.commons.lang.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.domain.service.EncounterService;
@@ -60,11 +61,11 @@ public class EncounterController {
 
 
     @RequestMapping(value = "/encounters/bycatchments", method = RequestMethod.GET)
-    public DeferredResult<List<EncounterBundle>> findAllByCatchment(@RequestHeader String facilityId, @RequestParam(value = "facilityDate",required = false) String facilityDate) throws ExecutionException, InterruptedException, ParseException {
+    public DeferredResult<List<EncounterBundle>> findAllByCatchment(@RequestHeader String facilityId, @RequestParam(value = "updatedSince",required = false) String updatedSince) throws ExecutionException, InterruptedException, ParseException {
         logger.debug(" Find all encounters by facility id:" + facilityId);
         final DeferredResult<List<EncounterBundle>> deferredResult = new DeferredResult<>();
         try {
-            List<EncounterBundle> encountersByCatchments = encounterService.findEncountersByCatchments(facilityId, facilityDate);
+            List<EncounterBundle> encountersByCatchments = encounterService.findAllEncountersByFacilityCatchments(facilityId, updatedSince);
             deferredResult.setResult(encountersByCatchments);
         }
         catch (Exception e){
@@ -72,6 +73,55 @@ public class EncounterController {
         }
         return deferredResult;
 
+    }
+
+    @RequestMapping(value = "/catchments/{catchment}/encounters", method = RequestMethod.GET)
+    public DeferredResult<EncounterSearchResponse> findEncountersForCatchment(
+            @RequestHeader String facilityId,
+            @PathVariable String catchment,
+            @RequestParam(value = "updatedSince",required = false) String updatedSince,
+            @RequestParam(value = "lastMarker",  required = false) String lastMarker) throws ExecutionException, InterruptedException, ParseException {
+        logger.debug(String.format("Find all encounters for facility %s in catchment %s", facilityId, catchment));
+        final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<>();
+        try {
+            List<EncounterBundle> catchmentEncounters =
+                    filterAfterMarker(encounterService.findEncountersForFacilityCatchment(facilityId, catchment, updatedSince), lastMarker);
+            deferredResult.setResult(new EncounterSearchResponse(null, getNextResultURL(catchment, catchmentEncounters), catchmentEncounters));
+        }
+        catch (Exception e){
+            deferredResult.setErrorResult(e);
+        }
+        return deferredResult;
+    }
+
+    private String getNextResultURL(String catchment, List<EncounterBundle> catchmentEncounters) {
+        int size = catchmentEncounters.size();
+        if (size <= 0) return null;
+
+        EncounterBundle lastEncounter = catchmentEncounters.get(size - 1);
+        return String.format("/catchments/%s/encounters?updatedSince=%s&lastMarker=%s", catchment, lastEncounter.getReceivedDate(), lastEncounter.getEncounterId());
+    }
+
+    private List<EncounterBundle> filterAfterMarker(List<EncounterBundle> encounters, String lastMarker) {
+        //TODO use a linkedHashSet
+        if (!StringUtils.isBlank(lastMarker)) {
+            int lastMarkerIndex = identifyLastMarker(lastMarker, encounters);
+            if (lastMarkerIndex >= 0) {
+                return encounters.subList(lastMarkerIndex, encounters.size());
+            }
+        }
+        return encounters;
+    }
+
+    private int identifyLastMarker(String lastMarker, final List<EncounterBundle> encountersByCatchment) {
+        int idx = 0;
+        for (EncounterBundle encounterBundle : encountersByCatchment) {
+            if (encounterBundle.getEncounterId().equals(lastMarker)) {
+                return idx;
+            }
+            idx++;
+        }
+        return -1;
     }
 
     @ResponseStatus(value = HttpStatus.PRECONDITION_FAILED)
@@ -87,4 +137,9 @@ public class EncounterController {
     public EncounterResponse unProcessableEntity(UnProcessableEntity unProcessableEntity) {
         return unProcessableEntity.getResult();
     }
+
+
+
+
+
 }

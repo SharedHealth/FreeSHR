@@ -48,15 +48,22 @@ ext.libraries = [
         saxon                : 'net.sf.saxon:Saxon-HE:9.5.1-6',
         rxjava               : 'com.netflix.rxjava:rxjava-core:0.17.5',
         future_converter     : 'net.javacrumbs.future-converter:spring-rxjava:0.0.2',
-        netflix_astyanax:"com.netflix.astyanax:astyanax:1.56.48"
+        netflix_astyanax     : "com.netflix.astyanax:astyanax:1.56.48",
+        rome                 : "rome:rome:1.0",
+        time_uuid            : "com.eaio.uuid:uuid:3.2"
 ]
 
+//junit         : "junit:junit:4.10",
 ext.testLibraries = [
-        junit         : "junit:junit:4.10",
+        junit         : dependencies.create("junit:junit:4.10") {
+            exclude module: 'hamcrest-core'
+            force = true
+        },
         mockito       : "org.mockito:mockito-all:1.8.4",
-        spring_test   : "org.springframework:spring-test:4.0.3.RELEASE",
-        cassandra_unit: "org.cassandraunit:cassandra-unit-spring:2.0.2.2-SNAPSHOT",
-        wiremock      : "com.github.tomakehurst:wiremock:1.43"
+        spring_test   : "org.springframework:spring-test:4.1.1.RELEASE",
+        cassandra_unit_spring: "org.cassandraunit:cassandra-unit-spring:2.0.2.2",
+        wiremock      : "com.github.tomakehurst:wiremock:1.51",
+        hamcrest_core : "org.hamcrest:hamcrest-all:1.3"
 ]
 
 def getProcessBuilder() {

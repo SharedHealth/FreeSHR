@@ -11,7 +11,7 @@ public class EncounterBundle {
 
     private String encounterId;
     private String healthId;
-    private String date;
+    private String receivedDate;
 
     @JsonIgnore
     private EncounterContent encounterContent;
@@ -32,8 +32,8 @@ public class EncounterBundle {
         this.healthId = healthId;
     }
 
-    public String getDate() {
-        return date;
+    public String getReceivedDate() {
+        return receivedDate;
     }
 
     @Override
@@ -43,7 +43,7 @@ public class EncounterBundle {
 
         EncounterBundle that = (EncounterBundle) o;
 
-        if (date != null ? !date.equals(that.date) : that.date != null) return false;
+        if (receivedDate != null ? !receivedDate.equals(that.receivedDate) : that.receivedDate != null) return false;
         if (encounterId != null ? !encounterId.equals(that.encounterId) : that.encounterId != null) return false;
         if (healthId != null ? !healthId.equals(that.healthId) : that.healthId != null) return false;
 
@@ -54,12 +54,12 @@ public class EncounterBundle {
     public int hashCode() {
         int result = encounterId != null ? encounterId.hashCode() : 0;
         result = 31 * result + (healthId != null ? healthId.hashCode() : 0);
-        result = 31 * result + (date != null ? date.hashCode() : 0);
+        result = 31 * result + (receivedDate != null ? receivedDate.hashCode() : 0);
         return result;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setReceivedDate(String date) {
+        this.receivedDate = date;
     }
 
     public EncounterContent getEncounterContent() {
