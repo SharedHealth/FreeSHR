@@ -5,7 +5,7 @@ import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
-import org.freeshr.domain.service.FacilityCatchment;
+import org.freeshr.domain.model.Catchment;
 import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -98,7 +98,7 @@ public class EncounterRepositoryIntegrationTest {
         patient.setAddress(new Address("01", "02", "03", "04", "05"));
         encounterRepository.save(createEncounterBundle("e-0", healthId), patient);
         encounterRepository.save(createEncounterBundle("e-2", healthId), patient);
-        List<EncounterBundle> encountersForCatchment = encounterRepository.findEncountersForCatchment(new FacilityCatchment("0102"), date, 10);
+        List<EncounterBundle> encountersForCatchment = encounterRepository.findEncountersForCatchment(new Catchment("0102"), date, 10);
         //System.out.println(encountersForCatchment);
         //List<EncounterBundle> encounters = encounterRepository.findAllEncountersByCatchment("0102", "district_id", date);
         assertEquals(2, encountersForCatchment.size());

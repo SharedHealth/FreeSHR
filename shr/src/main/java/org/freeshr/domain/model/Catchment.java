@@ -1,11 +1,11 @@
-package org.freeshr.domain.service;
+package org.freeshr.domain.model;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class FacilityCatchment {
+public class Catchment {
     ////division_id, district_id, upazila_id, city_corporation_id, union_urban_ward_id
     public static final String DIVISION_ID = "division_id";
     public static final String DISTRICT_ID = "district_id";
@@ -14,7 +14,7 @@ public class FacilityCatchment {
     public static final String UNION_OR_URBAN_WARD_ID = "union_urban_ward_id";
 
 
-    private Map<Integer, String> addressLevelMap = new HashMap<Integer, String>() {{
+    private static final Map<Integer, String> catchmentTypes = new HashMap<Integer, String>() {{
         put(1, DIVISION_ID);
         put(2, DISTRICT_ID);
         put(3, UPAZILA_ID);
@@ -22,34 +22,29 @@ public class FacilityCatchment {
         put(5, UNION_OR_URBAN_WARD_ID);
     }};
 
-    private String catchment;
+    private String code;
     private boolean valid = false;
     private int level = 0;
 
-    public FacilityCatchment(String catchment) {
-        parse(catchment);
+    public Catchment(String code) {
+        parse(code);
     }
 
-    public String getCatchment() {
-        return this.catchment;
+    public String getCode() {
+        return this.code;
     }
 
-    public String getCatchmentType() {
-        return addressLevelMap.get(this.level);
+    public String getType() {
+        return catchmentTypes.get(this.level);
     }
-
-    public String getDivisionId() {
-        return null;
-    }
-
 
     private void parse(String catchment) {
         int mod = catchment.length() % 2;
         if (mod != 0) return;
 
-        this.valid = true;
-        this.catchment = catchment;
+        this.code = catchment;
         this.level = catchment.length()/2;
+        this.valid = this.level > 0;
     }
 
     public int getLevel() {
@@ -58,35 +53,39 @@ public class FacilityCatchment {
 
     public String levelCode(int i) {
         if (i > this.level) return null;
-        if (StringUtils.isBlank(this.catchment)) return null;
+        if (StringUtils.isBlank(this.code)) return null;
         
-        return catchment.substring(0, i*2);
+        return code.substring(0, i*2);
     }
 
     public String levelType(int level) {
         if (level > this.level) return null;
-        return addressLevelMap.get(level);
+        return catchmentTypes.get(level);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof FacilityCatchment)) return false;
+        if (!(o instanceof Catchment)) return false;
 
-        FacilityCatchment that = (FacilityCatchment) o;
+        Catchment that = (Catchment) o;
 
         if (level != that.level) return false;
         if (valid != that.valid) return false;
-        if (catchment != null ? !catchment.equals(that.catchment) : that.catchment != null) return false;
+        if (code != null ? !code.equals(that.code) : that.code != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = catchment != null ? catchment.hashCode() : 0;
+        int result = code != null ? code.hashCode() : 0;
         result = 31 * result + (valid ? 1 : 0);
         result = 31 * result + level;
         return result;
+    }
+
+    public boolean isValid() {
+        return valid;
     }
 }

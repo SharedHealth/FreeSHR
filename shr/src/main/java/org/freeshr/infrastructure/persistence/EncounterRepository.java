@@ -11,9 +11,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
-import org.freeshr.domain.service.FacilityCatchment;
+import org.freeshr.domain.model.Catchment;
 import org.freeshr.utils.DateUtil;
-import org.freeshr.utils.TimeUuidUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +71,7 @@ public class EncounterRepository {
         cqlOperations.execute(batch);
     }
 
-    public List<EncounterBundle> findEncountersForCatchment(FacilityCatchment catchment, Date updatedSince, int limit) throws ExecutionException, InterruptedException {
+    public List<EncounterBundle> findEncountersForCatchment(Catchment catchment, Date updatedSince, int limit) throws ExecutionException, InterruptedException {
         String identifyEncountersQuery = buildCatchmentSearchQuery(catchment, updatedSince, limit);
         ResultSet resultSet = cqlOperations.query(identifyEncountersQuery);
         List<Row> rows = resultSet.all();
@@ -84,7 +83,7 @@ public class EncounterRepository {
 
     }
 
-    private String buildCatchmentSearchQuery(FacilityCatchment catchment, Date updatedSince, int limit) {
+    private String buildCatchmentSearchQuery(Catchment catchment, Date updatedSince, int limit) {
         int yearOfDate = DateUtil.getYearOf(updatedSince);
         String lastUpdateTime = new SimpleDateFormat(DateUtil.UTC_DATE_IN_MILLIS_FORMAT).format(updatedSince);
         return String.format("SELECT encounter_id FROM enc_by_catchment " +
@@ -112,7 +111,7 @@ public class EncounterRepository {
         return encounterQuery.toString();
     }
 
-    private String buildClauseForCatchment(FacilityCatchment catchment) {
+    private String buildClauseForCatchment(Catchment catchment) {
         int level = catchment.getLevel();
         String clause = "";
         for (int l = 1; l <= level; l++) {
@@ -137,7 +136,7 @@ public class EncounterRepository {
      * @throws InterruptedException
      *
      * @deprecated do not use this method
-     * @see #findEncountersForCatchment(org.freeshr.domain.service.FacilityCatchment, java.util.Date, int)
+     * @see #findEncountersForCatchment(org.freeshr.domain.model.Catchment, java.util.Date, int)
      */
     public List<EncounterBundle> findAllEncountersByCatchment(String catchment, String catchmentType, String date) throws ExecutionException, InterruptedException {
         String query = String.format("SELECT encounter_id, health_id, date, content " +

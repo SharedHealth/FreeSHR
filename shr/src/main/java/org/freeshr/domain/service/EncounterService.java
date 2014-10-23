@@ -5,6 +5,7 @@ import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.application.fhir.FhirValidator;
+import org.freeshr.domain.model.Catchment;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
@@ -106,7 +107,7 @@ public class EncounterService {
         if (null == facility) return encounterBundles;
         if (StringUtils.isBlank(catchment)) return encounterBundles;
         if (!facility.has(catchment)) return encounterBundles; //TODO rule check if we throw error!
-        return encounterRepository.findEncountersForCatchment(new FacilityCatchment(catchment), updateSince, DEFAULT_FETCH_LIMIT);
+        return encounterRepository.findEncountersForCatchment(new Catchment(catchment), updateSince, DEFAULT_FETCH_LIMIT);
     }
 
     private Date parseDate(final String sinceDate) {
@@ -121,7 +122,7 @@ public class EncounterService {
         Set<EncounterBundle> encounters = new HashSet<>();
         Date updateSince = parseDate(sinceDate);
         for (String catchment : catchments) {
-            FacilityCatchment facilityCatchment = new FacilityCatchment(catchment);
+            Catchment facilityCatchment = new Catchment(catchment);
             encounters.addAll(encounterRepository.findEncountersForCatchment(facilityCatchment, updateSince, DEFAULT_FETCH_LIMIT));
         }
         return new ArrayList<>(encounters);
