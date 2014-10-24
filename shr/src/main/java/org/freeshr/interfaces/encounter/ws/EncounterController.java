@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.domain.service.EncounterService;
+import org.freeshr.utils.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -82,16 +85,30 @@ public class EncounterController {
             @RequestParam(value = "updatedSince",required = false) String updatedSince,
             @RequestParam(value = "lastMarker",  required = false) String lastMarker) throws ExecutionException, InterruptedException, ParseException {
         logger.debug(String.format("Find all encounters for facility %s in catchment %s", facilityId, catchment));
+
+        Date lastUpdateDate = getLastUpdateDate(updatedSince);
         final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<>();
         try {
             List<EncounterBundle> catchmentEncounters =
-                    filterAfterMarker(encounterService.findEncountersForFacilityCatchment(facilityId, catchment, updatedSince), lastMarker);
+                    filterAfterMarker(encounterService.findEncountersForFacilityCatchment(facilityId, catchment, lastUpdateDate), lastMarker);
             deferredResult.setResult(new EncounterSearchResponse(null, getNextResultURL(catchment, catchmentEncounters), catchmentEncounters));
         }
         catch (Exception e){
             deferredResult.setErrorResult(e);
         }
         return deferredResult;
+    }
+
+    private Date getLastUpdateDate(String updatedSince) {
+        Date lastUpdateDate = DateUtil.parseDate(updatedSince);
+        if (lastUpdateDate == null) {
+            //get default
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.MONTH, -1);
+            //TODO set hour, min, ss to 00:00:00
+            lastUpdateDate = calendar.getTime();
+        }
+        return lastUpdateDate;
     }
 
     private String getNextResultURL(String catchment, List<EncounterBundle> catchmentEncounters) {

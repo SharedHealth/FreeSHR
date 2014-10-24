@@ -97,29 +97,19 @@ public class EncounterService {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public List<EncounterBundle> findEncountersForFacilityCatchment(String facilityId, String catchment, final String sinceDate) throws ExecutionException, InterruptedException {
-        Date updateSince = parseDate(sinceDate);
-
+    public List<EncounterBundle> findEncountersForFacilityCatchment(String facilityId, String catchment, final Date sinceDate) throws ExecutionException, InterruptedException {
         List<EncounterBundle> encounterBundles = new ArrayList<>();
         Facility facility = facilityService.ensurePresent(facilityId);
 
         if (null == facility) return encounterBundles;
         if (StringUtils.isBlank(catchment)) return encounterBundles;
         if (!facility.has(catchment)) return encounterBundles; //TODO rule check if we throw error!
-        return encounterRepository.findEncountersForCatchment(new Catchment(catchment), updateSince, DEFAULT_FETCH_LIMIT);
-    }
-
-    private Date parseDate(final String sinceDate) {
-        try {
-            return DateUtil.parseDate(sinceDate, DateUtil.DATE_FORMATS);
-        } catch (ParseException e) {
-            throw new RuntimeException("invalid date:" + sinceDate);
-        }
+        return encounterRepository.findEncountersForCatchment(new Catchment(catchment), sinceDate, DEFAULT_FETCH_LIMIT);
     }
 
     private List<EncounterBundle> findEncountersForCatchments(final List<String> catchments, String sinceDate) throws ExecutionException, InterruptedException {
         Set<EncounterBundle> encounters = new HashSet<>();
-        Date updateSince = parseDate(sinceDate);
+        Date updateSince = DateUtil.parseDate(sinceDate);
         for (String catchment : catchments) {
             Catchment facilityCatchment = new Catchment(catchment);
             encounters.addAll(encounterRepository.findEncountersForCatchment(facilityCatchment, updateSince, DEFAULT_FETCH_LIMIT));

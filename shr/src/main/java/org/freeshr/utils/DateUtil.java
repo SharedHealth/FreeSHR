@@ -35,6 +35,13 @@ public class DateUtil {
 
     public static Date parseDate(String date, String[] formats) throws ParseException {
         return org.apache.commons.lang3.time.DateUtils.parseDate(date, formats);
+    }
 
+    public static Date parseDate(String date) {
+        try {
+            return parseDate(date, DateUtil.DATE_FORMATS);
+        } catch (ParseException e) {
+            throw new RuntimeException("invalid date:" + date);
+        }
     }
 }
