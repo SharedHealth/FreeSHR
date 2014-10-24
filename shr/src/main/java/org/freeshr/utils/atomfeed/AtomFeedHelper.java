@@ -3,6 +3,7 @@ package org.freeshr.utils.atomfeed;
 
 import com.sun.syndication.feed.atom.*;
 import org.freeshr.application.fhir.EncounterBundle;
+import org.freeshr.utils.DateUtil;
 
 import java.net.URI;
 import java.text.SimpleDateFormat;
@@ -18,7 +19,7 @@ public class AtomFeedHelper {
     private static final String LINK_TYPE_VIA = "via";
     private static final String ATOMFEED_MEDIA_TYPE = "application/vnd.atomfeed+xml";
 
-    public class NavigationLink {
+    public static class NavigationLink {
         String prev;
         String next;
         public NavigationLink(String prev, String next) {
@@ -33,8 +34,7 @@ public class AtomFeedHelper {
         }
     }
 
-    public Feed generateFeed(URI requestUri, List<EncounterBundle> encounters, Date dateOfFeed, String catchment, NavigationLink navigationLink) {
-        String feedId = generateIdForEventFeed(dateOfFeed, catchment);
+    public Feed generateFeed(URI requestUri, List<EncounterBundle> encounters, String feedId, NavigationLink navigationLink) {
         return new FeedBuilder()
                 .type("atom_1.0")
                 .id(feedId)
@@ -54,12 +54,19 @@ public class AtomFeedHelper {
     }
 
     private List<Entry> getEntries(List<EncounterBundle> encounters) {
-        return null;
-    }
-
-    private String generateIdForEventFeed(Date date, String catchment){
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-        return dateFormat.format(date) + "+" + catchment;
+        List<Entry> entryList = new ArrayList<Entry>();
+        for (EncounterBundle encounter : encounters) {
+            final Entry entry = new Entry();
+            entry.setId(encounter.getEncounterId());
+            entry.setTitle("ENCOUNTER:" + encounter.getEncounterId());
+            entry.setUpdated(DateUtil.parseDate(encounter.getReceivedDate()));
+            entry.setContents(generateContents(encounter));
+            Category category = new Category();
+            category.setTerm("Encounter");
+            entry.setCategories(Arrays.asList(category));
+            entryList.add(entry);
+        }
+        return entryList;
     }
 
     private Generator getGenerator() {
@@ -122,5 +129,19 @@ public class AtomFeedHelper {
             links.add(prev);
         }
         return links;
+    }
+
+    private List<Content> generateContents(EncounterBundle encounter) {
+        Content content = new Content();
+        content.setType(ATOMFEED_MEDIA_TYPE);
+        content.setValue(wrapInCDATA(encounter.getContent()));
+        return Arrays.asList(content);
+    }
+
+    private String wrapInCDATA(String contents){
+        if(contents == null){
+            return null;
+        }
+        return String.format("%s%s%s","<![CDATA[",contents,"]]>");
     }
 }

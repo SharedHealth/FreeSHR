@@ -11,8 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.ParseException;
@@ -68,7 +71,17 @@ public class EncounterController {
         return deferredResult;
     }
 
-
+    /**
+     *
+     * @param facilityId
+     * @param updatedSince
+     * @return
+     * @throws ExecutionException
+     * @throws InterruptedException
+     * @throws ParseException
+     *
+     * @deprecated do not use this method
+     */
     @RequestMapping(value = "/encounters/bycatchments", method = RequestMethod.GET)
     public DeferredResult<List<EncounterBundle>> findAllByCatchment(
             @RequestHeader String facilityId,
@@ -89,23 +102,24 @@ public class EncounterController {
 
     @RequestMapping(value = "/catchments/{catchment}/encounters", method = RequestMethod.GET)
     public DeferredResult<EncounterSearchResponse> findEncountersForCatchment(
+            HttpServletRequest request,
             @RequestHeader String facilityId,
             @PathVariable String catchment,
             @RequestParam(value = "updatedSince",required = false) String updatedSince,
             @RequestParam(value = "lastMarker",  required = false) String lastMarker)
             throws ExecutionException, InterruptedException, ParseException {
         logger.debug(String.format("Find all encounters for facility %s in catchment %s", facilityId, catchment));
-
         final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<>();
         try {
             Date lastUpdateDate = getLastUpdateDate(updatedSince);
             List<EncounterBundle> catchmentEncounters =
                filterAfterMarker(
-                  encounterService.findEncountersForFacilityCatchment(
-                          facilityId, catchment, lastUpdateDate, EncounterService.DEFAULT_FETCH_LIMIT),
-                  lastMarker, EncounterService.DEFAULT_FETCH_LIMIT);
+                       encounterService.findEncountersForFacilityCatchment(
+                               facilityId, catchment, lastUpdateDate, EncounterService.DEFAULT_FETCH_LIMIT),
+                       lastMarker, EncounterService.DEFAULT_FETCH_LIMIT);
             deferredResult.setResult(
-               new EncounterSearchResponse(null, getNextResultURL(catchment, catchmentEncounters), catchmentEncounters));
+               new EncounterSearchResponse(null,
+                  getNextResultURL(request, catchmentEncounters), catchmentEncounters));
         }
         catch (Exception e){
             deferredResult.setErrorResult(e);
@@ -135,14 +149,17 @@ public class EncounterController {
         return lastUpdateDate;
     }
 
-    private String getNextResultURL(String catchment, List<EncounterBundle> catchmentEncounters) throws UnsupportedEncodingException {
+    private String getNextResultURL(HttpServletRequest request, List<EncounterBundle> catchmentEncounters)
+            throws UnsupportedEncodingException, URISyntaxException {
         int size = catchmentEncounters.size();
         if (size <= 0) return null;
 
         EncounterBundle lastEncounter = catchmentEncounters.get(size - 1);
         String receivedDate = URLEncoder.encode(lastEncounter.getReceivedDate(), "UTF-8");
-        return String.format("/catchments/%s/encounters?updatedSince=%s&lastMarker=%s",
-                catchment, receivedDate, lastEncounter.getEncounterId());
+
+        return UriComponentsBuilder.fromUriString(request.getRequestURL().toString())
+                .queryParam("updatedSince", receivedDate)
+                .queryParam("lastMarker", lastEncounter.getEncounterId()).build().toString();
     }
 
     private List<EncounterBundle> filterAfterMarker(List<EncounterBundle> encounters, String lastMarker, int limit) {
@@ -151,7 +168,7 @@ public class EncounterController {
         //TODO use a linkedHashSet
         int lastMarkerIndex = identifyLastMarker(lastMarker, encounters);
         if (lastMarkerIndex >= 0) {
-            if ((lastMarkerIndex+1) >= encounters.size()) {
+            if ((lastMarkerIndex+1) <= encounters.size()) {
                 return encounters.subList(lastMarkerIndex + 1, encounters.size());
             }
         }
