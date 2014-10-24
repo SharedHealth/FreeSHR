@@ -64,7 +64,7 @@ public class FacilityMessageConverter  extends AbstractHttpMessageConverter<Faci
         Address address = new Address();
         address.setDivision((String)linkedHashMap.get("division_code"));
         address.setDistrict((String)linkedHashMap.get("district_code"));
-        address.setUpazilla((String)linkedHashMap.get("upazila_code"));
+        address.setUpazila((String) linkedHashMap.get("upazila_code"));
         address.setCityCorporation((String)linkedHashMap.get("paurasava_code"));
         address.setWard((String)linkedHashMap.get("ward_code"));
         return address;

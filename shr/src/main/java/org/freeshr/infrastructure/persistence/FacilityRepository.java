@@ -29,8 +29,8 @@ public class FacilityRepository {
     public Facility find(String facilityId) throws ExecutionException {
         ResultSet resultSet = cqlOperations.query(
                 "SELECT facility_id, facility_name, facility_type, catchments, " +
-                        "division_id, district_id, upazilla_id, city_corporation_id, " +
-                        "ward_id FROM facilities WHERE facility_id='" + facilityId + "';");
+                        "division_id, district_id, upazila_id, city_corporation_id, " +
+                        "union_urban_ward_id FROM facilities WHERE facility_id='" + facilityId + "';");
         return read(resultSet);
     }
 
@@ -45,9 +45,9 @@ public class FacilityRepository {
             Address address = new Address();
             address.setDivision(result.getString("division_id"));
             address.setDistrict(result.getString("district_id"));
-            address.setUpazilla(result.getString("upazilla_id"));
+            address.setUpazila(result.getString("upazila_id"));
             address.setCityCorporation(result.getString("city_corporation_id"));
-            address.setWard(result.getString("ward_id"));
+            address.setWard(result.getString("union_urban_ward_id"));
             facility.setFacilityLocation(address);
             return facility;
         } else {
@@ -62,10 +62,10 @@ public class FacilityRepository {
     private String toCQL(Facility facility) {
         String query = query(asList(facility.getFacilityId(), facility.getFacilityName(), facility.getFacilityType(),
                 facility.getFacilityLocation().getDivision(), facility.getFacilityLocation().getDistrict(),
-                facility.getFacilityLocation().getUpazilla(), facility.getFacilityLocation().getCityCorporation(),
+                facility.getFacilityLocation().getUpazila(), facility.getFacilityLocation().getCityCorporation(),
                 facility.getFacilityLocation().getWard(), facility.getCatchmentsAsCommaSeparatedString()));
         return "INSERT into facilities (facility_id, facility_name, facility_type, division_id, district_id, " +
-                "upazilla_id, city_corporation_id, ward_id, catchments) values  (" + query + ")";
+                "upazila_id, city_corporation_id, union_urban_ward_id, catchments) values  (" + query + ")";
     }
 
     private String query(List<String> values) {

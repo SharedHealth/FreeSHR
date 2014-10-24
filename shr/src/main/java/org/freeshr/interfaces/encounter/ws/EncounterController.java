@@ -12,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,7 +33,9 @@ public class EncounterController {
     }
 
     @RequestMapping(value = "/patients/{healthId}/encounters", method = RequestMethod.POST)
-    public DeferredResult<EncounterResponse> create(@PathVariable String healthId, @RequestBody EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
+    public DeferredResult<EncounterResponse> create(
+            @PathVariable String healthId,
+            @RequestBody EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
         logger.debug("Create encounter. " + encounterBundle);
         encounterBundle.setHealthId(healthId);
 
@@ -64,7 +69,10 @@ public class EncounterController {
 
 
     @RequestMapping(value = "/encounters/bycatchments", method = RequestMethod.GET)
-    public DeferredResult<List<EncounterBundle>> findAllByCatchment(@RequestHeader String facilityId, @RequestParam(value = "updatedSince",required = false) String updatedSince) throws ExecutionException, InterruptedException, ParseException {
+    public DeferredResult<List<EncounterBundle>> findAllByCatchment(
+            @RequestHeader String facilityId,
+            @RequestParam(value = "updatedSince",required = false) String updatedSince)
+            throws ExecutionException, InterruptedException, ParseException {
         logger.debug(" Find all encounters by facility id:" + facilityId);
         final DeferredResult<List<EncounterBundle>> deferredResult = new DeferredResult<>();
         try {
@@ -83,15 +91,20 @@ public class EncounterController {
             @RequestHeader String facilityId,
             @PathVariable String catchment,
             @RequestParam(value = "updatedSince",required = false) String updatedSince,
-            @RequestParam(value = "lastMarker",  required = false) String lastMarker) throws ExecutionException, InterruptedException, ParseException {
+            @RequestParam(value = "lastMarker",  required = false) String lastMarker)
+            throws ExecutionException, InterruptedException, ParseException {
         logger.debug(String.format("Find all encounters for facility %s in catchment %s", facilityId, catchment));
 
-        Date lastUpdateDate = getLastUpdateDate(updatedSince);
         final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<>();
         try {
+            Date lastUpdateDate = getLastUpdateDate(updatedSince);
             List<EncounterBundle> catchmentEncounters =
-                    filterAfterMarker(encounterService.findEncountersForFacilityCatchment(facilityId, catchment, lastUpdateDate), lastMarker);
-            deferredResult.setResult(new EncounterSearchResponse(null, getNextResultURL(catchment, catchmentEncounters), catchmentEncounters));
+               filterAfterMarker(
+                  encounterService.findEncountersForFacilityCatchment(
+                          facilityId, catchment, lastUpdateDate, EncounterService.DEFAULT_FETCH_LIMIT),
+                  lastMarker, EncounterService.DEFAULT_FETCH_LIMIT);
+            deferredResult.setResult(
+               new EncounterSearchResponse(null, getNextResultURL(catchment, catchmentEncounters), catchmentEncounters));
         }
         catch (Exception e){
             deferredResult.setErrorResult(e);
@@ -99,8 +112,9 @@ public class EncounterController {
         return deferredResult;
     }
 
-    private Date getLastUpdateDate(String updatedSince) {
-        Date lastUpdateDate = DateUtil.parseDate(updatedSince);
+    private Date getLastUpdateDate(String updatedSince) throws UnsupportedEncodingException {
+        String decodeLastUpdate = URLDecoder.decode(updatedSince, "UTF-8");
+        Date lastUpdateDate = DateUtil.parseDate(decodeLastUpdate);
         if (lastUpdateDate == null) {
             //get default
             Calendar calendar = Calendar.getInstance();
@@ -111,15 +125,17 @@ public class EncounterController {
         return lastUpdateDate;
     }
 
-    private String getNextResultURL(String catchment, List<EncounterBundle> catchmentEncounters) {
+    private String getNextResultURL(String catchment, List<EncounterBundle> catchmentEncounters) throws UnsupportedEncodingException {
         int size = catchmentEncounters.size();
         if (size <= 0) return null;
 
         EncounterBundle lastEncounter = catchmentEncounters.get(size - 1);
-        return String.format("/catchments/%s/encounters?updatedSince=%s&lastMarker=%s", catchment, lastEncounter.getReceivedDate(), lastEncounter.getEncounterId());
+        String receivedDate = URLEncoder.encode(lastEncounter.getReceivedDate(), "UTF-8");
+        return String.format("/catchments/%s/encounters?updatedSince=%s&lastMarker=%s",
+                catchment, receivedDate, lastEncounter.getEncounterId());
     }
 
-    private List<EncounterBundle> filterAfterMarker(List<EncounterBundle> encounters, String lastMarker) {
+    private List<EncounterBundle> filterAfterMarker(List<EncounterBundle> encounters, String lastMarker, int limit) {
         //TODO use a linkedHashSet
         if (!StringUtils.isBlank(lastMarker)) {
             int lastMarkerIndex = identifyLastMarker(lastMarker, encounters);

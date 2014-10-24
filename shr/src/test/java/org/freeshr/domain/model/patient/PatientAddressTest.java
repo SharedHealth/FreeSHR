@@ -11,7 +11,7 @@ public class PatientAddressTest {
     public void shouldReturnConcatenatedAddressPArts() {
         Address address = new Address("01", "02", "03", "04", "05");
         assertEquals(address.getConcatenatedDistrictId(), "0102");
-        assertEquals(address.getConcatenatedUpazillaId(), "010203");
+        assertEquals(address.getConcatenatedUpazilaId(), "010203");
         assertEquals(address.getConcatenatedCityCorporationId(), "01020304");
         assertEquals(address.getConcatenatedWardId(), "0102030405");
     }

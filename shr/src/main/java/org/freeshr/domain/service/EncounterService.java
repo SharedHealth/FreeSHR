@@ -21,7 +21,7 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 public class EncounterService {
-    private static final int DEFAULT_FETCH_LIMIT = 20;
+    public static final int DEFAULT_FETCH_LIMIT = 20;
     private EncounterRepository encounterRepository;
     private PatientService patientService;
     private FhirValidator fhirValidator;
@@ -62,7 +62,17 @@ public class EncounterService {
         }
     }
 
+    /**
+     *
+     * @param healthId
+     * @return
+     * @throws ExecutionException
+     * @throws InterruptedException
+     *
+     * @deprecated do not use this query
+     */
     public List<EncounterBundle> findAll(String healthId) throws ExecutionException, InterruptedException {
+        //TODO refactor
         return encounterRepository.findAll(healthId);
     }
 
@@ -93,18 +103,19 @@ public class EncounterService {
      * @param facilityId
      * @param catchment
      * @param sinceDate
+     * @param defaultFetchLimit
      * @return list of encounters. limited to 20
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public List<EncounterBundle> findEncountersForFacilityCatchment(String facilityId, String catchment, final Date sinceDate) throws ExecutionException, InterruptedException {
+    public List<EncounterBundle> findEncountersForFacilityCatchment(String facilityId, String catchment, final Date sinceDate, int limit) throws ExecutionException, InterruptedException {
         List<EncounterBundle> encounterBundles = new ArrayList<>();
         Facility facility = facilityService.ensurePresent(facilityId);
 
         if (null == facility) return encounterBundles;
         if (StringUtils.isBlank(catchment)) return encounterBundles;
         if (!facility.has(catchment)) return encounterBundles; //TODO rule check if we throw error!
-        return encounterRepository.findEncountersForCatchment(new Catchment(catchment), sinceDate, DEFAULT_FETCH_LIMIT);
+        return encounterRepository.findEncountersForCatchment(new Catchment(catchment), sinceDate, limit);
     }
 
     private List<EncounterBundle> findEncountersForCatchments(final List<String> catchments, String sinceDate) throws ExecutionException, InterruptedException {

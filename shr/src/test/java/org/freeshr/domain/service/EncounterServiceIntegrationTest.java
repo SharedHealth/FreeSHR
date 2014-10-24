@@ -244,7 +244,7 @@ public class EncounterServiceIntegrationTest {
         assertThat(address.getLine(), is("house30"));
         assertThat(address.getDistrict(), is("56"));
         assertThat(address.getWard(), is("17"));
-        assertThat(address.getUpazilla(), is("10"));
+        assertThat(address.getUpazila(), is("10"));
         assertThat(address.getDivision(), is("30"));
         assertThat(address.getCityCorporation(), is("99"));
     }

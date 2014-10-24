@@ -55,7 +55,7 @@ public class PatientRepositoryIntegrationTest {
         address.setDistrict("district");
         address.setDivision("division");
         address.setLine("line");
-        address.setUpazilla("upazilla");
+        address.setUpazila("upazilla");
         address.setWard("union");
         address.setCityCorporation("cityCorporation");
         return address;

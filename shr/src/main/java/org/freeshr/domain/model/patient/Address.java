@@ -2,6 +2,7 @@ package org.freeshr.domain.model.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
@@ -20,19 +21,20 @@ public class Address {
     private String ward;
 
     @JsonProperty("upazilla_id")
-    private String upazilla;
+    private String upazila;
 
     @JsonProperty("city_corporation_id")
     private String cityCorporation;
+
 
     public Address() {
 
     }
 
-    public Address(String division, String district, String upazilla, String cityCorporation, String ward) {
+    public Address(String division, String district, String upazila, String cityCorporation, String ward) {
         this.division = division;
         this.district = district;
-        this.upazilla = upazilla;
+        this.upazila = upazila;
         this.cityCorporation = cityCorporation;
         this.ward = ward;
     }
@@ -70,28 +72,28 @@ public class Address {
         this.ward = ward;
     }
 
-    public String getUpazilla() {
-        return upazilla;
+    public String getUpazila() {
+        return upazila;
     }
 
-    public void setUpazilla(String upazilla) {
-        this.upazilla = upazilla;
+    public void setUpazila(String upazila) {
+        this.upazila = upazila;
     }
 
     public String getConcatenatedDistrictId() {
         return division + district;
     }
 
-    public String getConcatenatedUpazillaId() {
-        return division + district + upazilla;
+    public String getConcatenatedUpazilaId() {
+        return division + district + upazila;
     }
 
     public String getConcatenatedCityCorporationId() {
-        return cityCorporation != null ? division + district + upazilla + cityCorporation : null;
+        return cityCorporation != null ? division + district + upazila + cityCorporation : null;
     }
 
     public String getConcatenatedWardId() {
-        return ward != null ? division + district + upazilla + cityCorporation + ward : null;
+        return ward != null ? division + district + upazila + cityCorporation + ward : null;
     }
 
 
@@ -111,5 +113,9 @@ public class Address {
 
     public void setCityCorporation(String cityCorporation) {
         this.cityCorporation = cityCorporation;
+    }
+
+    public String getLocationCode() {
+        return division + district + upazila + StringUtils.defaultString(cityCorporation) + StringUtils.defaultString(ward);
     }
 }

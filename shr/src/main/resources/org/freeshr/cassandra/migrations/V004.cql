@@ -1,1 +1,0 @@
-alter table patient add city_corporation_id varchar;

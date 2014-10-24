@@ -50,7 +50,7 @@ public class MasterClientIndexClientIntegrationTest {
         assertThat(adddress.getLine(), is("house30"));
         assertThat(adddress.getDistrict(), is("56"));
         assertThat(adddress.getDivision(), is("30"));
-        assertThat(adddress.getUpazilla(), is("10"));
+        assertThat(adddress.getUpazila(), is("10"));
         assertThat(adddress.getWard(), is("17"));
         assertThat(adddress.getCityCorporation(), is("99"));
     }

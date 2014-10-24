@@ -44,15 +44,9 @@ public class EncounterRepository {
         Insert insertEncounterStmt = QueryBuilder.insertInto("encounter");
         insertEncounterStmt.value("encounter_id", encounterBundle.getEncounterId());
         insertEncounterStmt.value("health_id", encounterBundle.getHealthId());
-        insertEncounterStmt.value("date", DateUtil.getCurrentTimeInUTC()); //TODO check timefunction
+        insertEncounterStmt.value("received_date", DateUtil.getCurrentTimeInISOString()); //TODO check timefunction
         insertEncounterStmt.value("content", encounterBundle.getEncounterContent().toString());
-
-//        insertEncounterStmt.value("division_id", address.getDivision());
-//        insertEncounterStmt.value("district_id", address.getConcatenatedDistrictId());
-//        insertEncounterStmt.value("upazila_id", address.getConcatenatedUpazillaId()); //TODO change name
-//        insertEncounterStmt.value("city_corporation_id", address.getConcatenatedCityCorporationId());
-//        insertEncounterStmt.value("union_urban_ward_id", address.getConcatenatedWardId()); //TODO change name
-
+        insertEncounterStmt.value("patient_location_code", address.getLocationCode());
 
         String encCatchmentInsertQuery =
                 String.format("INSERT INTO enc_by_catchment (division_id, district_id, year, " +
@@ -61,9 +55,9 @@ public class EncounterRepository {
                         address.getDivision(),
                         address.getConcatenatedDistrictId(),
                         DateUtil.getCurrentYear(),
-                        address.getConcatenatedUpazillaId(),
-                        address.getConcatenatedCityCorporationId(),
-                        address.getConcatenatedWardId(),
+                        address.getConcatenatedUpazilaId(),
+                        StringUtils.defaultString(address.getConcatenatedCityCorporationId()),
+                        StringUtils.defaultString(address.getConcatenatedWardId()),
                         encounterBundle.getEncounterId());
         RegularStatement encCatchmentStmt = new SimpleStatement(encCatchmentInsertQuery);
         Batch batch = QueryBuilder.batch(insertEncounterStmt, encCatchmentStmt);
@@ -97,7 +91,7 @@ public class EncounterRepository {
     }
 
     private String buildEncounterSelectionQuery(LinkedHashSet<String> encounterIds) {
-        StringBuffer encounterQuery = new StringBuffer("SELECT encounter_id, health_id, date, content FROM encounter where encounter_id in (");
+        StringBuffer encounterQuery = new StringBuffer("SELECT encounter_id, health_id, received_date, content FROM encounter where encounter_id in (");
         int noOfEncounters = encounterIds.size();
         int idx = 0;
         for (String encounterId : encounterIds) {
@@ -139,8 +133,8 @@ public class EncounterRepository {
      * @see #findEncountersForCatchment(org.freeshr.domain.model.Catchment, java.util.Date, int)
      */
     public List<EncounterBundle> findAllEncountersByCatchment(String catchment, String catchmentType, String date) throws ExecutionException, InterruptedException {
-        String query = String.format("SELECT encounter_id, health_id, date, content " +
-                "FROM encounter WHERE %s = '%s' and date > '%s'; ", catchmentType, catchment, date);
+        String query = String.format("SELECT encounter_id, health_id, received_date, content " +
+                "FROM encounter WHERE %s = '%s' and received_date > '%s'; ", catchmentType, catchment, date);
         return executeFindQuery(query);
     }
 
@@ -157,15 +151,25 @@ public class EncounterRepository {
             EncounterBundle bundle = new EncounterBundle();
             bundle.setEncounterId(result.getString("encounter_id"));
             bundle.setHealthId(result.getString("health_id"));
-            bundle.setReceivedDate(DateUtil.fromUTCDate(result.getDate("date")));
+            bundle.setReceivedDate(DateUtil.toISOString(result.getDate("received_date")));
             bundle.setEncounterContent(result.getString("content"));
             bundles.add(bundle);
         }
         return bundles;
     }
 
+    /**
+     *
+     * @param healthId
+     * @return
+     * @throws ExecutionException
+     * @throws InterruptedException
+     *
+     * @deprecated do not use this query.
+     */
     public List<EncounterBundle> findAll(String healthId) throws ExecutionException, InterruptedException {
-        return executeFindQuery("SELECT encounter_id, health_id, date, content " +
+        //TODO refactor
+        return executeFindQuery("SELECT encounter_id, health_id, received_date, content " +
                 "FROM encounter WHERE health_id='" + healthId + "';");
     }
 
