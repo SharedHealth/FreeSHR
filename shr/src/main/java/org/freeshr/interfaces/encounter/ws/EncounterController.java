@@ -1,6 +1,6 @@
 package org.freeshr.interfaces.encounter.ws;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.domain.service.EncounterService;
@@ -16,6 +16,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -136,14 +137,16 @@ public class EncounterController {
     }
 
     private List<EncounterBundle> filterAfterMarker(List<EncounterBundle> encounters, String lastMarker, int limit) {
+        if (StringUtils.isBlank(lastMarker)) return encounters;
+
         //TODO use a linkedHashSet
-        if (!StringUtils.isBlank(lastMarker)) {
-            int lastMarkerIndex = identifyLastMarker(lastMarker, encounters);
-            if (lastMarkerIndex >= 0) {
-                return encounters.subList(lastMarkerIndex, encounters.size());
+        int lastMarkerIndex = identifyLastMarker(lastMarker, encounters);
+        if (lastMarkerIndex >= 0) {
+            if ((lastMarkerIndex+1) >= encounters.size()) {
+                return encounters.subList(lastMarkerIndex + 1, encounters.size());
             }
         }
-        return encounters;
+        return new ArrayList<>();
     }
 
     private int identifyLastMarker(String lastMarker, final List<EncounterBundle> encountersByCatchment) {
