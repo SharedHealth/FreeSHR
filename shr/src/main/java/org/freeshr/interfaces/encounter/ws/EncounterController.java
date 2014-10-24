@@ -113,16 +113,25 @@ public class EncounterController {
         return deferredResult;
     }
 
+    /**
+     *
+     * @param updatedSince
+     * @return parsed date. For formats please refer to @see org.freeshr.utils.DateUtil#DATE_FORMATS
+     * If no date is given, then by default, the date one month earlier is calculated.
+     * @throws UnsupportedEncodingException
+     */
     private Date getLastUpdateDate(String updatedSince) throws UnsupportedEncodingException {
-        String decodeLastUpdate = URLDecoder.decode(updatedSince, "UTF-8");
-        Date lastUpdateDate = DateUtil.parseDate(decodeLastUpdate);
-        if (lastUpdateDate == null) {
-            //get default
+        if (StringUtils.isBlank(updatedSince)) {
             Calendar calendar = Calendar.getInstance();
             calendar.add(Calendar.MONTH, -1);
-            //TODO set hour, min, ss to 00:00:00
-            lastUpdateDate = calendar.getTime();
+            calendar.set(Calendar.HOUR, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            return calendar.getTime();
         }
+        String decodeLastUpdate = URLDecoder.decode(updatedSince, "UTF-8");
+        Date lastUpdateDate = DateUtil.parseDate(decodeLastUpdate);
         return lastUpdateDate;
     }
 
