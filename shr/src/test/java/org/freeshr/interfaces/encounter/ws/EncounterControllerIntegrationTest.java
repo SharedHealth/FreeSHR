@@ -57,7 +57,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
     @Test
     public void shouldSaveEncounter() throws Exception {
         mockMvc.perform(post("/patients/" + VALID_HEALTH_ID + "/encounters")
-                .accept(MediaType.APPLICATION_XML)
+                .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
                 .content(asString("xmls/encounters/encounter.xml")))
@@ -69,7 +69,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
     @Test
     public void shouldRejectAnEncounterWithCorrectHttpResponseCodeWhenHealthIdIsInvalid() throws Exception {
         mockMvc.perform(post("/patients/" + INVALID_HEALTH_ID + "/encounters")
-                .accept(MediaType.APPLICATION_XML)
+                .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
                 .content(asString("xmls/encounters/encounter.xml")))
@@ -98,7 +98,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
         createEncounter(createEncounterBundle("e-2-"+healthId, healthId), patient);
         mockMvc.perform(MockMvcRequestBuilders.get(
                 String.format("/patients/%s/encounters", healthId))
-                .accept(MediaType.APPLICATION_XML))
+                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(request().asyncResult(IsCollectionWithSize.hasSize(3)));
     }
 
@@ -129,14 +129,14 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
 
         mockMvc.perform(MockMvcRequestBuilders.get("/catchments/" + "3026" + "/encounters?updatedSince="+today)
                 .header("facilityId", "10000069")
-                .accept(MediaType.APPLICATION_XML))
+                .accept(MediaType.APPLICATION_ATOM_XML))
                 .andExpect(request().asyncResult(hasEncountersOfSize(6)));
 
 
 
         mockMvc.perform(MockMvcRequestBuilders.get("/catchments/" + "30261801" + "/encounters?updatedSince="+today)
                 .header("facilityId", "10000069")
-                .accept(MediaType.APPLICATION_XML))
+                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(request().asyncResult(hasEncountersOfSize(3)));
     }
 
