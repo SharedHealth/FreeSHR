@@ -1,18 +1,22 @@
 package org.freeshr.interfaces.encounter.ws;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.freeshr.application.fhir.EncounterBundle;
 
 import java.util.List;
 
 public class EncounterSearchResponse {
+    @JsonProperty("feedUrl")
+    private String requestUrl;
+    private String author = "FreeSHR";
+    private String title  = "Encounters";
     private String nextUrl;
     private String prevUrl;
-    private List<EncounterBundle> results;
+    private List<EncounterBundle> entries;
 
-    public EncounterSearchResponse(String prevUrl, String nextUrl, List<EncounterBundle> results) {
-        this.prevUrl = prevUrl;
-        this.nextUrl = nextUrl;
-        this.results = results;
+    public EncounterSearchResponse(String requestUrl, List<EncounterBundle> entries) {
+        this.requestUrl = requestUrl;
+        this.entries = entries;
     }
 
     public String getNextUrl() {
@@ -23,7 +27,24 @@ public class EncounterSearchResponse {
         return prevUrl;
     }
 
-    public List<EncounterBundle> getResults() {
-        return results;
+    public List<EncounterBundle> getEntries() {
+        return entries;
+    }
+
+    public void setNavLinks(String prevResultUrl, String nextResultURL) {
+        this.prevUrl = prevResultUrl;
+        this.nextUrl = nextResultURL;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getRequestUrl() {
+        return requestUrl;
     }
 }

@@ -6,7 +6,6 @@ import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Facility;
-import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
 import org.freeshr.infrastructure.persistence.FacilityRepository;
@@ -66,7 +65,7 @@ public abstract class APIIntegrationTestBase {
 
             @Override
             public boolean matches(Object item) {
-                return ((EncounterSearchResponse) item).getResults().size() == expectedSize;
+                return ((EncounterSearchResponse) item).getEntries().size() == expectedSize;
             }
 
             @Override

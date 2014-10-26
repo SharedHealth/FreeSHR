@@ -3,10 +3,10 @@ package org.freeshr.interfaces.encounter.ws;
 
 import com.sun.syndication.feed.atom.Feed;
 import com.sun.syndication.io.WireFeedOutput;
+import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.domain.service.EncounterService;
 import org.freeshr.utils.DateUtil;
-import org.freeshr.utils.atomfeed.AtomFeedHelper;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -15,7 +15,6 @@ import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.async.DeferredResult;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -48,13 +47,13 @@ public class EncounterControllerTest {
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null, "/catchments/3026/encounters");
         DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncountersForCatchment(mockHttpServletRequest, "F1", "3026", "2014-10-10", null);
         EncounterSearchResponse response = (EncounterSearchResponse) encountersForCatchment.getResult();
-        assertEquals(EncounterService.DEFAULT_FETCH_LIMIT, response.getResults().size());
+        assertEquals(EncounterService.DEFAULT_FETCH_LIMIT, response.getEntries().size());
         assertEquals("http://localhost/catchments/3026/encounters?updatedSince=2014-10-10T00%3A00%3A19.000%2B0530&lastMarker=e-20", response.getNextUrl());
 
 
         encountersForCatchment = controller.findEncountersForCatchment(mockHttpServletRequest, "F1", "3026", "2014-10-10", "e-11");
         response = (EncounterSearchResponse) encountersForCatchment.getResult();
-        assertEquals(9, response.getResults().size());
+        assertEquals(9, response.getEntries().size());
         System.out.println(response.getNextUrl());
     }
 
@@ -68,13 +67,15 @@ public class EncounterControllerTest {
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null, "/catchments/3026/encounters");
         DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncountersForCatchment(mockHttpServletRequest, "F1", "3026", "2014-10-10", null);
         EncounterSearchResponse response = (EncounterSearchResponse) encountersForCatchment.getResult();
-        List<EncounterBundle> results = response.getResults();
+        List<EncounterBundle> results = response.getEntries();
 
-        AtomFeedHelper atomFeedHelper = new AtomFeedHelper();
-        String feedId = "3026-" + "2014-10-10";
-        Feed feed = atomFeedHelper.generateFeed(new URI(mockHttpServletRequest.getRequestURL().toString()),
-                results.subList(0,2), feedId, new AtomFeedHelper.NavigationLink(response.getPrevUrl(), response.getNextUrl()));
+        EncounterFeedHelper encounterFeedBuilder = new EncounterFeedHelper();
+        Feed feed = encounterFeedBuilder.generateFeed(response, generateFeedId("2014-10-10", null));
         System.out.println(new WireFeedOutput().outputString(feed));
+    }
+
+    private String generateFeedId(String updatedSince, String requestedMarker) {
+        return StringUtils.isBlank(requestedMarker) ? "E-" + updatedSince : "E-" + updatedSince + "%2B" + requestedMarker;
     }
 
     private List<EncounterBundle> slice(int size, List<EncounterBundle> dummyEncounters) {
@@ -91,7 +92,7 @@ public class EncounterControllerTest {
         List<EncounterBundle> encounters = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             EncounterBundle encounter = new EncounterBundle();
-            encounter.setEncounterId("e-" + (i+1));
+            encounter.setEncounterId("e-" + (i + 1));
             encounter.setHealthId(healthId);
             calendar.set(Calendar.SECOND, i);
             encounter.setReceivedDate(DateUtil.toISOString(calendar.getTime()));

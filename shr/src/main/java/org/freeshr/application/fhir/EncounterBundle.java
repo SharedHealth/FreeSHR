@@ -2,19 +2,31 @@ package org.freeshr.application.fhir;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(namespace = "http://www.w3.org/2005/Atom", name = "feed")
+@XmlRootElement(name = "encounter")
 public class EncounterBundle {
 
+    @JsonProperty("id")
+    @XmlAttribute(name = "id")
     private String encounterId;
+
+
     private String healthId;
+
+    @JsonProperty("publishedDate")
+    @XmlAttribute(name = "updated")
     private String receivedDate;
 
     @JsonIgnore
     private EncounterContent encounterContent;
+
+    private String[] categories = new String[] {"encounter"};
+
+    private String title = "Encounter";
 
     public String getEncounterId() {
         return encounterId;
@@ -71,7 +83,32 @@ public class EncounterBundle {
     }
 
     @JsonProperty("content")
+    @XmlAttribute(name = "content")
     public String getContent() {
         return this.encounterContent.toString();
+    }
+
+    @JsonProperty("link")
+    @XmlAttribute(name = "link")
+    public String getLink() {
+        return String.format("/patients/%s/encounters/%s", getHealthId(), getEncounterId());
+    }
+
+
+    public void setCategories(String[] categories) {
+        this.categories = categories;
+    }
+
+    public String[] getCategories() {
+        return categories != null ? categories : new String[] {};
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    @JsonProperty("title")
+    public String getTitle() {
+        return title + ":" + getEncounterId();
     }
 }

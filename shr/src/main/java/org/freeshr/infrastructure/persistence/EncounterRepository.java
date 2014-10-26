@@ -80,6 +80,7 @@ public class EncounterRepository {
     private String buildCatchmentSearchQuery(Catchment catchment, Date updatedSince, int limit) {
         int yearOfDate = DateUtil.getYearOf(updatedSince);
         String lastUpdateTime = new SimpleDateFormat(DateUtil.UTC_DATE_IN_MILLIS_FORMAT).format(updatedSince);
+        //TODO test. condition should be >=
         return String.format("SELECT encounter_id FROM enc_by_catchment " +
                       " WHERE year = %s and received_date > minTimeUuid('%s') and %s LIMIT %s ALLOW FILTERING;",
                         yearOfDate, lastUpdateTime, buildClauseForCatchment(catchment), limit);

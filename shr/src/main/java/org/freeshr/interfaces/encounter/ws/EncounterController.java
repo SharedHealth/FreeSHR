@@ -19,10 +19,7 @@ import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -100,7 +97,7 @@ public class EncounterController {
 
     }
 
-    @RequestMapping(value = "/catchments/{catchment}/encounters", method = RequestMethod.GET)
+    @RequestMapping(value = "/catchments/{catchment}/encounters", method = RequestMethod.GET, produces={"application/json", "application/atom+xml"})
     public DeferredResult<EncounterSearchResponse> findEncountersForCatchment(
             HttpServletRequest request,
             @RequestHeader String facilityId,
@@ -111,20 +108,23 @@ public class EncounterController {
         logger.debug(String.format("Find all encounters for facility %s in catchment %s", facilityId, catchment));
         final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<>();
         try {
-            Date lastUpdateDate = getLastUpdateDate(updatedSince);
-            List<EncounterBundle> catchmentEncounters =
-               filterAfterMarker(
-                       encounterService.findEncountersForFacilityCatchment(
-                               facilityId, catchment, lastUpdateDate, EncounterService.DEFAULT_FETCH_LIMIT),
-                       lastMarker, EncounterService.DEFAULT_FETCH_LIMIT);
-            deferredResult.setResult(
-               new EncounterSearchResponse(null,
-                  getNextResultURL(request, catchmentEncounters), catchmentEncounters));
+            Date requestedDate = getRequestedDate(updatedSince);
+            List<EncounterBundle> catchmentEncounters = findFacilityCatchmentEncounters(facilityId, catchment, lastMarker, requestedDate);
+            EncounterSearchResponse searchResponse = new EncounterSearchResponse(
+                    getRequestUri(request, requestedDate, lastMarker), catchmentEncounters);
+            searchResponse.setNavLinks(null, getNextResultURL(request, catchmentEncounters));
+            deferredResult.setResult(searchResponse);
         }
         catch (Exception e){
             deferredResult.setErrorResult(e);
         }
         return deferredResult;
+    }
+
+    private List<EncounterBundle> findFacilityCatchmentEncounters(String facilityId, String catchment, String lastMarker, Date lastUpdateDate) throws ExecutionException, InterruptedException {
+        List<EncounterBundle> facilityCatchmentEncounters =
+           encounterService.findEncountersForFacilityCatchment(facilityId,catchment,lastUpdateDate, EncounterService.DEFAULT_FETCH_LIMIT);
+        return filterAfterMarker( facilityCatchmentEncounters, lastMarker, EncounterService.DEFAULT_FETCH_LIMIT);
     }
 
     /**
@@ -134,7 +134,7 @@ public class EncounterController {
      * If no date is given, then by default, the date one month earlier is calculated.
      * @throws UnsupportedEncodingException
      */
-    private Date getLastUpdateDate(String updatedSince) throws UnsupportedEncodingException {
+    private Date getRequestedDate(String updatedSince) throws UnsupportedEncodingException {
         if (StringUtils.isBlank(updatedSince)) {
             Calendar calendar = Calendar.getInstance();
             calendar.add(Calendar.MONTH, -1);
@@ -155,12 +155,25 @@ public class EncounterController {
         if (size <= 0) return null;
 
         EncounterBundle lastEncounter = catchmentEncounters.get(size - 1);
-        String receivedDate = URLEncoder.encode(lastEncounter.getReceivedDate(), "UTF-8");
+        String lastEncounterDate = URLEncoder.encode(lastEncounter.getReceivedDate(), "UTF-8");
 
         return UriComponentsBuilder.fromUriString(request.getRequestURL().toString())
-                .queryParam("updatedSince", receivedDate)
-                .queryParam("lastMarker", lastEncounter.getEncounterId()).build().toString();
+                .queryParam("updatedSince", lastEncounterDate)
+                .queryParam("lastMarker", lastEncounter.getEncounterId())
+                .build().toString();
     }
+
+    private String getRequestUri(HttpServletRequest request, Date lastUpdateDate, String lastMarker)
+            throws UnsupportedEncodingException {
+        UriComponentsBuilder uriBuilder =
+           UriComponentsBuilder.fromUriString(request.getRequestURL().toString())
+              .queryParam("updatedSince", URLEncoder.encode(DateUtil.toISOString(lastUpdateDate), "UTF-8"));
+        if (!StringUtils.isBlank(lastMarker)) {
+            uriBuilder.queryParam("lastMarker", lastMarker);
+        }
+        return uriBuilder.build().toString();
+    }
+
 
     private List<EncounterBundle> filterAfterMarker(List<EncounterBundle> encounters, String lastMarker, int limit) {
         if (StringUtils.isBlank(lastMarker)) return encounters;

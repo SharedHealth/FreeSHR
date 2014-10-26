@@ -1,10 +1,14 @@
-package org.freeshr.utils.atomfeed;
+package org.freeshr.interfaces.encounter.ws;
 
 
 import com.sun.syndication.feed.atom.*;
+import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.utils.DateUtil;
+import org.freeshr.utils.atomfeed.FeedBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -12,45 +16,39 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class AtomFeedHelper {
+public class EncounterFeedHelper {
 
     private static final String ATOM_MEDIA_TYPE = "application/atom+xml";
     private static final String LINK_TYPE_SELF = "self";
     private static final String LINK_TYPE_VIA = "via";
     private static final String ATOMFEED_MEDIA_TYPE = "application/vnd.atomfeed+xml";
 
-    public static class NavigationLink {
-        String prev;
-        String next;
-        public NavigationLink(String prev, String next) {
-            this.prev = prev;
-            this.next = next;
-        }
-        public String getPrev() {
-            return prev;
-        }
-        public String getNext() {
-            return next;
-        }
-    }
-
-    public Feed generateFeed(URI requestUri, List<EncounterBundle> encounters, String feedId, NavigationLink navigationLink) {
+    public Feed generateFeed(EncounterSearchResponse result, String feedId) {
         return new FeedBuilder()
                 .type("atom_1.0")
                 .id(feedId)
                 .title("Patient Encounters")
                 .generator(getGenerator())
                 .authors(getAuthors())
-                .entries(getEntries(encounters))
-                .updated(newestEventDate(encounters))
-                .link(getLink(requestUri.toString(), LINK_TYPE_SELF, ATOM_MEDIA_TYPE))
-                .link(getLink(generateCanonicalUri(requestUri, feedId), LINK_TYPE_VIA, ATOM_MEDIA_TYPE))
-                .links(generatePagingLinks(navigationLink))
+                .entries(getEntries(result.getEntries()))
+                .updated(newestEventDate(result.getEntries()))
+                .link(getSelfLink(result.getRequestUrl()))
+                .link(getViaLink(result.getRequestUrl()))
+                .links(generatePagingLinks(result.getPrevUrl(), result.getNextUrl()))
                 .build();
     }
 
+    private Link getViaLink(String requestUrl) {
+        //return getLink(generateCanonicalUri(request, feedId), LINK_TYPE_VIA, ATOM_MEDIA_TYPE);
+        return getLink(requestUrl, LINK_TYPE_VIA, ATOM_MEDIA_TYPE);
+    }
+
+    private Link getSelfLink(String requestUrl) {
+        return getLink(requestUrl, LINK_TYPE_SELF, ATOM_MEDIA_TYPE);
+    }
+
     private Date newestEventDate(List<EncounterBundle> encounters) {
-        return null;
+        return (encounters.size() > 0) ? DateUtil.parseDate(encounters.get(0).getReceivedDate()) : null;
     }
 
     private List<Entry> getEntries(List<EncounterBundle> encounters) {
@@ -58,11 +56,25 @@ public class AtomFeedHelper {
         for (EncounterBundle encounter : encounters) {
             final Entry entry = new Entry();
             entry.setId(encounter.getEncounterId());
-            entry.setTitle("ENCOUNTER:" + encounter.getEncounterId());
+            entry.setTitle("Encounter:" + encounter.getEncounterId());
+
+            Link encLink1 = new Link();
+            encLink1.setRel("self");
+            encLink1.setType("application/json");
+            encLink1.setHref(encounter.getLink());
+            entry.setAlternateLinks(Arrays.asList(encLink1));
+
+            Link encLink2 = new Link();
+            encLink2.setRel("self");
+            encLink2.setType("application/json");
+            encLink2.setHref(encounter.getLink());
+            entry.setOtherLinks(Arrays.asList(encLink2));
+
+
             entry.setUpdated(DateUtil.parseDate(encounter.getReceivedDate()));
             entry.setContents(generateContents(encounter));
             Category category = new Category();
-            category.setTerm("Encounter");
+            category.setTerm("encounter");
             entry.setCategories(Arrays.asList(category));
             entryList.add(entry);
         }
@@ -109,23 +121,21 @@ public class AtomFeedHelper {
         }
     }
 
-    private List<Link> generatePagingLinks(NavigationLink navigationLink) {
+    private List<Link> generatePagingLinks(String prevLink, String nextLink) {
         ArrayList<Link> links = new ArrayList<Link>();
-        if (navigationLink == null) return links;
-
-        if (navigationLink.getNext() != null) {
+        if (!StringUtils.isBlank(nextLink)) {
             Link next = new Link();
             next.setRel("next-archive");
             next.setType(ATOM_MEDIA_TYPE);
-            next.setHref(navigationLink.getNext());
+            next.setHref(nextLink);
             links.add(next);
         }
 
-        if (navigationLink.getPrev() != null) {
+        if (!StringUtils.isBlank(prevLink)) {
             Link prev = new Link();
             prev.setRel("prev-archive");
             prev.setType(ATOM_MEDIA_TYPE);
-            prev.setHref(navigationLink.getPrev());
+            prev.setHref(prevLink);
             links.add(prev);
         }
         return links;
