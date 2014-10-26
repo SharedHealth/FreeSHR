@@ -22,6 +22,7 @@ public class EncounterFeedHelper {
     private static final String LINK_TYPE_SELF = "self";
     private static final String LINK_TYPE_VIA = "via";
     private static final String ATOMFEED_MEDIA_TYPE = "application/vnd.atomfeed+xml";
+    public static final String APPLICATION_XML = "application/xml";
 
     public Feed generateFeed(EncounterSearchResponse result, String feedId) {
         return new FeedBuilder()
@@ -58,17 +59,11 @@ public class EncounterFeedHelper {
             entry.setId(encounter.getEncounterId());
             entry.setTitle("Encounter:" + encounter.getEncounterId());
 
-            Link encLink1 = new Link();
-            encLink1.setRel("self");
-            encLink1.setType("application/json");
-            encLink1.setHref(encounter.getLink());
-            entry.setAlternateLinks(Arrays.asList(encLink1));
-
-            Link encLink2 = new Link();
-            encLink2.setRel("self");
-            encLink2.setType("application/json");
-            encLink2.setHref(encounter.getLink());
-            entry.setOtherLinks(Arrays.asList(encLink2));
+            Link encLink = new Link();
+            encLink.setRel(LINK_TYPE_VIA);
+            encLink.setType(APPLICATION_XML);
+            encLink.setHref(encounter.getLink());
+            entry.setAlternateLinks(Arrays.asList(encLink));
 
 
             entry.setUpdated(DateUtil.parseDate(encounter.getReceivedDate()));
