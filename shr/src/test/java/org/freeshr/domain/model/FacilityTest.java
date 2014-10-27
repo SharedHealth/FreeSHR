@@ -6,6 +6,8 @@ import java.util.Arrays;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class FacilityTest {
 
@@ -21,6 +23,15 @@ public class FacilityTest {
         Facility facility = new Facility();
         facility.setCatchments("09,0989");
         assertThat(facility.getCatchmentsAsCommaSeparatedString(), is("09,0989"));
+    }
+
+    @Test
+    public void shouldValidateFacilitiesCatchment(){
+        Facility facility = new Facility();
+        facility.setCatchments("09,0989");
+        assertTrue(facility.has("09"));
+        assertTrue(facility.has("0989"));
+        assertFalse(facility.has("098918"));
     }
 
 }
