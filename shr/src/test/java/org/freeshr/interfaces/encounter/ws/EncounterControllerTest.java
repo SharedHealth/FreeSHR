@@ -4,6 +4,8 @@ package org.freeshr.interfaces.encounter.ws;
 import com.sun.syndication.feed.atom.Feed;
 import com.sun.syndication.io.WireFeedOutput;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.domain.service.EncounterService;
 import org.freeshr.utils.DateUtil;
@@ -15,6 +17,7 @@ import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -48,8 +51,10 @@ public class EncounterControllerTest {
         DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncountersForCatchment(mockHttpServletRequest, "F1", "3026", "2014-10-10", null);
         EncounterSearchResponse response = (EncounterSearchResponse) encountersForCatchment.getResult();
         assertEquals(EncounterService.DEFAULT_FETCH_LIMIT, response.getEntries().size());
-        assertEquals("http://localhost/catchments/3026/encounters?updatedSince=2014-10-10T00%3A00%3A04.000%2B0530&lastMarker=e-5", response.getNextUrl());
-
+        String expectedNextUrl = "http://localhost/catchments/3026/encounters?updatedSince=2014-10-10T00%3A00%3A04.000%2B0530&lastMarker=e-5";
+        List<NameValuePair> params = URLEncodedUtils.parse(new URI(expectedNextUrl), "UTF-8");
+        assertEquals("e-5", params.get(1).getValue());
+        
 
         encountersForCatchment = controller.findEncountersForCatchment(mockHttpServletRequest, "F1", "3026", "2014-10-10", "e-2");
         response = (EncounterSearchResponse) encountersForCatchment.getResult();
