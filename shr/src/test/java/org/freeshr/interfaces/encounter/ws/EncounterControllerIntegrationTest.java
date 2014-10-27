@@ -6,6 +6,7 @@ import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
+import org.freeshr.domain.service.EncounterService;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.collection.IsCollectionWithSize;
@@ -130,7 +131,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
         mockMvc.perform(MockMvcRequestBuilders.get("/catchments/" + "3026" + "/encounters?updatedSince="+today)
                 .header("facilityId", "10000069")
                 .accept(MediaType.APPLICATION_ATOM_XML))
-                .andExpect(request().asyncResult(hasEncountersOfSize(6)));
+                .andExpect(request().asyncResult(hasEncountersOfSize(EncounterService.DEFAULT_FETCH_LIMIT)));
 
 
 

@@ -48,12 +48,12 @@ public class EncounterControllerTest {
         DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncountersForCatchment(mockHttpServletRequest, "F1", "3026", "2014-10-10", null);
         EncounterSearchResponse response = (EncounterSearchResponse) encountersForCatchment.getResult();
         assertEquals(EncounterService.DEFAULT_FETCH_LIMIT, response.getEntries().size());
-        assertEquals("http://localhost/catchments/3026/encounters?updatedSince=2014-10-10T00%3A00%3A19.000%2B0530&lastMarker=e-20", response.getNextUrl());
+        assertEquals("http://localhost/catchments/3026/encounters?updatedSince=2014-10-10T00%3A00%3A04.000%2B0530&lastMarker=e-5", response.getNextUrl());
 
 
-        encountersForCatchment = controller.findEncountersForCatchment(mockHttpServletRequest, "F1", "3026", "2014-10-10", "e-11");
+        encountersForCatchment = controller.findEncountersForCatchment(mockHttpServletRequest, "F1", "3026", "2014-10-10", "e-2");
         response = (EncounterSearchResponse) encountersForCatchment.getResult();
-        assertEquals(9, response.getEntries().size());
+        assertEquals(3, response.getEntries().size());
         System.out.println(response.getNextUrl());
     }
 
