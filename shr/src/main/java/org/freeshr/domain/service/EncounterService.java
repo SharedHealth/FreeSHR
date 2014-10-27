@@ -21,7 +21,7 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 public class EncounterService {
-    public static final int DEFAULT_FETCH_LIMIT = 20;
+    public static final int DEFAULT_FETCH_LIMIT = 5;
     private EncounterRepository encounterRepository;
     private PatientService patientService;
     private FhirValidator fhirValidator;

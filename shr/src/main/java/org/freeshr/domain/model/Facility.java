@@ -108,7 +108,11 @@ public class Facility {
     }
 
     public boolean has(String catchment) {
-        //rule check if the given catchment is within a facilities catchment's hierarchy
-        return getCatchments().contains(catchment);
+        for (String facilityCatchment : catchments) {
+            boolean isPartOfFacilitiesCatchment = facilityCatchment.startsWith(catchment);
+            if (isPartOfFacilitiesCatchment) return true;
+        }
+        //return getCatchments().contains(catchment);
+        return false;
     }
 }
