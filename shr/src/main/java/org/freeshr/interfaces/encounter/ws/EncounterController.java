@@ -144,8 +144,10 @@ public class EncounterController {
             calendar.set(Calendar.MILLISECOND, 0);
             return calendar.getTime();
         }
-        String decodeLastUpdate = URLDecoder.decode(updatedSince, "UTF-8");
-        Date lastUpdateDate = DateUtil.parseDate(decodeLastUpdate);
+
+        //NO need to decode the date, since the spring request mapper would have already decoded the string
+        //String decodeLastUpdate = URLDecoder.decode(updatedSince, "UTF-8");
+        Date lastUpdateDate = DateUtil.parseDate(updatedSince);
         return lastUpdateDate;
     }
 
