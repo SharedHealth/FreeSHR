@@ -35,9 +35,8 @@ public class FacilityRegistryClient {
 
 
     public ListenableFuture<Facility> getFacility(final String facilityId) {
-
         Observable<ResponseEntity<Facility>> response = toObservable(shrRestTemplate.exchange(
-                shrProperties.getFacilityRegistryUrl() + facilityId + ".json",
+                getFacilityUrl(facilityId),
                 HttpMethod.GET,
                 new HttpEntity(basicHeaders(shrProperties.getFacilityRegistryAuthToken())),
                 Facility.class));
@@ -50,5 +49,9 @@ public class FacilityRegistryClient {
         });
 
         return toListenableFuture(facilityObservable);
+    }
+
+    private String getFacilityUrl(String facilityId) {
+        return shrProperties.getFacilityRegistryUrl() + facilityId + ".json";
     }
 }

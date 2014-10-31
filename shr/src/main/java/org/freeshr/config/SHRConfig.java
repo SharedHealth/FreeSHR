@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.client.AsyncClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.AsyncRestTemplate;
 
@@ -29,7 +31,16 @@ public class SHRConfig {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.initialize();
         executor.setCorePoolSize(shrProperties.getRestPoolSize());
-        return new AsyncRestTemplate(executor);
+        AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate(executor);
+        AsyncClientHttpRequestFactory asyncRequestFactory = asyncRestTemplate.getAsyncRequestFactory();
+        if (asyncRequestFactory instanceof SimpleClientHttpRequestFactory) {
+            setRequestTimeOuts((SimpleClientHttpRequestFactory) asyncRequestFactory);
+        }
+        return asyncRestTemplate;
+    }
+
+    private void setRequestTimeOuts(SimpleClientHttpRequestFactory asyncRequestFactory) {
+        asyncRequestFactory.setConnectTimeout(shrProperties.getServerConnectionTimeout());
     }
 
     @Bean

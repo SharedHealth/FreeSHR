@@ -41,6 +41,12 @@ public class SHRProperties {
     @Value("${FACILITY_REGISTRY_AUTH_TOKEN}")
     private String facilityRegistryAuthToken;
 
+    @Value("${ENCOUNTER_FETCH_LIMIT}")
+    private int encounterFetchLimit;
+    @Value("${SERVER_CONNECTION_TIMEOUT}")
+    private int serverConnectionTimeout;
+
+
     public String getMCIPatientUrl() {
         return String.format("http://%s:%s/api/v1/patients", mciHost, mciPort);
     }
@@ -95,6 +101,14 @@ public class SHRProperties {
         } else {
             return new File(this.getClass().getClassLoader().getResource("validation.zip").toURI()).getAbsolutePath();
         }
+    }
+
+    public int getServerConnectionTimeout() {
+        return serverConnectionTimeout;
+    }
+
+    public int getEncounterFetchLimit() {
+        return encounterFetchLimit;
     }
 
 }

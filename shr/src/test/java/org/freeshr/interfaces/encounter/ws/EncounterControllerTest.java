@@ -43,14 +43,15 @@ public class EncounterControllerTest {
 
     @Test
     public void shouldGetPagedEncountersForCatchment() throws Exception {
+        int encounterFetchLimit = EncounterService.getEncounterFetchLimit();
         List<EncounterBundle> dummyEncounters = createEncounterBundles("hid01", 50, DateUtil.parseDate("2014-10-10"));
         Mockito.when(mockedEncounterService.findEncountersForFacilityCatchment(anyString(), anyString(), any(Date.class),
-                eq(EncounterService.DEFAULT_FETCH_LIMIT))).thenReturn(slice(EncounterService.DEFAULT_FETCH_LIMIT, dummyEncounters));
+                eq(encounterFetchLimit))).thenReturn(slice(encounterFetchLimit, dummyEncounters));
 
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null, "/catchments/3026/encounters");
         DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncountersForCatchment(mockHttpServletRequest, "F1", "3026", "2014-10-10", null);
         EncounterSearchResponse response = (EncounterSearchResponse) encountersForCatchment.getResult();
-        assertEquals(EncounterService.DEFAULT_FETCH_LIMIT, response.getEntries().size());
+        assertEquals(encounterFetchLimit, response.getEntries().size());
         String expectedNextUrl = "http://localhost/catchments/3026/encounters?updatedSince=2014-10-10T00%3A00%3A04.000%2B0530&lastMarker=e-5";
         List<NameValuePair> params = URLEncodedUtils.parse(new URI(expectedNextUrl), "UTF-8");
         assertEquals("e-5", params.get(1).getValue());
@@ -58,16 +59,16 @@ public class EncounterControllerTest {
 
         encountersForCatchment = controller.findEncountersForCatchment(mockHttpServletRequest, "F1", "3026", "2014-10-10", "e-2");
         response = (EncounterSearchResponse) encountersForCatchment.getResult();
-        assertEquals(3, response.getEntries().size());
+        assertEquals(18, response.getEntries().size());
         System.out.println(response.getNextUrl());
     }
 
-    @Ignore
     @Test
     public void shouldGetAtomFeed() throws Exception {
+        int encounterFetchLimit = EncounterService.getEncounterFetchLimit();
         List<EncounterBundle> dummyEncounters = createEncounterBundles("hid01", 50, DateUtil.parseDate("2014-10-10"));
         Mockito.when(mockedEncounterService.findEncountersForFacilityCatchment(anyString(), anyString(), any(Date.class),
-                eq(EncounterService.DEFAULT_FETCH_LIMIT))).thenReturn(slice(EncounterService.DEFAULT_FETCH_LIMIT, dummyEncounters));
+                eq(encounterFetchLimit))).thenReturn(slice(encounterFetchLimit, dummyEncounters));
 
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null, "/catchments/3026/encounters");
         DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncountersForCatchment(mockHttpServletRequest, "F1", "3026", "2014-10-10", null);
@@ -76,7 +77,7 @@ public class EncounterControllerTest {
 
         EncounterFeedHelper encounterFeedBuilder = new EncounterFeedHelper();
         Feed feed = encounterFeedBuilder.generateFeed(response, generateFeedId("2014-10-10", null));
-        System.out.println(new WireFeedOutput().outputString(feed));
+        assertEquals(encounterFetchLimit, feed.getEntries().size());
     }
 
     private String generateFeedId(String updatedSince, String requestedMarker) {

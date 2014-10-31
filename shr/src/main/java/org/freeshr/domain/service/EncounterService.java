@@ -21,7 +21,8 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 public class EncounterService {
-    public static final int DEFAULT_FETCH_LIMIT = 5;
+    private static final int DEFAULT_FETCH_LIMIT = 20;
+    private static final String ENCOUNTER_FETCH_LIMIT_LOOKUP_KEY = "ENCOUNTER_FETCH_LIMIT";
     private EncounterRepository encounterRepository;
     private PatientService patientService;
     private FhirValidator fhirValidator;
@@ -123,10 +124,25 @@ public class EncounterService {
         Date updateSince = DateUtil.parseDate(sinceDate);
         for (String catchment : catchments) {
             Catchment facilityCatchment = new Catchment(catchment);
-            encounters.addAll(encounterRepository.findEncountersForCatchment(facilityCatchment, updateSince, DEFAULT_FETCH_LIMIT));
+            encounters.addAll(encounterRepository.findEncountersForCatchment(facilityCatchment, updateSince, getEncounterFetchLimit()));
         }
         return new ArrayList<>(encounters);
     }
+
+    public static int getEncounterFetchLimit() {
+        Map<String, String> env = System.getenv();
+        String encounterFetchLimit = env.get(ENCOUNTER_FETCH_LIMIT_LOOKUP_KEY);
+        int fetchLimit = DEFAULT_FETCH_LIMIT;
+        if (!StringUtils.isBlank(encounterFetchLimit)) {
+            try {
+                fetchLimit = Integer.valueOf(encounterFetchLimit);
+            } catch (NumberFormatException nfe) {
+                //Do nothing
+            }
+        }
+        return fetchLimit;
+    }
+
 
 
 }

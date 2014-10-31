@@ -123,8 +123,8 @@ public class EncounterController {
 
     private List<EncounterBundle> findFacilityCatchmentEncounters(String facilityId, String catchment, String lastMarker, Date lastUpdateDate) throws ExecutionException, InterruptedException {
         List<EncounterBundle> facilityCatchmentEncounters =
-           encounterService.findEncountersForFacilityCatchment(facilityId,catchment,lastUpdateDate, EncounterService.DEFAULT_FETCH_LIMIT);
-        return filterAfterMarker( facilityCatchmentEncounters, lastMarker, EncounterService.DEFAULT_FETCH_LIMIT);
+           encounterService.findEncountersForFacilityCatchment(facilityId,catchment,lastUpdateDate, EncounterService.getEncounterFetchLimit());
+        return filterAfterMarker( facilityCatchmentEncounters, lastMarker, EncounterService.getEncounterFetchLimit());
     }
 
     /**

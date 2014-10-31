@@ -131,7 +131,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
         mockMvc.perform(MockMvcRequestBuilders.get("/catchments/" + "3026" + "/encounters?updatedSince="+today)
                 .header("facilityId", "10000069")
                 .accept(MediaType.APPLICATION_ATOM_XML))
-                .andExpect(request().asyncResult(hasEncountersOfSize(EncounterService.DEFAULT_FETCH_LIMIT)));
+                .andExpect(request().asyncResult(hasEncountersOfSize(6)));
 
 
 
