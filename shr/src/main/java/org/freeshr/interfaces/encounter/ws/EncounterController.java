@@ -16,7 +16,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.*;
@@ -109,10 +108,11 @@ public class EncounterController {
         final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<>();
         try {
             Date requestedDate = getRequestedDate(updatedSince);
-            List<EncounterBundle> catchmentEncounters = findFacilityCatchmentEncounters(facilityId, catchment, lastMarker, requestedDate);
+            List<EncounterBundle> catchmentEncounters =
+               findFacilityCatchmentEncounters(facilityId, catchment, lastMarker, requestedDate);
             EncounterSearchResponse searchResponse = new EncounterSearchResponse(
                     getRequestUri(request, requestedDate, lastMarker), catchmentEncounters);
-            searchResponse.setNavLinks(null, getNextResultURL(request, catchmentEncounters));
+            searchResponse.setNavLinks(null, getNextResultURL(request, catchmentEncounters, requestedDate));
             deferredResult.setResult(searchResponse);
         }
         catch (Exception e){
@@ -122,9 +122,10 @@ public class EncounterController {
     }
 
     private List<EncounterBundle> findFacilityCatchmentEncounters(String facilityId, String catchment, String lastMarker, Date lastUpdateDate) throws ExecutionException, InterruptedException {
+        int encounterFetchLimit = EncounterService.getEncounterFetchLimit();
         List<EncounterBundle> facilityCatchmentEncounters =
-           encounterService.findEncountersForFacilityCatchment(facilityId,catchment,lastUpdateDate, EncounterService.getEncounterFetchLimit());
-        return filterAfterMarker( facilityCatchmentEncounters, lastMarker, EncounterService.getEncounterFetchLimit());
+            encounterService.findEncountersForFacilityCatchment(facilityId, catchment,lastUpdateDate, encounterFetchLimit*2);
+        return filterAfterMarker( facilityCatchmentEncounters, lastMarker, encounterFetchLimit);
     }
 
     /**
@@ -137,8 +138,8 @@ public class EncounterController {
     private Date getRequestedDate(String updatedSince) throws UnsupportedEncodingException {
         if (StringUtils.isBlank(updatedSince)) {
             Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.MONTH, -1);
-            calendar.set(Calendar.HOUR, 0);
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
             calendar.set(Calendar.MILLISECOND, 0);
@@ -151,18 +152,39 @@ public class EncounterController {
         return lastUpdateDate;
     }
 
-    private String getNextResultURL(HttpServletRequest request, List<EncounterBundle> catchmentEncounters)
+    String getNextResultURL(
+            HttpServletRequest request, List<EncounterBundle> requestResults, Date requestedDate)
             throws UnsupportedEncodingException, URISyntaxException {
-        int size = catchmentEncounters.size();
-        if (size <= 0) return null;
+        int size = requestResults.size();
+        if (size <= 0) {
+            //next result set url might need to rolled over
+            return rollingFeedUrl(request, requestedDate);
+        }
 
-        EncounterBundle lastEncounter = catchmentEncounters.get(size - 1);
+        EncounterBundle lastEncounter = requestResults.get(size - 1);
         String lastEncounterDate = URLEncoder.encode(lastEncounter.getReceivedDate(), "UTF-8");
 
         return UriComponentsBuilder.fromUriString(request.getRequestURL().toString())
                 .queryParam("updatedSince", lastEncounterDate)
                 .queryParam("lastMarker", lastEncounter.getEncounterId())
                 .build().toString();
+    }
+
+    String rollingFeedUrl(HttpServletRequest request, Date forDate) throws UnsupportedEncodingException {
+        Calendar requestedTime = Calendar.getInstance();
+        requestedTime.setTime(forDate);
+        int requestedYear = requestedTime.get(Calendar.YEAR);
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+
+        if (currentYear == requestedYear) return null; //same year
+        if (currentYear < requestedYear) return null;  //future year
+        if (currentYear > requestedYear) { //advance to the next month's beginning date.
+            requestedTime.add(Calendar.MONTH, 1);
+            String nextApplicableDate = String.format("%s-%s-01", requestedTime.get(Calendar.YEAR), requestedTime.get(Calendar.MONTH)+1);
+            return UriComponentsBuilder.fromUriString(request.getRequestURL().toString())
+                    .queryParam("updatedSince", nextApplicableDate).build().toString();
+        }
+        return null;
     }
 
     private String getRequestUri(HttpServletRequest request, Date lastUpdateDate, String lastMarker)
@@ -178,13 +200,16 @@ public class EncounterController {
 
 
     private List<EncounterBundle> filterAfterMarker(List<EncounterBundle> encounters, String lastMarker, int limit) {
-        if (StringUtils.isBlank(lastMarker)) return encounters;
-
         //TODO use a linkedHashSet
+        if (StringUtils.isBlank(lastMarker)) {
+            return encounters.size() > limit ? encounters.subList(0, limit) : encounters;
+        }
+
         int lastMarkerIndex = identifyLastMarker(lastMarker, encounters);
         if (lastMarkerIndex >= 0) {
             if ((lastMarkerIndex+1) <= encounters.size()) {
-                return encounters.subList(lastMarkerIndex + 1, encounters.size());
+                List<EncounterBundle> remainingEncounters = encounters.subList(lastMarkerIndex + 1, encounters.size());
+                return remainingEncounters.size() > limit ? remainingEncounters.subList(0, limit) : remainingEncounters;
             }
         }
         return new ArrayList<>();
