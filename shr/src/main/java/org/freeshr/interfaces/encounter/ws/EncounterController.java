@@ -135,10 +135,10 @@ public class EncounterController {
      * If no date is given, then by default, the date one month earlier is calculated.
      * @throws UnsupportedEncodingException
      */
-    private Date getRequestedDate(String updatedSince) throws UnsupportedEncodingException {
+    Date getRequestedDate(String updatedSince) throws UnsupportedEncodingException {
         if (StringUtils.isBlank(updatedSince)) {
             Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.DAY_OF_MONTH, 1);
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
             calendar.set(Calendar.HOUR_OF_DAY, 0);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
@@ -187,7 +187,7 @@ public class EncounterController {
         return null;
     }
 
-    private String getRequestUri(HttpServletRequest request, Date lastUpdateDate, String lastMarker)
+    String getRequestUri(HttpServletRequest request, Date lastUpdateDate, String lastMarker)
             throws UnsupportedEncodingException {
         UriComponentsBuilder uriBuilder =
            UriComponentsBuilder.fromUriString(request.getRequestURL().toString())

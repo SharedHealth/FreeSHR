@@ -109,6 +109,13 @@ public class EncounterControllerTest {
         assertNull("For current year, should have returned null", nextResultURL);
     }
 
+    @Test
+    public void shouldDefaultToStartOfMonthIfNotSpecified() throws UnsupportedEncodingException {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(controller.getRequestedDate(""));
+        assertEquals(1, calendar.get(Calendar.DAY_OF_MONTH));
+    }
+
     private String generateFeedId(String updatedSince, String requestedMarker) {
         return StringUtils.isBlank(requestedMarker) ? "E-" + updatedSince : "E-" + updatedSince + "%2B" + requestedMarker;
     }
