@@ -28,10 +28,11 @@ public class FacilityTest {
     @Test
     public void shouldValidateFacilitiesCatchment(){
         Facility facility = new Facility();
-        facility.setCatchments("09,0989");
+        facility.setCatchments("09,0889");
         assertTrue(facility.has("09"));
-        assertTrue(facility.has("0989"));
-        assertFalse(facility.has("098918"));
+        assertTrue(facility.has("0889"));
+        assertTrue("catchments down the hierarchy should be valid", facility.has("088918"));
+        assertFalse("catchments hierarchy should be validated", facility.has("078918"));
     }
 
 }

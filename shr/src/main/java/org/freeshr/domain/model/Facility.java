@@ -109,7 +109,7 @@ public class Facility {
 
     public boolean has(String catchment) {
         for (String facilityCatchment : catchments) {
-            boolean isPartOfFacilitiesCatchment = facilityCatchment.startsWith(catchment);
+            boolean isPartOfFacilitiesCatchment = catchment.startsWith(facilityCatchment);
             if (isPartOfFacilitiesCatchment) return true;
         }
         //return getCatchments().contains(catchment);
