@@ -63,4 +63,9 @@ public class DateUtil {
         SimpleDateFormat dateFormat = new SimpleDateFormat(ISO_DATE_IN_MILLIS_FORMAT);
         return dateFormat.format(new Date());
     }
+
+    public static String toDateString(Date date, String format) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+        return dateFormat.format(date);
+    }
 }

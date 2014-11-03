@@ -12,10 +12,13 @@ import org.freeshr.infrastructure.persistence.FacilityRepository;
 import org.freeshr.launch.WebMvcConfig;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -47,9 +50,20 @@ public abstract class APIIntegrationTestBase {
 
     protected MockMvc mockMvc;
 
+    @Autowired
+    @Qualifier("SHRCassandraTemplate")
+    private CqlOperations cqlTemplate;
+
     @Before
     public void setUpBase() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+    }
+
+    @After
+    public void tearDownBase() {
+        cqlTemplate.execute("truncate encounter");
+        cqlTemplate.execute("truncate patient");
+        cqlTemplate.execute("truncate facilities");
     }
 
     public void createEncounter(EncounterBundle encounter, Patient patient) throws ExecutionException, InterruptedException {
