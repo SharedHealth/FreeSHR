@@ -15,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -114,5 +116,15 @@ public class FhirValidatorIntegrationTest {
         EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle.getEncounterContent().toString());
         verify(trConceptLocator, times(3)).verifiesSystem(anyString());
         assertTrue(encounterValidationResponse.isSuccessful());
+    }
+
+    @Test
+    public void shouldValidateIfCategoriesOtherThanChiefComplaintAreCoded(){
+        encounterBundle = EncounterBundleData.encounter("healthId", FileUtil.asString("xmls/encounters/coded_and_noncoded_diagnosis.xml"));
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+        EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle.getEncounterContent().toString());
+        verify(trConceptLocator, times(3)).verifiesSystem(anyString());
+        assertFalse(encounterValidationResponse.isSuccessful());
+        assertThat(encounterValidationResponse.getErrors().size(), is(1));
     }
 }

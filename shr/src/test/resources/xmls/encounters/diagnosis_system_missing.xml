@@ -4,15 +4,13 @@
     <title>Encounter</title>
     <id>http://localhost/encounters/bcf6c340-d04a-4c29-b50c-2552beeee037</id>
     <updated>2014-07-25T16:50:29+05:30</updated>
-    <author>
-        <name>test author</name>
-        <email>test@test.com</email>
-        <uri>http://localhost/admin/adminid</uri>
-    </author>
     <entry>
         <title>Diagnosis</title>
         <id>http://localhost/diagnosis/5f982a33-4454-4b74-9236-b8157aa8effd</id>
         <updated>2014-07-25T16:51:37+05:30</updated>
+        <author>
+            <name>test author</name>
+        </author>
         <content type="text/xml">
             <Condition xmlns="http://hl7.org/fhir">
                 <identifier>

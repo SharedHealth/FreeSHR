@@ -25,6 +25,7 @@ import static org.freeshr.utils.CollectionUtils.reduce;
 public class FhirValidator {
 
     private FhirMessageFilter fhirMessageFilter;
+    private SHRValidator shrValidator;
     private TRConceptLocator trConceptLocator;
     private SHRProperties shrProperties;
 
@@ -33,6 +34,7 @@ public class FhirValidator {
         this.trConceptLocator = trConceptLocator;
         this.shrProperties = shrProperties;
         this.fhirMessageFilter = fhirMessageFilter;
+        this.shrValidator = new SHRValidator();
     }
 
     public EncounterValidationResponse validate(String sourceXML) {
@@ -51,7 +53,9 @@ public class FhirValidator {
 
     private List<ValidationMessage> validateDocument(String definitionsZipPath, String sourceXml) {
         try {
-            return new InstanceValidator(definitionsZipPath, null, trConceptLocator).validateInstance(document(sourceXml).getDocumentElement());
+            List<ValidationMessage> validationMessages = new InstanceValidator(definitionsZipPath, null, trConceptLocator).validateInstance(document(sourceXml).getDocumentElement());
+            validationMessages.addAll(shrValidator.validateCategories(sourceXml));
+            return validationMessages;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
