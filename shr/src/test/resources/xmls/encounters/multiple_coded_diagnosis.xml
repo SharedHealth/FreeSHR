@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Encounter</title>
+    <id>http://localhost/encounters/bcf6c340-d04a-4c29-b50c-2552beeee037</id>
+    <updated>2014-07-25T16:50:29+05:30</updated>
+    <entry>
+        <title>Diagnosis</title>
+        <id>urn:9826cf0c-66d6-4e33-bed1-91381ab200b5</id>
+        <updated>2014-10-31T17:03:37.136+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <Condition xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="9826cf0c-66d6-4e33-bed1-91381ab200b5"/>
+                </identifier>
+                <subject>
+                    <reference value="5928354432185008129"/>
+                </subject>
+                <encounter>
+                    <reference value="599ef7ae-ac5c-4ca5-a3e5-6161c60ea6a0"/>
+                    <display value="encounter"/>
+                </encounter>
+                <asserter>
+                    <reference value="13beae59-61e0-450f-8004-0fa4e4b596e3"/>
+                </asserter>
+                <dateAsserted value="2014-10-31T17:02:51+05:30"/>
+                <code>
+                    <coding>
+                        <code value="S40"/>
+                        <display value="Superficial injury of shoulder and upper arm"/>
+                    </coding>
+                    <coding>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/eddb01eb-61fc-4f9e-aca5-e44193509f35"/>
+                        <code value="eddb01eb-61fc-4f9e-aca5-e44193509f35"/>
+                        <display value="Viral pneumonia 785857"/>
+                    </coding>
+                    <coding>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/referenceterms/ec91e43c-0af9-4a9e-859d-a573768d4cca"/>
+                        <code value="S40"/>
+                        <display value="Viral pneumonia 785857"/>
+                    </coding>
+                </code>
+                <category>
+                    <coding>
+                        <system value="http://hl7.org/fhir/condition-category"/>
+                        <code value="diagnosis"/>
+                        <display value="Diagnosis"/>
+                    </coding>
+                </category>
+                <status value="provisional"/>
+            </Condition>
+        </content>
+    </entry>
+</feed>

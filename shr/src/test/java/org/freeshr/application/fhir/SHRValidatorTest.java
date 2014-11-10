@@ -23,10 +23,15 @@ public class SHRValidatorTest {
 
     @Test
     public void shouldRejectAnyCategoryWithoutCode(){
+        //This example has 3 entries:
+        // 1. Without code and system, 2. With valid code and system, 3. With only code
+
         List<ValidationMessage> messages = shrValidator.validateCategories(FileUtil.asString("xmls/encounters/coded_and_noncoded_diagnosis.xml"));
-        assertThat(messages.size(), is(1));
+        assertThat(messages.size(), is(2));
         assertThat(messages.get(0).getLevel(), is(OperationOutcome.IssueSeverity.error));
         assertThat(messages.get(0).getMessage(), is("Noncoded entry"));
+        assertThat(messages.get(1).getLevel(), is(OperationOutcome.IssueSeverity.error));
+        assertThat(messages.get(1).getMessage(), is("Noncoded entry"));
     }
 
     @Test
@@ -38,6 +43,12 @@ public class SHRValidatorTest {
     @Test
     public void shouldAllowCodedAsWellAsNonCodedChiefComplaint(){
         List<ValidationMessage> messages = shrValidator.validateCategories(FileUtil.asString("xmls/encounters/two_chief_complaints.xml"));
+        assertThat(messages.isEmpty(), is(true));
+    }
+
+    @Test
+    public void shouldAllowIfAtLeaseOneCodeIsRight(){
+        List<ValidationMessage> messages = shrValidator.validateCategories(FileUtil.asString("xmls/encounters/multiple_coded_diagnosis.xml"));
         assertThat(messages.isEmpty(), is(true));
     }
 }

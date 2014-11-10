@@ -32,7 +32,7 @@ public class SHRValidator {
         AtomFeed feed = resourceOrFeed.getFeed();
         List<AtomEntry<? extends Resource>> entryList = feed.getEntryList();
         for (AtomEntry<? extends Resource> atomEntry : entryList) {
-            if (eitherSystemOrCodeNotPresentInEntry(atomEntry)) {
+            if (!bothSystemAndCodePresentInEntry(atomEntry)) {
                 if (!entryIsChiefComplaint(atomEntry)) {
                     ValidationMessage validationMessage = new ValidationMessage();
                     validationMessage.setLevel(IssueSeverity.error);
@@ -45,17 +45,21 @@ public class SHRValidator {
         return validationMessages;
     }
 
-    private boolean eitherSystemOrCodeNotPresentInEntry(AtomEntry<? extends Resource> atomEntry) {
+    private boolean bothSystemAndCodePresentInEntry(AtomEntry<? extends Resource> atomEntry) {
         Property codeElement = atomEntry.getResource().getChildByName(CODE);
+        boolean bothSystemAndCodePresent = false;
         if (codeElement != null) {
             if (!areAllValuesNull(codeElement.getValues())) {
                 Property coding = getChildElement(codeElement, CODING);
-                Property system = getChildElement(coding, SYSTEM);
-                Property code = getChildElement(coding, CODE);
-                return (system.getValues().get(0) == null) || (code.getValues().get(0) == null);
+                for (Element element : coding.getValues()) {
+                    Property system = element.getChildByName(SYSTEM);
+                    Property code = element.getChildByName(CODE);
+                    bothSystemAndCodePresent |= ((system.getValues().get(0) != null) && (code.getValues().get(0) != null));
+                }
+                return bothSystemAndCodePresent;
             }
         }
-        return false;
+        return true;
     }
 
     private boolean entryIsChiefComplaint(AtomEntry<? extends Resource> atomEntry) {

@@ -123,8 +123,8 @@ public class FhirValidatorIntegrationTest {
         encounterBundle = EncounterBundleData.encounter("healthId", FileUtil.asString("xmls/encounters/coded_and_noncoded_diagnosis.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle.getEncounterContent().toString());
-        verify(trConceptLocator, times(3)).verifiesSystem(anyString());
+        verify(trConceptLocator, times(4)).verifiesSystem(anyString());
         assertFalse(encounterValidationResponse.isSuccessful());
-        assertThat(encounterValidationResponse.getErrors().size(), is(1));
+        assertThat(encounterValidationResponse.getErrors().size(), is(2));
     }
 }
