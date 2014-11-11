@@ -55,7 +55,7 @@
                     <text value="INVESTIGATION"/>
                 </type>
                 <subject>
-                    <reference value="5914157887923421185"/>
+                    <reference value="5893922485019082753"/>
                 </subject>
                 <participant>
                     <individual>
@@ -82,7 +82,7 @@
         <content type="text/xml">
             <DiagnosticOrder xmlns="http://hl7.org/fhir">
                 <subject>
-                    <reference value="5914157887923421185"/>
+                    <reference value="5893922485019082753"/>
                 </subject>
                 <orderer>
                     <reference value="456e6c79-35be-11e4-9d09-08002773bf1c"/>

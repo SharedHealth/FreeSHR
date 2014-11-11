@@ -14,6 +14,8 @@ import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity;
 
 public class SHRValidator {
 
+    public static final String SUBJECT = "subject";
+    public static final String INVALID = "invalid";
     private ResourceOrFeedDeserializer resourceOrFeedDeserializer;
 
     public static final String CHIEF_COMPLAINT = "Complaint";
@@ -28,21 +30,35 @@ public class SHRValidator {
 
     public List<ValidationMessage> validateCategories(String sourceXml) {
         List<ValidationMessage> validationMessages = new ArrayList<>();
-        ParserBase.ResourceOrFeed resourceOrFeed = resourceOrFeedDeserializer.deserialize(sourceXml);
-        AtomFeed feed = resourceOrFeed.getFeed();
+        AtomFeed feed = getAtomFeed(sourceXml);
         List<AtomEntry<? extends Resource>> entryList = feed.getEntryList();
         for (AtomEntry<? extends Resource> atomEntry : entryList) {
             if (!bothSystemAndCodePresentInEntry(atomEntry)) {
                 if (!entryIsChiefComplaint(atomEntry)) {
-                    ValidationMessage validationMessage = new ValidationMessage();
-                    validationMessage.setLevel(IssueSeverity.error);
-                    validationMessage.setMessage("Noncoded entry");
-                    validationMessage.setType("invalid");
+                    ValidationMessage validationMessage = new ValidationMessage(null, INVALID, "", "Noncoded entry", IssueSeverity.error);
                     validationMessages.add(validationMessage);
                 }
             }
         }
         return validationMessages;
+    }
+
+    public EncounterValidationResponse validateHealthId(String sourceXml, String expectedHealthId) {
+        EncounterValidationResponse encounterValidationResponse = new EncounterValidationResponse();
+        AtomFeed feed = getAtomFeed(sourceXml);
+        for (AtomEntry<? extends Resource> atomEntry : feed.getEntryList()) {
+            Property subject = atomEntry.getResource().getChildByName(SUBJECT);
+            if (!areAllValuesNull(subject.getValues())) {
+                String healthId = ((String_) subject.getValues().get(0).getChildByName("reference").getValues().get(0)).getValue();
+                if (!healthId.equalsIgnoreCase(expectedHealthId)) {
+                    Error error = new Error("healthId", INVALID, "Patient's Health Id does not match.");
+                    encounterValidationResponse.addError(error);
+                    return encounterValidationResponse;
+                }
+            }
+        }
+
+        return encounterValidationResponse;
     }
 
     private boolean bothSystemAndCodePresentInEntry(AtomEntry<? extends Resource> atomEntry) {
@@ -60,6 +76,11 @@ public class SHRValidator {
             }
         }
         return true;
+    }
+
+    private AtomFeed getAtomFeed(String sourceXml) {
+        ParserBase.ResourceOrFeed resourceOrFeed = resourceOrFeedDeserializer.deserialize(sourceXml);
+        return resourceOrFeed.getFeed();
     }
 
     private boolean entryIsChiefComplaint(AtomEntry<? extends Resource> atomEntry) {

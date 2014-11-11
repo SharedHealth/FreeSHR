@@ -61,7 +61,7 @@
                     <text value="LAB_RESULT"/>
                 </type>
                 <subject>
-                    <reference value="5920342892886360065"/>
+                    <reference value="5893922485019082753"/>
                 </subject>
                 <participant>
                     <individual>
@@ -101,7 +101,7 @@
                     <value value="ce6c6ac9-ca55-44a2-9c41-c1227d55c730"/>
                 </identifier>
                 <subject>
-                    <reference value="5920342892886360065"/>
+                    <reference value="5893922485019082753"/>
                 </subject>
             </Observation>
         </content>
@@ -130,7 +130,7 @@
                 <status value="final"/>
                 <issued value="2014-10-13T15:04:30+05:30"/>
                 <subject>
-                    <reference value="5920342892886360065"/>
+                    <reference value="5893922485019082753"/>
                 </subject>
                 <performer>
                     <reference value="456e6c79-35be-11e4-9d09-08002773bf1c"/>

@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -78,7 +77,7 @@ public class EncounterService {
     }
 
     private EncounterValidationResponse validate(EncounterBundle encounterBundle) {
-        final EncounterValidationResponse encounterValidationResponse = fhirValidator.validate(encounterBundle.getEncounterContent().toString());
+        final EncounterValidationResponse encounterValidationResponse = fhirValidator.validate(encounterBundle);
         return encounterValidationResponse.isSuccessful() ? null : encounterValidationResponse;
     }
 

@@ -7,19 +7,21 @@ import static org.freeshr.utils.FileUtil.asString;
 
 public class EncounterBundleData {
 
-    public static EncounterBundle withValidEncounter(String healthId) {
-        return encounter(healthId, asString("xmls/encounters/encounter.xml"));
+    public static final String HEALTH_ID = "5893922485019082753";
+
+    public static EncounterBundle withValidEncounter() {
+        return encounter(HEALTH_ID, asString("xmls/encounters/encounter.xml"));
     }
-    public static EncounterBundle withNewValidEncounter(String healthId) {
-        return encounter(healthId, asString("xmls/encounters/encounter_new.xml"));
+    public static EncounterBundle withNewValidEncounter() {
+        return encounter(HEALTH_ID, asString("xmls/encounters/encounter_new.xml"));
     }
 
-    public static EncounterBundle withInvalidConcept(String healthId) {
-        return encounter(healthId, asString("xmls/encounters/invalid_concept.xml"));
+    public static EncounterBundle withInvalidConcept() {
+        return encounter(HEALTH_ID, asString("xmls/encounters/invalid_concept.xml"));
     }
 
-    public static EncounterBundle withInvalidReferenceTerm(String healthId) {
-        return encounter(healthId, asString("xmls/encounters/invalid_ref.xml"));
+    public static EncounterBundle withInvalidReferenceTerm() {
+        return encounter(HEALTH_ID, asString("xmls/encounters/invalid_ref.xml"));
     }
 
     public static EncounterBundle encounter(String healthId, String content) {

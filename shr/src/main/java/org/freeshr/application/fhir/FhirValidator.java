@@ -37,9 +37,11 @@ public class FhirValidator {
         this.shrValidator = new SHRValidator();
     }
 
-    public EncounterValidationResponse validate(String sourceXML) {
+    public EncounterValidationResponse validate(EncounterBundle encounterBundle) {
         try {
-            return validate(sourceXML, shrProperties.getValidationFilePath());
+            String sourceXml = encounterBundle.getEncounterContent().toString();
+            EncounterValidationResponse encounterValidationResponse = shrValidator.validateHealthId(sourceXml, encounterBundle.getHealthId());
+            return encounterValidationResponse.isSuccessful() ? validate(sourceXml, shrProperties.getValidationFilePath()) : encounterValidationResponse;
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
