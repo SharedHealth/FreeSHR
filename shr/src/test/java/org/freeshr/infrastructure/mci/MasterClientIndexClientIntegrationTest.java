@@ -34,7 +34,7 @@ public class MasterClientIndexClientIntegrationTest {
 
     @Test
     public void shouldFetchAPatientByHealthId() throws ExecutionException, InterruptedException {
-        String heathId = "5dd24827-fd5d-4024-9f65-5a3c88a28af5";
+        String heathId = "5893922485019082753";
         givenThat(get(urlEqualTo("/api/v1/patients/" + heathId))
                 .willReturn(aResponse()
                         .withStatus(200)

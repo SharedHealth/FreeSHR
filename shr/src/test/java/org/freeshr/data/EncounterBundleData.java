@@ -10,14 +10,23 @@ public class EncounterBundleData {
     public static final String HEALTH_ID = "5893922485019082753";
 
     public static EncounterBundle withValidEncounter() {
-        return encounter(HEALTH_ID, asString("xmls/encounters/encounter.xml"));
+        return withValidEncounter(HEALTH_ID);
     }
-    public static EncounterBundle withNewValidEncounter() {
-        return encounter(HEALTH_ID, asString("xmls/encounters/encounter_new.xml"));
+
+    public static EncounterBundle withValidEncounter(String healthId) {
+        return encounter(healthId, asString("xmls/encounters/encounter.xml"));
+    }
+
+    public static EncounterBundle withNewValidEncounter(String healthId) {
+        return encounter(healthId, asString("xmls/encounters/encounter_new.xml"));
     }
 
     public static EncounterBundle withInvalidConcept() {
         return encounter(HEALTH_ID, asString("xmls/encounters/invalid_concept.xml"));
+    }
+
+    public static EncounterBundle encounterForUnknownPatient() {
+        return encounter("1234", asString("xmls/encounters/encounter_health_id_1234.xml"));
     }
 
     public static EncounterBundle withInvalidReferenceTerm() {

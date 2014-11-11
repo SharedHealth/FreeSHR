@@ -26,9 +26,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
 
-    private static final String VALID_HEALTH_ID = "5dd24827-fd5d-4024-9f65-5a3c88a28af5";
+    private static final String VALID_HEALTH_ID = "5893922485019082753";
 
-    private static final String INVALID_HEALTH_ID = "invalid-fd5d-4024-9f65-5a3c88a28af5";
+    private static final String INVALID_HEALTH_ID = "1234";
 
     @Before
     public void setUp() throws Exception {
@@ -73,7 +73,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/encounter.xml")))
+                .content(asString("xmls/encounters/encounter_health_id_1234.xml")))
                 .andExpect(request().asyncResult(new InstanceOf(PreconditionFailed.class)));
     }
 

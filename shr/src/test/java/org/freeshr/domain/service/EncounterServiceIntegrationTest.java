@@ -58,8 +58,8 @@ public class EncounterServiceIntegrationTest {
     @Qualifier("SHRCassandraTemplate")
     CqlOperations cqlOperations;
 
-    private static final String VALID_HEALTH_ID = "5dd24827-fd5d-4024-9f65-5a3c88a28af5";
-    private static final String VALID_HEALTH_ID_NEW = "44e24827-fd5d-4024-9f65-5a3c88a28af5";
+    private static final String VALID_HEALTH_ID = "5893922485019082753";
+    private static final String VALID_HEALTH_ID_NEW = "5893922485019081234";
 
     private static final String INVALID_HEALTH_ID = "invalid-fd5d-4024-9f65-5a3c88a28af5";
 
@@ -123,7 +123,7 @@ public class EncounterServiceIntegrationTest {
 
     @Test
     public void shouldRejectEncountersForUnknownPatients() throws ExecutionException, InterruptedException {
-        EncounterResponse response = encounterService.ensureCreated(withValidEncounter());
+        EncounterResponse response = encounterService.ensureCreated(encounterForUnknownPatient());
         assertThat(true, is(response.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition)));
     }
 
@@ -189,9 +189,9 @@ public class EncounterServiceIntegrationTest {
 
         assertNotNull(facilityRepository.find("3"));
         assertTrue(encounterService.ensureCreated(withValidEncounter()).isSuccessful());
-        assertTrue(encounterService.ensureCreated(withNewValidEncounter()).isSuccessful());
+        assertTrue(encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW)).isSuccessful());
 
-        assertEquals(2, encounterService.findAll(VALID_HEALTH_ID).size());
+        assertEquals(1, encounterService.findAll(VALID_HEALTH_ID).size());
         List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByFacilityCatchments("3", "2014-09-10");
         assertEquals(2, encounterBundles.size());
 
@@ -219,7 +219,7 @@ public class EncounterServiceIntegrationTest {
         Facility facility1 = new Facility("5", "facility1", "Main hospital", "305610,3056", new Address("1", "2", "3", null, null));
         facilityRepository.save(facility1);
         encounterService.ensureCreated(withValidEncounter());
-        encounterService.ensureCreated(withNewValidEncounter());
+        encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW));
 
         String date = "2014-09-10";
         List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByFacilityCatchments("5", date);
