@@ -33,12 +33,10 @@ public class SHRValidator {
         AtomFeed feed = getAtomFeed(sourceXml);
         List<AtomEntry<? extends Resource>> entryList = feed.getEntryList();
         for (AtomEntry<? extends Resource> atomEntry : entryList) {
-            if (!bothSystemAndCodePresentInEntry(atomEntry)) {
-                if (!entryIsChiefComplaint(atomEntry)) {
-                    ValidationMessage validationMessage = new ValidationMessage(null, INVALID, "", "Noncoded entry", IssueSeverity.error);
-                    validationMessages.add(validationMessage);
-                }
-            }
+            if (bothSystemAndCodePresentInEntry(atomEntry) || entryIsChiefComplaint(atomEntry)) continue;
+
+            ValidationMessage validationMessage = new ValidationMessage(null, INVALID, "", "Noncoded entry", IssueSeverity.error);
+            validationMessages.add(validationMessage);
         }
         return validationMessages;
     }
@@ -48,14 +46,14 @@ public class SHRValidator {
         AtomFeed feed = getAtomFeed(sourceXml);
         for (AtomEntry<? extends Resource> atomEntry : feed.getEntryList()) {
             Property subject = atomEntry.getResource().getChildByName(SUBJECT);
-            if (!areAllValuesNull(subject.getValues())) {
-                String healthId = ((String_) subject.getValues().get(0).getChildByName("reference").getValues().get(0)).getValue();
-                if (!healthId.equalsIgnoreCase(expectedHealthId)) {
-                    Error error = new Error("healthId", INVALID, "Patient's Health Id does not match.");
-                    encounterValidationResponse.addError(error);
-                    return encounterValidationResponse;
-                }
-            }
+            if (areAllValuesNull(subject.getValues()))  continue;
+
+            String healthId = ((String_) subject.getValues().get(0).getChildByName("reference").getValues().get(0)).getValue();
+            if (healthId.equalsIgnoreCase(expectedHealthId)) continue;
+
+            Error error = new Error("healthId", INVALID, "Patient's Health Id does not match.");
+            encounterValidationResponse.addError(error);
+            return encounterValidationResponse;
         }
 
         return encounterValidationResponse;
@@ -63,19 +61,17 @@ public class SHRValidator {
 
     private boolean bothSystemAndCodePresentInEntry(AtomEntry<? extends Resource> atomEntry) {
         Property codeElement = atomEntry.getResource().getChildByName(CODE);
+
+        if (codeElement == null || areAllValuesNull(codeElement.getValues())) return true;
+
         boolean bothSystemAndCodePresent = false;
-        if (codeElement != null) {
-            if (!areAllValuesNull(codeElement.getValues())) {
-                Property coding = getChildElement(codeElement, CODING);
-                for (Element element : coding.getValues()) {
-                    Property system = element.getChildByName(SYSTEM);
-                    Property code = element.getChildByName(CODE);
-                    bothSystemAndCodePresent |= ((system.getValues().get(0) != null) && (code.getValues().get(0) != null));
-                }
-                return bothSystemAndCodePresent;
-            }
+        Property coding = getChildElement(codeElement, CODING);
+        for (Element element : coding.getValues()) {
+            Property system = element.getChildByName(SYSTEM);
+            Property code = element.getChildByName(CODE);
+            bothSystemAndCodePresent |= ((system.getValues().get(0) != null) && (code.getValues().get(0) != null));
         }
-        return true;
+        return bothSystemAndCodePresent;
     }
 
     private AtomFeed getAtomFeed(String sourceXml) {
