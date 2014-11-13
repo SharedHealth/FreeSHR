@@ -1,12 +1,10 @@
 package org.freeshr.application.fhir;
 
-import org.freeshr.utils.CollectionUtils;
 import org.freeshr.utils.ResourceOrFeedDeserializer;
 import org.hl7.fhir.instance.formats.ParserBase;
 import org.hl7.fhir.instance.model.*;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 
-import java.lang.Boolean;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +20,6 @@ public class SHRValidator {
     public static final String CODE = "code";
     public static final String CODING = "coding";
     public static final String CATEGORY = "category";
-    public static final String SYSTEM = "system";
 
     public SHRValidator() {
         this.resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
@@ -46,9 +43,9 @@ public class SHRValidator {
         AtomFeed feed = getAtomFeed(sourceXml);
         for (AtomEntry<? extends Resource> atomEntry : feed.getEntryList()) {
             Property subject = atomEntry.getResource().getChildByName(SUBJECT);
-            if (areAllValuesNull(subject.getValues()))  continue;
+            if (!subject.hasValues())  continue;
 
-            String healthId = ((String_) subject.getValues().get(0).getChildByName("reference").getValues().get(0)).getValue();
+            String healthId = ((ResourceReference)subject.getValues().get(0)).getReferenceSimple();
             if (healthId.equalsIgnoreCase(expectedHealthId)) continue;
 
             Error error = new Error("healthId", INVALID, "Patient's Health Id does not match.");
@@ -62,14 +59,15 @@ public class SHRValidator {
     private boolean bothSystemAndCodePresentInEntry(AtomEntry<? extends Resource> atomEntry) {
         Property codeElement = atomEntry.getResource().getChildByName(CODE);
 
-        if (codeElement == null || areAllValuesNull(codeElement.getValues())) return true;
+        if (codeElement == null || !codeElement.hasValues()) return true;
 
         boolean bothSystemAndCodePresent = false;
-        Property coding = getChildElement(codeElement, CODING);
-        for (Element element : coding.getValues()) {
-            Property system = element.getChildByName(SYSTEM);
-            Property code = element.getChildByName(CODE);
-            bothSystemAndCodePresent |= ((system.getValues().get(0) != null) && (code.getValues().get(0) != null));
+        Property codingElement = getChildElement(codeElement, CODING);
+        for (Element element : codingElement.getValues()) {
+            Coding coding = (Coding) element;
+            Uri system = coding.getSystem();
+            Code code = coding.getCode();
+            bothSystemAndCodePresent |= (system != null && code!= null);
         }
         return bothSystemAndCodePresent;
     }
@@ -81,18 +79,9 @@ public class SHRValidator {
 
     private boolean entryIsChiefComplaint(AtomEntry<? extends Resource> atomEntry) {
         Property category = atomEntry.getResource().getChildByName(CATEGORY);
-        List<Element> coding = getChildElement(category, CODING).getValues();
-        String code = ((Code) coding.get(0).getChildByName(CODE).getValues().get(0)).getValue();
-        return code.equalsIgnoreCase(CHIEF_COMPLAINT);
-    }
-
-    private boolean areAllValuesNull(List<Element> values) {
-        return CollectionUtils.isEvery(values, new CollectionUtils.Fn<Element, Boolean>() {
-            @Override
-            public Boolean call(Element input) {
-                return input == null;
-            }
-        });
+        Coding coding = (Coding)getChildElement(category, CODING).getValues().get(0);
+        Code code = coding.getCode();
+        return code.getValue().equalsIgnoreCase(CHIEF_COMPLAINT);
     }
 
     private Property getChildElement(Property codeElement, String name) {
