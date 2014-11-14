@@ -1,33 +1,37 @@
-package org.freeshr.application.fhir;
+package org.freeshr.validations;
 
+import org.freeshr.application.fhir.*;
+import org.freeshr.application.fhir.Error;
 import org.freeshr.utils.ResourceOrFeedDeserializer;
 import org.hl7.fhir.instance.formats.ParserBase;
 import org.hl7.fhir.instance.model.*;
 import org.hl7.fhir.instance.validation.ValidationMessage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity;
 
-public class SHRValidator {
+@Component
+public class ResourceValidator {
 
-    public static final String SUBJECT = "subject";
     public static final String INVALID = "invalid";
-    private ResourceOrFeedDeserializer resourceOrFeedDeserializer;
-
     public static final String CHIEF_COMPLAINT = "Complaint";
     public static final String CODE = "code";
     public static final String CODING = "coding";
     public static final String CATEGORY = "category";
 
-    public SHRValidator() {
+    private ResourceOrFeedDeserializer resourceOrFeedDeserializer;
+
+    public ResourceValidator() {
         this.resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
     }
 
     public List<ValidationMessage> validateCategories(String sourceXml) {
         List<ValidationMessage> validationMessages = new ArrayList<>();
-        AtomFeed feed = getAtomFeed(sourceXml);
+        AtomFeed feed = resourceOrFeedDeserializer.deserialize(sourceXml);
         List<AtomEntry<? extends Resource>> entryList = feed.getEntryList();
         for (AtomEntry<? extends Resource> atomEntry : entryList) {
             if (bothSystemAndCodePresentInEntry(atomEntry) || entryIsChiefComplaint(atomEntry)) continue;
@@ -36,24 +40,6 @@ public class SHRValidator {
             validationMessages.add(validationMessage);
         }
         return validationMessages;
-    }
-
-    public EncounterValidationResponse validateHealthId(String sourceXml, String expectedHealthId) {
-        EncounterValidationResponse encounterValidationResponse = new EncounterValidationResponse();
-        AtomFeed feed = getAtomFeed(sourceXml);
-        for (AtomEntry<? extends Resource> atomEntry : feed.getEntryList()) {
-            Property subject = atomEntry.getResource().getChildByName(SUBJECT);
-            if (!subject.hasValues())  continue;
-
-            String healthId = ((ResourceReference)subject.getValues().get(0)).getReferenceSimple();
-            if (healthId.equalsIgnoreCase(expectedHealthId)) continue;
-
-            Error error = new Error("healthId", INVALID, "Patient's Health Id does not match.");
-            encounterValidationResponse.addError(error);
-            return encounterValidationResponse;
-        }
-
-        return encounterValidationResponse;
     }
 
     private boolean bothSystemAndCodePresentInEntry(AtomEntry<? extends Resource> atomEntry) {
@@ -67,19 +53,14 @@ public class SHRValidator {
             Coding coding = (Coding) element;
             Uri system = coding.getSystem();
             Code code = coding.getCode();
-            bothSystemAndCodePresent |= (system != null && code!= null);
+            bothSystemAndCodePresent |= (system != null && code != null);
         }
         return bothSystemAndCodePresent;
     }
 
-    private AtomFeed getAtomFeed(String sourceXml) {
-        ParserBase.ResourceOrFeed resourceOrFeed = resourceOrFeedDeserializer.deserialize(sourceXml);
-        return resourceOrFeed.getFeed();
-    }
-
     private boolean entryIsChiefComplaint(AtomEntry<? extends Resource> atomEntry) {
         Property category = atomEntry.getResource().getChildByName(CATEGORY);
-        Coding coding = (Coding)getChildElement(category, CODING).getValues().get(0);
+        Coding coding = (Coding) getChildElement(category, CODING).getValues().get(0);
         Code code = coding.getCode();
         return code.getValue().equalsIgnoreCase(CHIEF_COMPLAINT);
     }

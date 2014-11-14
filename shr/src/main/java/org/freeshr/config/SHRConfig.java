@@ -19,7 +19,8 @@ import org.springframework.web.client.AsyncRestTemplate;
         "org.freeshr.infrastructure",
         "org.freeshr.interfaces",
         "org.freeshr.domain",
-        "org.freeshr.application.fhir"})
+        "org.freeshr.application.fhir",
+        "org.freeshr.validations"})
 public class SHRConfig {
 
     @Autowired

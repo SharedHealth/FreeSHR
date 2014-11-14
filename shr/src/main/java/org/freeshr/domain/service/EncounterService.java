@@ -4,7 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.application.fhir.EncounterValidationResponse;
-import org.freeshr.application.fhir.FhirValidator;
+import org.freeshr.application.fhir.EncounterValidator;
 import org.freeshr.domain.model.Catchment;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Patient;
@@ -24,16 +24,16 @@ public class EncounterService {
     private static final String ENCOUNTER_FETCH_LIMIT_LOOKUP_KEY = "ENCOUNTER_FETCH_LIMIT";
     private EncounterRepository encounterRepository;
     private PatientService patientService;
-    private FhirValidator fhirValidator;
+    private EncounterValidator encounterValidator;
     private FacilityService facilityService;
 
     private static final Logger logger = LoggerFactory.getLogger(EncounterService.class);
 
     @Autowired
-    public EncounterService(EncounterRepository encounterRepository, PatientService patientService, FhirValidator fhirValidator, FacilityService facilityService) {
+    public EncounterService(EncounterRepository encounterRepository, PatientService patientService, EncounterValidator encounterValidator, FacilityService facilityService) {
         this.encounterRepository = encounterRepository;
         this.patientService = patientService;
-        this.fhirValidator = fhirValidator;
+        this.encounterValidator = encounterValidator;
         this.facilityService = facilityService;
     }
 
@@ -77,7 +77,7 @@ public class EncounterService {
     }
 
     private EncounterValidationResponse validate(EncounterBundle encounterBundle) {
-        final EncounterValidationResponse encounterValidationResponse = fhirValidator.validate(encounterBundle);
+        final EncounterValidationResponse encounterValidationResponse = encounterValidator.validate(encounterBundle);
         return encounterValidationResponse.isSuccessful() ? null : encounterValidationResponse;
     }
 

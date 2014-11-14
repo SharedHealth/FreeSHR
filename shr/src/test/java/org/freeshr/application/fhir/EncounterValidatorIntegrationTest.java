@@ -5,6 +5,9 @@ import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.data.EncounterBundleData;
 import org.freeshr.utils.FileUtil;
+import org.freeshr.validations.FhirSchemaValidator;
+import org.freeshr.validations.HealthIdValidator;
+import org.freeshr.validations.ResourceValidator;
 import org.hl7.fhir.instance.model.OperationOutcome;
 import org.hl7.fhir.instance.utils.ConceptLocator;
 import org.junit.Before;
@@ -26,9 +29,9 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
-public class FhirValidatorIntegrationTest {
+public class EncounterValidatorIntegrationTest {
 
-    private FhirValidator validator;
+    private EncounterValidator validator;
 
     @Mock
     private TRConceptLocator trConceptLocator;
@@ -37,15 +40,23 @@ public class FhirValidatorIntegrationTest {
     private SHRProperties shrProperties;
 
     @Autowired
+    private ResourceValidator resourceValidator;
+
+    @Autowired
+    private HealthIdValidator healthIdValidator;
+
+    @Autowired
     private FhirMessageFilter fhirMessageFilter;
+
+    private FhirSchemaValidator fhirSchemaValidator;
 
     EncounterBundle encounterBundle;
 
     @Before
-    public void setup() {
+    public void setup() throws Exception {
         initMocks(this);
-
-        validator = new FhirValidator(trConceptLocator, shrProperties, fhirMessageFilter);
+        fhirSchemaValidator = new FhirSchemaValidator(trConceptLocator, shrProperties);
+        validator = new EncounterValidator(fhirMessageFilter, fhirSchemaValidator, resourceValidator, healthIdValidator );
         encounterBundle = EncounterBundleData.withValidEncounter();
     }
 

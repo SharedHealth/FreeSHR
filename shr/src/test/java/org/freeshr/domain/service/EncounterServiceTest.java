@@ -2,7 +2,7 @@ package org.freeshr.domain.service;
 
 
 import org.freeshr.application.fhir.EncounterBundle;
-import org.freeshr.application.fhir.FhirValidator;
+import org.freeshr.application.fhir.EncounterValidator;
 import org.freeshr.domain.model.Catchment;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Address;
@@ -30,7 +30,7 @@ public class EncounterServiceTest {
     public void setup(){
         encounterRepository = mock(EncounterRepository.class);
         facilityService = mock(FacilityService.class);
-        encounterService = new EncounterService(encounterRepository, mock(PatientService.class), mock(FhirValidator.class), facilityService);
+        encounterService = new EncounterService(encounterRepository, mock(PatientService.class), mock(EncounterValidator.class), facilityService);
     }
 
 
