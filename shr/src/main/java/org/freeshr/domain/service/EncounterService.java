@@ -14,6 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import rx.Observable;
+import rx.functions.Func0;
+import rx.functions.Func1;
+import rx.functions.FuncN;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -37,41 +41,55 @@ public class EncounterService {
         this.facilityService = facilityService;
     }
 
-    public EncounterResponse ensureCreated(final EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
+    public Observable<EncounterResponse> ensureCreated(final EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
         EncounterValidationResponse validationResult = validate(encounterBundle);
         if (null == validationResult) {
-            Patient patient = patientService.ensurePresent(encounterBundle.getHealthId());
-            EncounterResponse response = new EncounterResponse();
-            if (patient != null) {
-                encounterBundle.setEncounterId(UUID.randomUUID().toString());
-                try {
-                    encounterRepository.save(encounterBundle, patient);
-                } catch (InterruptedException e) {
-                    logger.warn(e.getMessage());
-                    e.printStackTrace();
-                } catch (Exception e) {
-                    logger.warn(e.getMessage());
+            Observable<Patient> patientObservable = patientService.ensurePresent(encounterBundle.getHealthId());
+            return patientObservable.flatMap(new Func1<Patient, Observable<EncounterResponse>>() {
+                @Override
+                public Observable<EncounterResponse> call(Patient patient) {
+                    EncounterResponse response = new EncounterResponse();
+                    if (patient != null) {
+                        encounterBundle.setEncounterId(UUID.randomUUID().toString());
+                        try {
+                            encounterRepository.save(encounterBundle, patient);
+                        } catch (InterruptedException e) {
+                            logger.error(e.getMessage());
+                            e.printStackTrace();
+                        } catch (Exception e) {
+                            logger.error(e.getMessage());
+                        }
+                        response.setEncounterId(encounterBundle.getEncounterId());
+                        return Observable.just(response);
+                    } else {
+                        return Observable.just(response.preconditionFailure("healthId", "invalid", "Patient not available in patient registry"));
+                    }
                 }
-                response.setEncounterId(encounterBundle.getEncounterId());
-                return response;
-            } else {
-                return response.preconditionFailure("healthId", "invalid", "Patient not available in patient registry");
-            }
+            }, new Func1<Throwable, Observable<EncounterResponse>>() {
+                @Override
+                public Observable<EncounterResponse> call(Throwable throwable) {
+                    logger.error(throwable.getMessage());
+                    return null;
+                }
+            }, new Func0<Observable<EncounterResponse>>() {
+                @Override
+                public Observable<EncounterResponse> call() {
+                    return null;
+                }
+            });
+
         } else {
-            return new EncounterResponse().setValidationFailure(validationResult);
+            return Observable.just(new EncounterResponse().setValidationFailure(validationResult));
         }
     }
 
+
     /**
-     *
      * @param healthId
      * @return
-     * @throws ExecutionException
-     * @throws InterruptedException
-     *
      * @deprecated do not use this query
      */
-    public List<EncounterBundle> findAll(String healthId) throws ExecutionException, InterruptedException {
+    public Observable<List<EncounterBundle>> findAll(String healthId) {
         //TODO refactor
         return encounterRepository.findAll(healthId);
     }
@@ -82,51 +100,74 @@ public class EncounterService {
     }
 
     /**
-     *
      * @param facilityId
      * @param date
      * @return
-     * @throws ExecutionException
-     * @throws InterruptedException
-     *
-     * @deprecated do not use this. can not gaurantee order of encounters across all catchments.
+     * @deprecated do not use this. can not guarantee order of encounters across all catchments.
      */
-    public List<EncounterBundle> findAllEncountersByFacilityCatchments(String facilityId, final String date) throws ExecutionException, InterruptedException {
-        List<EncounterBundle> encounterBundles = new ArrayList<>();
-        Facility facility = facilityService.ensurePresent(facilityId);
-        if (null == facility) return encounterBundles;
-        return findEncountersForCatchments(facility.getCatchments(), date);
+    public Observable<List<EncounterBundle>> findAllEncountersByFacilityCatchments(String facilityId, final String date) {
+        Observable<Facility> facilityObservable = facilityService.ensurePresent(facilityId);
+        return facilityObservable.flatMap(new Func1<Facility, Observable<List<EncounterBundle>>>() {
+            @Override
+            public Observable<List<EncounterBundle>> call(Facility facility) {
+                return findEncountersForCatchments(facility.getCatchments(), date);
+            }
+        }, new Func1<Throwable, Observable<List<EncounterBundle>>>() {
+            @Override
+            public Observable<List<EncounterBundle>> call(Throwable throwable) {
+                logger.error(throwable.getMessage());
+                return Observable.<List<EncounterBundle>>just(new ArrayList<EncounterBundle>());
+            }
+        }, new Func0<Observable<List<EncounterBundle>>>() {
+            @Override
+            public Observable<List<EncounterBundle>> call() {
+                return null;
+            }
+        });
     }
 
     /**
-     *
      * @param facilityId
      * @param catchment
      * @param sinceDate
-     * @param defaultFetchLimit
      * @return list of encounters. limited to 20
-     * @throws ExecutionException
-     * @throws InterruptedException
      */
-    public List<EncounterBundle> findEncountersForFacilityCatchment(String facilityId, String catchment, final Date sinceDate, int limit) throws ExecutionException, InterruptedException {
-        List<EncounterBundle> encounterBundles = new ArrayList<>();
-        Facility facility = facilityService.ensurePresent(facilityId);
+    public Observable<List<EncounterBundle>> findEncountersForFacilityCatchment(String facilityId, final String catchment,
+                                                                                final Date sinceDate, final int limit) {
+        Observable<Facility> facility = facilityService.ensurePresent(facilityId);
 
-        if (null == facility) return encounterBundles;
-        if (StringUtils.isBlank(catchment)) return encounterBundles;
-        if (!facility.has(catchment)) return encounterBundles; //TODO rule check if we throw error!
-        return encounterRepository.findEncountersForCatchment(new Catchment(catchment), sinceDate, limit);
+        return facility.flatMap(new Func1<Facility, Observable<List<EncounterBundle>>>() {
+            @Override
+            public Observable<List<EncounterBundle>> call(Facility facility) {
+                if ((null == facility)
+                        || StringUtils.isBlank(catchment)
+                        || !(facility.has(catchment)))
+                    return Observable.<List<EncounterBundle>>just(new ArrayList<EncounterBundle>());
+                return encounterRepository.findEncountersForCatchment(new Catchment(catchment), sinceDate, limit);
+            }
+        });
     }
 
-    private List<EncounterBundle> findEncountersForCatchments(final List<String> catchments, String sinceDate) throws ExecutionException, InterruptedException {
-        Set<EncounterBundle> encounters = new HashSet<>();
+    private Observable<List<EncounterBundle>> findEncountersForCatchments(final List<String> catchments, String sinceDate) {
         Date updateSince = DateUtil.parseDate(sinceDate);
+        List<Observable<List<EncounterBundle>>> observablesForCatchment = new ArrayList<>();
         for (String catchment : catchments) {
             Catchment facilityCatchment = new Catchment(catchment);
-            encounters.addAll(encounterRepository.findEncountersForCatchment(facilityCatchment, updateSince, getEncounterFetchLimit()));
+            observablesForCatchment.add(encounterRepository.findEncountersForCatchment(facilityCatchment, updateSince, getEncounterFetchLimit()));
         }
-        return new ArrayList<>(encounters);
+
+        return Observable.zip(observablesForCatchment, new FuncN<List<EncounterBundle>>() {
+            @Override
+            public List<EncounterBundle> call(Object... args) {
+                Set<EncounterBundle> uniqueEncounterBundles = new HashSet<>();
+                for (Object encounterBundles : args) {
+                    uniqueEncounterBundles.addAll((List<EncounterBundle>) encounterBundles);
+                }
+                return new ArrayList<>(uniqueEncounterBundles);
+            }
+        });
     }
+
 
     public static int getEncounterFetchLimit() {
         Map<String, String> env = System.getenv();
@@ -141,7 +182,6 @@ public class EncounterService {
         }
         return fetchLimit;
     }
-
 
 
 }

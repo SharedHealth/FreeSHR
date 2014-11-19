@@ -36,7 +36,7 @@ public class PatientRepositoryIntegrationTest {
     @Test
     public void shouldFindPatientWithMatchingHealthId() throws ExecutionException, InterruptedException {
         patientRepository.save(patient(healthId));
-        Patient patient = patientRepository.find(healthId);
+        Patient patient = patientRepository.find(healthId).toBlocking().first();
         assertNotNull(patient);
         assertThat(patient, is(patient(healthId)));
         assertThat(patient.getAddress(), is(address()));
@@ -63,7 +63,7 @@ public class PatientRepositoryIntegrationTest {
 
     @Test
     public void shouldNotFindPatientWithoutMatchingHealthId() throws ExecutionException, InterruptedException {
-        assertNull(patientRepository.find(healthId + "invalid"));
+        assertNull(patientRepository.find(healthId + "invalid").toBlocking().first());
     }
 
     @After

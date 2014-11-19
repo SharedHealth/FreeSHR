@@ -41,7 +41,7 @@ public class MasterClientIndexClientIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/patient.json"))));
 
-        Patient patient = mci.getPatient(heathId).get();
+        Patient patient = mci.getPatient(heathId).toBlocking().first();
 
         assertThat(patient, is(notNullValue()));
         assertThat(patient.getHealthId(), is(heathId));

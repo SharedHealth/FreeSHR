@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.stereotype.Component;
+import rx.Observable;
+import rx.functions.Func1;
 
 import java.util.List;
 
@@ -26,10 +28,15 @@ public class PatientRepository {
         this.cqlOperations = cqlOperations;
     }
 
-    public Patient find(String healthId) {
-        ResultSet resultSet = cqlOperations.query("SELECT * FROM patient WHERE health_id='" + healthId + "';");
-
-        return readPatient(resultSet);
+    public Observable<Patient> find(String healthId) {
+        Observable<ResultSet> observable = Observable.from(
+                cqlOperations.queryAsynchronously("SELECT * FROM patient WHERE health_id='" + healthId + "';"));
+        return observable.map(new Func1<ResultSet, Patient>() {
+            @Override
+            public Patient call(ResultSet rows) {
+                return readPatient(rows);
+            }
+        });
     }
 
     private Patient readPatient(ResultSet resultSet) {
@@ -64,7 +71,6 @@ public class PatientRepository {
                 address.getDivision(), address.getWard(), address.getUpazila(), address.getCityCorporation()));
         return "INSERT into patient (health_id, gender, address_line, district_id, division_id, union_urban_ward_id, upazila_id, city_corporation_id) values  (" + query + ")";
     }
-
 
 
     private String query(List<String> values) {

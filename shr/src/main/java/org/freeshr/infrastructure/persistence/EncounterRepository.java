@@ -1,17 +1,14 @@
 package org.freeshr.infrastructure.persistence;
 
-import com.datastax.driver.core.RegularStatement;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.SimpleStatement;
+import com.datastax.driver.core.*;
 import com.datastax.driver.core.querybuilder.Batch;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
+import org.freeshr.domain.model.Catchment;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
-import org.freeshr.domain.model.Catchment;
 import org.freeshr.utils.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.stereotype.Component;
+import rx.Observable;
+import rx.functions.Func1;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -50,8 +49,8 @@ public class EncounterRepository {
 
         String encCatchmentInsertQuery =
                 String.format("INSERT INTO enc_by_catchment (division_id, district_id, year, " +
-                " received_date, upazila_id, city_corporation_id, union_urban_ward_id, encounter_id) " +
-                " values ('%s', '%s', %s, now(), '%s', '%s', '%s', '%s');",
+                                " received_date, upazila_id, city_corporation_id, union_urban_ward_id, encounter_id) " +
+                                " values ('%s', '%s', %s, now(), '%s', '%s', '%s', '%s');",
                         address.getDivision(),
                         address.getConcatenatedDistrictId(),
                         DateUtil.getCurrentYear(),
@@ -61,20 +60,25 @@ public class EncounterRepository {
                         encounterBundle.getEncounterId());
         RegularStatement encCatchmentStmt = new SimpleStatement(encCatchmentInsertQuery);
         Batch batch = QueryBuilder.batch(insertEncounterStmt, encCatchmentStmt);
-        System.out.println(batch.toString());
         cqlOperations.execute(batch);
     }
 
-    public List<EncounterBundle> findEncountersForCatchment(Catchment catchment, Date updatedSince, int limit) throws ExecutionException, InterruptedException {
+    public Observable<List<EncounterBundle>> findEncountersForCatchment(Catchment catchment, Date updatedSince, int limit) {
         String identifyEncountersQuery = buildCatchmentSearchQuery(catchment, updatedSince, limit);
-        ResultSet resultSet = cqlOperations.query(identifyEncountersQuery);
-        List<Row> rows = resultSet.all();
-        LinkedHashSet<String> encounterIds = new LinkedHashSet<>();
-        for (Row result : rows) {
-            encounterIds.add(result.getString("encounter_id"));
-        }
-        return findEncounters(encounterIds);
+        ResultSetFuture resultSet = cqlOperations.queryAsynchronously(identifyEncountersQuery);
+        Observable<ResultSet> resultSetObservable = Observable.from(resultSet);
+        return resultSetObservable.concatMap(new Func1<ResultSet, Observable<List<EncounterBundle>>>() {
+            @Override
+            public Observable<List<EncounterBundle>> call(ResultSet rows) {
+                List<Row> encounterBundles = rows.all();
+                LinkedHashSet<String> encounterIds = new LinkedHashSet<>();
 
+                for (Row result : encounterBundles) {
+                    encounterIds.add(result.getString("encounter_id"));
+                }
+                return findEncounters(encounterIds);
+            }
+        });
     }
 
     private String buildCatchmentSearchQuery(Catchment catchment, Date updatedSince, int limit) {
@@ -82,11 +86,11 @@ public class EncounterRepository {
         String lastUpdateTime = new SimpleDateFormat(DateUtil.UTC_DATE_IN_MILLIS_FORMAT).format(updatedSince);
         //TODO test. condition should be >=
         return String.format("SELECT encounter_id FROM enc_by_catchment " +
-                      " WHERE year = %s and received_date > minTimeUuid('%s') and %s LIMIT %s ALLOW FILTERING;",
-                        yearOfDate, lastUpdateTime, buildClauseForCatchment(catchment), limit);
+                        " WHERE year = %s and received_date > minTimeUuid('%s') and %s LIMIT %s ALLOW FILTERING;",
+                yearOfDate, lastUpdateTime, buildClauseForCatchment(catchment), limit);
     }
 
-    private List<EncounterBundle> findEncounters(LinkedHashSet<String> encounterIds) throws ExecutionException, InterruptedException {
+    private Observable<List<EncounterBundle>> findEncounters(LinkedHashSet<String> encounterIds) {
         String encounterQuery = buildEncounterSelectionQuery(encounterIds);
         return executeFindQuery(encounterQuery);
     }
@@ -122,29 +126,31 @@ public class EncounterRepository {
     }
 
     /**
-     *
      * @param catchment
      * @param catchmentType
      * @param date
      * @return
      * @throws ExecutionException
      * @throws InterruptedException
-     *
-     * @deprecated do not use this method
      * @see #findEncountersForCatchment(org.freeshr.domain.model.Catchment, java.util.Date, int)
+     * @deprecated do not use this method
      */
-    public List<EncounterBundle> findAllEncountersByCatchment(String catchment, String catchmentType, String date) throws ExecutionException, InterruptedException {
+    public Observable<List<EncounterBundle>> findAllEncountersByCatchment(String catchment, String catchmentType, String date) {
         String query = String.format("SELECT encounter_id, health_id, received_date, content " +
                 "FROM encounter WHERE %s = '%s' and received_date > '%s'; ", catchmentType, catchment, date);
         return executeFindQuery(query);
     }
 
-    private List<EncounterBundle> executeFindQuery(final String cql) throws ExecutionException, InterruptedException {
-        ResultSet resultSet = cqlOperations.query(cql);
-        return read(resultSet);
+    private Observable<List<EncounterBundle>> executeFindQuery(final String cql) {
+        return Observable.from(cqlOperations.queryAsynchronously(cql)).map(new Func1<ResultSet, List<EncounterBundle>>() {
+            @Override
+            public List<EncounterBundle> call(ResultSet rows) {
+                return read(rows);
+            }
+        });
     }
 
-    private List<EncounterBundle> read(ResultSet resultSet) throws ExecutionException {
+    private List<EncounterBundle> read(ResultSet resultSet) {
         //TODO return LinkedHashSet
         List<EncounterBundle> bundles = new ArrayList<>();
         List<Row> rows = resultSet.all();
@@ -160,15 +166,11 @@ public class EncounterRepository {
     }
 
     /**
-     *
      * @param healthId
      * @return
-     * @throws ExecutionException
-     * @throws InterruptedException
-     *
      * @deprecated do not use this query.
      */
-    public List<EncounterBundle> findAll(String healthId) throws ExecutionException, InterruptedException {
+    public Observable<List<EncounterBundle>> findAll(String healthId) {
         //TODO refactor
         return executeFindQuery("SELECT encounter_id, health_id, received_date, content " +
                 "FROM encounter WHERE health_id='" + healthId + "';");

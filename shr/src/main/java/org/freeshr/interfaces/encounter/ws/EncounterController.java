@@ -12,13 +12,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.util.UriComponentsBuilder;
+import rx.Observable;
+import rx.functions.Action1;
+import rx.functions.Func1;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -40,96 +46,93 @@ public class EncounterController {
         encounterBundle.setHealthId(healthId);
 
         final DeferredResult<EncounterResponse> deferredResult = new DeferredResult<>();
-        EncounterResponse encounterResponse = encounterService.ensureCreated(encounterBundle);
-        if (encounterResponse.isSuccessful()) {
-            deferredResult.setResult(encounterResponse);
-        } else {
-            if (encounterResponse.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition)) {
-                deferredResult.setErrorResult(new PreconditionFailed(encounterResponse));
-            } else {
-                deferredResult.setErrorResult(new UnProcessableEntity(encounterResponse));
+        Observable<EncounterResponse> encounterResponse = encounterService.ensureCreated(encounterBundle);
+
+        encounterResponse.subscribe(new Action1<EncounterResponse>() {
+            @Override
+            public void call(EncounterResponse encounterResponse) {
+                if (encounterResponse.isSuccessful()) {
+                    deferredResult.setResult(encounterResponse);
+                } else {
+                    if (encounterResponse.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition)) {
+                        deferredResult.setErrorResult(new PreconditionFailed(encounterResponse));
+                    } else {
+                        deferredResult.setErrorResult(new UnProcessableEntity(encounterResponse));
+                    }
+                }
             }
-        }
+        });
+
         return deferredResult;
     }
 
     @RequestMapping(value = "/patients/{healthId}/encounters", method = RequestMethod.GET)
     public DeferredResult<List<EncounterBundle>> findAll(@PathVariable String healthId) {
         logger.debug("Find all encounters by health id: " + healthId);
-        final DeferredResult<List<EncounterBundle>> deferredResult = new DeferredResult<List<EncounterBundle>>();
-        try {
-            List<EncounterBundle> encounterBundles = encounterService.findAll(healthId);
-            deferredResult.setResult(encounterBundles);
-        }
-        catch (Exception e){
-            deferredResult.setErrorResult(e);
-        }
-        return deferredResult;
-    }
-
-    /**
-     *
-     * @param facilityId
-     * @param updatedSince
-     * @return
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws ParseException
-     *
-     * @deprecated do not use this method
-     */
-    @RequestMapping(value = "/encounters/bycatchments", method = RequestMethod.GET)
-    public DeferredResult<List<EncounterBundle>> findAllByCatchment(
-            @RequestHeader String facilityId,
-            @RequestParam(value = "updatedSince",required = false) String updatedSince)
-            throws ExecutionException, InterruptedException, ParseException {
-        logger.debug(" Find all encounters by facility id:" + facilityId);
         final DeferredResult<List<EncounterBundle>> deferredResult = new DeferredResult<>();
-        try {
-            List<EncounterBundle> encountersByCatchments = encounterService.findAllEncountersByFacilityCatchments(facilityId, updatedSince);
-            deferredResult.setResult(encountersByCatchments);
-        }
-        catch (Exception e){
-            deferredResult.setErrorResult(e);
-        }
-        return deferredResult;
+        encounterService.findAll(healthId).subscribe(new Action1<List<EncounterBundle>>() {
+            @Override
+            public void call(List<EncounterBundle> encounterBundles) {
+                deferredResult.setResult(encounterBundles);
+            }
+        }, new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                deferredResult.setErrorResult(throwable);
+            }
+        });
 
+        return deferredResult;
     }
 
-    @RequestMapping(value = "/catchments/{catchment}/encounters", method = RequestMethod.GET, produces={"application/json", "application/atom+xml"})
+    @RequestMapping(value = "/catchments/{catchment}/encounters", method = RequestMethod.GET, produces = {"application/json", "application/atom+xml"})
     public DeferredResult<EncounterSearchResponse> findEncountersForCatchment(
-            HttpServletRequest request,
+            final HttpServletRequest request,
             @RequestHeader String facilityId,
             @PathVariable String catchment,
-            @RequestParam(value = "updatedSince",required = false) String updatedSince,
-            @RequestParam(value = "lastMarker",  required = false) String lastMarker)
-            throws ExecutionException, InterruptedException, ParseException {
+            @RequestParam(value = "updatedSince", required = false) String updatedSince,
+            @RequestParam(value = "lastMarker", required = false) final String lastMarker)
+            throws ExecutionException, InterruptedException, ParseException, UnsupportedEncodingException {
         logger.debug(String.format("Find all encounters for facility %s in catchment %s", facilityId, catchment));
         final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<>();
-        try {
-            Date requestedDate = getRequestedDate(updatedSince);
-            List<EncounterBundle> catchmentEncounters =
-               findFacilityCatchmentEncounters(facilityId, catchment, lastMarker, requestedDate);
-            EncounterSearchResponse searchResponse = new EncounterSearchResponse(
-                    getRequestUri(request, requestedDate, lastMarker), catchmentEncounters);
-            searchResponse.setNavLinks(null, getNextResultURL(request, catchmentEncounters, requestedDate));
-            deferredResult.setResult(searchResponse);
-        }
-        catch (Exception e){
-            deferredResult.setErrorResult(e);
-        }
+        final Date requestedDate = getRequestedDate(updatedSince);
+        final Observable<List<EncounterBundle>> catchmentEncounters =
+                findFacilityCatchmentEncounters(facilityId, catchment, lastMarker, requestedDate);
+
+        catchmentEncounters.subscribe(new Action1<List<EncounterBundle>>() {
+            @Override
+            public void call(List<EncounterBundle> encounterBundles) {
+
+                try {
+                    EncounterSearchResponse searchResponse = new EncounterSearchResponse(
+                            getRequestUri(request, requestedDate, lastMarker), encounterBundles);
+                    searchResponse.setNavLinks(null, getNextResultURL(request, encounterBundles, requestedDate));
+
+                    deferredResult.setResult(searchResponse);
+                } catch (Throwable t) {
+                    deferredResult.setErrorResult(t);
+                }
+            }
+        }, new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                deferredResult.setErrorResult(throwable);
+            }
+        });
+
         return deferredResult;
     }
 
-    private List<EncounterBundle> findFacilityCatchmentEncounters(String facilityId, String catchment, String lastMarker, Date lastUpdateDate) throws ExecutionException, InterruptedException {
+    private Observable<List<EncounterBundle>> findFacilityCatchmentEncounters(String facilityId, String catchment,
+                                                                              String lastMarker, Date lastUpdateDate) {
         int encounterFetchLimit = EncounterService.getEncounterFetchLimit();
-        List<EncounterBundle> facilityCatchmentEncounters =
-            encounterService.findEncountersForFacilityCatchment(facilityId, catchment,lastUpdateDate, encounterFetchLimit*2);
-        return filterAfterMarker( facilityCatchmentEncounters, lastMarker, encounterFetchLimit);
+        Observable<List<EncounterBundle>> facilityCatchmentEncounters =
+                encounterService.findEncountersForFacilityCatchment(facilityId, catchment, lastUpdateDate, encounterFetchLimit * 2);
+
+        return filterAfterMarker(facilityCatchmentEncounters, lastMarker, encounterFetchLimit);
     }
 
     /**
-     *
      * @param updatedSince
      * @return parsed date. For formats please refer to @see org.freeshr.utils.DateUtil#DATE_FORMATS
      * If no date is given, then by default, the date one month earlier is calculated.
@@ -180,7 +183,7 @@ public class EncounterController {
         if (currentYear < requestedYear) return null;  //future year
         if (currentYear > requestedYear) { //advance to the next month's beginning date.
             requestedTime.add(Calendar.MONTH, 1);
-            String nextApplicableDate = String.format("%s-%s-01", requestedTime.get(Calendar.YEAR), requestedTime.get(Calendar.MONTH)+1);
+            String nextApplicableDate = String.format("%s-%s-01", requestedTime.get(Calendar.YEAR), requestedTime.get(Calendar.MONTH) + 1);
             return UriComponentsBuilder.fromUriString(request.getRequestURL().toString())
                     .queryParam("updatedSince", nextApplicableDate).build().toString();
         }
@@ -190,8 +193,8 @@ public class EncounterController {
     String getRequestUri(HttpServletRequest request, Date lastUpdateDate, String lastMarker)
             throws UnsupportedEncodingException {
         UriComponentsBuilder uriBuilder =
-           UriComponentsBuilder.fromUriString(request.getRequestURL().toString())
-              .queryParam("updatedSince", URLEncoder.encode(DateUtil.toISOString(lastUpdateDate), "UTF-8"));
+                UriComponentsBuilder.fromUriString(request.getRequestURL().toString())
+                        .queryParam("updatedSince", URLEncoder.encode(DateUtil.toISOString(lastUpdateDate), "UTF-8"));
         if (!StringUtils.isBlank(lastMarker)) {
             uriBuilder.queryParam("lastMarker", lastMarker);
         }
@@ -199,20 +202,25 @@ public class EncounterController {
     }
 
 
-    private List<EncounterBundle> filterAfterMarker(List<EncounterBundle> encounters, String lastMarker, int limit) {
-        //TODO use a linkedHashSet
-        if (StringUtils.isBlank(lastMarker)) {
-            return encounters.size() > limit ? encounters.subList(0, limit) : encounters;
-        }
+    private Observable<List<EncounterBundle>> filterAfterMarker(final Observable<List<EncounterBundle>> encounters, final String lastMarker, final int limit) {
 
-        int lastMarkerIndex = identifyLastMarker(lastMarker, encounters);
-        if (lastMarkerIndex >= 0) {
-            if ((lastMarkerIndex+1) <= encounters.size()) {
-                List<EncounterBundle> remainingEncounters = encounters.subList(lastMarkerIndex + 1, encounters.size());
-                return remainingEncounters.size() > limit ? remainingEncounters.subList(0, limit) : remainingEncounters;
+        return encounters.map(new Func1<List<EncounterBundle>, List<EncounterBundle>>() {
+            @Override
+            public List<EncounterBundle> call(List<EncounterBundle> encounterBundles) {
+                if (StringUtils.isBlank(lastMarker)) {
+                    return encounterBundles.size() > limit ? encounterBundles.subList(0, limit) : encounterBundles;
+                }
+
+                int lastMarkerIndex = identifyLastMarker(lastMarker, encounterBundles);
+                if (lastMarkerIndex >= 0) {
+                    if ((lastMarkerIndex + 1) <= encounterBundles.size()) {
+                        List<EncounterBundle> remainingEncounters = encounterBundles.subList(lastMarkerIndex + 1, encounterBundles.size());
+                        return remainingEncounters.size() > limit ? remainingEncounters.subList(0, limit) : remainingEncounters;
+                    }
+                }
+                return new ArrayList<EncounterBundle>();
             }
-        }
-        return new ArrayList<>();
+        });
     }
 
     private int identifyLastMarker(String lastMarker, final List<EncounterBundle> encountersByCatchment) {
@@ -239,9 +247,6 @@ public class EncounterController {
     public EncounterResponse unProcessableEntity(UnProcessableEntity unProcessableEntity) {
         return unProcessableEntity.getResult();
     }
-
-
-
 
 
 }

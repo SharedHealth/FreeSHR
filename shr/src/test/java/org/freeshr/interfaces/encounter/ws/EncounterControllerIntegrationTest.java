@@ -6,9 +6,6 @@ import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
-import org.freeshr.domain.service.EncounterService;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.Before;
 import org.junit.Test;
@@ -124,7 +121,6 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String today = dateFormat.format(new Date());
 
-        //mockFacility("10000069");
         Facility facility = new Facility("10000069", "facility1", "Main hospital", "3026, 30261801", new Address("30", "26", "18", null, null));
         createFacility(facility);
 

@@ -1,7 +1,5 @@
 package org.freeshr.utils.concurrent;
 
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.util.concurrent.*;
 import rx.Observable;
 import rx.functions.Action1;
@@ -31,7 +29,7 @@ class ObservableListenableFuture<T> implements ListenableFuture<T> {
                         callbackRegistry.failure(throwable);
                     }
                 })
-                .toBlockingObservable().toFuture();
+                .toBlocking().toFuture();
     }
 
     @Override
