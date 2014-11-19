@@ -19,12 +19,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import rx.observables.BlockingObservable;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -134,7 +133,9 @@ public class EncounterServiceIntegrationTest {
         assertThat(response, is(notNullValue()));
         assertTrue(response.isSuccessful());
         assertValidPatient(patientRepository.find(VALID_HEALTH_ID));
-        List<EncounterBundle> encounterBundles = encounterService.findAll(VALID_HEALTH_ID);
+        BlockingObservable<List<EncounterBundle>> encounterBundlesObservable = encounterService.findAll(VALID_HEALTH_ID).toBlocking();
+
+        List<EncounterBundle> encounterBundles = encounterBundlesObservable.single();
         assertThat(encounterBundles.size(), is(1));
         assertThat(encounterBundles.get(0).getHealthId(), is(VALID_HEALTH_ID));
     }
@@ -144,16 +145,18 @@ public class EncounterServiceIntegrationTest {
     public void shouldReturnEmptyListOfEncountersWhenGivenFacilityNotFound() throws ExecutionException, InterruptedException, ParseException {
         final String date = "2014-09-10";
         encounterService.ensureCreated(withValidEncounter());
-        assertTrue(encounterService.findAllEncountersByFacilityCatchments("1", date).isEmpty());
-
+        List<EncounterBundle> encountersByFacilityCatchments = encounterService.findAllEncountersByFacilityCatchments("1", date).toBlocking().single();
+        assertTrue(encountersByFacilityCatchments.isEmpty());
     }
 
     @Test
     public void shouldReturnEmptyListOfEncountersIfFacilityIsNotPresent() throws ExecutionException, InterruptedException, ParseException {
         final String date = "2014-09-10";
         encounterService.ensureCreated(withValidEncounter());
-        assertTrue(encounterService.findAllEncountersByFacilityCatchments("9999999999", date).isEmpty());
+        List<EncounterBundle> encountersByFacilityCatchments = encounterService.findAllEncountersByFacilityCatchments("9999999999", date).toBlocking().single();
+        assertTrue(encountersByFacilityCatchments.isEmpty());
     }
+
 
     @Test
     @Ignore
@@ -169,13 +172,13 @@ public class EncounterServiceIntegrationTest {
         encounterService.ensureCreated(withValidEncounter());
         encounterService.ensureCreated(withValidEncounter());
 
-        List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByFacilityCatchments("1", date);
+        List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByFacilityCatchments("1", date).toBlocking().first();
         List<String> healthIds = extractListOfHealthIds(encounterBundles);
         assertEquals(2, healthIds.size());
         assertTrue(healthIds.containsAll(Arrays.asList(VALID_HEALTH_ID, VALID_HEALTH_ID_NEW)));
 
         //Only one encounter found in a given catchment
-        encounterBundles = encounterService.findAllEncountersByFacilityCatchments("2", date);
+        encounterBundles = encounterService.findAllEncountersByFacilityCatchments("2", date).toBlocking().first();
         healthIds = extractListOfHealthIds(encounterBundles);
         assertEquals(1, healthIds.size());
         assertTrue(healthIds.containsAll(Arrays.asList(VALID_HEALTH_ID_NEW)));
@@ -187,12 +190,12 @@ public class EncounterServiceIntegrationTest {
         Facility facility = new Facility("3", "facility", "Main hospital", "305610,3056", new Address("1", "2", "3", null, null));
         facilityRepository.save(facility);
 
-        assertNotNull(facilityRepository.find("3"));
+        assertNotNull(facilityRepository.find("3").toBlocking().first());
         assertTrue(encounterService.ensureCreated(withValidEncounter()).isSuccessful());
         assertTrue(encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW)).isSuccessful());
 
-        assertEquals(1, encounterService.findAll(VALID_HEALTH_ID).size());
-        List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByFacilityCatchments("3", "2014-09-10");
+        assertEquals(1, encounterService.findAll(VALID_HEALTH_ID).toBlocking().first().size());
+        List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByFacilityCatchments("3", "2014-09-10").toBlocking().first();
         assertEquals(2, encounterBundles.size());
 
         ArrayList<String> healthIds = extractListOfHealthIds(encounterBundles);
@@ -208,7 +211,7 @@ public class EncounterServiceIntegrationTest {
         encounterService.ensureCreated(withValidEncounter());
 
         String date = "2014-09-10";
-        List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByFacilityCatchments("4", date);
+        List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByFacilityCatchments("4", date).toBlocking().first();
         assertEquals(1, encounterBundles.size());
         assertEquals(VALID_HEALTH_ID, encounterBundles.iterator().next().getHealthId());
     }
@@ -222,9 +225,29 @@ public class EncounterServiceIntegrationTest {
         encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW));
 
         String date = "2014-09-10";
-        List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByFacilityCatchments("5", date);
+        List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByFacilityCatchments("5", date).toBlocking().first();
         ArrayList<String> healthIds = extractListOfHealthIds(encounterBundles);
         Collections.sort(healthIds);
+        assertEquals(2, healthIds.size());
+        assertTrue(healthIds.containsAll(Arrays.asList(VALID_HEALTH_ID, VALID_HEALTH_ID)));
+    }
+
+    @Test
+    public void shouldReturnUniqueListOfEncountersForFacilityCatchment() throws ExecutionException, InterruptedException, ParseException {
+        Facility facility = new Facility("3", "facility", "Main hospital", "305610,3056", new Address("1", "2", "3", null, null));
+        facilityRepository.save(facility);
+
+        assertNotNull(facilityRepository.find("3").toBlocking().first());
+        assertTrue(encounterService.ensureCreated(withValidEncounter()).isSuccessful());
+        assertTrue(encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW)).isSuccessful());
+
+        assertEquals(1, encounterService.findAll(VALID_HEALTH_ID).toBlocking().first().size());
+
+        List<EncounterBundle> encounterBundles = encounterService.findEncountersForFacilityCatchment(
+                "3", "3056", new SimpleDateFormat("dd/MM/yyyy").parse("10/9/2014"), 10).toBlocking().first();
+        assertEquals(2, encounterBundles.size());
+
+        ArrayList<String> healthIds = extractListOfHealthIds(encounterBundles);
         assertEquals(2, healthIds.size());
         assertTrue(healthIds.containsAll(Arrays.asList(VALID_HEALTH_ID, VALID_HEALTH_ID)));
     }

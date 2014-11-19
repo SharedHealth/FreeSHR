@@ -2,7 +2,6 @@ package org.freeshr.interfaces.encounter.ws;
 
 
 import com.sun.syndication.feed.atom.Feed;
-import com.sun.syndication.io.WireFeedOutput;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -10,12 +9,12 @@ import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.domain.service.EncounterService;
 import org.freeshr.utils.DateUtil;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.async.DeferredResult;
+import rx.Observable;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -26,9 +25,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -51,7 +48,7 @@ public class EncounterControllerTest {
         int encounterFetchLimit = EncounterService.getEncounterFetchLimit();
         List<EncounterBundle> dummyEncounters = createEncounterBundles("hid01", 50, DateUtil.parseDate("2014-10-10"));
         Mockito.when(mockedEncounterService.findEncountersForFacilityCatchment(anyString(), anyString(), any(Date.class),
-                eq(encounterFetchLimit*2))).thenReturn(slice(encounterFetchLimit*2, dummyEncounters));
+                eq(encounterFetchLimit * 2))).thenReturn(Observable.just(slice(encounterFetchLimit*2, dummyEncounters)));
 
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null, "/catchments/3026/encounters");
         DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncountersForCatchment(mockHttpServletRequest, "F1", "3026", "2014-10-10", null);
@@ -61,7 +58,7 @@ public class EncounterControllerTest {
         String expectedNextUrl = response.getNextUrl();
         List<NameValuePair> params = URLEncodedUtils.parse(new URI(expectedNextUrl), "UTF-8");
         assertEquals("e-20", params.get(1).getValue());
-        
+
 
         encountersForCatchment = controller.findEncountersForCatchment(mockHttpServletRequest, "F1", "3026", "2014-10-10", "e-22");
         response = (EncounterSearchResponse) encountersForCatchment.getResult();
@@ -74,7 +71,7 @@ public class EncounterControllerTest {
         int encounterFetchLimit = EncounterService.getEncounterFetchLimit();
         List<EncounterBundle> dummyEncounters = createEncounterBundles("hid01", 50, DateUtil.parseDate("2014-10-10"));
         Mockito.when(mockedEncounterService.findEncountersForFacilityCatchment(anyString(), anyString(), any(Date.class),
-                eq(encounterFetchLimit*2))).thenReturn(slice(encounterFetchLimit*2, dummyEncounters));
+                eq(encounterFetchLimit*2))).thenReturn(Observable.just(slice(encounterFetchLimit*2, dummyEncounters)));
 
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null, "/catchments/3026/encounters");
         DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncountersForCatchment(mockHttpServletRequest, "F1", "3026", "2014-10-10", null);

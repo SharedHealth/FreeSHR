@@ -15,8 +15,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.concurrent.ExecutionException;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -35,7 +35,6 @@ public class FacilityRepositoryIntegrationTest {
         cqlTemplate.execute("truncate facilities");
     }
 
-
     @Test
     public void returnFacilityByFacilityId() throws ExecutionException, InterruptedException {
         Facility facility = new Facility();
@@ -45,7 +44,7 @@ public class FacilityRepositoryIntegrationTest {
         facility.setCatchments("10,1020,102030");
         facility.setFacilityLocation(new Address("10","11", "32", "45", "67"));
         facilityRepository.save(facility);
-        Facility actualFacility = facilityRepository.find("10101");
+        Facility actualFacility = facilityRepository.find("10101").toBlocking().first();
         assertThat(actualFacility, is(facility));
     }
 

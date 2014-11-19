@@ -46,8 +46,7 @@ ext.libraries = [
         fhir_validator       : 'me.fhir:fhir-dstu1:0.0.81.2489',
         jackson              : 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.4.0',
         saxon                : 'net.sf.saxon:Saxon-HE:9.5.1-6',
-        rxjava               : 'com.netflix.rxjava:rxjava-core:0.17.5',
-        future_converter     : 'net.javacrumbs.future-converter:spring-rxjava:0.0.2',
+        rxjava               : 'io.reactivex:rxjava:1.+',
         netflix_astyanax     : "com.netflix.astyanax:astyanax:1.56.48",
         rome                 : "rome:rome:1.0",
         time_uuid            : "com.eaio.uuid:uuid:3.2"

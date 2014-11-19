@@ -10,14 +10,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.client.AsyncRestTemplate;
 import rx.Observable;
 import rx.functions.Func1;
 
 import static org.freeshr.utils.HttpUtil.basicHeaders;
-import static org.freeshr.utils.concurrent.FutureConverter.toListenableFuture;
-import static org.freeshr.utils.concurrent.FutureConverter.toObservable;
 
 @Component
 public class FacilityRegistryClient {
@@ -34,21 +31,24 @@ public class FacilityRegistryClient {
     }
 
 
-    public ListenableFuture<Facility> getFacility(final String facilityId) {
-        Observable<ResponseEntity<Facility>> response = toObservable(shrRestTemplate.exchange(
+    public Observable<Facility> getFacility(final String facilityId) {
+
+        Observable<ResponseEntity<Facility>> response = Observable.from(shrRestTemplate.exchange(
                 getFacilityUrl(facilityId),
                 HttpMethod.GET,
                 new HttpEntity(basicHeaders(shrProperties.getFacilityRegistryAuthToken())),
                 Facility.class));
 
-        Observable<Facility> facilityObservable = response.flatMap(new Func1<ResponseEntity<Facility>, Observable<Facility>>() {
-            @Override
-            public Observable<Facility> call(ResponseEntity<Facility> result) {
-                return Observable.from(result.getBody());
-            }
-        });
+        return response.map(parseResponse());
+    }
 
-        return toListenableFuture(facilityObservable);
+    private Func1<ResponseEntity<Facility>, Facility> parseResponse() {
+        return new Func1<ResponseEntity<Facility>, Facility>() {
+            @Override
+            public Facility call(ResponseEntity<Facility> facilityResponseEntity) {
+                return facilityResponseEntity.getBody();
+            }
+        };
     }
 
     private String getFacilityUrl(String facilityId) {

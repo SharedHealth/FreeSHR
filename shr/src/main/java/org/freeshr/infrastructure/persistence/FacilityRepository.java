@@ -9,9 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.stereotype.Component;
+import rx.Observable;
+import rx.functions.Func1;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.join;
@@ -26,15 +27,21 @@ public class FacilityRepository {
         this.cqlOperations = cqlOperations;
     }
 
-    public Facility find(String facilityId) throws ExecutionException {
-        ResultSet resultSet = cqlOperations.query(
+    public Observable<Facility> find(String facilityId) {
+        Observable<ResultSet> resultSet = Observable.from(cqlOperations.queryAsynchronously(
                 "SELECT facility_id, facility_name, facility_type, catchments, " +
                         "division_id, district_id, upazila_id, city_corporation_id, " +
-                        "union_urban_ward_id FROM facilities WHERE facility_id='" + facilityId + "';");
-        return read(resultSet);
+                        "union_urban_ward_id FROM facilities WHERE facility_id='" + facilityId + "';"));
+
+        return resultSet.map(new Func1<ResultSet, Facility>() {
+            @Override
+            public Facility call(ResultSet rows) {
+                return read(rows);
+            }
+        });
     }
 
-    private Facility read(ResultSet resultSet) throws ExecutionException {
+    private Facility read(ResultSet resultSet){
         Row result = resultSet.one();
         if (null != result) {
             Facility facility = new Facility();
@@ -55,8 +62,9 @@ public class FacilityRepository {
         }
     }
 
-    public void save(Facility facility) {
+    public Observable<Facility> save(Facility facility) {
         cqlOperations.execute(toCQL(facility));
+        return Observable.just(facility);
     }
 
     private String toCQL(Facility facility) {
