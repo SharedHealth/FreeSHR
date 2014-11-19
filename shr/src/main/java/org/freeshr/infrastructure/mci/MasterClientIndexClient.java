@@ -4,13 +4,13 @@ import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.patient.Patient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureAdapter;
 import org.springframework.web.client.AsyncRestTemplate;
-
-import java.util.concurrent.ExecutionException;
+import rx.Observable;
+import rx.functions.Func1;
 
 import static org.freeshr.utils.HttpUtil.basicAuthHeaders;
 
@@ -26,21 +26,23 @@ public class MasterClientIndexClient {
         this.shrProperties = shrProperties;
     }
 
-    public ListenableFuture<Patient> getPatient(String healthId) {
-        return new ListenableFutureAdapter<Patient, ResponseEntity<Patient>>(shrRestTemplate.exchange(
+    public Observable<Patient> getPatient(String healthId) {
+        Observable<ResponseEntity<Patient>> responseEntityObservable = Observable.from(shrRestTemplate.exchange(
                 shrProperties.getMCIPatientUrl() + "/" + healthId,
                 HttpMethod.GET,
                 new HttpEntity(basicAuthHeaders(shrProperties.getMciUser(), shrProperties.getMciPassword())),
-                Patient.class)) {
+                Patient.class));
+
+        return responseEntityObservable.map(new Func1<ResponseEntity<Patient>, Patient>() {
             @Override
-            protected Patient adapt(ResponseEntity<Patient> result) throws ExecutionException {
-                if (result.getStatusCode().is2xxSuccessful()) {
-                    return result.getBody();
+            public Patient call(ResponseEntity<Patient> patientResponse) {
+                if (patientResponse.getStatusCode().is2xxSuccessful()) {
+                    return patientResponse.getBody();
                 } else {
                     return null;
                 }
             }
-        };
+        }) ;
     }
 
 }

@@ -6,6 +6,9 @@ import org.freeshr.infrastructure.mci.MasterClientIndexClient;
 import org.freeshr.infrastructure.persistence.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import rx.Observable;
+import rx.functions.Func0;
+import rx.functions.Func1;
 
 import java.util.concurrent.ExecutionException;
 
@@ -23,18 +26,38 @@ public class PatientService {
         this.masterClientIndexClient = masterClientIndexClient;
     }
 
-    public Patient ensurePresent(final String healthId) throws ExecutionException, InterruptedException {
-        try {
-            Patient patient = patientRepository.find(healthId);
-            if (null != patient) return patient;
-            patient = masterClientIndexClient.getPatient(healthId).get();
-            if (null == patient) return null;
-            patientRepository.save(patient);
-            return patient;
-        }
-        catch (Exception e){
-            logger.warn(e);
-            return null;
-        }
+    public Observable<Patient> ensurePresent(final String healthId) throws ExecutionException, InterruptedException {
+        Observable<Patient> patient = patientRepository.find(healthId);
+        return patient.flatMap(new Func1<Patient, Observable<Patient>>() {
+            @Override
+            public Observable<Patient> call(Patient patient) {
+                if (null != patient) return Observable.just(patient);
+                return findRemote(healthId);
+            }
+        });
+    }
+
+    private Observable<Patient> findRemote(String healthId) {
+        Observable<Patient> remotePatient = masterClientIndexClient.getPatient(healthId);
+        return remotePatient.flatMap(new Func1<Patient, Observable<Patient>>() {
+            @Override
+            public Observable<Patient> call(Patient patient) {
+                if (null != patient) {
+                    patientRepository.save(patient);
+                }
+                return Observable.just(patient);
+            }
+        }, new Func1<Throwable, Observable<Patient>>() {
+            @Override
+            public Observable<Patient> call(Throwable throwable) {
+                logger.error(throwable);
+                return Observable.just(null);
+            }
+        }, new Func0<Observable<Patient>>() {
+            @Override
+            public Observable<Patient> call() {
+                return null;
+            }
+        });
     }
 }

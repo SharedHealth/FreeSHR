@@ -3,10 +3,10 @@ package org.freeshr.domain.service;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.mci.MasterClientIndexClient;
 import org.freeshr.infrastructure.persistence.PatientRepository;
-import org.freeshr.utils.concurrent.PreResolvedListenableFuture;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import rx.Observable;
 
 import java.util.concurrent.ExecutionException;
 
@@ -34,8 +34,8 @@ public class PatientServiceTest {
     public void shouldQueryAllPatientsToVerifyValidity() throws ExecutionException, InterruptedException {
         String healthId = "healthId";
 
-        when(allPatients.find(healthId)).thenReturn(new Patient());
-        assertNotNull(patientService.ensurePresent(healthId));
+        when(allPatients.find(healthId)).thenReturn(Observable.just(new Patient()));
+        assertNotNull(patientService.ensurePresent(healthId).toBlocking().first());
         verify(allPatients).find(healthId);
     }
 
@@ -43,7 +43,7 @@ public class PatientServiceTest {
     public void shouldNotQueryMasterClientIndexEagerly() throws ExecutionException, InterruptedException {
         String healthId = "healthId";
 
-        when(allPatients.find(healthId)).thenReturn(new Patient());
+        when(allPatients.find(healthId)).thenReturn(Observable.just(new Patient()));
         patientService.ensurePresent(healthId);
         verify(masterClientIndexClient, never()).getPatient(healthId);
     }
@@ -52,18 +52,18 @@ public class PatientServiceTest {
     public void shouldReturnTrueWhenPatientIsNotFoundLocallyButFoundInTheClientIndex() throws ExecutionException, InterruptedException {
         String healthId = "healthId";
 
-        when(allPatients.find(healthId)).thenReturn(null);
-        when(masterClientIndexClient.getPatient(healthId)).thenReturn(new PreResolvedListenableFuture<Patient>(new Patient()));
-        assertNotNull(patientService.ensurePresent(healthId));
+        when(allPatients.find(healthId)).thenReturn(Observable.<Patient>just(null));
+        when(masterClientIndexClient.getPatient(healthId)).thenReturn(Observable.just(new Patient()));
+        assertNotNull(patientService.ensurePresent(healthId).toBlocking().first());
     }
 
     @Test
     public void shouldReturnNullWhenPatientIsNotFoundEitherLocallyOrInTheClientIndex() throws ExecutionException, InterruptedException {
         String healthId = "healthId";
 
-        when(allPatients.find(healthId)).thenReturn(null);
-        when(masterClientIndexClient.getPatient(healthId)).thenReturn(new PreResolvedListenableFuture<Patient>(null));
-        assertTrue(null == patientService.ensurePresent(healthId));
+        when(allPatients.find(healthId)).thenReturn(Observable.<Patient>just(null));
+        when(masterClientIndexClient.getPatient(healthId)).thenReturn(Observable.<Patient>just(null));
+        assertTrue(null == patientService.ensurePresent(healthId).toBlocking().first());
     }
 
 

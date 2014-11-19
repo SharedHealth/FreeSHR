@@ -46,16 +46,23 @@ public class EncounterController {
         encounterBundle.setHealthId(healthId);
 
         final DeferredResult<EncounterResponse> deferredResult = new DeferredResult<>();
-        EncounterResponse encounterResponse = encounterService.ensureCreated(encounterBundle);
-        if (encounterResponse.isSuccessful()) {
-            deferredResult.setResult(encounterResponse);
-        } else {
-            if (encounterResponse.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition)) {
-                deferredResult.setErrorResult(new PreconditionFailed(encounterResponse));
-            } else {
-                deferredResult.setErrorResult(new UnProcessableEntity(encounterResponse));
+        Observable<EncounterResponse> encounterResponse = encounterService.ensureCreated(encounterBundle);
+
+        encounterResponse.subscribe(new Action1<EncounterResponse>() {
+            @Override
+            public void call(EncounterResponse encounterResponse) {
+                if (encounterResponse.isSuccessful()) {
+                    deferredResult.setResult(encounterResponse);
+                } else {
+                    if (encounterResponse.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition)) {
+                        deferredResult.setErrorResult(new PreconditionFailed(encounterResponse));
+                    } else {
+                        deferredResult.setErrorResult(new UnProcessableEntity(encounterResponse));
+                    }
+                }
             }
-        }
+        });
+
         return deferredResult;
     }
 
@@ -75,37 +82,6 @@ public class EncounterController {
             }
         });
 
-        return deferredResult;
-    }
-
-    /**
-     * @param facilityId
-     * @param updatedSince
-     * @return
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @throws ParseException
-     * @deprecated do not use this method
-     */
-    @RequestMapping(value = "/encounters/bycatchments", method = RequestMethod.GET)
-    public DeferredResult<List<EncounterBundle>> findAllByCatchment(
-            @RequestHeader String facilityId,
-            @RequestParam(value = "updatedSince", required = false) String updatedSince)
-            throws ExecutionException, InterruptedException, ParseException {
-        logger.debug(" Find all encounters by facility id:" + facilityId);
-        final DeferredResult<List<EncounterBundle>> deferredResult = new DeferredResult<>();
-        encounterService.findAllEncountersByFacilityCatchments(facilityId, updatedSince).subscribe(new Action1<List<EncounterBundle>>() {
-            @Override
-            public void call(List<EncounterBundle> encounterBundles) {
-                deferredResult.setResult(encounterBundles);
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                deferredResult.setErrorResult(throwable);
-
-            }
-        });
         return deferredResult;
     }
 

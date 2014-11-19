@@ -41,30 +41,48 @@ public class EncounterService {
         this.facilityService = facilityService;
     }
 
-    public EncounterResponse ensureCreated(final EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
+    public Observable<EncounterResponse> ensureCreated(final EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
         EncounterValidationResponse validationResult = validate(encounterBundle);
         if (null == validationResult) {
-            Patient patient = patientService.ensurePresent(encounterBundle.getHealthId());
-            EncounterResponse response = new EncounterResponse();
-            if (patient != null) {
-                encounterBundle.setEncounterId(UUID.randomUUID().toString());
-                try {
-                    encounterRepository.save(encounterBundle, patient);
-                } catch (InterruptedException e) {
-                    logger.warn(e.getMessage());
-                    e.printStackTrace();
-                } catch (Exception e) {
-                    logger.warn(e.getMessage());
+            Observable<Patient> patientObservable = patientService.ensurePresent(encounterBundle.getHealthId());
+            return patientObservable.flatMap(new Func1<Patient, Observable<EncounterResponse>>() {
+                @Override
+                public Observable<EncounterResponse> call(Patient patient) {
+                    EncounterResponse response = new EncounterResponse();
+                    if (patient != null) {
+                        encounterBundle.setEncounterId(UUID.randomUUID().toString());
+                        try {
+                            encounterRepository.save(encounterBundle, patient);
+                        } catch (InterruptedException e) {
+                            logger.error(e.getMessage());
+                            e.printStackTrace();
+                        } catch (Exception e) {
+                            logger.error(e.getMessage());
+                        }
+                        response.setEncounterId(encounterBundle.getEncounterId());
+                        return Observable.just(response);
+                    } else {
+                        return Observable.just(response.preconditionFailure("healthId", "invalid", "Patient not available in patient registry"));
+                    }
                 }
-                response.setEncounterId(encounterBundle.getEncounterId());
-                return response;
-            } else {
-                return response.preconditionFailure("healthId", "invalid", "Patient not available in patient registry");
-            }
+            }, new Func1<Throwable, Observable<EncounterResponse>>() {
+                @Override
+                public Observable<EncounterResponse> call(Throwable throwable) {
+                    logger.error(throwable.getMessage());
+                    return null;
+                }
+            }, new Func0<Observable<EncounterResponse>>() {
+                @Override
+                public Observable<EncounterResponse> call() {
+                    return null;
+                }
+            });
+
         } else {
-            return new EncounterResponse().setValidationFailure(validationResult);
+            return Observable.just(new EncounterResponse().setValidationFailure(validationResult));
         }
     }
+
 
     /**
      * @param healthId

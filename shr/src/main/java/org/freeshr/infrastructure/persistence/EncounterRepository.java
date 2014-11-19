@@ -60,7 +60,6 @@ public class EncounterRepository {
                         encounterBundle.getEncounterId());
         RegularStatement encCatchmentStmt = new SimpleStatement(encCatchmentInsertQuery);
         Batch batch = QueryBuilder.batch(insertEncounterStmt, encCatchmentStmt);
-        System.out.println(batch.toString());
         cqlOperations.execute(batch);
     }
 

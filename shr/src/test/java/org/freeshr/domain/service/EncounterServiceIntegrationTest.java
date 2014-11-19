@@ -12,6 +12,7 @@ import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.persistence.FacilityRepository;
 import org.freeshr.infrastructure.persistence.PatientRepository;
 import org.freeshr.util.ValidationFailures;
+import org.freeshr.utils.DateUtil;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +20,15 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import rx.Observable;
 import rx.observables.BlockingObservable;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -110,29 +115,30 @@ public class EncounterServiceIntegrationTest {
 
     @Test
     public void shouldRejectEncounterWithInvalidReferenceCode() throws Exception {
-        EncounterResponse response = encounterService.ensureCreated(withInvalidReferenceTerm());
+        EncounterResponse response = encounterService.ensureCreated(withInvalidReferenceTerm()).toBlocking().first();
         assertTrue(new ValidationFailures(response).matches(new String[]{"/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "code-unknown", null}));
     }
 
     @Test
     public void shouldRejectEncounterWithInvalidConceptCode() throws Exception {
-        EncounterResponse response = encounterService.ensureCreated(withInvalidConcept());
+        EncounterResponse response = encounterService.ensureCreated(withInvalidConcept()).toBlocking().first();
         assertTrue(new ValidationFailures(response).matches(new String[]{"/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "code-unknown", "Viral pneumonia 314247"}));
     }
 
     @Test
     public void shouldRejectEncountersForUnknownPatients() throws ExecutionException, InterruptedException {
-        EncounterResponse response = encounterService.ensureCreated(encounterForUnknownPatient());
+        Observable<EncounterResponse> encounterResponseObservable = encounterService.ensureCreated(encounterForUnknownPatient());
+        EncounterResponse response = encounterResponseObservable.toBlocking().first();
         assertThat(true, is(response.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition)));
     }
 
     @Test
     public void shouldCaptureAnEncounterAlongWithPatientDetails() throws Exception {
-        EncounterResponse response = encounterService.ensureCreated(withValidEncounter());
+        EncounterResponse response = encounterService.ensureCreated(withValidEncounter()).toBlocking().first();
 
         assertThat(response, is(notNullValue()));
         assertTrue(response.isSuccessful());
-        assertValidPatient(patientRepository.find(VALID_HEALTH_ID));
+        assertValidPatient(patientRepository.find(VALID_HEALTH_ID).toBlocking().first());
         BlockingObservable<List<EncounterBundle>> encounterBundlesObservable = encounterService.findAll(VALID_HEALTH_ID).toBlocking();
 
         List<EncounterBundle> encounterBundles = encounterBundlesObservable.single();
@@ -191,8 +197,8 @@ public class EncounterServiceIntegrationTest {
         facilityRepository.save(facility);
 
         assertNotNull(facilityRepository.find("3").toBlocking().first());
-        assertTrue(encounterService.ensureCreated(withValidEncounter()).isSuccessful());
-        assertTrue(encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW)).isSuccessful());
+        assertTrue(encounterService.ensureCreated(withValidEncounter()).toBlocking().first().isSuccessful());
+        assertTrue(encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW)).toBlocking().first().isSuccessful());
 
         assertEquals(1, encounterService.findAll(VALID_HEALTH_ID).toBlocking().first().size());
         List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByFacilityCatchments("3", "2014-09-10").toBlocking().first();
@@ -208,12 +214,17 @@ public class EncounterServiceIntegrationTest {
     public void shouldReturnUniqueListOfEncountersForGivenListOfCatchments() throws ExecutionException, InterruptedException, ParseException {
         Facility facility = new Facility("4", "facility1", "Main hospital", "305610", new Address("1", "2", "3", null, null));
         facilityRepository.save(facility);
-        encounterService.ensureCreated(withValidEncounter());
+        encounterService.ensureCreated(withValidEncounter()).toBlocking().first();
 
-        String date = "2014-09-10";
-        List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByFacilityCatchments("4", date).toBlocking().first();
+
+        List<EncounterBundle> encounterBundles = encounterService.findEncountersForFacilityCatchment("4", "305610",
+                DateUtil.parseDate("2014-9-9"), 20).toBlocking().first();
         assertEquals(1, encounterBundles.size());
         assertEquals(VALID_HEALTH_ID, encounterBundles.iterator().next().getHealthId());
+    }
+
+    private SimpleDateFormat dateFormat() {
+        return new SimpleDateFormat("dd/MM/YYYY");
     }
 
     @Test
@@ -238,8 +249,8 @@ public class EncounterServiceIntegrationTest {
         facilityRepository.save(facility);
 
         assertNotNull(facilityRepository.find("3").toBlocking().first());
-        assertTrue(encounterService.ensureCreated(withValidEncounter()).isSuccessful());
-        assertTrue(encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW)).isSuccessful());
+        assertTrue(encounterService.ensureCreated(withValidEncounter()).toBlocking().first().isSuccessful());
+        assertTrue(encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW)).toBlocking().first().isSuccessful());
 
         assertEquals(1, encounterService.findAll(VALID_HEALTH_ID).toBlocking().first().size());
 
