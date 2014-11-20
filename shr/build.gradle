@@ -19,13 +19,23 @@ repositories {
 test {
     testLogging {
         exceptionFormat "full" // default is "short"
-    }
-
-    // exclude '**/*IntegrationTest.class'
-
-    testLogging {
         events "passed", "skipped", "failed"
     }
+
+    beforeTest { descriptor ->
+        logger.lifecycle("Running test: " + descriptor)
+    }
+
+    // set heap size for the test JVM(s)
+    minHeapSize = "512m"
+    maxHeapSize = "1024m"
+
+    // set JVM arguments for the test JVM(s)
+    jvmArgs '-XX:MaxPermSize=256m'
+
+//    onOutput { descriptor, event ->
+//        logger.lifecycle("Test: " + descriptor + " produced standard out/err: " + event.message )
+//    }
 }
 
 test.finalizedBy(stopMockClientIndex)
@@ -130,7 +140,7 @@ buildscript {
     dependencies {
         classpath(
                 "org.springframework.boot:spring-boot-gradle-plugin:1.0.2.RELEASE",
-                'com.netflix.nebula:gradle-ospackage-plugin:1.9.1+'
+                'com.netflix.nebula:gradle-ospackage-plugin:2.+'
         )
     }
 }
