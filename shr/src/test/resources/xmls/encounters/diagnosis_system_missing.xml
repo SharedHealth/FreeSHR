@@ -31,6 +31,7 @@
                     <coding>
                         <system value=""/>
                         <code value="diagnosis"/>
+                        <display value="Diagnosis"/>
                     </coding>
                 </category>
                 <status value="confirmed"/>

@@ -38,6 +38,7 @@
                     <coding>
                         <system value="http://hl7.org/fhir/condition-category"/>
                         <code value="diagnosis"/>
+                        <display value="Diagnosis"/>
                     </coding>
                 </category>
                 <status value="confirmed"/>

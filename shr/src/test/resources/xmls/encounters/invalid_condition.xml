@@ -19,14 +19,20 @@
                 <subject>
                     <reference value="5893922485019082753"/>
                 </subject>
+                <!-- TODO: This is actually an invalid reference. Validations have to be added for references like these -->
+                <encounter>
+                    <reference value="dfbc9b30-ceef-473e-9q22-4ee31qfceqdd"/>
+                    <display value="encounter"/>
+                </encounter>
                 <asserter>
                     <reference value="7e2bd1c6-2370-418c-b2f7-1e46febc4ee0"/>
                 </asserter>
                 <dateAsserted value="2014-07-25T16:51:37+05:30"/>
                 <code>
                     <coding>
-                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/referenceterms/fa460ea6-04c7-45af-a6fa-5072e7caed40"/>
-                        <code value="INVALID_REFERENCE_TERM"/>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/eddb01eb-61fc-4f9e-aca5-e44193509f35"/>
+                        <code value="eddb01eb-61fc-4f9e-aca5-e44193509f35"/>
+                        <display value="Viral pneumonia 785857"/>
                     </coding>
                 </code>
                 <category>
@@ -36,8 +42,16 @@
                         <display value="Diagnosis"/>
                     </coding>
                 </category>
-                <status value="confirmed"/>
+                <status value="foo-bar"/>
+                <relatedItem>
+                    <type value="due-to"/>
+                    <target>
+                        <reference value="Some-123"/>
+                        <display value="Something"/>
+                    </target>
+                </relatedItem>
             </Condition>
+
         </content>
     </entry>
 </feed>

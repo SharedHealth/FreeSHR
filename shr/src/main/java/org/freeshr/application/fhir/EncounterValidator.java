@@ -2,8 +2,9 @@ package org.freeshr.application.fhir;
 
 
 import org.freeshr.validations.FhirSchemaValidator;
-import org.freeshr.validations.ResourceValidator;
+import org.freeshr.validations.ConditionValidator;
 import org.freeshr.validations.HealthIdValidator;
+import org.freeshr.validations.ResourceValidator;
 import org.hl7.fhir.instance.model.OperationOutcome;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public class EncounterValidator {
         List<ValidationMessage> validationMessages = new ArrayList<>();
 
         validationMessages.addAll(fhirSchemaValidator.validate(sourceXml));
-        validationMessages.addAll(resourceValidator.validateCategories(sourceXml));
+        validationMessages.addAll(resourceValidator.validate(sourceXml));
 
         return fhirMessageFilter.filterMessagesSevereThan(validationMessages, OperationOutcome.IssueSeverity.warning);
     }

@@ -18,7 +18,14 @@ public class HealthIdValidator {
 
     public EncounterValidationResponse validate(String sourceXml, String expectedHealthId) {
         EncounterValidationResponse encounterValidationResponse = new EncounterValidationResponse();
-        AtomFeed feed = resourceOrFeedDeserializer.deserialize(sourceXml);
+        AtomFeed feed = null;
+        try {
+            feed = resourceOrFeedDeserializer.deserialize(sourceXml);
+        } catch (Exception e) {
+            org.freeshr.application.fhir.Error error = new org.freeshr.application.fhir.Error("Condition-status", "invalid", e.getMessage());
+            encounterValidationResponse.addError(error);
+            return encounterValidationResponse;
+        }
         for (AtomEntry<? extends Resource> atomEntry : feed.getEntryList()) {
             Property subject = atomEntry.getResource().getChildByName("subject");
             if (!subject.hasValues()) continue;

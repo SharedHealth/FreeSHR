@@ -19,9 +19,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -63,7 +61,17 @@ public class EncounterValidatorIntegrationTest {
     @Test
     public void shouldValidateEncounterWhenInProperFormat() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, FileUtil.asString("xmls/encounters/encounter.xml"));
-        assertTrue(validator.validate(encounterBundle).isSuccessful());
+        EncounterValidationResponse validate = validator.validate(encounterBundle);
+        assertTrue(validate.isSuccessful());
+    }
+
+    @Test
+    public void shouldFailIfConditionStatusIsInvalid() throws Exception {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, FileUtil.asString("xmls/encounters/invalid_condition.xml"));
+        EncounterValidationResponse response = validator.validate(encounterBundle);
+        assertFalse(response.isSuccessful());
+        assertEquals(1, response.getErrors().size());
+        assertEquals("Condition-status", response.getErrors().get(0).getField());
     }
 
     @Test
@@ -130,13 +138,13 @@ public class EncounterValidatorIntegrationTest {
     }
 
     @Test
-    public void shouldValidateIfCategoriesOtherThanChiefComplaintAreCoded() {
+    public void shouldValidateConditionsToCheckIfCategoriesOtherThanChiefComplaintAreCoded() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, FileUtil.asString("xmls/encounters/coded_and_noncoded_diagnosis.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
-        verify(trConceptLocator, times(4)).verifiesSystem(anyString());
+        verify(trConceptLocator, times(6)).verifiesSystem(anyString());
         assertFalse(encounterValidationResponse.isSuccessful());
-        assertThat(encounterValidationResponse.getErrors().size(), is(2));
+        assertThat(encounterValidationResponse.getErrors().size(), is(3));
     }
 
     @Test

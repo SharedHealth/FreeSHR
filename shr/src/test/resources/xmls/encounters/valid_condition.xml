@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Encounter</title>
+    <id>http://localhost/encounters/bcf6c340-d04a-4c29-b50c-2552beeee037</id>
+    <updated>2014-07-25T16:50:29+05:30</updated>
+    <entry>
+        <title>Diagnosis</title>
+        <id>http://localhost/diagnosis/5f982a33-4454-4b74-9236-b8157aa8effd</id>
+        <updated>2014-07-25T16:51:37+05:30</updated>
+        <author>
+            <name>test author</name>
+        </author>
+        <content type="text/xml">
+            <Condition xmlns="http://hl7.org/fhir">
+                <subject>
+                    <reference value="5928353427514982401"/>
+                </subject>
+                <encounter>
+                    <reference value="9173b032-f8f6-43ae-bf58-d74b54fb4c45"/>
+                    <display value="encounter"/>
+                </encounter>
+                <asserter>
+                    <reference value="13beae59-61e0-450f-8004-0fa4e4b596e3"/>
+                </asserter>
+                <dateAsserted value="2014-10-31T16:59:47+05:30"/>
+                <stage>
+                    <summary>
+                        <coding>
+                            <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/referenceterms/b8d6be25-9547-462a-b858-0252ad04d4b3"/>
+                            <code value="258219007"/>
+                            <display value="stage II"/>
+                        </coding>
+                    </summary>
+                </stage>
+                <code>
+                    <coding>
+                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/referenceterms/b8d6be25-9547-462a-b858-0252ad04d4b3"/>
+                        <code value="368009"/>
+                        <display value="Heart valve disorder"/>
+                    </coding>
+                </code>
+                <category>
+                    <coding>
+                        <system value="http://hl7.org/fhir/condition-category"/>
+                        <code value="439401001"/>
+                        <display value="Diagnosis"/>
+                    </coding>
+                </category>
+                <status value="confirmed"/>
+                <severity>
+                    <coding>
+                        <system value="http://hl7.org/fhir/vs/condition-severity"/>
+                        <code value="6736007"/>
+                        <display value="Moderate"/>
+                    </coding>
+                </severity>
+                <onsetDate value="2011-08-05"/>
+                <evidence>
+                    <code>
+                        <coding>
+                            <system value="http://hl7.org/fhir"/>
+                            <code value="426396005"/>
+                            <display value="Cardiac chest pain"/>
+                        </coding>
+                    </code>
+                </evidence>
+                <location>
+                    <code>
+                        <coding>
+                            <system value="http://hl7.org/fhir/"/>
+                            <code value="40768004"/>
+                            <display value="Left thorax"/>
+                        </coding>
+                    </code>
+                    <detail value="heart structure"/>
+                </location>
+                <relatedItem>
+                    <type value="due-to"/>
+                    <target>
+                        <reference value="Some-123"/>
+                        <display value="Something"/>
+                    </target>
+                </relatedItem>
+            </Condition>
+        </content>
+    </entry>
+</feed>
