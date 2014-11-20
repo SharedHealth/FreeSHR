@@ -45,36 +45,21 @@ public class EncounterRepositoryIntegrationTest {
         String healthId = generateHealthId();
         patient.setHealthId(healthId);
         patient.setAddress(new Address("01", "02", "03", "04", "05"));
+        Date received_date = new Date();
         encounterRepository.save(createEncounterBundle("e-0", healthId), patient);
         encounterRepository.save(createEncounterBundle("e-1", healthId), patient);
         encounterRepository.save(createEncounterBundle("e-2", healthId), patient);
 
-        List<EncounterBundle> encounterBundles = encounterRepository.findAll(healthId).toBlocking().single();
+        List<EncounterBundle> encounterBundles = encounterRepository.findEncountersForPatient(healthId, received_date, 200).toBlocking().single();
         EncounterBundle encounter = encounterBundles.get(0);
         assertEquals(3, encounterBundles.size());
         assertThat(encounter.getReceivedDate(), is(notNullValue()));
         assertThat(encounter.getEncounterContent().toString(), is(content()));
+
+        encounterBundles = encounterRepository.findEncountersForPatient(healthId, new Date(), 200).toBlocking().single();
+        assertEquals("Should not have returned any encounter as updatedSince is after existing encounter dates", 0, encounterBundles.size());
     }
 
-
-    @Test
-    @Ignore
-    public void shouldFetchEncounterByAddressAndDate() throws InterruptedException, ExecutionException, ParseException {
-        Patient patient = new Patient();
-        String healthId = generateHealthId();
-        patient.setHealthId(healthId);
-        patient.setAddress(new Address("01", "02", "03", "04", "05"));
-        saveEncounterWithDate("e-0-"+healthId, healthId, "2014-03-13 09:23:31");
-        encounterRepository.save(createEncounterBundle("e-2-"+healthId, healthId), patient);
-
-        List<EncounterBundle> encounters = encounterRepository.findAllEncountersByCatchment("0102", "district_id", "2011-09-10")
-                .toBlocking().first();
-        EncounterBundle encounter = encounters.get(0);
-        assertEquals(1, encounters.size());
-        assertThat(encounter.getReceivedDate(), is(notNullValue()));
-        assertThat(encounter.getEncounterId(), is("e-2-"+healthId));
-
-    }
 
     private String generateHealthId() {
         return java.util.UUID.randomUUID().toString();

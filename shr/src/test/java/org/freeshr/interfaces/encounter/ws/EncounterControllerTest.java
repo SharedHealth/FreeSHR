@@ -109,7 +109,7 @@ public class EncounterControllerTest {
     @Test
     public void shouldDefaultToStartOfMonthIfNotSpecified() throws UnsupportedEncodingException {
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(controller.getRequestedDate(""));
+        calendar.setTime(controller.getRequestedDateForCatchment(""));
         assertEquals(1, calendar.get(Calendar.DAY_OF_MONTH));
     }
 

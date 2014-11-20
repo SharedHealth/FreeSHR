@@ -64,6 +64,8 @@ public abstract class APIIntegrationTestBase {
         cqlTemplate.execute("truncate encounter");
         cqlTemplate.execute("truncate patient");
         cqlTemplate.execute("truncate facilities");
+        cqlTemplate.execute("truncate enc_by_patient");
+        cqlTemplate.execute("truncate enc_by_catchment");
     }
 
     public void createEncounter(EncounterBundle encounter, Patient patient) throws ExecutionException, InterruptedException {

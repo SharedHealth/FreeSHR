@@ -67,21 +67,29 @@ public class EncounterController {
     }
 
     @RequestMapping(value = "/patients/{healthId}/encounters", method = RequestMethod.GET)
-    public DeferredResult<List<EncounterBundle>> findAll(@PathVariable String healthId) {
+    public DeferredResult<List<EncounterBundle>> findEncountersForPatient(
+            @PathVariable String healthId,
+            @RequestParam(value = "updatedSince",required = false) String updatedSince) {
         logger.debug("Find all encounters by health id: " + healthId);
-        final DeferredResult<List<EncounterBundle>> deferredResult = new DeferredResult<>();
-        encounterService.findAll(healthId).subscribe(new Action1<List<EncounterBundle>>() {
-            @Override
-            public void call(List<EncounterBundle> encounterBundles) {
-                deferredResult.setResult(encounterBundles);
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                deferredResult.setErrorResult(throwable);
-            }
-        });
-
+        final DeferredResult<List<EncounterBundle>> deferredResult = new DeferredResult<List<EncounterBundle>>();
+        try {
+            Observable<List<EncounterBundle>> encountersForPatient =
+               encounterService.findEncountersForPatient(healthId, getRequestedDate(updatedSince), 200);
+            encountersForPatient.subscribe(new Action1<List<EncounterBundle>>() {
+                @Override
+                public void call(List<EncounterBundle> encounterBundles) {
+                    deferredResult.setResult(encounterBundles);
+                }
+            }, new Action1<Throwable>() {
+                @Override
+                public void call(Throwable throwable) {
+                    deferredResult.setErrorResult(throwable);
+                }
+            });
+        }
+        catch (Exception e){
+            deferredResult.setErrorResult(e);
+        }
         return deferredResult;
     }
 
@@ -95,14 +103,13 @@ public class EncounterController {
             throws ExecutionException, InterruptedException, ParseException, UnsupportedEncodingException {
         logger.debug(String.format("Find all encounters for facility %s in catchment %s", facilityId, catchment));
         final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<>();
-        final Date requestedDate = getRequestedDate(updatedSince);
+        final Date requestedDate = getRequestedDateForCatchment(updatedSince);
         final Observable<List<EncounterBundle>> catchmentEncounters =
                 findFacilityCatchmentEncounters(facilityId, catchment, lastMarker, requestedDate);
 
         catchmentEncounters.subscribe(new Action1<List<EncounterBundle>>() {
             @Override
             public void call(List<EncounterBundle> encounterBundles) {
-
                 try {
                     EncounterSearchResponse searchResponse = new EncounterSearchResponse(
                             getRequestUri(request, requestedDate, lastMarker), encounterBundles);
@@ -119,7 +126,6 @@ public class EncounterController {
                 deferredResult.setErrorResult(throwable);
             }
         });
-
         return deferredResult;
     }
 
@@ -135,10 +141,10 @@ public class EncounterController {
     /**
      * @param updatedSince
      * @return parsed date. For formats please refer to @see org.freeshr.utils.DateUtil#DATE_FORMATS
-     * If no date is given, then by default, the date one month earlier is calculated.
+     * If no date is given, then by default, beginning of month is considered.
      * @throws UnsupportedEncodingException
      */
-    Date getRequestedDate(String updatedSince) throws UnsupportedEncodingException {
+    Date getRequestedDateForCatchment(String updatedSince) throws UnsupportedEncodingException {
         if (StringUtils.isBlank(updatedSince)) {
             Calendar calendar = Calendar.getInstance();
             calendar.set(Calendar.DAY_OF_MONTH, 1);
@@ -151,8 +157,11 @@ public class EncounterController {
 
         //NO need to decode the date, since the spring request mapper would have already decoded the string
         //String decodeLastUpdate = URLDecoder.decode(updatedSince, "UTF-8");
-        Date lastUpdateDate = DateUtil.parseDate(updatedSince);
-        return lastUpdateDate;
+        return getRequestedDate(updatedSince);
+    }
+
+    private Date getRequestedDate(String updatedSince) {
+        return StringUtils.isBlank(updatedSince) ? null : DateUtil.parseDate(updatedSince);
     }
 
     String getNextResultURL(

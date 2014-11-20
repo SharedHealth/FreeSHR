@@ -86,12 +86,14 @@ public class EncounterService {
 
     /**
      * @param healthId
+     * @param sinceDate
+     * @param limit
      * @return
-     * @deprecated do not use this query
+     * @throws ExecutionException
+     * @throws InterruptedException
      */
-    public Observable<List<EncounterBundle>> findAll(String healthId) {
-        //TODO refactor
-        return encounterRepository.findAll(healthId);
+    public Observable<List<EncounterBundle>> findEncountersForPatient(String healthId, Date sinceDate, int limit) throws ExecutionException, InterruptedException {
+        return encounterRepository.findEncountersForPatient(healthId, sinceDate, limit);
     }
 
     private EncounterValidationResponse validate(EncounterBundle encounterBundle) {

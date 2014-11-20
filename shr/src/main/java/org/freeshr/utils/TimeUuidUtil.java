@@ -8,7 +8,10 @@ import java.util.UUID;
  */
 public class TimeUuidUtil {
 
-
+    /*
+      Magic number obtained from #cassandra's thobbs, who
+      claims to have stolen it from a Python library.
+    */
     public static final long NUM_100NS_INTERVALS_SINCE_UUID_EPOCH = 0x01b21dd213814000L;
 
     public static java.util.UUID getTimeUUID()
@@ -63,18 +66,17 @@ public class TimeUuidUtil {
 
     public static java.util.UUID uuidForDate(Date d)
     {
-        /*
-          Magic number obtained from #cassandra's thobbs, who
-          claims to have stolen it from a Python library.
-        */
-
         long origTime = d.getTime();
-        long time = origTime * 10000 + NUM_100NS_INTERVALS_SINCE_UUID_EPOCH;
+        return uuidForDate(origTime);
+    }
+
+    public static UUID uuidForDate(long timeInMillis) {
+        long time = timeInMillis * 10000 + NUM_100NS_INTERVALS_SINCE_UUID_EPOCH;
         long timeLow = time &       0xffffffffL;
         long timeMid = time &   0xffff00000000L;
         long timeHi = time & 0xfff000000000000L;
         long upperLong = (timeLow << 32) | (timeMid >> 16) | (1 << 12) | (timeHi >> 48) ;
-        return new java.util.UUID(upperLong, 0xC000000000000000L);
+        return new UUID(upperLong, 0xC000000000000000L);
     }
 
     public static long getTimeFromUUID(UUID uuid) {

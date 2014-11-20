@@ -139,8 +139,7 @@ public class EncounterServiceIntegrationTest {
         assertThat(response, is(notNullValue()));
         assertTrue(response.isSuccessful());
         assertValidPatient(patientRepository.find(VALID_HEALTH_ID).toBlocking().first());
-        BlockingObservable<List<EncounterBundle>> encounterBundlesObservable = encounterService.findAll(VALID_HEALTH_ID).toBlocking();
-
+        BlockingObservable<List<EncounterBundle>> encounterBundlesObservable = encounterService.findEncountersForPatient(VALID_HEALTH_ID, null, 200).toBlocking();
         List<EncounterBundle> encounterBundles = encounterBundlesObservable.single();
         assertThat(encounterBundles.size(), is(1));
         assertThat(encounterBundles.get(0).getHealthId(), is(VALID_HEALTH_ID));
@@ -200,7 +199,7 @@ public class EncounterServiceIntegrationTest {
         assertTrue(encounterService.ensureCreated(withValidEncounter()).toBlocking().first().isSuccessful());
         assertTrue(encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW)).toBlocking().first().isSuccessful());
 
-        assertEquals(1, encounterService.findAll(VALID_HEALTH_ID).toBlocking().first().size());
+        assertEquals(1, encounterService.findEncountersForPatient(VALID_HEALTH_ID, null, 200).toBlocking().first().size());
         List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByFacilityCatchments("3", "2014-09-10").toBlocking().first();
         assertEquals(2, encounterBundles.size());
 
@@ -252,7 +251,7 @@ public class EncounterServiceIntegrationTest {
         assertTrue(encounterService.ensureCreated(withValidEncounter()).toBlocking().first().isSuccessful());
         assertTrue(encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW)).toBlocking().first().isSuccessful());
 
-        assertEquals(1, encounterService.findAll(VALID_HEALTH_ID).toBlocking().first().size());
+        assertEquals(1, encounterService.findEncountersForPatient(VALID_HEALTH_ID, null, 200).toBlocking().first().size());
 
         List<EncounterBundle> encounterBundles = encounterService.findEncountersForFacilityCatchment(
                 "3", "3056", new SimpleDateFormat("dd/MM/yyyy").parse("10/9/2014"), 10).toBlocking().first();
