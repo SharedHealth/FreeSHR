@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import rx.Observable;
+import rx.observers.TestSubscriber;
 
 import java.util.concurrent.ExecutionException;
 
@@ -43,9 +45,19 @@ public class FacilityRepositoryIntegrationTest {
         facility.setFacilityType("Village Hospital");
         facility.setCatchments("10,1020,102030");
         facility.setFacilityLocation(new Address("10","11", "32", "45", "67"));
-        facilityRepository.save(facility);
-        Facility actualFacility = facilityRepository.find("10101").toBlocking().first();
-        assertThat(actualFacility, is(facility));
+        Observable<Facility> save = facilityRepository.save(facility);
+        TestSubscriber<Facility> subscriber = new TestSubscriber<>();
+        save.subscribe(subscriber);
+        subscriber.awaitTerminalEvent();
+        subscriber.assertNoErrors();
+
+        Observable<Facility> savedFacilityObservable = facilityRepository.find("10101");
+        TestSubscriber<Facility> facilityTestSubscriber = new TestSubscriber<>();
+        savedFacilityObservable.subscribe(facilityTestSubscriber);
+        facilityTestSubscriber.awaitTerminalEvent();
+
+        facilityTestSubscriber.assertNoErrors();
+        assertThat(facilityTestSubscriber.getOnNextEvents().get(0), is(facility));
     }
 
 }

@@ -40,7 +40,7 @@ public class FacilityService {
     private Observable<Facility> findRemote(String facilityId) {
         try{
             Observable<Facility> facility = facilityRegistryClient.getFacility(facilityId);
-            return facility.concatMap(new Func1<Facility, Observable<Facility>>() {
+            return facility.flatMap(new Func1<Facility, Observable<Facility>>() {
                 @Override
                 public Observable<Facility> call(Facility facility) {
                     return facilityRepository.save(facility);

@@ -21,7 +21,7 @@ import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import rx.Observable;
-import rx.observables.BlockingObservable;
+import rx.observers.TestSubscriber;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -134,13 +134,27 @@ public class EncounterServiceIntegrationTest {
 
     @Test
     public void shouldCaptureAnEncounterAlongWithPatientDetails() throws Exception {
-        EncounterResponse response = encounterService.ensureCreated(withValidEncounter()).toBlocking().first();
 
-        assertThat(response, is(notNullValue()));
-        assertTrue(response.isSuccessful());
-        assertValidPatient(patientRepository.find(VALID_HEALTH_ID).toBlocking().first());
-        BlockingObservable<List<EncounterBundle>> encounterBundlesObservable = encounterService.findEncountersForPatient(VALID_HEALTH_ID, null, 200).toBlocking();
-        List<EncounterBundle> encounterBundles = encounterBundlesObservable.single();
+        Observable<EncounterResponse> response = encounterService.ensureCreated(withValidEncounter());
+        TestSubscriber<EncounterResponse> encounterResponseSubscriber = new TestSubscriber<>();
+        response.subscribe(encounterResponseSubscriber);
+        encounterResponseSubscriber.awaitTerminalEvent();
+        encounterResponseSubscriber.assertNoErrors();
+        EncounterResponse encounterResponse = encounterResponseSubscriber.getOnNextEvents().get(0);
+        assertNotNull(encounterResponse);
+
+        Observable<Patient> patientObservable = patientRepository.find(VALID_HEALTH_ID);
+        TestSubscriber<Patient> patientTestSubscriber = new TestSubscriber<>();
+        patientObservable.subscribe(patientTestSubscriber);
+        patientTestSubscriber.awaitTerminalEvent();
+        assertValidPatient(patientTestSubscriber.getOnNextEvents().get(0));
+
+        Observable<List<EncounterBundle>> encountersForPatientObservable = encounterService.findEncountersForPatient(VALID_HEALTH_ID, null, 200);
+        TestSubscriber<List<EncounterBundle>> encounterBundleTestSubscriber = new TestSubscriber<>();
+        encountersForPatientObservable.subscribe(encounterBundleTestSubscriber);
+        encounterBundleTestSubscriber.awaitTerminalEvent();
+
+        List<EncounterBundle> encounterBundles = encounterBundleTestSubscriber.getOnNextEvents().get(0);
         assertThat(encounterBundles.size(), is(1));
         assertThat(encounterBundles.get(0).getHealthId(), is(VALID_HEALTH_ID));
     }
@@ -168,14 +182,14 @@ public class EncounterServiceIntegrationTest {
     public void shouldReturnTheListOfEncountersForGivenListOfCatchments() throws ExecutionException, InterruptedException, ParseException {
         Facility facility1 = new Facility("1", "facility1", "Main hospital", "3056", new Address("1", "2", "3", null, null));
         Facility facility2 = new Facility("2", "facility2", "Trivial hospital", "305650", new Address("11", "22", "33", null, null));
-        facilityRepository.save(facility1);
-        facilityRepository.save(facility2);
+        facilityRepository.save(facility1).toBlocking().first();
+        facilityRepository.save(facility2).toBlocking().first();
         final String date = "2014-09-10";
 
 
         // Two unique encounters found in same catchment for 2 different patients
-        encounterService.ensureCreated(withValidEncounter());
-        encounterService.ensureCreated(withValidEncounter());
+        encounterService.ensureCreated(withValidEncounter()).toBlocking().first();
+        encounterService.ensureCreated(withValidEncounter()).toBlocking().first();
 
         List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByFacilityCatchments("1", date).toBlocking().first();
         List<String> healthIds = extractListOfHealthIds(encounterBundles);
@@ -193,7 +207,7 @@ public class EncounterServiceIntegrationTest {
     @Test
     public void shouldReturnUniqueListOfEncountersForSameHealthIdGivenListOfCatchments() throws ExecutionException, InterruptedException, ParseException {
         Facility facility = new Facility("3", "facility", "Main hospital", "305610,3056", new Address("1", "2", "3", null, null));
-        facilityRepository.save(facility);
+        facilityRepository.save(facility).toBlocking().first();
 
         assertNotNull(facilityRepository.find("3").toBlocking().first());
         assertTrue(encounterService.ensureCreated(withValidEncounter()).toBlocking().first().isSuccessful());
@@ -212,7 +226,7 @@ public class EncounterServiceIntegrationTest {
     @Test
     public void shouldReturnUniqueListOfEncountersForGivenListOfCatchments() throws ExecutionException, InterruptedException, ParseException {
         Facility facility = new Facility("4", "facility1", "Main hospital", "305610", new Address("1", "2", "3", null, null));
-        facilityRepository.save(facility);
+        facilityRepository.save(facility).toBlocking().first();
         encounterService.ensureCreated(withValidEncounter()).toBlocking().first();
 
 
@@ -230,9 +244,9 @@ public class EncounterServiceIntegrationTest {
     @Ignore
     public void shouldReturnSetOfEncounterByCatchment() throws ExecutionException, InterruptedException, ParseException {
         Facility facility1 = new Facility("5", "facility1", "Main hospital", "305610,3056", new Address("1", "2", "3", null, null));
-        facilityRepository.save(facility1);
-        encounterService.ensureCreated(withValidEncounter());
-        encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW));
+        facilityRepository.save(facility1).toBlocking().first();
+        encounterService.ensureCreated(withValidEncounter()).toBlocking().first();
+        encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW)).toBlocking().first();
 
         String date = "2014-09-10";
         List<EncounterBundle> encounterBundles = encounterService.findAllEncountersByFacilityCatchments("5", date).toBlocking().first();
@@ -245,7 +259,7 @@ public class EncounterServiceIntegrationTest {
     @Test
     public void shouldReturnUniqueListOfEncountersForFacilityCatchment() throws ExecutionException, InterruptedException, ParseException {
         Facility facility = new Facility("3", "facility", "Main hospital", "305610,3056", new Address("1", "2", "3", null, null));
-        facilityRepository.save(facility);
+        facilityRepository.save(facility).toBlocking().first();
 
         assertNotNull(facilityRepository.find("3").toBlocking().first());
         assertTrue(encounterService.ensureCreated(withValidEncounter()).toBlocking().first().isSuccessful());

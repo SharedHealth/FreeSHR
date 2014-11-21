@@ -2,86 +2,120 @@ package org.freeshr.infrastructure.persistence;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
+import com.datastax.driver.core.Statement;
+import com.datastax.driver.core.querybuilder.Insert;
+import com.datastax.driver.core.querybuilder.QueryBuilder;
+import org.apache.log4j.Logger;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Address;
-import org.freeshr.utils.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cassandra.core.CqlOperations;
+import org.springframework.cassandra.core.CqlTemplate;
 import org.springframework.stereotype.Component;
 import rx.Observable;
+import rx.functions.Func0;
 import rx.functions.Func1;
-
-import java.util.List;
-
-import static java.util.Arrays.asList;
-import static org.apache.commons.lang.StringUtils.join;
-import static org.freeshr.utils.CollectionUtils.map;
+import rx.schedulers.Schedulers;
 
 @Component
 public class FacilityRepository {
-    private CqlOperations cqlOperations;
+    private Logger logger = Logger.getLogger(FacilityRepository.class);
+    private CqlTemplate cqlTemplate;
 
     @Autowired
-    public FacilityRepository(@Qualifier("SHRCassandraTemplate") CqlOperations cqlOperations) {
-        this.cqlOperations = cqlOperations;
+    public FacilityRepository(@Qualifier("SHRCassandraTemplate") CqlTemplate cqlOperations) {
+        this.cqlTemplate = cqlOperations;
     }
 
     public Observable<Facility> find(String facilityId) {
-        Observable<ResultSet> resultSet = Observable.from(cqlOperations.queryAsynchronously(
-                "SELECT facility_id, facility_name, facility_type, catchments, " +
-                        "division_id, district_id, upazila_id, city_corporation_id, " +
-                        "union_urban_ward_id FROM facilities WHERE facility_id='" + facilityId + "';"));
+        String[] columns = new String[]{
+                "facility_id", "facility_name", "facility_type", "catchments",
+                "division_id", "district_id", "upazila_id", "city_corporation_id", "union_urban_ward_id"
 
-        return resultSet.map(new Func1<ResultSet, Facility>() {
+        };
+
+        Statement select = QueryBuilder.select(columns)
+                .from("facilities")
+                .where(QueryBuilder.eq("facility_id", facilityId));
+
+        Observable<ResultSet> resultSet = Observable.from(cqlTemplate.queryAsynchronously(select.toString()), Schedulers.io());
+
+        return resultSet.flatMap(new Func1<ResultSet, Observable<Facility>>() {
             @Override
-            public Facility call(ResultSet rows) {
-                return read(rows);
+            public Observable<Facility> call(ResultSet rows) {
+                try {
+                    return Observable.just(read(rows));
+                } catch (Exception e) {
+                    logger.error(e.getMessage());
+                    return Observable.error(e);
+                }
+            }
+        }, new Func1<Throwable, Observable<? extends Facility>>() {
+            @Override
+            public Observable<? extends Facility> call(Throwable throwable) {
+                return Observable.error(throwable);
+            }
+        }, new Func0<Observable<? extends Facility>>() {
+            @Override
+            public Observable<? extends Facility> call() {
+                return null;
             }
         });
     }
 
-    private Facility read(ResultSet resultSet){
+    private Facility read(ResultSet resultSet) throws Exception {
         Row result = resultSet.one();
-        if (null != result) {
-            Facility facility = new Facility();
-            facility.setFacilityId(result.getString("facility_id"));
-            facility.setFacilityName(result.getString("facility_name"));
-            facility.setFacilityType(result.getString("facility_type"));
-            facility.setCatchments(result.getString("catchments"));
-            Address address = new Address();
-            address.setDivision(result.getString("division_id"));
-            address.setDistrict(result.getString("district_id"));
-            address.setUpazila(result.getString("upazila_id"));
-            address.setCityCorporation(result.getString("city_corporation_id"));
-            address.setWard(result.getString("union_urban_ward_id"));
-            facility.setFacilityLocation(address);
-            return facility;
-        } else {
-            return null;
-        }
+        if (null == result) throw new Exception("Facility not found");
+
+        Facility facility = new Facility();
+        facility.setFacilityId(result.getString("facility_id"));
+        facility.setFacilityName(result.getString("facility_name"));
+        facility.setFacilityType(result.getString("facility_type"));
+        facility.setCatchments(result.getString("catchments"));
+        Address address = new Address();
+        address.setDivision(result.getString("division_id"));
+        address.setDistrict(result.getString("district_id"));
+        address.setUpazila(result.getString("upazila_id"));
+        address.setCityCorporation(result.getString("city_corporation_id"));
+        address.setWard(result.getString("union_urban_ward_id"));
+        facility.setFacilityLocation(address);
+        return facility;
     }
 
-    public Observable<Facility> save(Facility facility) {
-        cqlOperations.execute(toCQL(facility));
-        return Observable.just(facility);
-    }
+    public Observable<Facility> save(final Facility facility) {
+        Insert insert = buildInsertStatement(facility);
+        Observable<ResultSet> saveObservable = Observable.from(cqlTemplate.executeAsynchronously(insert));
 
-    private String toCQL(Facility facility) {
-        String query = query(asList(facility.getFacilityId(), facility.getFacilityName(), facility.getFacilityType(),
-                facility.getFacilityLocation().getDivision(), facility.getFacilityLocation().getDistrict(),
-                facility.getFacilityLocation().getUpazila(), facility.getFacilityLocation().getCityCorporation(),
-                facility.getFacilityLocation().getWard(), facility.getCatchmentsAsCommaSeparatedString()));
-        return "INSERT into facilities (facility_id, facility_name, facility_type, division_id, district_id, " +
-                "upazila_id, city_corporation_id, union_urban_ward_id, catchments) values  (" + query + ")";
-    }
-
-    private String query(List<String> values) {
-        return join(map(values, new CollectionUtils.Fn<String, String>() {
-            public String call(String input) {
-                return "'" + input + "'";
+        return saveObservable.flatMap(new Func1<ResultSet, Observable<Facility>>() {
+            @Override
+            public Observable<Facility> call(ResultSet rows) {
+                return Observable.just(facility);
             }
-        }), ",");
+        }, new Func1<Throwable, Observable<Facility>>() {
+            @Override
+            public Observable<Facility> call(Throwable throwable) {
+                return Observable.error(throwable);
+            }
+        }, new Func0<Observable<Facility>>() {
+            @Override
+            public Observable<Facility> call() {
+                return Observable.just(facility);
+            }
+        });
+    }
+
+    private Insert buildInsertStatement(Facility facility) {
+        return QueryBuilder
+                .insertInto("facilities")
+                .value("facility_id", facility.getFacilityId())
+                .value("facility_name", facility.getFacilityName())
+                .value("facility_type", facility.getFacilityType())
+                .value("division_id", facility.getFacilityLocation().getDivision())
+                .value("district_id", facility.getFacilityLocation().getDistrict())
+                .value("upazila_id", facility.getFacilityLocation().getUpazila())
+                .value("city_corporation_id", facility.getFacilityLocation().getCityCorporation())
+                .value("union_urban_ward_id", facility.getFacilityLocation().getWard())
+                .value("catchments", facility.getCatchmentsAsCommaSeparatedString());
     }
 
 }
