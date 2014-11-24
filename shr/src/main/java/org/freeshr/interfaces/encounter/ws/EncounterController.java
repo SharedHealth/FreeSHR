@@ -66,19 +66,28 @@ public class EncounterController {
         return deferredResult;
     }
 
-    @RequestMapping(value = "/patients/{healthId}/encounters", method = RequestMethod.GET)
-    public DeferredResult<List<EncounterBundle>> findEncountersForPatient(
+    @RequestMapping(value = "/patients/{healthId}/encounters", method = RequestMethod.GET, produces = {"application/json", "application/atom+xml"})
+    public DeferredResult<EncounterSearchResponse> findEncountersForPatient(
+            final HttpServletRequest request,
             @PathVariable String healthId,
             @RequestParam(value = "updatedSince",required = false) String updatedSince) {
         logger.debug("Find all encounters by health id: " + healthId);
-        final DeferredResult<List<EncounterBundle>> deferredResult = new DeferredResult<List<EncounterBundle>>();
+        final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<EncounterSearchResponse>();
         try {
+            final Date requestedDate = getRequestedDate(updatedSince);
             Observable<List<EncounterBundle>> encountersForPatient =
-               encounterService.findEncountersForPatient(healthId, getRequestedDate(updatedSince), 200);
+               encounterService.findEncountersForPatient(healthId, requestedDate, 200);
             encountersForPatient.subscribe(new Action1<List<EncounterBundle>>() {
                 @Override
                 public void call(List<EncounterBundle> encounterBundles) {
-                    deferredResult.setResult(encounterBundles);
+                    try {
+                        EncounterSearchResponse searchResponse = new EncounterSearchResponse(
+                                getRequestUri(request, requestedDate, null), encounterBundles);
+                        deferredResult.setResult(searchResponse);
+                    } catch (UnsupportedEncodingException e) {
+                        deferredResult.setErrorResult(e);
+                    }
+
                 }
             }, new Action1<Throwable>() {
                 @Override
@@ -202,8 +211,10 @@ public class EncounterController {
     String getRequestUri(HttpServletRequest request, Date lastUpdateDate, String lastMarker)
             throws UnsupportedEncodingException {
         UriComponentsBuilder uriBuilder =
-                UriComponentsBuilder.fromUriString(request.getRequestURL().toString())
-                        .queryParam("updatedSince", URLEncoder.encode(DateUtil.toISOString(lastUpdateDate), "UTF-8"));
+                UriComponentsBuilder.fromUriString(request.getRequestURL().toString());
+        if (lastUpdateDate != null) {
+            uriBuilder.queryParam("updatedSince", URLEncoder.encode(DateUtil.toISOString(lastUpdateDate), "UTF-8"));
+        }
         if (!StringUtils.isBlank(lastMarker)) {
             uriBuilder.queryParam("lastMarker", lastMarker);
         }

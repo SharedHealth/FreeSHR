@@ -97,7 +97,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
         mockMvc.perform(MockMvcRequestBuilders.get(
                 String.format("/patients/%s/encounters", healthId))
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(request().asyncResult(IsCollectionWithSize.hasSize(3)));
+                .andExpect(request().asyncResult(hasEncountersOfSize(3)));
     }
 
     @Test
