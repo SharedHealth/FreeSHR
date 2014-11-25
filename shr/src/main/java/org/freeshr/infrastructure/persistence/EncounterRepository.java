@@ -4,6 +4,7 @@ import com.datastax.driver.core.*;
 import com.datastax.driver.core.querybuilder.Batch;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
+import com.datastax.driver.core.querybuilder.Select;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.domain.model.Catchment;
@@ -25,6 +26,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
+
 @Component
 public class EncounterRepository {
     private static final Logger logger = LoggerFactory.getLogger(EncounterRepository.class);
@@ -43,6 +46,7 @@ public class EncounterRepository {
         insertEncounterStmt.value("encounter_id", encounterBundle.getEncounterId());
         insertEncounterStmt.value("health_id", encounterBundle.getHealthId());
         insertEncounterStmt.value("received_date", DateUtil.getCurrentTimeInISOString()); //TODO check timefunction
+        //insertEncounterStmt.value("received_date", System.currentTimeMillis());
         insertEncounterStmt.value("content", encounterBundle.getEncounterContent().toString());
         insertEncounterStmt.value("patient_location_code", address.getLocationCode());
 
@@ -84,6 +88,28 @@ public class EncounterRepository {
             }
         });
     }
+
+    public Observable<EncounterBundle> findEncounterById(String encounterId) {
+        Select findEncounter = QueryBuilder
+                        .select("encounter_id", "health_id", "received_date", "content")
+                        .from("encounter")
+                        .where(eq("encounter_id", encounterId))
+                        .limit(1);
+        return Observable.from(cqlOperations.queryAsynchronously(findEncounter)).flatMap(
+                new Func1<ResultSet, Observable<EncounterBundle>>() {
+                    @Override
+                    public Observable<EncounterBundle> call(ResultSet rows) {
+                        List<EncounterBundle> encounterBundles = read(rows);
+                        if (encounterBundles.isEmpty()) {
+                            return Observable.empty();
+                        } else {
+                            return Observable.just(encounterBundles.get(0));
+                        }
+                    }
+                });
+    }
+
+
 
     private String buildCatchmentSearchQuery(Catchment catchment, Date updatedSince, int limit) {
         int yearOfDate = DateUtil.getYearOf(updatedSince);

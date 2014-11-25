@@ -12,10 +12,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.mock.http.MockHttpOutputMessage;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.async.DeferredResult;
 import rx.Observable;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -139,5 +144,18 @@ public class EncounterControllerTest {
             encounters.add(encounter);
         }
         return encounters;
+    }
+
+    @Test
+    public void testSomething() {
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        ErrorInfo errorInfo = new ErrorInfo(HttpStatus.NOT_FOUND, "Not found");
+        MockHttpOutputMessage outputMessage = new MockHttpOutputMessage();
+        try {
+            converter.write(errorInfo, MediaType.APPLICATION_JSON, outputMessage);
+            System.out.println(outputMessage.getBodyAsString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -186,4 +186,12 @@ public class EncounterService {
     }
 
 
+    public Observable<EncounterBundle> findEncounter(final String healthId, String encounterId) {
+        return encounterRepository.findEncounterById(encounterId).filter(new Func1<EncounterBundle, Boolean>() {
+            @Override
+            public Boolean call(EncounterBundle encounterBundle) {
+                return encounterBundle.getHealthId().equals(healthId);
+            }
+        });
+    }
 }

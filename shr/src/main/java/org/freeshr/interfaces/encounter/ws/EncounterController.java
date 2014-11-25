@@ -138,6 +138,34 @@ public class EncounterController {
         return deferredResult;
     }
 
+
+    @RequestMapping(value = "/patients/{healthId}/encounters/{encounterId}", method = RequestMethod.GET, produces = {"application/json", "application/xml"})
+    public DeferredResult<EncounterBundle> findEncountersForPatient(
+            @PathVariable String healthId, @PathVariable final String encounterId) {
+        final DeferredResult<EncounterBundle> deferredResult = new DeferredResult<>();
+        Observable<EncounterBundle> observable = encounterService.findEncounter(healthId, encounterId).firstOrDefault(null);
+        observable.subscribe(new Action1<EncounterBundle>() {
+            @Override
+            public void call(EncounterBundle encounterBundle) {
+                if (encounterBundle != null) {
+                    deferredResult.setResult(encounterBundle);
+                } else {
+                    String errorMessage = String.format("Encounter %s not found", encounterId);
+                    deferredResult.setErrorResult(new ResourceNotFound(errorMessage));
+                }
+            }
+        },
+        new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                deferredResult.setErrorResult(throwable);
+            }
+        });
+
+        return deferredResult;
+    }
+
+
     private Observable<List<EncounterBundle>> findFacilityCatchmentEncounters(String facilityId, String catchment,
                                                                               String lastMarker, Date lastUpdateDate) {
         int encounterFetchLimit = EncounterService.getEncounterFetchLimit();
@@ -266,6 +294,20 @@ public class EncounterController {
     @ExceptionHandler(UnProcessableEntity.class)
     public EncounterResponse unProcessableEntity(UnProcessableEntity unProcessableEntity) {
         return unProcessableEntity.getResult();
+    }
+
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    @ResponseBody
+    @ExceptionHandler(ResourceNotFound.class)
+    public ErrorInfo resourceNotFound(ResourceNotFound resourceNotFound) {
+        return new ErrorInfo(HttpStatus.NOT_FOUND, resourceNotFound.getErrorMessage());
+    }
+
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    @ExceptionHandler(Exception.class)
+    public ErrorInfo resourceNotFound(Exception exception) {
+        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, exception.getLocalizedMessage());
     }
 
 

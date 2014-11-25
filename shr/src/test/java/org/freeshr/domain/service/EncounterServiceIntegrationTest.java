@@ -276,6 +276,21 @@ public class EncounterServiceIntegrationTest {
         assertTrue(healthIds.containsAll(Arrays.asList(VALID_HEALTH_ID, VALID_HEALTH_ID)));
     }
 
+    @Test
+    public void shouldReturnEncounterIfPresentForHealthId() throws ExecutionException, InterruptedException {
+        Facility facility = new Facility("3", "facility", "Main hospital", "305610,3056", new Address("1", "2", "3", null, null));
+        facilityRepository.save(facility).toBlocking().first();
+
+        EncounterResponse first = encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW)).toBlocking().first();
+        String encounterId = first.getEncounterId();
+        EncounterBundle encounterBundle = encounterService.findEncounter(VALID_HEALTH_ID_NEW, encounterId).toBlocking().first();
+        assertEquals(encounterId, encounterBundle.getEncounterId());
+
+        encounterBundle = encounterService.findEncounter(INVALID_HEALTH_ID, encounterId).toBlocking().firstOrDefault(null);
+        assertNull("Should have returned empty encounter for invalid healthId", encounterBundle);
+
+    }
+
     private ArrayList<String> extractListOfHealthIds(List<EncounterBundle> encounterBundles) {
         ArrayList<String> healthIds = new ArrayList<>();
         for (EncounterBundle encounterBundle : encounterBundles) {

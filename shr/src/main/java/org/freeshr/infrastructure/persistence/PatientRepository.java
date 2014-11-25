@@ -30,7 +30,9 @@ public class PatientRepository {
 
     public Observable<Patient> find(String healthId) {
         Observable<ResultSet> observable = Observable.from(
-                cqlOperations.queryAsynchronously("SELECT * FROM patient WHERE health_id='" + healthId + "';"));
+                cqlOperations.queryAsynchronously("SELECT " +
+                        " health_id, gender, division_id, district_id, upazila_id, city_corporation_id, union_urban_ward_id, address_line" +
+                        " FROM patient WHERE health_id='" + healthId + "';"));
         return observable.map(new Func1<ResultSet, Patient>() {
             @Override
             public Patient call(ResultSet rows) {
@@ -46,12 +48,12 @@ public class PatientRepository {
             Address address = new Address();
             patient.setHealthId(result.getString("health_id"));
             patient.setGender(result.getString("gender"));
-            address.setLine(result.getString("address_line"));
-            address.setDistrict(result.getString("district_id"));
-            address.setWard(result.getString("union_urban_ward_id"));
-            address.setCityCorporation(result.getString("city_corporation_id"));
-            address.setUpazila(result.getString("upazila_id"));
             address.setDivision(result.getString("division_id"));
+            address.setDistrict(result.getString("district_id"));
+            address.setUpazila(result.getString("upazila_id"));
+            address.setCityCorporation(result.getString("city_corporation_id"));
+            address.setWard(result.getString("union_urban_ward_id"));
+            address.setLine(result.getString("address_line"));
             patient.setAddress(address);
             return patient;
         } else {

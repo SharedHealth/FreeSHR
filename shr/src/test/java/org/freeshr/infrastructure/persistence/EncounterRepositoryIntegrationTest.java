@@ -15,6 +15,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import rx.Observable;
+import rx.functions.Action0;
+import rx.functions.Action1;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -25,6 +28,7 @@ import static org.freeshr.utils.FileUtil.asString;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
 
@@ -89,6 +93,20 @@ public class EncounterRepositoryIntegrationTest {
         assertEquals(2, encountersForCatchment.size());
         EncounterBundle encounter = encountersForCatchment.get(0);
         assertThat(encounter.getReceivedDate(), is(notNullValue()));
+    }
+
+    @Test
+    public void shouldFetchEncounterById() throws ExecutionException, InterruptedException {
+        Patient patient = new Patient();
+        String healthId = generateHealthId();
+        patient.setHealthId(healthId);
+        Date date = new Date();
+        patient.setAddress(new Address("01", "02", "03", "04", "05"));
+        encounterRepository.save(createEncounterBundle("e-0", healthId), patient);
+        encounterRepository.save(createEncounterBundle("e-2", healthId), patient);
+        Observable<EncounterBundle> encounterById = encounterRepository.findEncounterById("e-0");
+        assertEquals("e-0", encounterById.toBlocking().first().getEncounterId());
+
     }
 
     @After
