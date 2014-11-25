@@ -11,7 +11,7 @@ import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity;
 @Component
 public class ConditionValidator extends Validator {
 
-    public static final String CHIEF_COMPLAINT = "Complaint";
+    public static final String DIAGNOSIS = "Diagnosis";
     public static final String CATEGORY = "category";
 
     @Override
@@ -44,6 +44,6 @@ public class ConditionValidator extends Validator {
     boolean skipCheckForThisTypeOfEntry(AtomEntry<? extends Resource> atomEntry) {
         Property category = atomEntry.getResource().getChildByName(CATEGORY);
         Coding coding = ((CodeableConcept) category.getValues().get(0)).getCoding().get(0);
-        return coding.getDisplaySimple().equalsIgnoreCase(CHIEF_COMPLAINT);
+        return !coding.getDisplaySimple().equalsIgnoreCase(DIAGNOSIS);
     }
 }

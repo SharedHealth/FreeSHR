@@ -14,14 +14,11 @@ public abstract class Validator {
     abstract boolean skipCheckForThisTypeOfEntry(AtomEntry<? extends Resource> atomEntry);
 
     public void checkCodeableConcept(List<ValidationMessage> validationMessages, Property property, AtomEntry<? extends Resource> atomEntry) {
-        if (!property.getTypeCode().equals(CODEABLE_CONCEPT)) return;
-
-        if (!property.hasValues()) return;
+        if (!property.getTypeCode().equals(CODEABLE_CONCEPT) || !property.hasValues() || skipCheckForThisTypeOfEntry(atomEntry) ) return;
 
         boolean bothSystemAndCodePresent = bothSystemAndCodePresent(property);
-        if (bothSystemAndCodePresent || skipCheckForThisTypeOfEntry(atomEntry)) {
-            return;
-        }
+        if (bothSystemAndCodePresent) return;
+
         ValidationMessage validationMessage = new ValidationMessage(null, ResourceValidator.INVALID, atomEntry.getId(), String.format("'%s' is non-coded in the Condition", property.getName()), OperationOutcome.IssueSeverity.error);
         validationMessages.add(validationMessage);
     }

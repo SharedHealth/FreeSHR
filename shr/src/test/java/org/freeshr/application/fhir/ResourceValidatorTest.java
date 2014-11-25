@@ -43,18 +43,18 @@ public class ResourceValidatorTest {
 
     @Test
     public void shouldValidateConditionDiagnosisWithAllValidComponents() {
-        List<ValidationMessage> messages = resourceValidator.validate(FileUtil.asString("xmls/encounters/valid_condition.xml"));
+        List<ValidationMessage> messages = resourceValidator.validate(FileUtil.asString("xmls/encounters/valid_diagnosis.xml"));
         assertThat(messages.isEmpty(), is(true));
     }
 
     @Test
-    public void shouldAllowResourceTypeConditionWithCodedAsWellAsNonCodedChiefComplaint() {
-        List<ValidationMessage> messages = resourceValidator.validate(FileUtil.asString("xmls/encounters/two_chief_complaints.xml"));
+    public void shouldAllowResourceTypeConditionWithCodedAsWellAsNonCodedForAnythingOtherThanDiagnosis() {
+        List<ValidationMessage> messages = resourceValidator.validate(FileUtil.asString("xmls/encounters/other_conditions.xml"));
         assertThat(messages.isEmpty(), is(true));
     }
 
     @Test
-    public void shouldAcceptConditionIfAtLeaseOneReferenceTermIsRight() {
+    public void shouldAcceptDiagnosisIfAtLeaseOneReferenceTermIsRight() {
         List<ValidationMessage> messages = resourceValidator.validate(FileUtil.asString("xmls/encounters/multiple_coded_diagnosis.xml"));
         assertThat(messages.isEmpty(), is(true));
     }
