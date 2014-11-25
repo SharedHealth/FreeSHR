@@ -7,6 +7,7 @@ import org.freeshr.infrastructure.persistence.FacilityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rx.Observable;
+import rx.functions.Func0;
 import rx.functions.Func1;
 
 @Service
@@ -24,7 +25,7 @@ public class FacilityService {
 
     public Observable<Facility> ensurePresent(final String facilityId) {
         Observable<Facility> facility = facilityRepository.find(facilityId);
-        return facility.concatMap(findRemoteNotFound(facilityId));
+        return facility.flatMap(findRemoteNotFound(facilityId));
     }
 
     private Func1<Facility, Observable<Facility>> findRemoteNotFound(final String facilityId) {
@@ -38,19 +39,25 @@ public class FacilityService {
     }
 
     private Observable<Facility> findRemote(String facilityId) {
-        try{
             Observable<Facility> facility = facilityRegistryClient.getFacility(facilityId);
             return facility.flatMap(new Func1<Facility, Observable<Facility>>() {
                 @Override
                 public Observable<Facility> call(Facility facility) {
                     return facilityRepository.save(facility);
                 }
+            }, new Func1<Throwable, Observable<? extends Facility>>() {
+                @Override
+                public Observable<? extends Facility> call(Throwable throwable) {
+                    logger.info(throwable.getMessage());
+                    return Observable.just(null);
+                }
+            }, new Func0<Observable<? extends Facility>>() {
+                @Override
+                public Observable<? extends Facility> call() {
+                    return null;
+                }
             });
-        }
-        catch(Exception e){
-            logger.warn(e);
-            return null;
-        }
+
     }
 
 }

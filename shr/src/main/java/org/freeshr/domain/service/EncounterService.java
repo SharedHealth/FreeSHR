@@ -45,42 +45,53 @@ public class EncounterService {
         EncounterValidationResponse validationResult = validate(encounterBundle);
         if (null == validationResult) {
             Observable<Patient> patientObservable = patientService.ensurePresent(encounterBundle.getHealthId());
-            return patientObservable.flatMap(new Func1<Patient, Observable<EncounterResponse>>() {
-                @Override
-                public Observable<EncounterResponse> call(Patient patient) {
-                    EncounterResponse response = new EncounterResponse();
-                    if (patient != null) {
-                        encounterBundle.setEncounterId(UUID.randomUUID().toString());
-                        try {
-                            encounterRepository.save(encounterBundle, patient);
-                        } catch (InterruptedException e) {
-                            logger.error(e.getMessage());
-                            e.printStackTrace();
-                        } catch (Exception e) {
-                            logger.error(e.getMessage());
-                        }
-                        response.setEncounterId(encounterBundle.getEncounterId());
-                        return Observable.just(response);
-                    } else {
-                        return Observable.just(response.preconditionFailure("healthId", "invalid", "Patient not available in patient registry"));
-                    }
-                }
-            }, new Func1<Throwable, Observable<EncounterResponse>>() {
-                @Override
-                public Observable<EncounterResponse> call(Throwable throwable) {
-                    logger.error(throwable.getMessage());
-                    return null;
-                }
-            }, new Func0<Observable<EncounterResponse>>() {
-                @Override
-                public Observable<EncounterResponse> call() {
-                    return null;
-                }
-            });
+            return patientObservable.flatMap(success(encounterBundle), error(), complete());
 
         } else {
             return Observable.just(new EncounterResponse().setValidationFailure(validationResult));
         }
+    }
+
+    private Func0<Observable<EncounterResponse>> complete() {
+        return new Func0<Observable<EncounterResponse>>() {
+            @Override
+            public Observable<EncounterResponse> call() {
+                return null;
+            }
+        };
+    }
+
+    private Func1<Throwable, Observable<EncounterResponse>> error() {
+        return new Func1<Throwable, Observable<EncounterResponse>>() {
+            @Override
+            public Observable<EncounterResponse> call(Throwable throwable) {
+                logger.error(throwable.getMessage());
+                return Observable.error(throwable);
+            }
+        };
+    }
+
+    private Func1<Patient, Observable<EncounterResponse>> success(final EncounterBundle encounterBundle) {
+        return new Func1<Patient, Observable<EncounterResponse>>() {
+            @Override
+            public Observable<EncounterResponse> call(Patient patient) {
+                final EncounterResponse response = new EncounterResponse();
+                if (patient != null) {
+                    encounterBundle.setEncounterId(UUID.randomUUID().toString());
+                    Observable<Boolean> save = encounterRepository.save(encounterBundle, patient);
+                    return save.map(new Func1<Boolean, EncounterResponse>() {
+                        @Override
+                        public EncounterResponse call(Boolean aBoolean) {
+                            if (aBoolean)
+                                response.setEncounterId(encounterBundle.getEncounterId());
+                            return response;
+                        }
+                    });
+                } else {
+                    return Observable.just(response.preconditionFailure("healthId", "invalid", "Patient not available in patient registry"));
+                }
+            }
+        };
     }
 
 
@@ -109,17 +120,20 @@ public class EncounterService {
      */
     public Observable<List<EncounterBundle>> findAllEncountersByFacilityCatchments(String facilityId, final String date) {
         Observable<Facility> facilityObservable = facilityService.ensurePresent(facilityId);
+
         return facilityObservable.flatMap(new Func1<Facility, Observable<List<EncounterBundle>>>() {
             @Override
             public Observable<List<EncounterBundle>> call(Facility facility) {
+                if(facility == null) return Observable.<List<EncounterBundle>>just(new ArrayList<EncounterBundle>());
                 return findEncountersForCatchments(facility.getCatchments(), date);
             }
         }, new Func1<Throwable, Observable<List<EncounterBundle>>>() {
             @Override
             public Observable<List<EncounterBundle>> call(Throwable throwable) {
                 logger.error(throwable.getMessage());
-                return Observable.<List<EncounterBundle>>just(new ArrayList<EncounterBundle>());
+                return Observable.error(throwable);
             }
+
         }, new Func0<Observable<List<EncounterBundle>>>() {
             @Override
             public Observable<List<EncounterBundle>> call() {

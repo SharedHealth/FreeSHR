@@ -48,5 +48,4 @@ public class FacilityServiceTest {
         assertNotNull(facilityService.ensurePresent(facility.getFacilityId()));
 
     }
-
 }

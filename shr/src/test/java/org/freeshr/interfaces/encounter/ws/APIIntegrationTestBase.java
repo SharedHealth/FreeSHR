@@ -69,11 +69,11 @@ public abstract class APIIntegrationTestBase {
     }
 
     public void createEncounter(EncounterBundle encounter, Patient patient) throws ExecutionException, InterruptedException {
-        encounterRepository.save(encounter, patient);
+        encounterRepository.save(encounter, patient).toBlocking().first();
     }
 
     public void createFacility(Facility facility) {
-        facilityRepository.save(facility);
+        facilityRepository.save(facility).toBlocking().first();
     }
 
     public BaseMatcher<EncounterSearchResponse> hasEncountersOfSize(final int expectedSize) {

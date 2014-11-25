@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.stereotype.Component;
 import rx.Observable;
+import rx.functions.Func0;
 import rx.functions.Func1;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class EncounterRepository {
         this.cqlOperations = cassandraTemplate;
     }
 
-    public void save(EncounterBundle encounterBundle, Patient patient) throws ExecutionException, InterruptedException {
+    public Observable<Boolean> save(EncounterBundle encounterBundle, Patient patient) {
         Address address = patient.getAddress();
 
         Insert insertEncounterStmt = QueryBuilder.insertInto("encounter");
@@ -69,7 +70,24 @@ public class EncounterRepository {
 
         Batch batch = QueryBuilder.batch(insertEncounterStmt, encCatchmentStmt, encByPatientStmt);
         System.out.println(batch.toString());
-        cqlOperations.execute(batch);
+        Observable<ResultSet> saveObservable = Observable.from(cqlOperations.executeAsynchronously(batch));
+
+        return saveObservable.flatMap(new Func1<ResultSet, Observable<Boolean>>() {
+            @Override
+            public Observable<Boolean> call(ResultSet rows) {
+                return Observable.just(true);
+            }
+        }, new Func1<Throwable, Observable<? extends Boolean>>() {
+            @Override
+            public Observable<? extends Boolean> call(Throwable throwable) {
+                return Observable.error(throwable);
+            }
+        }, new Func0<Observable<? extends Boolean>>() {
+            @Override
+            public Observable<? extends Boolean> call() {
+                return Observable.just(true);
+            }
+        });
     }
 
     public Observable<List<EncounterBundle>> findEncountersForCatchment(Catchment catchment, Date updatedSince, int limit) {
@@ -130,11 +148,11 @@ public class EncounterRepository {
     }
 
     private String buildEncounterSelectionQuery(LinkedHashSet<String> encounterIds) {
-        StringBuffer encounterQuery = new StringBuffer("SELECT encounter_id, health_id, received_date, content FROM encounter where encounter_id in (");
+        StringBuilder encounterQuery = new StringBuilder("SELECT encounter_id, health_id, received_date, content FROM encounter where encounter_id in (");
         int noOfEncounters = encounterIds.size();
         int idx = 0;
         for (String encounterId : encounterIds) {
-            encounterQuery.append("'" + encounterId + "'");
+            encounterQuery.append("'").append(encounterId).append("'");
             idx++;
             if (idx < noOfEncounters) {
                 encounterQuery.append(",");
@@ -198,6 +216,4 @@ public class EncounterRepository {
         }
         return findEncounters(encounterIds);
     }
-
-
 }

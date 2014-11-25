@@ -54,12 +54,19 @@ public class EncounterController {
                 if (encounterResponse.isSuccessful()) {
                     deferredResult.setResult(encounterResponse);
                 } else {
-                    if (encounterResponse.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition)) {
-                        deferredResult.setErrorResult(new PreconditionFailed(encounterResponse));
-                    } else {
-                        deferredResult.setErrorResult(new UnProcessableEntity(encounterResponse));
-                    }
+                    //TODO: move code to encounter response class
+                    deferredResult.setErrorResult(
+                            encounterResponse.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition)
+                                    ?
+                                    new PreconditionFailed(encounterResponse)
+                                    : new UnProcessableEntity(encounterResponse));
                 }
+            }
+        }, new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                logger.error(throwable.getMessage());
+               deferredResult.setErrorResult(throwable.getMessage());
             }
         });
 

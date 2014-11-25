@@ -309,4 +309,6 @@ public class EncounterServiceIntegrationTest {
         assertThat(address.getDivision(), is("30"));
         assertThat(address.getCityCorporation(), is("99"));
     }
+
+
 }

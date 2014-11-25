@@ -43,16 +43,14 @@ public class FacilityRepository {
         return resultSet.flatMap(new Func1<ResultSet, Observable<Facility>>() {
             @Override
             public Observable<Facility> call(ResultSet rows) {
-                try {
-                    return Observable.just(read(rows));
-                } catch (Exception e) {
-                    logger.error(e.getMessage());
-                    return Observable.error(e);
-                }
+                Row facilityRow = rows.one();
+                if(facilityRow == null) return Observable.just(null);
+                    return Observable.just(read(facilityRow));
             }
         }, new Func1<Throwable, Observable<? extends Facility>>() {
             @Override
             public Observable<? extends Facility> call(Throwable throwable) {
+                logger.error(throwable.getMessage());
                 return Observable.error(throwable);
             }
         }, new Func0<Observable<? extends Facility>>() {
@@ -63,10 +61,7 @@ public class FacilityRepository {
         });
     }
 
-    private Facility read(ResultSet resultSet) throws Exception {
-        Row result = resultSet.one();
-        if (null == result) throw new Exception("Facility not found");
-
+    private Facility read(Row result) {
         Facility facility = new Facility();
         facility.setFacilityId(result.getString("facility_id"));
         facility.setFacilityName(result.getString("facility_name"));
@@ -94,6 +89,7 @@ public class FacilityRepository {
         }, new Func1<Throwable, Observable<Facility>>() {
             @Override
             public Observable<Facility> call(Throwable throwable) {
+                logger.error(throwable.getMessage());
                 return Observable.error(throwable);
             }
         }, new Func0<Observable<Facility>>() {

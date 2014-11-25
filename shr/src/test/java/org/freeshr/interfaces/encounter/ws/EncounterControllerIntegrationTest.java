@@ -6,7 +6,6 @@ import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
-import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.internal.matchers.InstanceOf;
@@ -91,9 +90,9 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
         patient.setHealthId(healthId);
         patient.setAddress(new Address("01", "02", "03", "04", "05"));
 
-        createEncounter(createEncounterBundle("e-0-"+healthId, healthId), patient);
-        createEncounter(createEncounterBundle("e-1-"+healthId, healthId), patient);
-        createEncounter(createEncounterBundle("e-2-"+healthId, healthId), patient);
+        createEncounter(createEncounterBundle("e-0-" + healthId, healthId), patient);
+        createEncounter(createEncounterBundle("e-1-" + healthId, healthId), patient);
+        createEncounter(createEncounterBundle("e-2-" + healthId, healthId), patient);
         mockMvc.perform(MockMvcRequestBuilders.get(
                 String.format("/patients/%s/encounters", healthId))
                 .accept(MediaType.APPLICATION_JSON))
@@ -106,17 +105,17 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
         String healthId1 = generateHealthId();
         patient1.setHealthId(healthId1);
         patient1.setAddress(new Address("30", "26", "18", "01", "02"));
-        createEncounter(createEncounterBundle("e-0100-"+healthId1, healthId1), patient1);
-        createEncounter(createEncounterBundle("e-1100-"+healthId1, healthId1), patient1);
-        createEncounter(createEncounterBundle("e-2100-"+healthId1, healthId1), patient1);
+        createEncounter(createEncounterBundle("e-0100-" + healthId1, healthId1), patient1);
+        createEncounter(createEncounterBundle("e-1100-" + healthId1, healthId1), patient1);
+        createEncounter(createEncounterBundle("e-2100-" + healthId1, healthId1), patient1);
 
         Patient patient2 = new Patient();
         String healthId2 = generateHealthId();
         patient2.setHealthId(healthId2);
         patient2.setAddress(new Address("30", "26", "18", "02", "02"));
-        createEncounter(createEncounterBundle("e-0200-"+healthId2, healthId2), patient2);
-        createEncounter(createEncounterBundle("e-1200-"+healthId2, healthId2), patient2);
-        createEncounter(createEncounterBundle("e-2200-"+healthId2, healthId2), patient2);
+        createEncounter(createEncounterBundle("e-0200-" + healthId2, healthId2), patient2);
+        createEncounter(createEncounterBundle("e-1200-" + healthId2, healthId2), patient2);
+        createEncounter(createEncounterBundle("e-2200-" + healthId2, healthId2), patient2);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String today = dateFormat.format(new Date());
@@ -124,14 +123,13 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
         Facility facility = new Facility("10000069", "facility1", "Main hospital", "3026, 30261801", new Address("30", "26", "18", null, null));
         createFacility(facility);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/catchments/" + "3026" + "/encounters?updatedSince="+today)
+        mockMvc.perform(MockMvcRequestBuilders.get("/catchments/" + "3026" + "/encounters?updatedSince=" + today)
                 .header("facilityId", "10000069")
                 .accept(MediaType.APPLICATION_ATOM_XML))
                 .andExpect(request().asyncResult(hasEncountersOfSize(6)));
 
 
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/catchments/" + "30261801" + "/encounters?updatedSince="+today)
+        mockMvc.perform(MockMvcRequestBuilders.get("/catchments/" + "30261801" + "/encounters?updatedSince=" + today)
                 .header("facilityId", "10000069")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(request().asyncResult(hasEncountersOfSize(3)));

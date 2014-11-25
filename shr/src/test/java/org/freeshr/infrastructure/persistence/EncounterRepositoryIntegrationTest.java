@@ -7,7 +7,6 @@ import org.freeshr.domain.model.Catchment;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +15,6 @@ import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import rx.Observable;
-import rx.functions.Action0;
-import rx.functions.Action1;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -28,7 +25,6 @@ import static org.freeshr.utils.FileUtil.asString;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
 
@@ -50,9 +46,9 @@ public class EncounterRepositoryIntegrationTest {
         patient.setHealthId(healthId);
         patient.setAddress(new Address("01", "02", "03", "04", "05"));
         Date received_date = new Date();
-        encounterRepository.save(createEncounterBundle("e-0", healthId), patient);
-        encounterRepository.save(createEncounterBundle("e-1", healthId), patient);
-        encounterRepository.save(createEncounterBundle("e-2", healthId), patient);
+        encounterRepository.save(createEncounterBundle("e-0", healthId), patient).toBlocking().first();
+        encounterRepository.save(createEncounterBundle("e-1", healthId), patient).toBlocking().first();
+        encounterRepository.save(createEncounterBundle("e-2", healthId), patient).toBlocking().first();
 
         List<EncounterBundle> encounterBundles = encounterRepository.findEncountersForPatient(healthId, received_date, 200).toBlocking().single();
         EncounterBundle encounter = encounterBundles.get(0);
@@ -85,8 +81,8 @@ public class EncounterRepositoryIntegrationTest {
         patient.setHealthId(healthId);
         Date date = new Date();
         patient.setAddress(new Address("01", "02", "03", "04", "05"));
-        encounterRepository.save(createEncounterBundle("e-0", healthId), patient);
-        encounterRepository.save(createEncounterBundle("e-2", healthId), patient);
+        encounterRepository.save(createEncounterBundle("e-0", healthId), patient).toBlocking().first();
+        encounterRepository.save(createEncounterBundle("e-2", healthId), patient).toBlocking().first();
         List<EncounterBundle> encountersForCatchment = encounterRepository.
                 findEncountersForCatchment(new Catchment("0102"), date, 10).toBlocking().first();
         System.out.println(encountersForCatchment);
@@ -102,8 +98,8 @@ public class EncounterRepositoryIntegrationTest {
         patient.setHealthId(healthId);
         Date date = new Date();
         patient.setAddress(new Address("01", "02", "03", "04", "05"));
-        encounterRepository.save(createEncounterBundle("e-0", healthId), patient);
-        encounterRepository.save(createEncounterBundle("e-2", healthId), patient);
+        encounterRepository.save(createEncounterBundle("e-0", healthId), patient).toBlocking().first();
+        encounterRepository.save(createEncounterBundle("e-2", healthId), patient).toBlocking().first();
         Observable<EncounterBundle> encounterById = encounterRepository.findEncounterById("e-0");
         assertEquals("e-0", encounterById.toBlocking().first().getEncounterId());
 
