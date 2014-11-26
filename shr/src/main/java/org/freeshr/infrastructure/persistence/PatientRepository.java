@@ -5,6 +5,8 @@ import com.datastax.driver.core.Row;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.utils.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cassandra.core.CqlOperations;
@@ -16,11 +18,13 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.join;
+import static org.freeshr.infrastructure.persistence.RxMaps.completeResponds;
+import static org.freeshr.infrastructure.persistence.RxMaps.respondOnNext;
 import static org.freeshr.utils.CollectionUtils.map;
 
 @Component
 public class PatientRepository {
-
+    private static final Logger logger = LoggerFactory.getLogger(PatientRepository.class);
     private CqlOperations cqlOperations;
 
     @Autowired
@@ -61,9 +65,9 @@ public class PatientRepository {
         }
     }
 
-    public void save(Patient patient) {
-        //TODO:use query builder
-        cqlOperations.execute(toCQL(patient));
+    public Observable<Boolean> save(Patient patient) {
+        Observable<ResultSet> saveObservable = Observable.from(cqlOperations.executeAsynchronously(toCQL(patient)));
+        return saveObservable.flatMap(respondOnNext(true), RxMaps.<Boolean>logAndForwardError(logger), completeResponds(true));
     }
 
     private String toCQL(Patient patient) {

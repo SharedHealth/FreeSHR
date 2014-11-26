@@ -65,10 +65,20 @@ ext.testLibraries = [
         hamcrest_core : "org.hamcrest:hamcrest-all:1.3"
 ]
 
-def getProcessBuilder() {
+def getRunProcessBuilder() {
     Properties properties = new Properties();
     properties.load(new FileInputStream(file('env/local.properties')))
     def builder = new ProcessBuilder('./gradlew', 'run', '--debug')
+    builder.environment().putAll(properties)
+    builder.redirectOutput(ProcessBuilder.Redirect.INHERIT)
+    return builder
+}
+
+
+def getDebugProcessBuilder() {
+    Properties properties = new Properties();
+    properties.load(new FileInputStream(file('env/local.properties')))
+    def builder = new ProcessBuilder('./gradlew', 'run', '--debug', '--debug-jvm')
     builder.environment().putAll(properties)
     builder.redirectOutput(ProcessBuilder.Redirect.INHERIT)
     return builder
@@ -86,7 +96,13 @@ def exportEnvironmentVariablesToXML(defaults) {
 }
 
 task runSHR << {
-    ProcessBuilder builder = getProcessBuilder()
+    ProcessBuilder builder = getRunProcessBuilder()
+    Process process = builder.start();
+    process.waitFor();
+}
+
+task debugSHR << {
+    ProcessBuilder builder = getDebugProcessBuilder()
     Process process = builder.start();
     process.waitFor();
 }

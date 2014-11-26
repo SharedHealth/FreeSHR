@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.stereotype.Component;
 import rx.Observable;
-import rx.functions.Func0;
 import rx.functions.Func1;
 
 import java.util.ArrayList;
@@ -28,6 +27,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
+import static org.freeshr.infrastructure.persistence.RxMaps.*;
+import static org.freeshr.infrastructure.persistence.RxMaps.respondOnNext;
 
 @Component
 public class EncounterRepository {
@@ -47,7 +48,7 @@ public class EncounterRepository {
         insertEncounterStmt.value("encounter_id", encounterBundle.getEncounterId());
         insertEncounterStmt.value("health_id", encounterBundle.getHealthId());
         insertEncounterStmt.value("received_date", DateUtil.getCurrentTimeInISOString()); //TODO check timefunction
-        //insertEncounterStmt.value("received_date", System.currentTimeMillis());
+//        insertEncounterStmt.value("received_date", System.currentTimeMillis());
         insertEncounterStmt.value("content", encounterBundle.getEncounterContent().toString());
         insertEncounterStmt.value("patient_location_code", address.getLocationCode());
 
@@ -64,30 +65,14 @@ public class EncounterRepository {
                         encounterBundle.getEncounterId());
         RegularStatement encCatchmentStmt = new SimpleStatement(encCatchmentInsertQuery);
         String encByPatientInsertQuery =
-           String.format("INSERT INTO enc_by_patient (health_id, received_date, encounter_id) " +
-                " VALUES ('%s', now(), '%s')", encounterBundle.getHealthId(), encounterBundle.getEncounterId());
+                String.format("INSERT INTO enc_by_patient (health_id, received_date, encounter_id) " +
+                        " VALUES ('%s', now(), '%s')", encounterBundle.getHealthId(), encounterBundle.getEncounterId());
         RegularStatement encByPatientStmt = new SimpleStatement(encByPatientInsertQuery);
 
         Batch batch = QueryBuilder.batch(insertEncounterStmt, encCatchmentStmt, encByPatientStmt);
-        System.out.println(batch.toString());
         Observable<ResultSet> saveObservable = Observable.from(cqlOperations.executeAsynchronously(batch));
 
-        return saveObservable.flatMap(new Func1<ResultSet, Observable<Boolean>>() {
-            @Override
-            public Observable<Boolean> call(ResultSet rows) {
-                return Observable.just(true);
-            }
-        }, new Func1<Throwable, Observable<? extends Boolean>>() {
-            @Override
-            public Observable<? extends Boolean> call(Throwable throwable) {
-                return Observable.error(throwable);
-            }
-        }, new Func0<Observable<? extends Boolean>>() {
-            @Override
-            public Observable<? extends Boolean> call() {
-                return Observable.just(true);
-            }
-        });
+        return saveObservable.flatMap(respondOnNext(true), RxMaps.<Boolean>logAndForwardError(logger), completeResponds(true));
     }
 
     public Observable<List<EncounterBundle>> findEncountersForCatchment(Catchment catchment, Date updatedSince, int limit) {
@@ -109,10 +94,11 @@ public class EncounterRepository {
 
     public Observable<EncounterBundle> findEncounterById(String encounterId) {
         Select findEncounter = QueryBuilder
-                        .select("encounter_id", "health_id", "received_date", "content")
-                        .from("encounter")
-                        .where(eq("encounter_id", encounterId))
-                        .limit(1);
+                .select("encounter_id", "health_id", "received_date", "content")
+                .from("encounter")
+                .where(eq("encounter_id", encounterId))
+                .limit(1);
+
         return Observable.from(cqlOperations.queryAsynchronously(findEncounter)).flatMap(
                 new Func1<ResultSet, Observable<EncounterBundle>>() {
                     @Override
@@ -127,15 +113,13 @@ public class EncounterRepository {
                 });
     }
 
-
-
     private String buildCatchmentSearchQuery(Catchment catchment, Date updatedSince, int limit) {
         int yearOfDate = DateUtil.getYearOf(updatedSince);
         String lastUpdateTime = DateUtil.toDateString(updatedSince, DateUtil.UTC_DATE_IN_MILLIS_FORMAT);
         //TODO test. condition should be >=
         return String.format("SELECT encounter_id FROM enc_by_catchment " +
-                      " WHERE year = %s and received_date >= minTimeUuid('%s') and %s LIMIT %s ALLOW FILTERING;",
-                        yearOfDate, lastUpdateTime, buildClauseForCatchment(catchment), limit);
+                        " WHERE year = %s and received_date >= minTimeUuid('%s') and %s LIMIT %s ALLOW FILTERING;",
+                yearOfDate, lastUpdateTime, buildClauseForCatchment(catchment), limit);
     }
 
     private Observable<List<EncounterBundle>> findEncounters(LinkedHashSet<String> encounterIds) {
@@ -202,18 +186,39 @@ public class EncounterRepository {
     }
 
     public Observable<List<EncounterBundle>> findEncountersForPatient(String healthId, Date updatedSince, int limit) throws ExecutionException, InterruptedException {
+        StringBuilder queryBuilder = buildQuery(healthId, updatedSince, limit);
+        Observable<LinkedHashSet<String>> encounterIdsObservable = Observable.from(cqlOperations.queryAsynchronously(queryBuilder.toString()))
+                .map(new Func1<ResultSet, LinkedHashSet<String>>() {
+                    @Override
+                    public LinkedHashSet<String> call(ResultSet rows) {
+                        LinkedHashSet<String> encounterIds = new LinkedHashSet<>();
+                        for (Row row : rows) {
+                            encounterIds.add(row.getString("encounter_id"));
+                        }
+                        return encounterIds;
+                    }
+                });
+
+        return encounterIdsObservable.flatMap(
+                new Func1<LinkedHashSet<String>, Observable<List<EncounterBundle>>>() {
+                    @Override
+                    public Observable<List<EncounterBundle>> call(LinkedHashSet<String> encounterIds) {
+                        if (encounterIds.isEmpty()) {
+                            return Observable.<List<EncounterBundle>>just(new ArrayList<EncounterBundle>());
+                        }
+                        String encounterQuery = buildEncounterSelectionQuery(encounterIds);
+                        return executeFindQuery(encounterQuery);
+                    }
+                });
+    }
+
+    private StringBuilder buildQuery(String healthId, Date updatedSince, int limit) {
         StringBuilder queryBuilder = new StringBuilder(String.format("SELECT encounter_id FROM enc_by_patient where health_id='%s'", healthId));
         if (updatedSince != null) {
             String lastUpdateTime = DateUtil.toDateString(updatedSince, DateUtil.UTC_DATE_IN_MILLIS_FORMAT);
             queryBuilder.append(String.format(" and received_date >= minTimeUuid('%s')", lastUpdateTime));
         }
-
-        queryBuilder.append(String.format(" LIMIT %d;",limit));
-        ResultSet resultSet = cqlOperations.query(queryBuilder.toString());
-        LinkedHashSet<String> encounterIds = new LinkedHashSet<>();
-        for (Row row : resultSet) {
-            encounterIds.add(row.getString("encounter_id"));
-        }
-        return findEncounters(encounterIds);
+        queryBuilder.append(String.format(" LIMIT %d;", limit));
+        return queryBuilder;
     }
 }

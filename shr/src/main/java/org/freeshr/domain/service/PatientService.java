@@ -7,8 +7,9 @@ import org.freeshr.infrastructure.persistence.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rx.Observable;
-import rx.functions.Func0;
+import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 import java.util.concurrent.ExecutionException;
 
@@ -39,24 +40,27 @@ public class PatientService {
 
     private Observable<Patient> findRemote(String healthId) {
         Observable<Patient> remotePatient = masterClientIndexClient.getPatient(healthId);
-        return remotePatient.flatMap(new Func1<Patient, Observable<Patient>>() {
+        savePatient(remotePatient);
+        return remotePatient.onErrorReturn(new Func1<Throwable, Patient>() {
             @Override
-            public Observable<Patient> call(Patient patient) {
-                if (null != patient) {
-                    patientRepository.save(patient);
-                }
-                return Observable.just(patient);
-            }
-        }, new Func1<Throwable, Observable<Patient>>() {
-            @Override
-            public Observable<Patient> call(Throwable throwable) {
-                logger.error(throwable);
-                return Observable.just(null);
-            }
-        }, new Func0<Observable<Patient>>() {
-            @Override
-            public Observable<Patient> call() {
+            public Patient call(Throwable throwable) {
+                logger.error("Patient not found at MCI");
                 return null;
+            }
+        });
+    }
+
+    private void savePatient(Observable<Patient> remotePatient) {
+        remotePatient.subscribeOn(Schedulers.io());
+        remotePatient.subscribe(new Action1<Patient>() {
+            @Override
+            public void call(Patient patient) {
+                patientRepository.save(patient);
+            }
+        }, new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                logger.error(throwable.getMessage());
             }
         });
     }
