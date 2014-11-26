@@ -5,7 +5,8 @@ import com.sun.syndication.feed.atom.Feed;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.freeshr.application.fhir.EncounterBundle;
+import org.freeshr.application.fhir.*;
+import org.freeshr.application.fhir.Error;
 import org.freeshr.domain.service.EncounterService;
 import org.freeshr.utils.DateUtil;
 import org.junit.Before;
@@ -148,13 +149,21 @@ public class EncounterControllerTest {
     }
 
     @Test
-    public void testSomething() {
+    public void shouldSerializeErrorInfo() {
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
         ErrorInfo errorInfo = new ErrorInfo(HttpStatus.NOT_FOUND, "Not found");
         MockHttpOutputMessage outputMessage = new MockHttpOutputMessage();
         try {
             converter.write(errorInfo, MediaType.APPLICATION_JSON, outputMessage);
-            System.out.println(outputMessage.getBodyAsString());
+            assertEquals("{\"httpStatus\":\"404\",\"message\":\"Not found\"}", outputMessage.getBodyAsString());
+
+//            EncounterResponse encounterResponse = new EncounterResponse();
+//            EncounterValidationResponse encounterValidationResponse = new EncounterValidationResponse();
+//            encounterValidationResponse.addError(new Error("encounterDate", "invalid", "invalid date" ));
+//            encounterResponse.setValidationFailure(encounterValidationResponse);
+//            converter.write(encounterResponse, MediaType.APPLICATION_JSON, outputMessage);
+//            System.out.println(outputMessage.getBodyAsString());
+
         } catch (IOException e) {
             e.printStackTrace();
         }
