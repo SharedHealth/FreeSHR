@@ -31,14 +31,14 @@ public class ResourceValidatorTest {
         List<ValidationMessage> messages = resourceValidator.validate(FileUtil.asString("xmls/encounters/coded_and_noncoded_diagnosis.xml"));
         assertThat(messages.size(), is(3));
         assertThat(messages.get(0).getLevel(), is(OperationOutcome.IssueSeverity.error));
-        assertThat(messages.get(0).getMessage(), is("'code' is non-coded in the Condition"));
-        assertThat(messages.get(0).getType(), is("invalid"));
+        assertThat(messages.get(0).getMessage(), is("Viral pneumonia 785857"));
+        assertThat(messages.get(0).getType(), is(ResourceValidator.CODE_UNKNOWN));
         assertThat(messages.get(1).getLevel(), is(OperationOutcome.IssueSeverity.error));
-        assertThat(messages.get(1).getMessage(), is("'code' is non-coded in the Condition"));
-        assertThat(messages.get(1).getType(), is("invalid"));
+        assertThat(messages.get(1).getMessage(), is("Viral pneumonia 785857"));
+        assertThat(messages.get(1).getType(), is(ResourceValidator.CODE_UNKNOWN));
         assertThat(messages.get(2).getLevel(), is(OperationOutcome.IssueSeverity.error));
-        assertThat(messages.get(2).getMessage(), is("'severity' is non-coded in the Condition"));
-        assertThat(messages.get(2).getType(), is("invalid"));
+        assertThat(messages.get(2).getMessage(), is("Moderate"));
+        assertThat(messages.get(2).getType(), is(ResourceValidator.CODE_UNKNOWN));
     }
 
     @Test

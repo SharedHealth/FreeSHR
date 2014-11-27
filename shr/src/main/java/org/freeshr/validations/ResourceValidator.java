@@ -15,6 +15,7 @@ import java.util.Map;
 public class ResourceValidator {
 
     public static final String INVALID = "invalid";
+    public static final String CODE_UNKNOWN = "code-unknown";
 
     private ResourceOrFeedDeserializer resourceOrFeedDeserializer;
     private Map<ResourceType, Validator> resourceTypeValidatorMap = new HashMap<ResourceType, Validator>();

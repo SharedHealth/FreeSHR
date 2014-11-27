@@ -19,7 +19,8 @@ public abstract class Validator {
         boolean bothSystemAndCodePresent = bothSystemAndCodePresent(property);
         if (bothSystemAndCodePresent) return;
 
-        ValidationMessage validationMessage = new ValidationMessage(null, ResourceValidator.INVALID, atomEntry.getId(), String.format("'%s' is non-coded in the Condition", property.getName()), OperationOutcome.IssueSeverity.error);
+        String errorMessage = (((CodeableConcept) property.getValues().get(0)).getCoding()).get(0).getDisplaySimple();
+        ValidationMessage validationMessage = new ValidationMessage(null, ResourceValidator.CODE_UNKNOWN, atomEntry.getId(), errorMessage , OperationOutcome.IssueSeverity.error);
         validationMessages.add(validationMessage);
     }
 
