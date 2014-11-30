@@ -1,6 +1,7 @@
 package org.freeshr.application.fhir;
 
 import org.freeshr.utils.FileUtil;
+import org.freeshr.utils.ResourceOrFeedDeserializer;
 import org.freeshr.validations.ConditionValidator;
 import org.freeshr.validations.ResourceValidator;
 import org.hl7.fhir.instance.model.OperationOutcome;
@@ -16,10 +17,12 @@ import static org.junit.Assert.*;
 public class ResourceValidatorTest {
 
     private ResourceValidator resourceValidator;
+    ResourceOrFeedDeserializer resourceOrFeedDeserializer;
 
     @Before
     public void setup() {
         resourceValidator = new ResourceValidator();
+        resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
     }
 
     @Test
@@ -28,7 +31,9 @@ public class ResourceValidatorTest {
         // 1. Without code and system for diagnosis, 2. With valid code and system for diagnosis, 3. With only code for daiagnosis
         // 4. With non-coded severity, location, evidence etc.
 
-        List<ValidationMessage> messages = resourceValidator.validate(FileUtil.asString("xmls/encounters/coded_and_noncoded_diagnosis.xml"));
+
+        String xml = FileUtil.asString("xmls/encounters/coded_and_noncoded_diagnosis.xml");
+        List<ValidationMessage> messages = resourceValidator.validate(resourceOrFeedDeserializer.deserialize(xml));
         assertThat(messages.size(), is(3));
         assertThat(messages.get(0).getLevel(), is(OperationOutcome.IssueSeverity.error));
         assertThat(messages.get(0).getMessage(), is("Viral pneumonia 785857"));
@@ -43,19 +48,23 @@ public class ResourceValidatorTest {
 
     @Test
     public void shouldValidateConditionDiagnosisWithAllValidComponents() {
-        List<ValidationMessage> messages = resourceValidator.validate(FileUtil.asString("xmls/encounters/valid_diagnosis.xml"));
+        String xml = FileUtil.asString("xmls/encounters/valid_diagnosis.xml");
+        List<ValidationMessage> messages = resourceValidator.validate(resourceOrFeedDeserializer.deserialize(xml));
+
         assertThat(messages.isEmpty(), is(true));
     }
 
     @Test
     public void shouldAllowResourceTypeConditionWithCodedAsWellAsNonCodedForAnythingOtherThanDiagnosis() {
-        List<ValidationMessage> messages = resourceValidator.validate(FileUtil.asString("xmls/encounters/other_conditions.xml"));
+        String xml = FileUtil.asString("xmls/encounters/other_conditions.xml");
+        List<ValidationMessage> messages = resourceValidator.validate(resourceOrFeedDeserializer.deserialize(xml));
         assertThat(messages.isEmpty(), is(true));
     }
 
     @Test
     public void shouldAcceptDiagnosisIfAtLeaseOneReferenceTermIsRight() {
-        List<ValidationMessage> messages = resourceValidator.validate(FileUtil.asString("xmls/encounters/multiple_coded_diagnosis.xml"));
+        String xml = FileUtil.asString("xmls/encounters/multiple_coded_diagnosis.xml");
+        List<ValidationMessage> messages = resourceValidator.validate(resourceOrFeedDeserializer.deserialize(xml));
         assertThat(messages.isEmpty(), is(true));
     }
 

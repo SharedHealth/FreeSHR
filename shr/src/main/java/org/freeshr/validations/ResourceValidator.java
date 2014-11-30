@@ -18,7 +18,7 @@ public class ResourceValidator {
     public static final String CODE_UNKNOWN = "code-unknown";
 
     private ResourceOrFeedDeserializer resourceOrFeedDeserializer;
-    private Map<ResourceType, Validator> resourceTypeValidatorMap = new HashMap<ResourceType, Validator>();
+    private Map<ResourceType, Validator> resourceTypeValidatorMap = new HashMap<>();
 
     public ResourceValidator() {
         this.resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
@@ -36,9 +36,8 @@ public class ResourceValidator {
         }
     }
 
-    public List<ValidationMessage> validate(String sourceXml) {
+    public List<ValidationMessage> validate(AtomFeed feed) {
         List<ValidationMessage> validationMessages = new ArrayList<>();
-        AtomFeed feed = resourceOrFeedDeserializer.deserialize(sourceXml);
         for (AtomEntry<? extends Resource> atomEntry : feed.getEntryList()) {
             ResourceType resourceType = atomEntry.getResource().getResourceType();
             Validator validator = resourceTypeValidatorMap.get(resourceType);

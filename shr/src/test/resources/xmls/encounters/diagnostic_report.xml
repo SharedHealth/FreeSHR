@@ -18,6 +18,9 @@
                 </identifier>
                 <date value="2014-10-13T14:38:22+05:30"/>
                 <status value="final"/>
+                <subject>
+                    <reference value="5893922485019082753"/>
+                </subject>
                 <encounter>
                     <reference value="d3cc23c3-1f12-4b89-a415-356feeba0690"/>
                     <display value="encounter"/>

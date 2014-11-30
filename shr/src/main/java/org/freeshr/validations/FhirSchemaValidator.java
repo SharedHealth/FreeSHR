@@ -2,6 +2,7 @@ package org.freeshr.validations;
 
 import org.freeshr.application.fhir.TRConceptLocator;
 import org.freeshr.config.SHRProperties;
+import org.hl7.fhir.instance.model.AtomFeed;
 import org.hl7.fhir.instance.validation.InstanceValidator;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
