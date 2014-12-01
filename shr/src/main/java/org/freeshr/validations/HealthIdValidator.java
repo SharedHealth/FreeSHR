@@ -1,9 +1,8 @@
 package org.freeshr.validations;
 
 
-import org.freeshr.application.fhir.*;
+import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.utils.ResourceOrFeedDeserializer;
-import org.hl7.fhir.instance.formats.ParserBase;
 import org.hl7.fhir.instance.model.*;
 import org.springframework.stereotype.Component;
 
@@ -29,9 +28,8 @@ public class HealthIdValidator {
         for (AtomEntry<? extends Resource> atomEntry : feed.getEntryList()) {
             Property subject = atomEntry.getResource().getChildByName("subject");
             if (!subject.hasValues()) continue;
-
-            String healthId = ((ResourceReference) subject.getValues().get(0)).getReferenceSimple();
-            if (healthId.equalsIgnoreCase(expectedHealthId)) continue;
+            String healthIdFromUrl = getHealthIdFromUrl(((ResourceReference) subject.getValues().get(0)).getReferenceSimple());
+            if (expectedHealthId.equals(healthIdFromUrl)) continue;
 
             org.freeshr.application.fhir.Error error = new org.freeshr.application.fhir.Error("healthId", "invalid", "Patient's Health Id does not match.");
             encounterValidationResponse.addError(error);
@@ -39,5 +37,9 @@ public class HealthIdValidator {
         }
 
         return encounterValidationResponse;
+    }
+
+    private String getHealthIdFromUrl(String url) {
+        return url.substring(url.lastIndexOf('/') + 1, url.length());
     }
 }

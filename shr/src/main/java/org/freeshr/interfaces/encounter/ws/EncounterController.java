@@ -236,7 +236,8 @@ public class EncounterController {
         if (currentYear < requestedYear) return null;  //future year
         if (currentYear > requestedYear) { //advance to the next month's beginning date.
             requestedTime.add(Calendar.MONTH, 1);
-            String nextApplicableDate = String.format("%s-%s-01", requestedTime.get(Calendar.YEAR), requestedTime.get(Calendar.MONTH) + 1);
+
+            String nextApplicableDate = String.format("%s-%02d-01", requestedTime.get(Calendar.YEAR), requestedTime.get(Calendar.MONTH) + 1);
             return UriComponentsBuilder.fromUriString(request.getRequestURL().toString())
                     .queryParam("updatedSince", nextApplicableDate).build().toString();
         }

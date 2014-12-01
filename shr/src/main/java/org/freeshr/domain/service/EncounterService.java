@@ -19,6 +19,7 @@ import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.functions.FuncN;
 
+import java.net.MalformedURLException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -107,7 +108,7 @@ public class EncounterService {
         return encounterRepository.findEncountersForPatient(healthId, sinceDate, limit);
     }
 
-    private EncounterValidationResponse validate(EncounterBundle encounterBundle) {
+    private EncounterValidationResponse validate(EncounterBundle encounterBundle)  {
         final EncounterValidationResponse encounterValidationResponse = encounterValidator.validate(encounterBundle);
         return encounterValidationResponse.isSuccessful() ? null : encounterValidationResponse;
     }

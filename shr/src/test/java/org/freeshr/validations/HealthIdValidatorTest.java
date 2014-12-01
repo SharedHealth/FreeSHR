@@ -5,8 +5,11 @@ import org.freeshr.utils.FileUtil;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 public class HealthIdValidatorTest {
 
@@ -18,13 +21,13 @@ public class HealthIdValidatorTest {
     }
 
     @Test
-    public void shouldAcceptEncounterIfHealthIdInTheXmlMatchesTheGivenHealthId() {
+    public void shouldAcceptEncounterIfHealthIdInTheXmlMatchesTheGivenHealthId() throws MalformedURLException, URISyntaxException {
         EncounterValidationResponse response = healthIdValidator.validate(FileUtil.asString("xmls/encounters/diagnostic_order_valid.xml"), "5893922485019082753");
         assertThat(response.isSuccessful(), is(true));
     }
 
     @Test
-    public void shouldRejectEncounterIfHealthIdInTheXmlDoesNotMatchTheGivenHealthId(){
+    public void shouldRejectEncounterIfHealthIdInTheXmlDoesNotMatchTheGivenHealthId() {
         EncounterValidationResponse response = healthIdValidator.validate(FileUtil.asString("xmls/encounters/encounter.xml"), "11112222233333");
         assertThat(response.isSuccessful(), is(false));
         assertThat(response.getErrors().get(0).getType(), is(ResourceValidator.INVALID));

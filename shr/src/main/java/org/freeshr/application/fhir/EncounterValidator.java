@@ -2,7 +2,6 @@ package org.freeshr.application.fhir;
 
 
 import org.freeshr.validations.FhirSchemaValidator;
-import org.freeshr.validations.ConditionValidator;
 import org.freeshr.validations.HealthIdValidator;
 import org.freeshr.validations.ResourceValidator;
 import org.hl7.fhir.instance.model.OperationOutcome;
@@ -10,10 +9,9 @@ import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.freeshr.utils.CollectionUtils.reduce;
 
 @Component
 public class EncounterValidator {
