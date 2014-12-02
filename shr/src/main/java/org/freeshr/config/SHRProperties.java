@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 @Component
 public class SHRProperties {
 
+    public static final int ONE_DAY = 86400;
     @Value("${MCI_HOST}")
     private String mciHost;
     @Value("${MCI_PORT}")

@@ -6,6 +6,7 @@ import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import org.apache.log4j.Logger;
+import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Address;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +80,7 @@ public class FacilityRepository {
 
     public Observable<Facility> save(final Facility facility) {
         Insert insert = buildInsertStatement(facility);
+
         Observable<ResultSet> saveObservable = Observable.from(cqlTemplate.executeAsynchronously(insert));
 
         return saveObservable.flatMap(new Func1<ResultSet, Observable<Facility>>() {
@@ -103,6 +105,7 @@ public class FacilityRepository {
     private Insert buildInsertStatement(Facility facility) {
         return QueryBuilder
                 .insertInto("facilities")
+                .using(QueryBuilder.ttl(SHRProperties.ONE_DAY))
                 .value("facility_id", facility.getFacilityId())
                 .value("facility_name", facility.getFacilityName())
                 .value("facility_type", facility.getFacilityType())
@@ -111,7 +114,8 @@ public class FacilityRepository {
                 .value("upazila_id", facility.getFacilityLocation().getUpazila())
                 .value("city_corporation_id", facility.getFacilityLocation().getCityCorporation())
                 .value("union_urban_ward_id", facility.getFacilityLocation().getWard())
-                .value("catchments", facility.getCatchmentsAsCommaSeparatedString());
+                .value("catchments", facility.getCatchmentsAsCommaSeparatedString())
+                ;
     }
 
 }
