@@ -11,7 +11,6 @@ import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +46,7 @@ public class EncounterValidator {
         }
         encounterValidationResponse = healthIdValidator.validate(feed, encounterBundle.getHealthId());
         return encounterValidationResponse.isSuccessful() ? validate(sourceXml, feed) : encounterValidationResponse;
+
     }
 
 

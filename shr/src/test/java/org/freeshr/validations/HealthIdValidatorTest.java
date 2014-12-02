@@ -19,7 +19,7 @@ public class HealthIdValidatorTest {
     ResourceOrFeedDeserializer resourceOrFeedDeserializer;
 
     @Before
-    public void setup(){
+    public void setup() {
         healthIdValidator = new HealthIdValidator();
         resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
     }

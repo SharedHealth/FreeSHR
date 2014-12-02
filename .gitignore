@@ -19,6 +19,10 @@ node_modules
 
 #Logs
 nohup.out
+*.log
 
 #OSX specific files
 .DS_Store
+
+#zip files
+*.zip
