@@ -47,4 +47,16 @@ public class EncounterSearchResponse {
     public String getRequestUrl() {
         return requestUrl;
     }
+
+    @Override
+    public String toString() {
+        return "EncounterSearchResponse{" +
+                "requestUrl='" + requestUrl + '\'' +
+                ", author='" + author + '\'' +
+                ", title='" + title + '\'' +
+                ", nextUrl='" + nextUrl + '\'' +
+                ", prevUrl='" + prevUrl + '\'' +
+                ", entries=" + entries +
+                '}';
+    }
 }

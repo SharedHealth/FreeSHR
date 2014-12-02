@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Arrays;
 
 @XmlRootElement(name = "encounter")
 public class EncounterBundle {
@@ -110,5 +111,17 @@ public class EncounterBundle {
     @JsonProperty("title")
     public String getTitle() {
         return title + ":" + getEncounterId();
+    }
+
+    @Override
+    public String toString() {
+        return "EncounterBundle{" +
+                "encounterId='" + encounterId + '\'' +
+                ", healthId='" + healthId + '\'' +
+                ", receivedDate='" + receivedDate + '\'' +
+                ", encounterContent=" + encounterContent +
+                ", categories=" + Arrays.toString(categories) +
+                ", title='" + title + '\'' +
+                '}';
     }
 }

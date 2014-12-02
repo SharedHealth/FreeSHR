@@ -81,6 +81,7 @@ public class EncounterControllerTest {
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null, "/catchments/3026/encounters");
         DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncountersForCatchment(mockHttpServletRequest, "F1", "3026", "2014-10-10", null);
         EncounterSearchResponse response = (EncounterSearchResponse) encountersForCatchment.getResult();
+        System.out.println(response.toString());
         List<EncounterBundle> results = response.getEntries();
 
         EncounterFeedHelper encounterFeedBuilder = new EncounterFeedHelper();

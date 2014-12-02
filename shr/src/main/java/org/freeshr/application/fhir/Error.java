@@ -45,4 +45,5 @@ public class Error {
     public String toString() {
         return new Gson().toJson(this);
     }
+
 }

@@ -34,4 +34,12 @@ public class EncounterValidationResponse {
         error.setReason(message);
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "EncounterValidationResponse{" +
+                "errors=" + errors +
+                ", encounterId='" + encounterId + '\'' +
+                '}';
+    }
 }

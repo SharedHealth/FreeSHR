@@ -60,4 +60,14 @@ public class EncounterResponse {
         Precondition,
         None
     }
+
+    @Override
+    public String toString() {
+        return "EncounterResponse{" +
+                "encounterValidationResponse=" + encounterValidationResponse +
+                ", typeOfFailure=" + typeOfFailure +
+                ", encounterId='" + encounterId + '\'' +
+                ", preconditionFailure=" + preconditionFailure +
+                '}';
+    }
 }

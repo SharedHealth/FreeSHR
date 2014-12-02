@@ -52,6 +52,7 @@ public class EncounterController {
             @Override
             public void call(EncounterResponse encounterResponse) {
                 if (encounterResponse.isSuccessful()) {
+                    logger.debug(encounterResponse.toString());
                     deferredResult.setResult(encounterResponse);
                 } else {
                     //TODO: move code to encounter response class
@@ -90,6 +91,7 @@ public class EncounterController {
                     try {
                         EncounterSearchResponse searchResponse = new EncounterSearchResponse(
                                 getRequestUri(request, requestedDate, null), encounterBundles);
+                        logger.debug(searchResponse.toString());
                         deferredResult.setResult(searchResponse);
                     } catch (UnsupportedEncodingException e) {
                         deferredResult.setErrorResult(e);
@@ -99,6 +101,7 @@ public class EncounterController {
             }, new Action1<Throwable>() {
                 @Override
                 public void call(Throwable throwable) {
+                    logger.error(throwable.getMessage());
                     deferredResult.setErrorResult(throwable);
                 }
             });
@@ -130,10 +133,11 @@ public class EncounterController {
                     EncounterSearchResponse searchResponse = new EncounterSearchResponse(
                             getRequestUri(request, requestedDate, lastMarker), encounterBundles);
                     searchResponse.setNavLinks(null, getNextResultURL(request, encounterBundles, requestedDate));
-
+                    logger.debug(searchResponse.toString());
                     deferredResult.setResult(searchResponse);
                 } catch (Throwable t) {
                     deferredResult.setErrorResult(t);
+                    logger.error(t.getMessage());
                 }
             }
         }, new Action1<Throwable>() {
@@ -149,15 +153,18 @@ public class EncounterController {
     @RequestMapping(value = "/patients/{healthId}/encounters/{encounterId}", method = RequestMethod.GET, produces = {"application/json", "application/xml"})
     public DeferredResult<EncounterBundle> findEncountersForPatient(
             @PathVariable String healthId, @PathVariable final String encounterId) {
+        logger.debug(String.format("Find encounter %s for patient %s", encounterId, healthId));
         final DeferredResult<EncounterBundle> deferredResult = new DeferredResult<>();
         Observable<EncounterBundle> observable = encounterService.findEncounter(healthId, encounterId).firstOrDefault(null);
         observable.subscribe(new Action1<EncounterBundle>() {
             @Override
             public void call(EncounterBundle encounterBundle) {
                 if (encounterBundle != null) {
+                    logger.debug(encounterBundle.toString());
                     deferredResult.setResult(encounterBundle);
                 } else {
                     String errorMessage = String.format("Encounter %s not found", encounterId);
+                    logger.error(errorMessage);
                     deferredResult.setErrorResult(new ResourceNotFound(errorMessage));
                 }
             }
@@ -165,6 +172,7 @@ public class EncounterController {
         new Action1<Throwable>() {
             @Override
             public void call(Throwable throwable) {
+                logger.error(throwable.getMessage());
                 deferredResult.setErrorResult(throwable);
             }
         });
@@ -274,7 +282,7 @@ public class EncounterController {
                         return remainingEncounters.size() > limit ? remainingEncounters.subList(0, limit) : remainingEncounters;
                     }
                 }
-                return new ArrayList<EncounterBundle>();
+                return new ArrayList<>();
             }
         });
     }
