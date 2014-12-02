@@ -42,7 +42,7 @@ public class EncounterController {
     public DeferredResult<EncounterResponse> create(
             @PathVariable String healthId,
             @RequestBody EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
-        logger.debug("Create encounter. " + encounterBundle);
+        logger.debug("Create encounter. " + encounterBundle.getContent());
         encounterBundle.setHealthId(healthId);
 
         final DeferredResult<EncounterResponse> deferredResult = new DeferredResult<>();
