@@ -1,8 +1,10 @@
 package org.freeshr.validations;
 
 
-import org.freeshr.utils.ResourceOrFeedDeserializer;
-import org.hl7.fhir.instance.model.*;
+import org.hl7.fhir.instance.model.AtomEntry;
+import org.hl7.fhir.instance.model.AtomFeed;
+import org.hl7.fhir.instance.model.Resource;
+import org.hl7.fhir.instance.model.ResourceType;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.springframework.stereotype.Component;
 
@@ -17,15 +19,9 @@ public class ResourceValidator {
     public static final String INVALID = "invalid";
     public static final String CODE_UNKNOWN = "code-unknown";
 
-    private ResourceOrFeedDeserializer resourceOrFeedDeserializer;
     private Map<ResourceType, Validator> resourceTypeValidatorMap = new HashMap<>();
 
     public ResourceValidator() {
-        this.resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
-        populateValidatorMap();
-    }
-
-    private void populateValidatorMap() {
         assignDefaultValidatorToAllResourceTypes();
         resourceTypeValidatorMap.put(ResourceType.Condition, new ConditionValidator());
     }

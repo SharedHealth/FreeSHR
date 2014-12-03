@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.List;
+
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
@@ -54,7 +56,7 @@ public class EncounterValidatorIntegrationTest {
     public void setup() throws Exception {
         initMocks(this);
         fhirSchemaValidator = new FhirSchemaValidator(trConceptLocator, shrProperties);
-        validator = new EncounterValidator(fhirMessageFilter, fhirSchemaValidator, resourceValidator, healthIdValidator );
+        validator = new EncounterValidator(fhirMessageFilter, fhirSchemaValidator, resourceValidator, healthIdValidator);
         encounterBundle = EncounterBundleData.withValidEncounter();
     }
 
@@ -145,6 +147,28 @@ public class EncounterValidatorIntegrationTest {
         verify(trConceptLocator, times(6)).verifiesSystem(anyString());
         assertFalse(encounterValidationResponse.isSuccessful());
         assertThat(encounterValidationResponse.getErrors().size(), is(3));
+    }
+
+
+    @Test
+    public void shouldValidateCodesInObservations() {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, FileUtil.asString("xmls/encounters/encounter_with_obs_valid.xml"));
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+        EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
+        assertTrue(encounterValidationResponse.isSuccessful());
+    }
+
+    @Test
+    public void shouldInvalidateWrongCodesInObservations() {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, FileUtil.asString("xmls/encounters/encounter_with_obs_invalid.xml"));
+        when(trConceptLocator.validate(anyString(), eq("77405a73-b915-4a93-87a7-f29fe6697fb4-INVALID"), anyString())).thenReturn(new ConceptLocator.ValidationResult(OperationOutcome.IssueSeverity.error, "Invalid code"));
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+        EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
+        List<Error> errors = encounterValidationResponse.getErrors();
+        assertEquals(1, errors.size());
+        assertEquals("Invalid code", errors.get(0).getReason());
+        assertFalse(encounterValidationResponse.isSuccessful());
+
     }
 
     @Test

@@ -49,7 +49,6 @@ public class EncounterValidator {
 
     }
 
-
     private EncounterValidationResponse validate(String sourceXml, AtomFeed feed) {
         List<ValidationMessage> validationMessages = new ArrayList<>();
 
