@@ -4,23 +4,25 @@ import org.hl7.fhir.instance.model.*;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity;
 
 @Component
-public class ConditionValidator extends Validator {
+public class ConditionValidator extends AtomEntryValidator {
 
     public static final String DIAGNOSIS = "Diagnosis";
     public static final String CATEGORY = "category";
 
     @Override
-    public void validate(List<ValidationMessage> validationMessages, AtomEntry<? extends Resource> atomEntry) {
-
+    public List<ValidationMessage> validate(AtomEntry<? extends Resource> atomEntry) {
+        ArrayList<ValidationMessage> validationMessages = new ArrayList<>();
         for (Property property : atomEntry.getResource().children()) {
             if (verifyIfPropertyIsARelatedItem(validationMessages, property, atomEntry.getId())) continue;
             checkCodeableConcept(validationMessages, property, atomEntry);
         }
+        return validationMessages;
 
     }
 
@@ -45,5 +47,16 @@ public class ConditionValidator extends Validator {
         Property category = atomEntry.getResource().getChildByName(CATEGORY);
         Coding coding = ((CodeableConcept) category.getValues().get(0)).getCoding().get(0);
         return !coding.getDisplaySimple().equalsIgnoreCase(DIAGNOSIS);
+    }
+
+    protected void checkCodeableConcept(List<ValidationMessage> validationMessages, Property property, AtomEntry<? extends Resource> atomEntry) {
+        if (!property.getTypeCode().equals(CODEABLE_CONCEPT) || !property.hasValues() || skipCheckForThisTypeOfEntry(atomEntry) ) return;
+
+        boolean bothSystemAndCodePresent = bothSystemAndCodePresent(property);
+        if (bothSystemAndCodePresent) return;
+
+        String errorMessage = (((CodeableConcept) property.getValues().get(0)).getCoding()).get(0).getDisplaySimple();
+        ValidationMessage validationMessage = new ValidationMessage(null, ResourceValidator.CODE_UNKNOWN, atomEntry.getId(), errorMessage , IssueSeverity.error);
+        validationMessages.add(validationMessage);
     }
 }

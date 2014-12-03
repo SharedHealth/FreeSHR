@@ -1,10 +1,10 @@
-package org.freeshr.application.fhir;
+package org.freeshr.validations;
 
 
+import org.freeshr.application.fhir.EncounterBundle;
+import org.freeshr.application.fhir.EncounterValidationResponse;
+import org.freeshr.application.fhir.FhirMessageFilter;
 import org.freeshr.utils.ResourceOrFeedDeserializer;
-import org.freeshr.validations.FhirSchemaValidator;
-import org.freeshr.validations.HealthIdValidator;
-import org.freeshr.validations.ResourceValidator;
 import org.hl7.fhir.instance.model.AtomFeed;
 import org.hl7.fhir.instance.model.OperationOutcome;
 import org.hl7.fhir.instance.validation.ValidationMessage;
@@ -64,7 +64,7 @@ public class EncounterValidator {
 
     private EncounterValidationResponse createErrorResponse(Exception e) {
         EncounterValidationResponse encounterValidationResponse = new EncounterValidationResponse();
-        encounterValidationResponse.addError(new Error("Condition-status", "invalid", e.getMessage()));
+        encounterValidationResponse.addError(new org.freeshr.application.fhir.Error("Condition-status", "invalid", e.getMessage()));
         return encounterValidationResponse;
     }
 

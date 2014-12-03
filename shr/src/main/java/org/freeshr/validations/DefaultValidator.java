@@ -4,17 +4,13 @@ import org.hl7.fhir.instance.model.AtomEntry;
 import org.hl7.fhir.instance.model.Resource;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class DefaultValidator extends Validator {
+public class DefaultValidator extends AtomEntryValidator {
 
     @Override
-    public void validate(List<ValidationMessage> validationMessages, AtomEntry<? extends Resource> atomEntry) {
-
-    }
-
-    @Override
-    boolean skipCheckForThisTypeOfEntry(AtomEntry<? extends Resource> atomEntry) {
-        return false;
+    public List<ValidationMessage> validate(AtomEntry<? extends Resource> atomEntry) {
+        return new ArrayList<>();
     }
 }

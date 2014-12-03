@@ -1,19 +1,15 @@
 package org.freeshr.validations;
 
 
-import org.freeshr.application.fhir.*;
+import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.application.fhir.Error;
-import org.freeshr.utils.ResourceOrFeedDeserializer;
 import org.hl7.fhir.instance.model.*;
 import org.springframework.stereotype.Component;
 
 @Component
 public class HealthIdValidator {
 
-    private final ResourceOrFeedDeserializer resourceOrFeedDeserializer;
-
     public HealthIdValidator() {
-        this.resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
     }
 
     public EncounterValidationResponse validate(AtomFeed feed, String expectedHealthId) {
@@ -42,4 +38,5 @@ public class HealthIdValidator {
     private String getHealthIdFromUrl(String url) {
         return url.substring(url.lastIndexOf('/') + 1, url.length());
     }
+
 }

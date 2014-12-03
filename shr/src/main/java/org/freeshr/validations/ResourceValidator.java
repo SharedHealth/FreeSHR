@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class ResourceValidator {
+public class ResourceValidator implements Validator<AtomFeed>{
 
     public static final String INVALID = "invalid";
     public static final String CODE_UNKNOWN = "code-unknown";
 
-    private Map<ResourceType, Validator> resourceTypeValidatorMap = new HashMap<>();
+    private Map<ResourceType, AtomEntryValidator> resourceTypeValidatorMap = new HashMap<>();
 
     public ResourceValidator() {
         assignDefaultValidatorToAllResourceTypes();
@@ -32,12 +32,12 @@ public class ResourceValidator {
         }
     }
 
+    @Override
     public List<ValidationMessage> validate(AtomFeed feed) {
         List<ValidationMessage> validationMessages = new ArrayList<>();
         for (AtomEntry<? extends Resource> atomEntry : feed.getEntryList()) {
-            ResourceType resourceType = atomEntry.getResource().getResourceType();
-            Validator validator = resourceTypeValidatorMap.get(resourceType);
-            validator.validate(validationMessages, atomEntry);
+            AtomEntryValidator validator = resourceTypeValidatorMap.get(atomEntry.getResource().getResourceType());
+            validationMessages.addAll(validator.validate(atomEntry));
         }
         return validationMessages;
     }

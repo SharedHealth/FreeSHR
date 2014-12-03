@@ -4,7 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.application.fhir.EncounterValidationResponse;
-import org.freeshr.application.fhir.EncounterValidator;
+import org.freeshr.validations.EncounterValidator;
 import org.freeshr.domain.model.Catchment;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Patient;
@@ -19,7 +19,6 @@ import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.functions.FuncN;
 
-import java.net.MalformedURLException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 

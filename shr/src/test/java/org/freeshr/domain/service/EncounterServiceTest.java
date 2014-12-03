@@ -2,7 +2,7 @@ package org.freeshr.domain.service;
 
 
 import org.freeshr.application.fhir.EncounterBundle;
-import org.freeshr.application.fhir.EncounterValidator;
+import org.freeshr.validations.EncounterValidator;
 import org.freeshr.domain.model.Catchment;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Address;

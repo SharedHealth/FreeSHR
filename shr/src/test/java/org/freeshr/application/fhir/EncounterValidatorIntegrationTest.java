@@ -5,6 +5,7 @@ import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.data.EncounterBundleData;
 import org.freeshr.utils.FileUtil;
+import org.freeshr.validations.EncounterValidator;
 import org.freeshr.validations.FhirSchemaValidator;
 import org.freeshr.validations.HealthIdValidator;
 import org.freeshr.validations.ResourceValidator;
