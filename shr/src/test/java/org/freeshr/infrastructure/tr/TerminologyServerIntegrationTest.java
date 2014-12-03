@@ -66,4 +66,30 @@ public class TerminologyServerIntegrationTest {
     public void shouldRejectInvalidSystemPath() throws Exception {
         assertFalse(trServer.isValid("http://localhost:9997/invalid/path/code", "code").toBlocking().first());
     }
+
+    @Test
+    public void shouldFetchValueSetWithCaseSensitivity() throws Exception {
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/encounter-type"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/encounter-type-case-sensitive.json"))));
+
+        assertTrue(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type", "REG").toBlocking().first());
+        assertFalse(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type", "reg").toBlocking().first());
+        assertFalse(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type", "friend").toBlocking().first());
+    }
+
+    @Test
+    public void shouldFetchValueSetWithCaseInSensitivity() throws Exception {
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/encounter-type"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/encounter-type-case-insensitive.json"))));
+
+        assertTrue(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type", "REG").toBlocking().first());
+        assertTrue(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type", "reg").toBlocking().first());
+        assertFalse(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type", "friend").toBlocking().first());
+    }
 }

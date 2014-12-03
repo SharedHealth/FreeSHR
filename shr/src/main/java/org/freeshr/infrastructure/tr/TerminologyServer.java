@@ -15,8 +15,9 @@ public class TerminologyServer {
     }
 
     public Observable<Boolean> isValid(String uri, String code) {
-        if (factory.getValidator(uri) != null) {
-            return factory.getValidator(uri).isValid(uri, code);
+        CodeValidator validator = factory.getValidator(uri);
+        if (validator != null) {
+            return validator.isValid(uri, code);
         }
         return Observable.just(false);
     }

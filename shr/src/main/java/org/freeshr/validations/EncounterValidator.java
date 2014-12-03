@@ -4,6 +4,7 @@ package org.freeshr.validations;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.application.fhir.FhirMessageFilter;
+import org.freeshr.infrastructure.tr.ValueSetCodeValidator;
 import org.freeshr.utils.ResourceOrFeedDeserializer;
 import org.hl7.fhir.instance.model.AtomFeed;
 import org.hl7.fhir.instance.model.OperationOutcome;
@@ -22,14 +23,19 @@ public class EncounterValidator {
     private FhirSchemaValidator fhirSchemaValidator;
     private ResourceValidator resourceValidator;
     private HealthIdValidator healthIdValidator;
+    private ValueSetCodeValidator valueSetCodeValidator;
 
     @Autowired
-    public EncounterValidator(FhirMessageFilter fhirMessageFilter, FhirSchemaValidator fhirSchemaValidator,
-                              ResourceValidator resourceValidator, HealthIdValidator healthIdValidator) {
+    public EncounterValidator(FhirMessageFilter fhirMessageFilter,
+                              FhirSchemaValidator fhirSchemaValidator,
+                              ResourceValidator resourceValidator,
+                              HealthIdValidator healthIdValidator,
+                              ValueSetCodeValidator valueSetCodeValidator) {
         this.fhirMessageFilter = fhirMessageFilter;
         this.fhirSchemaValidator = fhirSchemaValidator;
         this.resourceValidator = resourceValidator;
         this.healthIdValidator = healthIdValidator;
+        this.valueSetCodeValidator = valueSetCodeValidator;
         this.resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
     }
 

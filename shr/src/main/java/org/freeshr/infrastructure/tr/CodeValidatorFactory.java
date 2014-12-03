@@ -13,11 +13,15 @@ public class CodeValidatorFactory {
 
     private CodeValidator refTermValidator;
     private CodeValidator conceptValidator;
+    private CodeValidator valueSetCodeValidator;
 
     @Autowired
-    public CodeValidatorFactory(AsyncRestTemplate shrRestTemplate, SHRProperties shrProperties) {
+    public CodeValidatorFactory(AsyncRestTemplate shrRestTemplate,
+                                SHRProperties shrProperties,
+                                ValueSetCodeValidator valueSetCodeValidator) {
         this.refTermValidator = new HttpCodeValidator(shrRestTemplate, shrProperties, "code");
         this.conceptValidator = new HttpCodeValidator(shrRestTemplate, shrProperties, "uuid");
+        this.valueSetCodeValidator = valueSetCodeValidator;
     }
 
 
@@ -27,6 +31,9 @@ public class CodeValidatorFactory {
         }
         if (url.contains(CONCEPT_PATTERN)) {
             return conceptValidator;
+        }
+        if (url.contains(ValueSetCodeValidator.VALUE_SET_PATTERN)) {
+            return valueSetCodeValidator;
         }
         return null;
     }

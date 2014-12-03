@@ -47,6 +47,9 @@ public class SHRProperties {
     @Value("${SERVER_CONNECTION_TIMEOUT}")
     private int serverConnectionTimeout;
 
+    @Value("${TR_SERVER_BASE_URL}")
+    private String trServerBaseUrl;
+
 
     public String getMCIPatientUrl() {
         return String.format("http://%s:%s/api/v1/patients", mciHost, mciPort);
@@ -112,4 +115,8 @@ public class SHRProperties {
         return encounterFetchLimit;
     }
 
+    public String getTrServerBaseUrl() {
+        return trServerBaseUrl;
+
+    }
 }

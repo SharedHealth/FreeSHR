@@ -4,6 +4,7 @@ import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.data.EncounterBundleData;
+import org.freeshr.infrastructure.tr.ValueSetCodeValidator;
 import org.freeshr.utils.FileUtil;
 import org.freeshr.validations.EncounterValidator;
 import org.freeshr.validations.FhirSchemaValidator;
@@ -51,13 +52,16 @@ public class EncounterValidatorIntegrationTest {
 
     private FhirSchemaValidator fhirSchemaValidator;
 
+    @Autowired
+    ValueSetCodeValidator valueSetCodeValidator;
+
     EncounterBundle encounterBundle;
 
     @Before
     public void setup() throws Exception {
         initMocks(this);
         fhirSchemaValidator = new FhirSchemaValidator(trConceptLocator, shrProperties);
-        validator = new EncounterValidator(fhirMessageFilter, fhirSchemaValidator, resourceValidator, healthIdValidator);
+        validator = new EncounterValidator(fhirMessageFilter, fhirSchemaValidator, resourceValidator, healthIdValidator, valueSetCodeValidator);
         encounterBundle = EncounterBundleData.withValidEncounter();
     }
 
