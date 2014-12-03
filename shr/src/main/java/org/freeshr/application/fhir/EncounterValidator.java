@@ -24,7 +24,8 @@ public class EncounterValidator {
     private HealthIdValidator healthIdValidator;
 
     @Autowired
-    public EncounterValidator(FhirMessageFilter fhirMessageFilter, FhirSchemaValidator fhirSchemaValidator, ResourceValidator resourceValidator, HealthIdValidator healthIdValidator) {
+    public EncounterValidator(FhirMessageFilter fhirMessageFilter, FhirSchemaValidator fhirSchemaValidator,
+                              ResourceValidator resourceValidator, HealthIdValidator healthIdValidator) {
         this.fhirMessageFilter = fhirMessageFilter;
         this.fhirSchemaValidator = fhirSchemaValidator;
         this.resourceValidator = resourceValidator;
@@ -34,28 +35,44 @@ public class EncounterValidator {
 
     public EncounterValidationResponse validate(EncounterBundle encounterBundle) {
         String sourceXml = encounterBundle.getEncounterContent().toString();
+        EncounterValidationResponse validationResponse = validateSchema(sourceXml);
+        if (validationResponse.isNotSuccessful())
+            return validationResponse;
 
-        EncounterValidationResponse encounterValidationResponse = new EncounterValidationResponse();
         AtomFeed feed = null;
         try {
             feed = resourceOrFeedDeserializer.deserialize(sourceXml);
         } catch (Exception e) {
-            org.freeshr.application.fhir.Error error = new org.freeshr.application.fhir.Error("Condition-status", "invalid", e.getMessage());
-            encounterValidationResponse.addError(error);
-            return encounterValidationResponse;
+            return createErrorResponse(e);
         }
-        encounterValidationResponse = healthIdValidator.validate(feed, encounterBundle.getHealthId());
-        return encounterValidationResponse.isSuccessful() ? validate(sourceXml, feed) : encounterValidationResponse;
 
+        validationResponse = validateResources(feed);
+        return validationResponse.isSuccessful() ? healthIdValidator.validate(feed, encounterBundle.getHealthId())
+                : validationResponse;
     }
 
-    private EncounterValidationResponse validate(String sourceXml, AtomFeed feed) {
+    private EncounterValidationResponse validateSchema(String sourceXml) {
+        List<ValidationMessage> validationMessages = fhirSchemaValidator.validate(sourceXml);
+        return createValidationResponse(validationMessages);
+    }
+
+    private EncounterValidationResponse validateResources(AtomFeed feed) {
         List<ValidationMessage> validationMessages = new ArrayList<>();
-
-        validationMessages.addAll(fhirSchemaValidator.validate(sourceXml));
         validationMessages.addAll(resourceValidator.validate(feed));
-
-        return fhirMessageFilter.filterMessagesSevereThan(validationMessages, OperationOutcome.IssueSeverity.warning);
+        return createValidationResponse(validationMessages);
     }
+
+    private EncounterValidationResponse createErrorResponse(Exception e) {
+        EncounterValidationResponse encounterValidationResponse = new EncounterValidationResponse();
+        encounterValidationResponse.addError(new Error("Condition-status", "invalid", e.getMessage()));
+        return encounterValidationResponse;
+    }
+
+
+    private EncounterValidationResponse createValidationResponse(List<ValidationMessage> validationMessages) {
+        return fhirMessageFilter.filterMessagesSevereThan(validationMessages,
+                OperationOutcome.IssueSeverity.warning);
+    }
+
 
 }

@@ -16,6 +16,10 @@ public class EncounterValidationResponse {
         return errors.isEmpty();
     }
 
+    public boolean isNotSuccessful() {
+        return !isSuccessful();
+    }
+
     public String getEncounterId() {
         return encounterId;
     }

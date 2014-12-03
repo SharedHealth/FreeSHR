@@ -157,7 +157,21 @@
                     </coding>
                 </name>
                 <valueDecimal value="120.5"/>
+
                 <status value="final"/>
+
+                <location>
+                    <code>
+                        <coding>
+                            <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/concepts/77405a73-b915-4a93-87a7-f29fe6697fb4-INVALID"/>
+                            <code value="77405a73-b915-4a93-87a7-f29fe6697fb4-INVALID"/>
+                            <display value="Invalid location"/>
+                        </coding>
+                    </code>
+                    <detail value="Invalid location"/>
+                </location>
+
+
                 <reliability value="ok"/>
                 <identifier>
                     <value value="6e2b5e18-eeae-44c4-81de-2441fbf67c2d"/>
@@ -186,6 +200,7 @@
                         <display value="Blood Pressure"/>
                     </coding>
                 </name>
+
                 <status value="final"/>
                 <reliability value="ok"/>
                 <identifier>

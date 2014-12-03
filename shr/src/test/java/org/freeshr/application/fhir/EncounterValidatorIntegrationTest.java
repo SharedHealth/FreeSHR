@@ -165,7 +165,7 @@ public class EncounterValidatorIntegrationTest {
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
         List<Error> errors = encounterValidationResponse.getErrors();
-        assertEquals(1, errors.size());
+        assertEquals(2, errors.size());
         assertEquals("Invalid code", errors.get(0).getReason());
         assertFalse(encounterValidationResponse.isSuccessful());
 
@@ -177,7 +177,7 @@ public class EncounterValidatorIntegrationTest {
         EncounterValidationResponse response = validator.validate(encounterBundle);
         assertFalse(response.isSuccessful());
         assertThat(response.getErrors().size(), is(1));
-        verify(trConceptLocator, never()).verifiesSystem(anyString());
+        assertTrue(response.getErrors().get(0).getReason().contains("Health Id does not match"));
     }
 
 }
