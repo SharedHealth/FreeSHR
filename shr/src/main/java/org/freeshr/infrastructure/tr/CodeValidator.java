@@ -1,8 +1,8 @@
 package org.freeshr.infrastructure.tr;
 
 
-import org.springframework.util.concurrent.ListenableFuture;
+import rx.Observable;
 
 public interface CodeValidator {
-    ListenableFuture<Boolean> isValid(String uri, String code);
+    Observable<Boolean> isValid(String uri, String code);
 }

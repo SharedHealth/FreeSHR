@@ -5,10 +5,9 @@ import org.freeshr.config.SHRProperties;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureCallback;
-import org.springframework.util.concurrent.SettableListenableFuture;
 import org.springframework.web.client.AsyncRestTemplate;
+import rx.Observable;
+import rx.functions.Func1;
 
 import java.util.Map;
 
@@ -27,28 +26,29 @@ public class HttpCodeValidator implements CodeValidator {
         this.path = path;
     }
 
-    private void get(String uri, ListenableFutureCallback<ResponseEntity<Map>> callback) {
-        ListenableFuture<ResponseEntity<Map>> future = shrRestTemplate.exchange(uri,
+    private Observable<ResponseEntity<Map>> get(String uri) {
+        return Observable.from(shrRestTemplate.exchange(uri,
                 HttpMethod.GET,
                 new HttpEntity(basicAuthHeaders(shrProperties.getTrUser(), shrProperties.getTrPassword())),
-                Map.class);
-        future.addCallback(callback);
+                Map.class));
     }
+
 
     @Override
-    public ListenableFuture<Boolean> isValid(String uri, final String code) {
-        final SettableListenableFuture<Boolean> future = new SettableListenableFuture<Boolean>();
-
-        get(uri, new ListenableFutureCallback<ResponseEntity<Map>>() {
-            public void onSuccess(ResponseEntity<Map> result) {
-                future.set(result.getStatusCode().is2xxSuccessful() && fetch(result.getBody(), path).equals(code));
-            }
-
-            public void onFailure(Throwable t) {
-                future.set(false);
+    public Observable<Boolean> isValid(String uri, final String code) {
+        Observable<Boolean> observable = get(uri).map(new Func1<ResponseEntity<Map>, Boolean>() {
+            @Override
+            public Boolean call(ResponseEntity<Map> mapResponseEntity) {
+                return mapResponseEntity.getStatusCode().is2xxSuccessful()
+                        && fetch(mapResponseEntity.getBody(), path).equals(code);
             }
         });
-
-        return future;
+        return observable.onErrorReturn(new Func1<Throwable, Boolean>() {
+            @Override
+            public Boolean call(Throwable throwable) {
+                return false;
+            }
+        });
     }
+
 }

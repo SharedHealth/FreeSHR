@@ -1,9 +1,8 @@
 package org.freeshr.infrastructure.tr;
 
-import org.freeshr.utils.concurrent.PreResolvedListenableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.concurrent.ListenableFuture;
+import rx.Observable;
 
 @Component
 public class TerminologyServer {
@@ -15,10 +14,10 @@ public class TerminologyServer {
         this.factory = factory;
     }
 
-    public ListenableFuture<Boolean> isValid(String uri, String code) {
+    public Observable<Boolean> isValid(String uri, String code) {
         if (factory.getValidator(uri) != null) {
             return factory.getValidator(uri).isValid(uri, code);
         }
-        return new PreResolvedListenableFuture<>(false);
+        return Observable.just(false);
     }
 }

@@ -10,9 +10,11 @@ import org.hl7.fhir.instance.utils.ConceptLocator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
+import static java.util.Collections.EMPTY_LIST;
+import static org.hl7.fhir.instance.model.ValueSet.ValueSetDefineConceptComponent;
+import static org.hl7.fhir.instance.model.ValueSet.ValueSetExpansionContainsComponent;
 
 @Component
 public class TRConceptLocator implements ConceptLocator {
@@ -27,13 +29,13 @@ public class TRConceptLocator implements ConceptLocator {
     }
 
     @Override
-    public ValueSet.ValueSetDefineConceptComponent locate(String system, final String code) {
+    public ValueSetDefineConceptComponent locate(String system, final String code) {
         try {
-            Boolean isValid = terminologyServer.isValid(system, code).get();
+            final Boolean isValid = terminologyServer.isValid(system, code).toBlocking().first();
             if (isValid) {
                 Code conceptCode = new Code();
                 conceptCode.setValue(code);
-                return new ValueSet.ValueSetDefineConceptComponent(conceptCode);
+                return new ValueSetDefineConceptComponent(conceptCode);
             } else {
                 return null;
             }
@@ -57,7 +59,7 @@ public class TRConceptLocator implements ConceptLocator {
     }
 
     @Override
-    public List<ValueSet.ValueSetExpansionContainsComponent> expand(ValueSet.ConceptSetComponent inc) throws Exception {
-        return Collections.EMPTY_LIST;
+    public List<ValueSetExpansionContainsComponent> expand(ValueSet.ConceptSetComponent inc) throws Exception {
+        return EMPTY_LIST;
     }
 }

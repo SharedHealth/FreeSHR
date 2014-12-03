@@ -51,21 +51,19 @@ public class TerminologyServerIntegrationTest {
 
     @Test
     public void shouldIdentifyValidReferenceTerms() throws Exception {
-        assertTrue(trServer.isValid(concat("http://localhost:9997", REFERENCE_TERM_PATH), "S40").get());
-
-        assertFalse(trServer.isValid(concat("http://localhost:9997", REFERENCE_TERM_PATH), "invalid_ref_code").get());
+        assertTrue(trServer.isValid(concat("http://localhost:9997", REFERENCE_TERM_PATH), "S40").toBlocking().first());
+        assertFalse(trServer.isValid(concat("http://localhost:9997", REFERENCE_TERM_PATH), "invalid_ref_code").toBlocking().first());
     }
 
     @Test
     public void shouldIdentifyValidConcepts() throws Exception {
-        assertTrue(trServer.isValid(concat("http://localhost:9997", CONCEPT_URL), "eddb01eb-61fc-4f9e-aca5-e44193509f35").get());
-
-        assertFalse(trServer.isValid(concat("http://localhost:9997", CONCEPT_URL), "invalid_uuid").get());
+        assertTrue(trServer.isValid(concat("http://localhost:9997", CONCEPT_URL), "eddb01eb-61fc-4f9e-aca5-e44193509f35").toBlocking().first());
+        assertFalse(trServer.isValid(concat("http://localhost:9997", CONCEPT_URL), "invalid_uuid").toBlocking().first());
 
     }
 
     @Test
     public void shouldRejectInvalidSystemPath() throws Exception {
-        assertFalse(trServer.isValid("http://localhost:9997/invalid/path/code", "code").get());
+        assertFalse(trServer.isValid("http://localhost:9997/invalid/path/code", "code").toBlocking().first());
     }
 }
