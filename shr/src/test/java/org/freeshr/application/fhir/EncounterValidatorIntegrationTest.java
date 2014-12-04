@@ -10,6 +10,7 @@ import org.freeshr.validations.EncounterValidator;
 import org.freeshr.validations.FhirSchemaValidator;
 import org.freeshr.validations.HealthIdValidator;
 import org.freeshr.validations.ResourceValidator;
+import org.freeshr.validations.StructureValidator;
 import org.hl7.fhir.instance.model.OperationOutcome;
 import org.hl7.fhir.instance.utils.ConceptLocator;
 import org.junit.Before;
@@ -48,6 +49,9 @@ public class EncounterValidatorIntegrationTest {
     private HealthIdValidator healthIdValidator;
 
     @Autowired
+    private StructureValidator structureValidator;
+
+    @Autowired
     private FhirMessageFilter fhirMessageFilter;
 
     private FhirSchemaValidator fhirSchemaValidator;
@@ -61,7 +65,7 @@ public class EncounterValidatorIntegrationTest {
     public void setup() throws Exception {
         initMocks(this);
         fhirSchemaValidator = new FhirSchemaValidator(trConceptLocator, shrProperties);
-        validator = new EncounterValidator(fhirMessageFilter, fhirSchemaValidator, resourceValidator, healthIdValidator, valueSetCodeValidator);
+        validator = new EncounterValidator(fhirMessageFilter, fhirSchemaValidator, resourceValidator, healthIdValidator, structureValidator);
         encounterBundle = EncounterBundleData.withValidEncounter();
     }
 
@@ -177,12 +181,14 @@ public class EncounterValidatorIntegrationTest {
     }
 
     @Test
-    public void shouldValidateIfTheHealthIdInTheEncounterContentIsSameAsTheOneExpected() {
+    public void shouldValidateIfTheHealthIdInTheEncounterContentIsNotSameAsTheOneExpected() {
         encounterBundle.setHealthId("1111222233334444555");
         EncounterValidationResponse response = validator.validate(encounterBundle);
         assertFalse(response.isSuccessful());
-        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getErrors().size(), is(3));
         assertTrue(response.getErrors().get(0).getReason().contains("Health Id does not match"));
+        assertTrue(response.getErrors().get(1).getReason().contains("Health Id does not match"));
+        assertTrue(response.getErrors().get(2).getReason().contains("Health Id does not match"));
     }
 
     @Test

@@ -5,6 +5,36 @@
     <id>http://localhost/encounters/bcf6c340-d04a-4c29-b50c-2552beeee037</id>
     <updated>2014-07-25T16:50:29+05:30</updated>
     <entry>
+        <title>Composition</title>
+        <id>urn:Encounter - c41cabed-3c47-4260-bd70-ac4893b97ee8</id>
+        <updated>2014-09-22T18:40:07.504+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <Composition xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="Encounter - c41cabed-3c47-4260-bd70-ac4893b97ee8"/>
+                </identifier>
+                <date value="2014-09-22T13:48:18+05:30"/>
+                <status value="final"/>
+                <subject>
+                    <reference value="1234"/>
+                </subject>
+                <encounter>
+                    <reference value="c41cabed-3c47-4260-bd70-ac4893b97ee8"/>
+                    <display value="encounter"/>
+                </encounter>
+                <section>
+                    <content>
+                        <reference value="5f982a33-4454-4b74-9236-b8157aa8effd"/>
+                        <display value="Condition"/>
+                    </content>
+                </section>
+            </Composition>
+        </content>
+    </entry>
+    <entry>
         <title>Diagnosis</title>
         <id>http://localhost/diagnosis/5f982a33-4454-4b74-9236-b8157aa8effd</id>
         <updated>2014-07-25T16:51:37+05:30</updated>

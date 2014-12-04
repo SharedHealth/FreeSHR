@@ -2,8 +2,8 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom">
     <title>Encounter</title>
-    <id>http://localhost/encounters/44e6c340-d04a-4c29-b50c-2552beeee037</id>
-    <updated>2014-07-25T16:50:29+04:30</updated>
+    <id>urn:1faa88db-ef1a-4729-b0bf-6870dbd8590b</id>
+    <updated>2014-09-22T13:48:18+05:30</updated>
     <entry>
         <title>Composition</title>
         <id>urn:Encounter - c41cabed-3c47-4260-bd70-ac4893b97ee8</id>
@@ -18,11 +18,8 @@
                 </identifier>
                 <date value="2014-09-22T13:48:18+05:30"/>
                 <status value="final"/>
-                <subject>
-                    <reference value="http://mci/patients/5893922485019081234"/>
-                </subject>
                 <encounter>
-                    <reference value="c41cabed-3c47-4260-bd70-ac4893b97ee8"/>
+                    <reference value="333344445555666677778889999"/>
                     <display value="encounter"/>
                 </encounter>
                 <section>
@@ -33,8 +30,14 @@
                 </section>
                 <section>
                     <content>
-                        <reference value="5f982a33-4454-4b74-9236-b8157aa8effd"/>
-                        <display value="Condition"/>
+                        <reference value="11122223333444455556666777788889999"/>
+                        <display value="Diagnostic Order"/>
+                    </content>
+                </section>
+                <section>
+                    <content>
+                        <reference value="24030c01-f6dd-42a1-a7d9-acb5dc5d04d1"/>
+                        <display value="Diagnostic Report"/>
                     </content>
                 </section>
             </Composition>
@@ -42,8 +45,8 @@
     </entry>
     <entry>
         <title>Encounter</title>
-        <id>urn:d3cc23c3-1f12-4b89-a415-356feeba0690</id>
-        <updated>2014-10-14T12:29:14.212+05:30</updated>
+        <id>urn:c41cabed-3c47-4260-bd70-ac4893b97ee8</id>
+        <updated>2014-09-22T18:40:07.504+05:30</updated>
         <author>
             <name>bahmni</name>
         </author>
@@ -55,10 +58,10 @@
                 <status value="finished"/>
                 <class value="outpatient"/>
                 <type>
-                    <text value="LAB_RESULT"/>
+                    <text value="INVESTIGATION"/>
                 </type>
                 <subject>
-                    <reference value="http://mci/patients/5893922485019081234"/>
+                    <reference value="5893922485019082753"/>
                 </subject>
                 <participant>
                     <individual>
@@ -66,7 +69,7 @@
                     </individual>
                 </participant>
                 <indication>
-                    <reference value="d3cc23c3-1f12-4b89-a415-356feeba0690"/>
+                    <reference value="c41cabed-3c47-4260-bd70-ac4893b97ee8"/>
                     <display value="encounter"/>
                 </indication>
                 <serviceProvider>
@@ -76,11 +79,47 @@
         </content>
     </entry>
     <entry>
-        <title>Diagnosis</title>
-        <id>http://localhost/diagnosis/4e982a33-4454-4b74-9236-b8157aa8effd</id>
-        <updated>2014-07-25T16:51:37+04:30</updated>
+        <title>Diagnostic Order</title>
+        <id>urn:a86018fa-e15d-4004-85bc-a1ee713dc923</id>
+        <updated>2014-09-22T18:40:07.525+05:30</updated>
         <author>
-            <name>test author new</name>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <DiagnosticOrder xmlns="http://hl7.org/fhir">
+                <subject>
+                    <reference value="5893922485019082753"/>
+                </subject>
+                <orderer>
+                    <reference value="456e6c79-35be-11e4-9d09-08002773bf1c"/>
+                </orderer>
+                <identifier>
+                    <value value="a86018fa-e15d-4004-85bc-a1ee713dc923"/>
+                </identifier>
+                <encounter>
+                    <reference value="c41cabed-3c47-4260-bd70-ac4893b97ee8"/>
+                    <display value="encounter"/>
+                </encounter>
+                <status value="requested"/>
+                <item>
+                    <code>
+                        <coding>
+                            <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba"/>
+                            <code value="79647ed4-a60e-4cf5-ba68-cf4d55956cba"/>
+                            <display value="Hemoglobin"/>
+                        </coding>
+                    </code>
+                    <status value="requested"/>
+                </item>
+            </DiagnosticOrder>
+        </content>
+    </entry>
+    <entry>
+        <title>Diagnosis</title>
+        <id>http://localhost/diagnosis/5f982a33-4454-4b74-9236-b8157aa8effd</id>
+        <updated>2014-07-25T16:51:37+05:30</updated>
+        <author>
+            <name>test author</name>
         </author>
         <content type="text/xml">
             <Condition xmlns="http://hl7.org/fhir">
@@ -88,7 +127,7 @@
                     <value value="5f982a33-4454-4b74-9236-b8157aa8effd"/>
                 </identifier>
                 <subject>
-                    <reference value="http://mci/patients/5893922485019081234"/>
+                    <reference value="http://mci/patients/5893922485019082753"/>
                 </subject>
                 <!-- TODO: This is actually an invalid reference. Validations have to be added for references like these -->
                 <encounter>

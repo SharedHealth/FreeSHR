@@ -23,27 +23,26 @@ public class EncounterValidator {
     private FhirSchemaValidator fhirSchemaValidator;
     private ResourceValidator resourceValidator;
     private HealthIdValidator healthIdValidator;
-    private ValueSetCodeValidator valueSetCodeValidator;
+    private StructureValidator structureValidator;
 
     @Autowired
     public EncounterValidator(FhirMessageFilter fhirMessageFilter,
                               FhirSchemaValidator fhirSchemaValidator,
                               ResourceValidator resourceValidator,
                               HealthIdValidator healthIdValidator,
-                              ValueSetCodeValidator valueSetCodeValidator) {
+                              StructureValidator structureValidator) {
         this.fhirMessageFilter = fhirMessageFilter;
         this.fhirSchemaValidator = fhirSchemaValidator;
         this.resourceValidator = resourceValidator;
         this.healthIdValidator = healthIdValidator;
-        this.valueSetCodeValidator = valueSetCodeValidator;
+        this.structureValidator = structureValidator;
         this.resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
     }
 
     public EncounterValidationResponse validate(EncounterBundle encounterBundle) {
         String sourceXml = encounterBundle.getEncounterContent().toString();
         EncounterValidationResponse validationResponse = validateSchema(sourceXml);
-        if (validationResponse.isNotSuccessful())
-            return validationResponse;
+        if (validationResponse.isNotSuccessful()) return validationResponse;
 
         AtomFeed feed = null;
         try {
@@ -51,6 +50,10 @@ public class EncounterValidator {
         } catch (Exception e) {
             return createErrorResponse(e);
         }
+
+        validationResponse = createValidationResponse(structureValidator.validate(feed));
+
+        if (validationResponse.isNotSuccessful()) return validationResponse;
 
         validationResponse = validateResources(feed);
         return validationResponse.isSuccessful() ? healthIdValidator.validate(feed, encounterBundle.getHealthId())

@@ -5,29 +5,6 @@
     <id>urn:1faa88db-ef1a-4729-b0bf-6870dbd8590b</id>
     <updated>2014-09-22T13:48:18+05:30</updated>
     <entry>
-        <title>Composition</title>
-        <id>urn:Encounter - c41cabed-3c47-4260-bd70-ac4893b97ee8</id>
-        <updated>2014-09-22T18:40:07.504+05:30</updated>
-        <author>
-            <name>bahmni</name>
-        </author>
-        <content type="text/xml">
-            <Composition xmlns="http://hl7.org/fhir">
-                <identifier>
-                    <value value="Encounter - c41cabed-3c47-4260-bd70-ac4893b97ee8"/>
-                </identifier>
-                <date value="2014-09-22T13:48:18+05:30"/>
-                <status value="final"/>
-                <section>
-                    <content>
-                        <reference value="c41cabed-3c47-4260-bd70-ac4893b97ee8"/>
-                        <display value="Encounter"/>
-                    </content>
-                </section>
-            </Composition>
-        </content>
-    </entry>
-    <entry>
         <title>Encounter</title>
         <id>urn:c41cabed-3c47-4260-bd70-ac4893b97ee8</id>
         <updated>2014-09-22T18:40:07.504+05:30</updated>
