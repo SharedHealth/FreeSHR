@@ -185,4 +185,15 @@ public class EncounterValidatorIntegrationTest {
         assertTrue(response.getErrors().get(0).getReason().contains("Health Id does not match"));
     }
 
+    @Test
+    public void shouldValidateEncounterTypeAgainstValueSet(){
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, FileUtil.asString("xmls/encounters/encounter_with_valid_type.xml"));
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+        EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
+        verify(trConceptLocator, times(1)).verifiesSystem("http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba");
+        verify(trConceptLocator, times(1)).verifiesSystem("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type");
+        verify(trConceptLocator, times(1)).validate("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type", "REG", "registration");
+        assertTrue(encounterValidationResponse.isSuccessful());
+    }
+
 }

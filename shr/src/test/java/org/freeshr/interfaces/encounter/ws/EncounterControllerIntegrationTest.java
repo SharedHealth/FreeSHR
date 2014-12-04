@@ -49,6 +49,12 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/concept.json"))));
+
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/encounter-type"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/encounter-type-case-insensitive.json"))));
     }
 
     @Test
@@ -80,6 +86,26 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
                 .content(asString("xmls/encounters/diagnosis_category_invalid.xml")))
+                .andExpect(request().asyncResult(new InstanceOf(UnProcessableEntity.class)));
+    }
+
+    @Test
+    public void shouldSaveTheEncounterWhenValidType() throws Exception {
+        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID + "/encounters")
+                .accept(MediaType.APPLICATION_XML)
+                .contentType(MediaType.APPLICATION_XML)
+                .characterEncoding(Charsets.UTF_8.name())
+                .content(asString("xmls/encounters/encounter_with_valid_type.xml")))
+                .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
+    }
+
+    @Test
+    public void shouldRejectAnEncounterWithInvalidEncounterType() throws Exception {
+        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID + "/encounters")
+                .accept(MediaType.APPLICATION_XML)
+                .contentType(MediaType.APPLICATION_XML)
+                .characterEncoding(Charsets.UTF_8.name())
+                .content(asString("xmls/encounters/encounter_with_invalid_type.xml")))
                 .andExpect(request().asyncResult(new InstanceOf(UnProcessableEntity.class)));
     }
 
