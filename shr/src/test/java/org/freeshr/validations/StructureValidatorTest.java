@@ -1,7 +1,6 @@
 package org.freeshr.validations;
 
 
-import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.utils.FileUtil;
 import org.freeshr.utils.ResourceOrFeedDeserializer;
 import org.hl7.fhir.instance.model.AtomFeed;
@@ -28,15 +27,25 @@ public class StructureValidatorTest {
 
     @Test
     public void shouldAcceptAValidXmlWithOneEntryForEachSectionPresentInComposition() {
-        String xml = FileUtil.asString("xmls/encounters/diagnostic_order_valid.xml");
-        List<ValidationMessage> validationMessages = structureValidator.validate(resourceOrFeedDeserializer.deserialize(xml));
+        final String xml = FileUtil.asString("xmls/encounters/diagnostic_order_valid.xml");
+        List<ValidationMessage> validationMessages = structureValidator.validate(new EncounterValidationFragment<AtomFeed>() {
+            @Override
+            public AtomFeed extract() {
+                return resourceOrFeedDeserializer.deserialize(xml);
+            }
+        });
         assertThat(validationMessages.isEmpty(), is(true));
     }
 
     @Test
     public void shouldRejectIfCompositionIsNotPresent() {
-        String xml = FileUtil.asString("xmls/encounters/no_composition.xml");
-        List<ValidationMessage> validationMessages = structureValidator.validate(resourceOrFeedDeserializer.deserialize(xml));
+        final String xml = FileUtil.asString("xmls/encounters/no_composition.xml");
+        List<ValidationMessage> validationMessages = structureValidator.validate(new EncounterValidationFragment<AtomFeed>() {
+            @Override
+            public AtomFeed extract() {
+                return resourceOrFeedDeserializer.deserialize(xml);
+            }
+        });
         assertThat(validationMessages.isEmpty(), is(false));
         assertThat(validationMessages.size(), is(1));
         assertThat(validationMessages.get(0).getMessage(), is("Feed must have a Composition with an encounter."));
@@ -44,8 +53,13 @@ public class StructureValidatorTest {
 
     @Test
     public void shouldRejectIfCompositionDoesNotContainASectionCalledEncounter() {
-        String xml = FileUtil.asString("xmls/encounters/invalid_composition.xml");
-        List<ValidationMessage> validationMessages = structureValidator.validate(resourceOrFeedDeserializer.deserialize(xml));
+        final String xml = FileUtil.asString("xmls/encounters/invalid_composition.xml");
+        List<ValidationMessage> validationMessages = structureValidator.validate(new EncounterValidationFragment<AtomFeed>() {
+            @Override
+            public AtomFeed extract() {
+                return resourceOrFeedDeserializer.deserialize(xml);
+            }
+        });
         assertThat(validationMessages.isEmpty(), is(false));
         assertThat(validationMessages.size(), is(1));
         assertThat(validationMessages.get(0).getMessage(), is("Feed must have a Composition with an encounter."));
@@ -61,8 +75,13 @@ public class StructureValidatorTest {
         3. An entry with no matching section
 
          */
-        String xml = FileUtil.asString("xmls/encounters/invalid_composition_sections.xml");
-        List<ValidationMessage> validationMessages = structureValidator.validate(resourceOrFeedDeserializer.deserialize(xml));
+        final String xml = FileUtil.asString("xmls/encounters/invalid_composition_sections.xml");
+        List<ValidationMessage> validationMessages = structureValidator.validate(new EncounterValidationFragment<AtomFeed>() {
+            @Override
+            public AtomFeed extract() {
+                return resourceOrFeedDeserializer.deserialize(xml);
+            }
+        });
         assertThat(validationMessages.isEmpty(), is(false));
         assertThat(validationMessages.size(), is(4));
     }

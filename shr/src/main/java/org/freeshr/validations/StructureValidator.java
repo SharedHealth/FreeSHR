@@ -7,9 +7,10 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 @Component
-public class StructureValidator {
-
-    public List<ValidationMessage> validate(AtomFeed feed) {
+public class StructureValidator implements Validator<AtomFeed>{
+    @Override
+    public List<ValidationMessage> validate(EncounterValidationFragment<AtomFeed> fragment) {
+        AtomFeed feed = fragment.extract();
         List<ValidationMessage> validationMessages = new ArrayList<>();
 
         AtomEntry<? extends Resource> compositionEntry = hasCompositionWithEncounter(feed.getEntryList());
@@ -72,5 +73,6 @@ public class StructureValidator {
         }
         return compositionEntry;
     }
+
 }
 

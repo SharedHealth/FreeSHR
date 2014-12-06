@@ -10,13 +10,15 @@ import java.util.List;
 import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity;
 
 @Component
-public class ConditionValidator extends AtomEntryValidator {
+public class ConditionValidator implements Validator<AtomEntry<? extends Resource>> {
+    private static final String CODEABLE_CONCEPT = "CodeableConcept";
 
     public static final String DIAGNOSIS = "Diagnosis";
     public static final String CATEGORY = "category";
 
     @Override
-    public List<ValidationMessage> validate(AtomEntry<? extends Resource> atomEntry) {
+    public List<ValidationMessage> validate(EncounterValidationFragment<AtomEntry<? extends Resource>> fragment) {
+        AtomEntry<? extends Resource> atomEntry = fragment.extract();
         ArrayList<ValidationMessage> validationMessages = new ArrayList<>();
         for (Property property : atomEntry.getResource().children()) {
             if (verifyIfPropertyIsARelatedItem(validationMessages, property, atomEntry.getId())) continue;
@@ -50,13 +52,24 @@ public class ConditionValidator extends AtomEntryValidator {
     }
 
     protected void checkCodeableConcept(List<ValidationMessage> validationMessages, Property property, AtomEntry<? extends Resource> atomEntry) {
-        if (!property.getTypeCode().equals(CODEABLE_CONCEPT) || !property.hasValues() || skipCheckForThisTypeOfEntry(atomEntry) ) return;
+        if (!property.getTypeCode().equals(CODEABLE_CONCEPT) || !property.hasValues() || skipCheckForThisTypeOfEntry(atomEntry))
+            return;
 
         boolean bothSystemAndCodePresent = bothSystemAndCodePresent(property);
         if (bothSystemAndCodePresent) return;
 
         String errorMessage = (((CodeableConcept) property.getValues().get(0)).getCoding()).get(0).getDisplaySimple();
-        ValidationMessage validationMessage = new ValidationMessage(null, ResourceValidator.CODE_UNKNOWN, atomEntry.getId(), errorMessage , IssueSeverity.error);
+        ValidationMessage validationMessage = new ValidationMessage(null, ResourceValidator.CODE_UNKNOWN, atomEntry.getId(), errorMessage, IssueSeverity.error);
         validationMessages.add(validationMessage);
     }
+
+    private boolean bothSystemAndCodePresent(Property property) {
+        boolean bothSystemAndCodePresent = false;
+        List<Coding> codings = ((CodeableConcept) property.getValues().get(0)).getCoding();
+        for (Coding coding : codings) {
+            bothSystemAndCodePresent |= (coding.getSystem() != null && coding.getCode() != null);
+        }
+        return bothSystemAndCodePresent;
+    }
+
 }

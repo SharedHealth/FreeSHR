@@ -34,8 +34,10 @@ public class FhirSchemaValidator implements Validator<String> {
         return builder.parse(new ByteArrayInputStream(sourceXml.getBytes()));
     }
 
+
     @Override
-    public List<ValidationMessage> validate(String sourceXml) {
+    public List<ValidationMessage> validate(EncounterValidationFragment<String> fragment) {
+        String sourceXml = fragment.extract();
         try {
             return instanceValidator.validateInstance(document(sourceXml).getDocumentElement());
         } catch (Exception e) {

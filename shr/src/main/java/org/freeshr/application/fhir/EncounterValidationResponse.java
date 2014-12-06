@@ -1,5 +1,8 @@
 package org.freeshr.application.fhir;
 
+import org.hl7.fhir.instance.model.OperationOutcome;
+import org.hl7.fhir.instance.validation.ValidationMessage;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,11 +35,17 @@ public class EncounterValidationResponse {
         return errors;
     }
 
-    public EncounterValidationResponse addError(String field, String message) {
-        Error error = new Error();
-        error.setField(field);
-        error.setReason(message);
-        return this;
+    public static EncounterValidationResponse fromValidationMessages(List<ValidationMessage> validationMessages,
+                                                                     FhirMessageFilter filter) {
+        return filter.filterMessagesSevereThan(validationMessages,
+                OperationOutcome.IssueSeverity.warning);
+    }
+
+
+    public static EncounterValidationResponse createErrorResponse(Exception e) {
+        EncounterValidationResponse encounterValidationResponse = new EncounterValidationResponse();
+        encounterValidationResponse.addError(new Error("Condition-status", "invalid", e.getMessage()));
+        return encounterValidationResponse;
     }
 
     @Override

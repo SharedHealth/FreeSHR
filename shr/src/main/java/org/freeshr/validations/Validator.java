@@ -5,5 +5,5 @@ import org.hl7.fhir.instance.validation.ValidationMessage;
 import java.util.List;
 
 public interface Validator<T> {
-    List<ValidationMessage> validate(T fragment);
+    List<ValidationMessage> validate(EncounterValidationFragment<T> fragment);
 }

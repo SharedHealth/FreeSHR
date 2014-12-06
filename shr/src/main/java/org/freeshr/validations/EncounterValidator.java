@@ -4,16 +4,13 @@ package org.freeshr.validations;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.application.fhir.FhirMessageFilter;
-import org.freeshr.infrastructure.tr.ValueSetCodeValidator;
 import org.freeshr.utils.ResourceOrFeedDeserializer;
 import org.hl7.fhir.instance.model.AtomFeed;
-import org.hl7.fhir.instance.model.OperationOutcome;
-import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.freeshr.application.fhir.EncounterValidationResponse.createErrorResponse;
+import static org.freeshr.application.fhir.EncounterValidationResponse.fromValidationMessages;
 
 @Component
 public class EncounterValidator {
@@ -40,47 +37,50 @@ public class EncounterValidator {
     }
 
     public EncounterValidationResponse validate(EncounterBundle encounterBundle) {
-        String sourceXml = encounterBundle.getEncounterContent().toString();
-        EncounterValidationResponse validationResponse = validateSchema(sourceXml);
-        if (validationResponse.isNotSuccessful()) return validationResponse;
-
-        AtomFeed feed = null;
         try {
-            feed = resourceOrFeedDeserializer.deserialize(sourceXml);
+            final EncounterValidationContext validationContext = new EncounterValidationContext(encounterBundle,
+                    resourceOrFeedDeserializer);
+
+            EncounterValidationResponse validationResponse = fromValidationMessages(fhirSchemaValidator.validate(
+                    sourceXml(validationContext)), fhirMessageFilter);
+            if (validationResponse.isNotSuccessful()) return validationResponse;
+
+            validationResponse = fromValidationMessages(structureValidator.validate(feed(validationContext)), fhirMessageFilter);
+            if (validationResponse.isNotSuccessful()) return validationResponse;
+
+            validationResponse = fromValidationMessages(resourceValidator.validate(feed(validationContext)), fhirMessageFilter);
+            return validationResponse.isSuccessful() ? fromValidationMessages(healthIdValidator.validate(context(validationContext)), fhirMessageFilter)
+                    : validationResponse;
         } catch (Exception e) {
             return createErrorResponse(e);
         }
-
-        validationResponse = createValidationResponse(structureValidator.validate(feed));
-
-        if (validationResponse.isNotSuccessful()) return validationResponse;
-
-        validationResponse = validateResources(feed);
-        return validationResponse.isSuccessful() ? healthIdValidator.validate(feed, encounterBundle.getHealthId())
-                : validationResponse;
     }
 
-    private EncounterValidationResponse validateSchema(String sourceXml) {
-        List<ValidationMessage> validationMessages = fhirSchemaValidator.validate(sourceXml);
-        return createValidationResponse(validationMessages);
+    private EncounterValidationFragment<EncounterValidationContext> context(final EncounterValidationContext validationContext) {
+        return new EncounterValidationFragment<EncounterValidationContext>() {
+            @Override
+            public EncounterValidationContext extract() {
+                return validationContext;
+            }
+        };
     }
 
-    private EncounterValidationResponse validateResources(AtomFeed feed) {
-        List<ValidationMessage> validationMessages = new ArrayList<>();
-        validationMessages.addAll(resourceValidator.validate(feed));
-        return createValidationResponse(validationMessages);
+    private EncounterValidationFragment<AtomFeed> feed(final EncounterValidationContext validationContext) {
+        return new EncounterValidationFragment<AtomFeed>() {
+            @Override
+            public AtomFeed extract() {
+                return validationContext.getFeed();
+            }
+        };
     }
 
-    private EncounterValidationResponse createErrorResponse(Exception e) {
-        EncounterValidationResponse encounterValidationResponse = new EncounterValidationResponse();
-        encounterValidationResponse.addError(new org.freeshr.application.fhir.Error("Condition-status", "invalid", e.getMessage()));
-        return encounterValidationResponse;
-    }
-
-
-    private EncounterValidationResponse createValidationResponse(List<ValidationMessage> validationMessages) {
-        return fhirMessageFilter.filterMessagesSevereThan(validationMessages,
-                OperationOutcome.IssueSeverity.warning);
+    private EncounterValidationFragment<String> sourceXml(final EncounterValidationContext validationContext) {
+        return new EncounterValidationFragment<String>() {
+            @Override
+            public String extract() {
+                return validationContext.getSourceXml();
+            }
+        };
     }
 
 

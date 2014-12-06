@@ -7,10 +7,9 @@ import org.hl7.fhir.instance.validation.ValidationMessage;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DefaultValidator extends AtomEntryValidator {
-
+public class DefaultValidator implements Validator<AtomEntry<? extends Resource>> {
     @Override
-    public List<ValidationMessage> validate(AtomEntry<? extends Resource> atomEntry) {
+    public List<ValidationMessage> validate(EncounterValidationFragment<AtomEntry<? extends Resource>> fragment) {
         return new ArrayList<>();
     }
 }

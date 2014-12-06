@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class ResourceValidator implements Validator<AtomFeed>{
+public class ResourceValidator implements Validator<AtomFeed> {
 
     public static final String INVALID = "invalid";
     public static final String CODE_UNKNOWN = "code-unknown";
 
-    private Map<ResourceType, AtomEntryValidator> resourceTypeValidatorMap = new HashMap<>();
+    private Map<ResourceType, Validator<AtomEntry<? extends Resource>>> resourceTypeValidatorMap = new HashMap<>();
 
     public ResourceValidator() {
         assignDefaultValidatorToAllResourceTypes();
@@ -33,12 +33,23 @@ public class ResourceValidator implements Validator<AtomFeed>{
     }
 
     @Override
-    public List<ValidationMessage> validate(AtomFeed feed) {
+    public List<ValidationMessage> validate(EncounterValidationFragment<AtomFeed> fragment) {
+        AtomFeed feed = fragment.extract();
         List<ValidationMessage> validationMessages = new ArrayList<>();
-        for (AtomEntry<? extends Resource> atomEntry : feed.getEntryList()) {
-            AtomEntryValidator validator = resourceTypeValidatorMap.get(atomEntry.getResource().getResourceType());
-            validationMessages.addAll(validator.validate(atomEntry));
+        for (final AtomEntry<? extends Resource> atomEntry : feed.getEntryList()) {
+            Validator<AtomEntry<? extends Resource>> validator = resourceTypeValidatorMap.get(atomEntry.getResource().getResourceType());
+            validationMessages.addAll(validator.validate(atomEntryFragment(atomEntry)));
         }
         return validationMessages;
     }
+
+    private EncounterValidationFragment<AtomEntry<? extends Resource>> atomEntryFragment(final AtomEntry<? extends Resource> atomEntry) {
+        return new EncounterValidationFragment<AtomEntry<? extends Resource>>() {
+            @Override
+            public AtomEntry<? extends Resource> extract() {
+                return atomEntry;
+            }
+        };
+    }
+
 }
