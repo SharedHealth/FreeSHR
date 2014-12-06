@@ -49,7 +49,8 @@ public class PatientServiceTest {
     }
 
     @Test
-    public void shouldReturnTrueWhenPatientIsNotFoundLocallyButFoundInTheClientIndex() throws ExecutionException, InterruptedException {
+    public void shouldReturnTrueWhenPatientIsNotFoundLocallyButFoundInTheClientIndex() throws ExecutionException,
+            InterruptedException {
         String healthId = "healthId";
 
         when(patientRepository.find(healthId)).thenReturn(Observable.<Patient>just(null));
@@ -60,7 +61,8 @@ public class PatientServiceTest {
     }
 
     @Test
-    public void shouldReturnNullWhenPatientIsNotFoundEitherLocallyOrInTheClientIndex() throws ExecutionException, InterruptedException {
+    public void shouldReturnNullWhenPatientIsNotFoundEitherLocallyOrInTheClientIndex() throws ExecutionException,
+            InterruptedException {
         String healthId = "healthId";
 
         when(patientRepository.find(healthId)).thenReturn(Observable.<Patient>just(null));

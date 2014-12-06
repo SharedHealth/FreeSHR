@@ -9,9 +9,7 @@ import org.hl7.fhir.instance.model.Resource;
 
 import java.util.List;
 
-import static org.freeshr.utils.CollectionUtils.Fn;
-import static org.freeshr.utils.CollectionUtils.isEvery;
-import static org.freeshr.utils.CollectionUtils.isNotEmpty;
+import static org.freeshr.utils.CollectionUtils.*;
 
 public class EncounterFunctions {
 
@@ -43,7 +41,8 @@ public class EncounterFunctions {
         }
     };
 
-    public static final Fn<AtomEntry<? extends Resource>, Resource> toResource = new Fn<AtomEntry<? extends Resource>, Resource>() {
+    public static final Fn<AtomEntry<? extends Resource>, Resource> toResource = new Fn<AtomEntry<? extends
+            Resource>, Resource>() {
         @Override
         public Resource call(AtomEntry<? extends Resource> input) {
             return input.getResource();

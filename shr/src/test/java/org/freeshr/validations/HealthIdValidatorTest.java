@@ -33,7 +33,8 @@ public class HealthIdValidatorTest {
         final String xml = FileUtil.asString("xmls/encounters/diagnostic_order_valid.xml");
         AtomFeed feed = resourceOrFeedDeserializer.deserialize(xml);
         List<ValidationMessage> response = healthIdValidator.validate(getEncounterContext(xml, "5893922485019082753"));
-        assertThat(EncounterValidationResponse.fromValidationMessages(response, fhirMessageFilter).isSuccessful(), is(true));
+        assertThat(EncounterValidationResponse.fromValidationMessages(response, fhirMessageFilter).isSuccessful(),
+                is(true));
     }
 
 
@@ -45,7 +46,8 @@ public class HealthIdValidatorTest {
                 healthIdValidator.validate(getEncounterContext(xml, "5893922485019082753")), fhirMessageFilter);
         assertThat(response.isSuccessful(), is(false));
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().get(0).getReason(), is("Composition must have patient's Health Id in subject."));
+        assertThat(response.getErrors().get(0).getReason(), is("Composition must have patient's Health Id in subject" +
+                "."));
     }
 
     @Test
@@ -71,8 +73,8 @@ public class HealthIdValidatorTest {
     }
 
 
-    private EncounterValidationFragment<EncounterValidationContext> getEncounterContext(final String xml, final String healthId) {
-        return new EncounterValidationFragment<EncounterValidationContext>() {
+    private ValidationSubject<EncounterValidationContext> getEncounterContext(final String xml, final String healthId) {
+        return new ValidationSubject<EncounterValidationContext>() {
             @Override
             public EncounterValidationContext extract() {
                 EncounterBundle encounterBundle = new EncounterBundle();

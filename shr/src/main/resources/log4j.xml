@@ -10,16 +10,16 @@
     </appender>
 
     <appender name="VAR_LOG" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="/var/log/bdshr/shr.log" />
-        <param name="DatePattern" value="'.'dd-MM-yyyy" />
+        <param name="file" value="/var/log/bdshr/shr.log"/>
+        <param name="DatePattern" value="'.'dd-MM-yyyy"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%-5p %c{1} - %m%n"/>
         </layout>
     </appender>
 
     <appender name="FILE" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="file" value="shr.log" />
-        <param name="DatePattern" value="'.'dd-MM-yyyy" />
+        <param name="file" value="shr.log"/>
+        <param name="DatePattern" value="'.'dd-MM-yyyy"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%-5p %c{1} - %m%n"/>
         </layout>
@@ -27,14 +27,14 @@
 
     <logger name="org.freeshr">
         <level value="DEBUG"/>
-        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="CONSOLE"/>
     </logger>
 
     <root>
-        <priority value ="DEBUG" />
-        <appender-ref ref="CONSOLE" />
-        <appender-ref ref="VAR_LOG" />
-        <appender-ref ref="FILE" />
+        <priority value="DEBUG"/>
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="VAR_LOG"/>
+        <appender-ref ref="FILE"/>
     </root>
 
 </log4j:configuration>

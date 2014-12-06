@@ -17,8 +17,8 @@ public class ConditionValidator implements Validator<AtomEntry<? extends Resourc
     public static final String CATEGORY = "category";
 
     @Override
-    public List<ValidationMessage> validate(EncounterValidationFragment<AtomEntry<? extends Resource>> fragment) {
-        AtomEntry<? extends Resource> atomEntry = fragment.extract();
+    public List<ValidationMessage> validate(ValidationSubject<AtomEntry<? extends Resource>> subject) {
+        AtomEntry<? extends Resource> atomEntry = subject.extract();
         ArrayList<ValidationMessage> validationMessages = new ArrayList<>();
         for (Property property : atomEntry.getResource().children()) {
             if (verifyIfPropertyIsARelatedItem(validationMessages, property, atomEntry.getId())) continue;
@@ -28,14 +28,18 @@ public class ConditionValidator implements Validator<AtomEntry<? extends Resourc
 
     }
 
-    private boolean verifyIfPropertyIsARelatedItem(List<ValidationMessage> validationMessages, Property property, String id) {
+    private boolean verifyIfPropertyIsARelatedItem(List<ValidationMessage> validationMessages, Property property,
+                                                   String id) {
         if (!property.getName().equals("relatedItem") || !(property.hasValues())) return false;
 
-        Condition.ConditionRelationshipType relatedItem = ((Condition.ConditionRelatedItemComponent) property.getValues().get(0)).getTypeSimple();
-        Condition.ConditionRelationshipTypeEnumFactory conditionRelationshipTypeEnumFactory = new Condition.ConditionRelationshipTypeEnumFactory();
+        Condition.ConditionRelationshipType relatedItem = ((Condition.ConditionRelatedItemComponent) property
+                .getValues().get(0)).getTypeSimple();
+        Condition.ConditionRelationshipTypeEnumFactory conditionRelationshipTypeEnumFactory = new Condition
+                .ConditionRelationshipTypeEnumFactory();
         try {
             if (conditionRelationshipTypeEnumFactory.toCode(relatedItem).equals("?")) {
-                validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, id, "Unknown ConditionRelationshipType code", IssueSeverity.error));
+                validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, id,
+                        "Unknown ConditionRelationshipType code", IssueSeverity.error));
             }
             return true;
         } catch (Exception e) {
@@ -51,15 +55,18 @@ public class ConditionValidator implements Validator<AtomEntry<? extends Resourc
         return !coding.getDisplaySimple().equalsIgnoreCase(DIAGNOSIS);
     }
 
-    protected void checkCodeableConcept(List<ValidationMessage> validationMessages, Property property, AtomEntry<? extends Resource> atomEntry) {
-        if (!property.getTypeCode().equals(CODEABLE_CONCEPT) || !property.hasValues() || skipCheckForThisTypeOfEntry(atomEntry))
+    protected void checkCodeableConcept(List<ValidationMessage> validationMessages, Property property,
+                                        AtomEntry<? extends Resource> atomEntry) {
+        if (!property.getTypeCode().equals(CODEABLE_CONCEPT) || !property.hasValues() || skipCheckForThisTypeOfEntry
+                (atomEntry))
             return;
 
         boolean bothSystemAndCodePresent = bothSystemAndCodePresent(property);
         if (bothSystemAndCodePresent) return;
 
         String errorMessage = (((CodeableConcept) property.getValues().get(0)).getCoding()).get(0).getDisplaySimple();
-        ValidationMessage validationMessage = new ValidationMessage(null, ResourceValidator.CODE_UNKNOWN, atomEntry.getId(), errorMessage, IssueSeverity.error);
+        ValidationMessage validationMessage = new ValidationMessage(null, ResourceValidator.CODE_UNKNOWN,
+                atomEntry.getId(), errorMessage, IssueSeverity.error);
         validationMessages.add(validationMessage);
     }
 

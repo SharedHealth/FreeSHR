@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
-import static org.freeshr.infrastructure.persistence.RxMaps.*;
+import static org.freeshr.infrastructure.persistence.RxMaps.completeResponds;
 import static org.freeshr.infrastructure.persistence.RxMaps.respondOnNext;
 
 @Component
@@ -72,10 +72,12 @@ public class EncounterRepository {
         Batch batch = QueryBuilder.batch(insertEncounterStmt, encCatchmentStmt, encByPatientStmt);
         Observable<ResultSet> saveObservable = Observable.from(cqlOperations.executeAsynchronously(batch));
 
-        return saveObservable.flatMap(respondOnNext(true), RxMaps.<Boolean>logAndForwardError(logger), completeResponds(true));
+        return saveObservable.flatMap(respondOnNext(true), RxMaps.<Boolean>logAndForwardError(logger),
+                completeResponds(true));
     }
 
-    public Observable<List<EncounterBundle>> findEncountersForCatchment(Catchment catchment, Date updatedSince, int limit) {
+    public Observable<List<EncounterBundle>> findEncountersForCatchment(Catchment catchment, Date updatedSince,
+                                                                        int limit) {
         String identifyEncountersQuery = buildCatchmentSearchQuery(catchment, updatedSince, limit);
         ResultSetFuture resultSet = cqlOperations.queryAsynchronously(identifyEncountersQuery);
         Observable<ResultSet> resultSetObservable = Observable.from(resultSet);
@@ -132,7 +134,8 @@ public class EncounterRepository {
     }
 
     private String buildEncounterSelectionQuery(LinkedHashSet<String> encounterIds) {
-        StringBuilder encounterQuery = new StringBuilder("SELECT encounter_id, health_id, received_date, content FROM encounter where encounter_id in (");
+        StringBuilder encounterQuery = new StringBuilder("SELECT encounter_id, health_id, received_date, " +
+                "content FROM encounter where encounter_id in (");
         int noOfEncounters = encounterIds.size();
         int idx = 0;
         for (String encounterId : encounterIds) {
@@ -162,7 +165,8 @@ public class EncounterRepository {
     }
 
     private Observable<List<EncounterBundle>> executeFindQuery(final String cql) {
-        return Observable.from(cqlOperations.queryAsynchronously(cql)).map(new Func1<ResultSet, List<EncounterBundle>>() {
+        return Observable.from(cqlOperations.queryAsynchronously(cql)).map(new Func1<ResultSet,
+                List<EncounterBundle>>() {
             @Override
             public List<EncounterBundle> call(ResultSet rows) {
                 return read(rows);
@@ -185,9 +189,12 @@ public class EncounterRepository {
         return bundles;
     }
 
-    public Observable<List<EncounterBundle>> findEncountersForPatient(String healthId, Date updatedSince, int limit) throws ExecutionException, InterruptedException {
+    public Observable<List<EncounterBundle>> findEncountersForPatient(String healthId, Date updatedSince,
+                                                                      int limit) throws ExecutionException,
+            InterruptedException {
         StringBuilder queryBuilder = buildQuery(healthId, updatedSince, limit);
-        Observable<LinkedHashSet<String>> encounterIdsObservable = Observable.from(cqlOperations.queryAsynchronously(queryBuilder.toString()))
+        Observable<LinkedHashSet<String>> encounterIdsObservable = Observable.from(cqlOperations.queryAsynchronously
+                (queryBuilder.toString()))
                 .map(new Func1<ResultSet, LinkedHashSet<String>>() {
                     @Override
                     public LinkedHashSet<String> call(ResultSet rows) {
@@ -213,7 +220,8 @@ public class EncounterRepository {
     }
 
     private StringBuilder buildQuery(String healthId, Date updatedSince, int limit) {
-        StringBuilder queryBuilder = new StringBuilder(String.format("SELECT encounter_id FROM enc_by_patient where health_id='%s'", healthId));
+        StringBuilder queryBuilder = new StringBuilder(String.format("SELECT encounter_id FROM enc_by_patient where " +
+                "health_id='%s'", healthId));
         if (updatedSince != null) {
             String lastUpdateTime = DateUtil.toDateString(updatedSince, DateUtil.UTC_DATE_IN_MILLIS_FORMAT);
             queryBuilder.append(String.format(" and received_date >= minTimeUuid('%s')", lastUpdateTime));

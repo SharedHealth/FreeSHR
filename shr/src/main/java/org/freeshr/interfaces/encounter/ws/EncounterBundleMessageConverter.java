@@ -25,11 +25,14 @@ public class EncounterBundleMessageConverter extends AbstractHttpMessageConverte
     }
 
     private boolean isXML(MediaType mediaType) {
-        return MediaType.APPLICATION_XML.getType().equals(mediaType.getType()) && MediaType.APPLICATION_XML.getSubtype().equals(mediaType.getSubtype());
+        return MediaType.APPLICATION_XML.getType().equals(mediaType.getType()) && MediaType.APPLICATION_XML
+                .getSubtype().equals(mediaType.getSubtype());
     }
 
     @Override
-    protected EncounterBundle readInternal(Class<? extends EncounterBundle> clazz, HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
+    protected EncounterBundle readInternal(Class<? extends EncounterBundle> clazz,
+                                           HttpInputMessage inputMessage) throws IOException,
+            HttpMessageNotReadableException {
         return createEncounterBundle(inputMessage);
     }
 
@@ -40,6 +43,7 @@ public class EncounterBundleMessageConverter extends AbstractHttpMessageConverte
     }
 
     @Override
-    protected void writeInternal(EncounterBundle encounter, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
+    protected void writeInternal(EncounterBundle encounter, HttpOutputMessage outputMessage) throws IOException,
+            HttpMessageNotWritableException {
     }
 }

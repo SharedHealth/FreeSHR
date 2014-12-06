@@ -5,8 +5,7 @@ import com.sun.syndication.feed.atom.Feed;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.freeshr.application.fhir.*;
-import org.freeshr.application.fhir.Error;
+import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.domain.service.EncounterService;
 import org.freeshr.utils.DateUtil;
 import org.junit.Before;
@@ -53,11 +52,15 @@ public class EncounterControllerTest {
     public void shouldGetPagedEncountersForCatchment() throws Exception {
         int encounterFetchLimit = EncounterService.getEncounterFetchLimit();
         List<EncounterBundle> dummyEncounters = createEncounterBundles("hid01", 50, DateUtil.parseDate("2014-10-10"));
-        Mockito.when(mockedEncounterService.findEncountersForFacilityCatchment(anyString(), anyString(), any(Date.class),
-                eq(encounterFetchLimit * 2))).thenReturn(Observable.just(slice(encounterFetchLimit*2, dummyEncounters)));
+        Mockito.when(mockedEncounterService.findEncountersForFacilityCatchment(anyString(), anyString(),
+                any(Date.class),
+                eq(encounterFetchLimit * 2))).thenReturn(Observable.just(slice(encounterFetchLimit * 2,
+                dummyEncounters)));
 
-        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null, "/catchments/3026/encounters");
-        DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncountersForCatchment(mockHttpServletRequest, "F1", "3026", "2014-10-10", null);
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null,
+                "/catchments/3026/encounters");
+        DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncountersForCatchment
+                (mockHttpServletRequest, "F1", "3026", "2014-10-10", null);
         EncounterSearchResponse response = (EncounterSearchResponse) encountersForCatchment.getResult();
         List<EncounterBundle> entries = response.getEntries();
         assertEquals(encounterFetchLimit, entries.size());
@@ -66,7 +69,8 @@ public class EncounterControllerTest {
         assertEquals("e-20", params.get(1).getValue());
 
 
-        encountersForCatchment = controller.findEncountersForCatchment(mockHttpServletRequest, "F1", "3026", "2014-10-10", "e-22");
+        encountersForCatchment = controller.findEncountersForCatchment(mockHttpServletRequest, "F1", "3026",
+                "2014-10-10", "e-22");
         response = (EncounterSearchResponse) encountersForCatchment.getResult();
         entries = response.getEntries();
         assertEquals(18, entries.size());
@@ -76,11 +80,15 @@ public class EncounterControllerTest {
     public void shouldGetAtomFeed() throws Exception {
         int encounterFetchLimit = EncounterService.getEncounterFetchLimit();
         List<EncounterBundle> dummyEncounters = createEncounterBundles("hid01", 50, DateUtil.parseDate("2014-10-10"));
-        Mockito.when(mockedEncounterService.findEncountersForFacilityCatchment(anyString(), anyString(), any(Date.class),
-                eq(encounterFetchLimit*2))).thenReturn(Observable.just(slice(encounterFetchLimit*2, dummyEncounters)));
+        Mockito.when(mockedEncounterService.findEncountersForFacilityCatchment(anyString(), anyString(),
+                any(Date.class),
+                eq(encounterFetchLimit * 2))).thenReturn(Observable.just(slice(encounterFetchLimit * 2,
+                dummyEncounters)));
 
-        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null, "/catchments/3026/encounters");
-        DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncountersForCatchment(mockHttpServletRequest, "F1", "3026", "2014-10-10", null);
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null,
+                "/catchments/3026/encounters");
+        DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncountersForCatchment
+                (mockHttpServletRequest, "F1", "3026", "2014-10-10", null);
         EncounterSearchResponse response = (EncounterSearchResponse) encountersForCatchment.getResult();
         System.out.println(response.toString());
         List<EncounterBundle> results = response.getEntries();
@@ -92,11 +100,13 @@ public class EncounterControllerTest {
 
     @Test
     public void shouldRollOverForNextUrl() throws UnsupportedEncodingException, URISyntaxException {
-        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null, "/catchments/3026/encounters");
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null,
+                "/catchments/3026/encounters");
         Calendar calendar = Calendar.getInstance();
         int currentYear = calendar.get(Calendar.YEAR);
-        calendar.set(Calendar.YEAR, currentYear-1);
-        String nextResultURL = controller.getNextResultURL(mockHttpServletRequest, new ArrayList<EncounterBundle>(), calendar.getTime());
+        calendar.set(Calendar.YEAR, currentYear - 1);
+        String nextResultURL = controller.getNextResultURL(mockHttpServletRequest, new ArrayList<EncounterBundle>(),
+                calendar.getTime());
         List<NameValuePair> params = URLEncodedUtils.parse(new URI(nextResultURL), "UTF-8");
 
         calendar.add(Calendar.MONTH, 1);
@@ -106,10 +116,12 @@ public class EncounterControllerTest {
 
         Calendar futureDate = Calendar.getInstance();
         futureDate.add(Calendar.YEAR, 1);
-        nextResultURL = controller.getNextResultURL(mockHttpServletRequest, new ArrayList<EncounterBundle>(), futureDate.getTime());
+        nextResultURL = controller.getNextResultURL(mockHttpServletRequest, new ArrayList<EncounterBundle>(),
+                futureDate.getTime());
         assertNull("For future year, should have returned null", nextResultURL);
 
-        nextResultURL = controller.getNextResultURL(mockHttpServletRequest, new ArrayList<EncounterBundle>(), Calendar.getInstance().getTime());
+        nextResultURL = controller.getNextResultURL(mockHttpServletRequest, new ArrayList<EncounterBundle>(),
+                Calendar.getInstance().getTime());
         assertNull("For current year, should have returned null", nextResultURL);
     }
 
@@ -121,7 +133,8 @@ public class EncounterControllerTest {
     }
 
     private String generateFeedId(String updatedSince, String requestedMarker) {
-        return StringUtils.isBlank(requestedMarker) ? "E-" + updatedSince : "E-" + updatedSince + "%2B" + requestedMarker;
+        return StringUtils.isBlank(requestedMarker) ? "E-" + updatedSince : "E-" + updatedSince + "%2B" +
+                requestedMarker;
     }
 
     private List<EncounterBundle> slice(int size, List<EncounterBundle> dummyEncounters) {
@@ -142,7 +155,7 @@ public class EncounterControllerTest {
             encounter.setHealthId(healthId);
             calendar.set(Calendar.SECOND, i);
             encounter.setReceivedDate(DateUtil.toISOString(calendar.getTime()));
-            encounter.setEncounterContent("content-" + (i+1));
+            encounter.setEncounterContent("content-" + (i + 1));
             encounters.add(encounter);
         }
         return encounters;

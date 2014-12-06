@@ -43,7 +43,7 @@ public class Catchment {
         if (mod != 0) return;
 
         this.code = catchment;
-        this.level = catchment.length()/2;
+        this.level = catchment.length() / 2;
         this.valid = this.level > 0;
     }
 
@@ -54,8 +54,8 @@ public class Catchment {
     public String levelCode(int i) {
         if (i > this.level) return null;
         if (StringUtils.isBlank(this.code)) return null;
-        
-        return code.substring(0, i*2);
+
+        return code.substring(0, i * 2);
     }
 
     public String levelType(int level) {

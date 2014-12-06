@@ -19,7 +19,7 @@ public class StructureValidatorTest {
     private StructureValidator structureValidator;
 
     @Before
-    public void setup(){
+    public void setup() {
         resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
         structureValidator = new StructureValidator();
     }
@@ -28,7 +28,7 @@ public class StructureValidatorTest {
     @Test
     public void shouldAcceptAValidXmlWithOneEntryForEachSectionPresentInComposition() {
         final String xml = FileUtil.asString("xmls/encounters/diagnostic_order_valid.xml");
-        List<ValidationMessage> validationMessages = structureValidator.validate(new EncounterValidationFragment<AtomFeed>() {
+        List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<AtomFeed>() {
             @Override
             public AtomFeed extract() {
                 return resourceOrFeedDeserializer.deserialize(xml);
@@ -40,7 +40,7 @@ public class StructureValidatorTest {
     @Test
     public void shouldRejectIfCompositionIsNotPresent() {
         final String xml = FileUtil.asString("xmls/encounters/no_composition.xml");
-        List<ValidationMessage> validationMessages = structureValidator.validate(new EncounterValidationFragment<AtomFeed>() {
+        List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<AtomFeed>() {
             @Override
             public AtomFeed extract() {
                 return resourceOrFeedDeserializer.deserialize(xml);
@@ -54,7 +54,7 @@ public class StructureValidatorTest {
     @Test
     public void shouldRejectIfCompositionDoesNotContainASectionCalledEncounter() {
         final String xml = FileUtil.asString("xmls/encounters/invalid_composition.xml");
-        List<ValidationMessage> validationMessages = structureValidator.validate(new EncounterValidationFragment<AtomFeed>() {
+        List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<AtomFeed>() {
             @Override
             public AtomFeed extract() {
                 return resourceOrFeedDeserializer.deserialize(xml);
@@ -76,7 +76,7 @@ public class StructureValidatorTest {
 
          */
         final String xml = FileUtil.asString("xmls/encounters/invalid_composition_sections.xml");
-        List<ValidationMessage> validationMessages = structureValidator.validate(new EncounterValidationFragment<AtomFeed>() {
+        List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<AtomFeed>() {
             @Override
             public AtomFeed extract() {
                 return resourceOrFeedDeserializer.deserialize(xml);

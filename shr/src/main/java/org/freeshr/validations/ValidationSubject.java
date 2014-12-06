@@ -1,5 +1,5 @@
 package org.freeshr.validations;
 
-public interface EncounterValidationFragment<T> {
+public interface ValidationSubject<T> {
     public T extract();
 }

@@ -6,11 +6,7 @@ import org.freeshr.config.SHRProperties;
 import org.freeshr.data.EncounterBundleData;
 import org.freeshr.infrastructure.tr.ValueSetCodeValidator;
 import org.freeshr.utils.FileUtil;
-import org.freeshr.validations.EncounterValidator;
-import org.freeshr.validations.FhirSchemaValidator;
-import org.freeshr.validations.HealthIdValidator;
-import org.freeshr.validations.ResourceValidator;
-import org.freeshr.validations.StructureValidator;
+import org.freeshr.validations.*;
 import org.hl7.fhir.instance.model.OperationOutcome;
 import org.hl7.fhir.instance.utils.ConceptLocator;
 import org.junit.Before;
@@ -65,20 +61,23 @@ public class EncounterValidatorIntegrationTest {
     public void setup() throws Exception {
         initMocks(this);
         fhirSchemaValidator = new FhirSchemaValidator(trConceptLocator, shrProperties);
-        validator = new EncounterValidator(fhirMessageFilter, fhirSchemaValidator, resourceValidator, healthIdValidator, structureValidator);
+        validator = new EncounterValidator(fhirMessageFilter, fhirSchemaValidator, resourceValidator,
+                healthIdValidator, structureValidator);
         encounterBundle = EncounterBundleData.withValidEncounter();
     }
 
     @Test
     public void shouldValidateEncounterWhenInProperFormat() throws Exception {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, FileUtil.asString("xmls/encounters/encounter.xml"));
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/encounter.xml"));
         EncounterValidationResponse validate = validator.validate(encounterBundle);
         assertTrue(validate.isSuccessful());
     }
 
     @Test
     public void shouldFailIfConditionStatusIsInvalid() throws Exception {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, FileUtil.asString("xmls/encounters/invalid_condition.xml"));
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/invalid_condition.xml"));
         EncounterValidationResponse response = validator.validate(encounterBundle);
         assertFalse(response.isSuccessful());
         assertEquals(1, response.getErrors().size());
@@ -88,51 +87,62 @@ public class EncounterValidatorIntegrationTest {
     @Test
     public void shouldRejectEncounterWithInvalidConcept() {
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        when(trConceptLocator.validate(anyString(), eq("invalid-eddb01eb-61fc-4f9e-aca5"), anyString())).thenReturn(new ConceptLocator.ValidationResult(OperationOutcome.IssueSeverity.error, "Invalid code"));
+        when(trConceptLocator.validate(anyString(), eq("invalid-eddb01eb-61fc-4f9e-aca5"),
+                anyString())).thenReturn(new ConceptLocator.ValidationResult(OperationOutcome.IssueSeverity.error,
+                "Invalid code"));
 
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, FileUtil.asString("xmls/encounters/invalid_concept.xml"));
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/invalid_concept.xml"));
         assertFalse(validator.validate(encounterBundle).isSuccessful());
     }
 
     @Test
     public void shouldRejectEncounterWithInvalidConceptReferenceTerms() {
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        when(trConceptLocator.validate(anyString(), eq("INVALID_REFERENCE_TERM"), anyString())).thenReturn(new ConceptLocator.ValidationResult(OperationOutcome.IssueSeverity.error, "Invalid code"));
+        when(trConceptLocator.validate(anyString(), eq("INVALID_REFERENCE_TERM"),
+                anyString())).thenReturn(new ConceptLocator.ValidationResult(OperationOutcome.IssueSeverity.error,
+                "Invalid code"));
 
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, FileUtil.asString("xmls/encounters/invalid_ref.xml"));
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/invalid_ref.xml"));
         assertFalse(validator.validate(encounterBundle).isSuccessful());
     }
 
     @Test
     public void shouldRejectEncounterWithMissingSystemForDiagnosis() throws Exception {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, FileUtil.asString("xmls/encounters/diagnosis_system_missing.xml"));
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/diagnosis_system_missing.xml"));
         assertFalse(validator.validate(encounterBundle).isSuccessful());
     }
 
     @Test
     public void shouldRejectEncountersWithDiagnosisHavingAllInvalidSystems() {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, FileUtil.asString("xmls/encounters/diagnosis_system_invalid.xml"));
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/diagnosis_system_invalid.xml"));
         EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
         assertFalse(encounterValidationResponse.isSuccessful());
     }
 
     @Test
     public void shouldTreatFHIRWarningAsError() {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, FileUtil.asString("xmls/encounters/diagnosis_system_invalid.xml"));
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/diagnosis_system_invalid.xml"));
         EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
         assertFalse(encounterValidationResponse.isSuccessful());
     }
 
     @Test
     public void shouldRejectInvalidDiagnosisCategory() {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, FileUtil.asString("xmls/encounters/diagnosis_category_invalid.xml"));
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/diagnosis_category_invalid.xml"));
         EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
         assertFalse(encounterValidationResponse.isSuccessful());
     }
 
     @Test
     public void shouldValidateDiagnosticOrder() throws Exception {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, FileUtil.asString("xmls/encounters/diagnostic_order_valid.xml"));
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/diagnostic_order_valid.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
         verify(trConceptLocator, times(1)).verifiesSystem(anyString());
@@ -141,7 +151,8 @@ public class EncounterValidatorIntegrationTest {
 
     @Test
     public void shouldValidateDiagnosticReport() {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, FileUtil.asString("xmls/encounters/diagnostic_report.xml"));
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/diagnostic_report.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
         verify(trConceptLocator, times(3)).verifiesSystem(anyString());
@@ -150,7 +161,8 @@ public class EncounterValidatorIntegrationTest {
 
     @Test
     public void shouldValidateConditionsToCheckIfCategoriesOtherThanChiefComplaintAreCoded() {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, FileUtil.asString("xmls/encounters/coded_and_noncoded_diagnosis.xml"));
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/coded_and_noncoded_diagnosis.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
         verify(trConceptLocator, times(6)).verifiesSystem(anyString());
@@ -161,7 +173,8 @@ public class EncounterValidatorIntegrationTest {
 
     @Test
     public void shouldValidateCodesInObservations() {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, FileUtil.asString("xmls/encounters/encounter_with_obs_valid.xml"));
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/encounter_with_obs_valid.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
         assertTrue(encounterValidationResponse.isSuccessful());
@@ -169,8 +182,11 @@ public class EncounterValidatorIntegrationTest {
 
     @Test
     public void shouldInvalidateWrongCodesInObservations() {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, FileUtil.asString("xmls/encounters/encounter_with_obs_invalid.xml"));
-        when(trConceptLocator.validate(anyString(), eq("77405a73-b915-4a93-87a7-f29fe6697fb4-INVALID"), anyString())).thenReturn(new ConceptLocator.ValidationResult(OperationOutcome.IssueSeverity.error, "Invalid code"));
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/encounter_with_obs_invalid.xml"));
+        when(trConceptLocator.validate(anyString(), eq("77405a73-b915-4a93-87a7-f29fe6697fb4-INVALID"),
+                anyString())).thenReturn(new ConceptLocator.ValidationResult(OperationOutcome.IssueSeverity.error,
+                "Invalid code"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
         List<Error> errors = encounterValidationResponse.getErrors();
@@ -192,13 +208,17 @@ public class EncounterValidatorIntegrationTest {
     }
 
     @Test
-    public void shouldValidateEncounterTypeAgainstValueSet(){
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, FileUtil.asString("xmls/encounters/encounter_with_valid_type.xml"));
+    public void shouldValidateEncounterTypeAgainstValueSet() {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/encounter_with_valid_type.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
-        verify(trConceptLocator, times(1)).verifiesSystem("http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba");
-        verify(trConceptLocator, times(1)).verifiesSystem("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type");
-        verify(trConceptLocator, times(1)).validate("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type", "REG", "registration");
+        verify(trConceptLocator, times(1)).verifiesSystem
+                ("http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba");
+        verify(trConceptLocator, times(1)).verifiesSystem
+                ("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type");
+        verify(trConceptLocator, times(1)).validate("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type",
+                "REG", "registration");
         assertTrue(encounterValidationResponse.isSuccessful());
     }
 

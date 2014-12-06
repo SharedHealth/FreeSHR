@@ -67,7 +67,8 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
                 .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
     }
 
-    /*Note: Verifying status code on async result is not supported in spring test. The actual response codes are being set as expected.*/
+    /*Note: Verifying status code on async result is not supported in spring test. The actual response codes are
+    being set as expected.*/
 
     @Test
     public void shouldRejectAnEncounterWithCorrectHttpResponseCodeWhenHealthIdIsInvalid() throws Exception {
@@ -146,7 +147,8 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String today = dateFormat.format(new Date());
 
-        Facility facility = new Facility("10000069", "facility1", "Main hospital", "3026, 30261801", new Address("30", "26", "18", null, null));
+        Facility facility = new Facility("10000069", "facility1", "Main hospital", "3026, 30261801",
+                new Address("30", "26", "18", null, null));
         createFacility(facility);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/catchments/" + "3026" + "/encounters?updatedSince=" + today)

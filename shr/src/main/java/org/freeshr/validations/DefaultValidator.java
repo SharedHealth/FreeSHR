@@ -9,7 +9,7 @@ import java.util.List;
 
 public class DefaultValidator implements Validator<AtomEntry<? extends Resource>> {
     @Override
-    public List<ValidationMessage> validate(EncounterValidationFragment<AtomEntry<? extends Resource>> fragment) {
+    public List<ValidationMessage> validate(ValidationSubject<AtomEntry<? extends Resource>> subject) {
         return new ArrayList<>();
     }
 }

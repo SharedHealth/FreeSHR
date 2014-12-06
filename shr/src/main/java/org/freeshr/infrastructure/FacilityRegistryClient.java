@@ -24,7 +24,8 @@ public class FacilityRegistryClient {
     private Logger logger = Logger.getLogger(FacilityRegistryClient.class);
 
     @Autowired
-    public FacilityRegistryClient(@Qualifier("SHRRestTemplate") AsyncRestTemplate shrRestTemplate, SHRProperties shrProperties) {
+    public FacilityRegistryClient(@Qualifier("SHRRestTemplate") AsyncRestTemplate shrRestTemplate,
+                                  SHRProperties shrProperties) {
         this.shrRestTemplate = shrRestTemplate;
         this.shrRestTemplate.getMessageConverters().add(0, new FacilityMessageConverter());
         this.shrProperties = shrProperties;

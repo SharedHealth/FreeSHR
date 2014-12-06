@@ -44,7 +44,7 @@ public class FacilityRepositoryIntegrationTest {
         facility.setFacilityName("Foo");
         facility.setFacilityType("Village Hospital");
         facility.setCatchments("10,1020,102030");
-        facility.setFacilityLocation(new Address("10","11", "32", "45", "67"));
+        facility.setFacilityLocation(new Address("10", "11", "32", "45", "67"));
         Observable<Facility> save = facilityRepository.save(facility);
         TestSubscriber<Facility> subscriber = new TestSubscriber<>();
         save.subscribe(subscriber);

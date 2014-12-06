@@ -44,11 +44,14 @@ public class EncounterValidator {
                     validationContext.sourceFragment()), fhirMessageFilter);
             if (validationResponse.isNotSuccessful()) return validationResponse;
 
-            validationResponse = fromValidationMessages(structureValidator.validate(validationContext.feedFragment()), fhirMessageFilter);
+            validationResponse = fromValidationMessages(structureValidator.validate(validationContext.feedFragment())
+                    , fhirMessageFilter);
             if (validationResponse.isNotSuccessful()) return validationResponse;
 
-            validationResponse = fromValidationMessages(resourceValidator.validate(validationContext.feedFragment()), fhirMessageFilter);
-            return validationResponse.isSuccessful() ? fromValidationMessages(healthIdValidator.validate(validationContext.context()), fhirMessageFilter)
+            validationResponse = fromValidationMessages(resourceValidator.validate(validationContext.feedFragment()),
+                    fhirMessageFilter);
+            return validationResponse.isSuccessful() ? fromValidationMessages(healthIdValidator.validate
+                    (validationContext.context()), fhirMessageFilter)
                     : validationResponse;
         } catch (Exception e) {
             return createErrorResponse(e);

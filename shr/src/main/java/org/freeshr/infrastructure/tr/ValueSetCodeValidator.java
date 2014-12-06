@@ -11,9 +11,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureCallback;
-import org.springframework.util.concurrent.SettableListenableFuture;
 import org.springframework.web.client.AsyncRestTemplate;
 import rx.Observable;
 import rx.functions.Func1;
@@ -49,7 +46,8 @@ public class ValueSetCodeValidator implements CodeValidator {
             @Override
             public Boolean call(ResponseEntity<String> stringResponseEntity) {
                 try {
-                    Resource resource = new JsonParser().parse(IOUtils.toInputStream(stringResponseEntity.getBody(), "UTF-8"));
+                    Resource resource = new JsonParser().parse(IOUtils.toInputStream(stringResponseEntity.getBody(),
+                            "UTF-8"));
                     ValueSet valueSet = (ValueSet) resource;
                     ValueSet.ValueSetDefineComponent definition = valueSet.getDefine();
                     Boolean isCaseSensitive = definition.getCaseSensitive().getValue();

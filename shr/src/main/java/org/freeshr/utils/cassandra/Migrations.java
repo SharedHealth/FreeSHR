@@ -63,7 +63,7 @@ public class Migrations {
                                 .setSeeds(env.get("MUTAGEN_SEEDS"))
                 )
                 .withConnectionPoolMonitor(new CountingConnectionPoolMonitor())
-                .buildKeyspace( ThriftFamilyFactory.getInstance());
+                .buildKeyspace(ThriftFamilyFactory.getInstance());
     }
 
     protected Keyspace createKeyspaceIfNoneExist(AstyanaxContext<Keyspace> context) throws ConnectionException {

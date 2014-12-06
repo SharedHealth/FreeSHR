@@ -19,8 +19,11 @@ public class CodeValidatorFactoryIntegrationTest {
 
     @Test
     public void shouldIdentifyTheCorrectValidator() throws Exception {
-        assertTrue(factory.getValidator("http://tr.shr.com/openmrs/ws/rest/v1/tr/referenceterms/ref1") instanceof HttpCodeValidator);
-        assertTrue(factory.getValidator("http://tr.shr.com/openmrs/ws/rest/v1/tr/concepts/ref1") instanceof HttpCodeValidator);
-        assertTrue(factory.getValidator("http://tr.shr.com/openmrs/ws/rest/v1/tr/vs/ref1") instanceof ValueSetCodeValidator);
+        assertTrue(factory.getValidator("http://tr.shr.com/openmrs/ws/rest/v1/tr/referenceterms/ref1") instanceof
+                HttpCodeValidator);
+        assertTrue(factory.getValidator("http://tr.shr.com/openmrs/ws/rest/v1/tr/concepts/ref1") instanceof
+                HttpCodeValidator);
+        assertTrue(factory.getValidator("http://tr.shr.com/openmrs/ws/rest/v1/tr/vs/ref1") instanceof
+                ValueSetCodeValidator);
     }
 }

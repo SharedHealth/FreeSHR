@@ -33,18 +33,20 @@ public class ResourceValidator implements Validator<AtomFeed> {
     }
 
     @Override
-    public List<ValidationMessage> validate(EncounterValidationFragment<AtomFeed> fragment) {
-        AtomFeed feed = fragment.extract();
+    public List<ValidationMessage> validate(ValidationSubject<AtomFeed> subject) {
+        AtomFeed feed = subject.extract();
         List<ValidationMessage> validationMessages = new ArrayList<>();
         for (final AtomEntry<? extends Resource> atomEntry : feed.getEntryList()) {
-            Validator<AtomEntry<? extends Resource>> validator = resourceTypeValidatorMap.get(atomEntry.getResource().getResourceType());
+            Validator<AtomEntry<? extends Resource>> validator = resourceTypeValidatorMap.get(atomEntry.getResource()
+                    .getResourceType());
             validationMessages.addAll(validator.validate(atomEntryFragment(atomEntry)));
         }
         return validationMessages;
     }
 
-    private EncounterValidationFragment<AtomEntry<? extends Resource>> atomEntryFragment(final AtomEntry<? extends Resource> atomEntry) {
-        return new EncounterValidationFragment<AtomEntry<? extends Resource>>() {
+    private ValidationSubject<AtomEntry<? extends Resource>> atomEntryFragment(final AtomEntry<? extends Resource>
+                                                                                       atomEntry) {
+        return new ValidationSubject<AtomEntry<? extends Resource>>() {
             @Override
             public AtomEntry<? extends Resource> extract() {
                 return atomEntry;

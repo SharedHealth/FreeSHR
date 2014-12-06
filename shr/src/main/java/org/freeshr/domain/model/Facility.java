@@ -45,7 +45,8 @@ public class Facility {
         }
     }
 
-    public Facility(){}
+    public Facility() {
+    }
 
     //Only for tests
     public Facility(String facilityId, String facilityName, String facilityType, String catchments, Address location) {

@@ -2,9 +2,9 @@ package org.freeshr.domain.model.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang3.StringUtils;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Address {
@@ -116,6 +116,7 @@ public class Address {
     }
 
     public String getLocationCode() {
-        return division + district + upazila + StringUtils.defaultString(cityCorporation) + StringUtils.defaultString(ward);
+        return division + district + upazila + StringUtils.defaultString(cityCorporation) + StringUtils.defaultString
+                (ward);
     }
 }

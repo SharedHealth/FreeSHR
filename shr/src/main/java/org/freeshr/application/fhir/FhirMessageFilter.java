@@ -19,13 +19,16 @@ public class FhirMessageFilter {
         ignoreList.add("f:DiagnosticReport/f:name");
     }
 
-    public EncounterValidationResponse filterMessagesSevereThan(List<ValidationMessage> outputs, final OperationOutcome.IssueSeverity severity) {
-        return CollectionUtils.reduce(CollectionUtils.filter(outputs, new CollectionUtils.Fn<ValidationMessage, Boolean>() {
+    public EncounterValidationResponse filterMessagesSevereThan(List<ValidationMessage> outputs,
+                                                                final OperationOutcome.IssueSeverity severity) {
+        return CollectionUtils.reduce(CollectionUtils.filter(outputs, new CollectionUtils.Fn<ValidationMessage,
+                Boolean>() {
             @Override
             public Boolean call(ValidationMessage input) {
                 //For SHR: We treat FHIR warning level as error.
                 boolean possibleError = severity.compareTo(input.getLevel()) >= 0;
-                // TODO :  remove the following if condition once the validation mechanism is finalised for DiagnosticOrder
+                // TODO :  remove the following if condition once the validation mechanism is finalised for
+                // DiagnosticOrder
                 if (possibleError) {
                     if (shouldFilterMessagesOfType(input)) {
                         possibleError = false;
@@ -34,7 +37,8 @@ public class FhirMessageFilter {
                 return possibleError;
 
             }
-        }), new EncounterValidationResponse(), new CollectionUtils.ReduceFn<ValidationMessage, EncounterValidationResponse>() {
+        }), new EncounterValidationResponse(), new CollectionUtils.ReduceFn<ValidationMessage,
+                EncounterValidationResponse>() {
             @Override
             public EncounterValidationResponse call(ValidationMessage input, EncounterValidationResponse acc) {
                 Error error = new Error();
@@ -48,9 +52,9 @@ public class FhirMessageFilter {
     }
 
     private boolean shouldFilterMessagesOfType(ValidationMessage input) {
-        if (input.getType().equalsIgnoreCase("code-unknown") ) {
+        if (input.getType().equalsIgnoreCase("code-unknown")) {
             for (String ignoreString : ignoreList) {
-                if (input.getLocation().contains(ignoreString)){
+                if (input.getLocation().contains(ignoreString)) {
                     return true;
                 }
             }

@@ -4,7 +4,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
 public class DateUtil {
 
@@ -35,7 +34,7 @@ public class DateUtil {
         return instance.get(Calendar.YEAR);
     }
 
-    public static Date parseDate(String date, String ... formats) throws ParseException {
+    public static Date parseDate(String date, String... formats) throws ParseException {
         return org.apache.commons.lang3.time.DateUtils.parseDate(date, formats);
     }
 

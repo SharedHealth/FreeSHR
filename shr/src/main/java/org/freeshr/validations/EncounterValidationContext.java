@@ -9,14 +9,15 @@ public class EncounterValidationContext {
     private ResourceOrFeedDeserializer resourceOrFeedDeserializer;
     private AtomFeed feed;
 
-    public EncounterValidationContext(EncounterBundle encounterBundle, ResourceOrFeedDeserializer resourceOrFeedDeserializer) {
+    public EncounterValidationContext(EncounterBundle encounterBundle,
+                                      ResourceOrFeedDeserializer resourceOrFeedDeserializer) {
         this.encounterBundle = encounterBundle;
         this.resourceOrFeedDeserializer = resourceOrFeedDeserializer;
     }
 
     public AtomFeed getFeed() {
         //deserialize only once
-        if(feed != null) return feed;
+        if (feed != null) return feed;
         feed = resourceOrFeedDeserializer.deserialize(encounterBundle.getContent());
         return feed;
     }
@@ -26,8 +27,8 @@ public class EncounterValidationContext {
     }
 
 
-    public EncounterValidationFragment<AtomFeed> feedFragment() {
-        return new EncounterValidationFragment<AtomFeed>() {
+    public ValidationSubject<AtomFeed> feedFragment() {
+        return new ValidationSubject<AtomFeed>() {
             @Override
             public AtomFeed extract() {
                 return getFeed();
@@ -35,8 +36,8 @@ public class EncounterValidationContext {
         };
     }
 
-    public EncounterValidationFragment<EncounterValidationContext> context() {
-        return new EncounterValidationFragment<EncounterValidationContext>() {
+    public ValidationSubject<EncounterValidationContext> context() {
+        return new ValidationSubject<EncounterValidationContext>() {
             @Override
             public EncounterValidationContext extract() {
                 return EncounterValidationContext.this;
@@ -44,8 +45,8 @@ public class EncounterValidationContext {
         };
     }
 
-    public EncounterValidationFragment<String> sourceFragment() {
-        return new EncounterValidationFragment<String>() {
+    public ValidationSubject<String> sourceFragment() {
+        return new ValidationSubject<String>() {
             @Override
             public String extract() {
                 return encounterBundle.getContent();

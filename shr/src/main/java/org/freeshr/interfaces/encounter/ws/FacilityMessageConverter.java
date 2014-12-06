@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("unchecked")
-public class FacilityMessageConverter  extends AbstractHttpMessageConverter<Facility> {
+public class FacilityMessageConverter extends AbstractHttpMessageConverter<Facility> {
 
     public FacilityMessageConverter() {
         super(MediaType.APPLICATION_JSON);
@@ -30,18 +30,21 @@ public class FacilityMessageConverter  extends AbstractHttpMessageConverter<Faci
     }
 
     @Override
-    protected Facility readInternal(Class<? extends Facility> clazz, HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
+    protected Facility readInternal(Class<? extends Facility> clazz, HttpInputMessage inputMessage) throws
+            IOException, HttpMessageNotReadableException {
         return createFacility(inputMessage);
     }
 
     @Override
     public boolean canRead(Class<?> clazz, MediaType mediaType) {
-        if(mediaType == null) return true;
-            return supports(clazz) && canRead(mediaType);
+        if (mediaType == null) return true;
+        return supports(clazz) && canRead(mediaType);
     }
+
     @Override
     protected boolean canRead(MediaType mediaType) {
-        return MediaType.APPLICATION_JSON.getType().equals(mediaType.getType()) && MediaType.APPLICATION_JSON.getSubtype().equals(mediaType.getSubtype());
+        return MediaType.APPLICATION_JSON.getType().equals(mediaType.getType()) && MediaType.APPLICATION_JSON
+                .getSubtype().equals(mediaType.getSubtype());
     }
 
 
@@ -53,25 +56,26 @@ public class FacilityMessageConverter  extends AbstractHttpMessageConverter<Faci
         facility.setFacilityName((String) facilityMapper.get("name"));
         LinkedHashMap properties = (LinkedHashMap) facilityMapper.get("properties");
         facility.setFacilityType((String) properties.get("org_type"));
-        List<String> catchments = (List<String>)properties.get("catchment");
+        List<String> catchments = (List<String>) properties.get("catchment");
         String catchmentsString = Joiner.on(",").join(catchments);
         facility.setCatchments(catchmentsString);
         facility.setFacilityLocation(getAddress(((LinkedHashMap) properties.get("locations"))));
-        return  facility;
+        return facility;
     }
 
     private Address getAddress(LinkedHashMap linkedHashMap) {
         Address address = new Address();
-        address.setDivision((String)linkedHashMap.get("division_code"));
-        address.setDistrict((String)linkedHashMap.get("district_code"));
+        address.setDivision((String) linkedHashMap.get("division_code"));
+        address.setDistrict((String) linkedHashMap.get("district_code"));
         address.setUpazila((String) linkedHashMap.get("upazila_code"));
-        address.setCityCorporation((String)linkedHashMap.get("paurasava_code"));
-        address.setWard((String)linkedHashMap.get("ward_code"));
+        address.setCityCorporation((String) linkedHashMap.get("paurasava_code"));
+        address.setWard((String) linkedHashMap.get("ward_code"));
         return address;
     }
 
 
     @Override
-    protected void writeInternal(Facility facility, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
+    protected void writeInternal(Facility facility, HttpOutputMessage outputMessage) throws IOException,
+            HttpMessageNotWritableException {
     }
 }

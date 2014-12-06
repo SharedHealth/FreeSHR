@@ -15,15 +15,16 @@ public class HttpUtil {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         String auth = userName + ":" + password;
-        headers.add("Authorization", "Basic " + new String(Base64.encodeBase64(auth.getBytes(Charset.forName("UTF-8")))));
+        headers.add("Authorization", "Basic " + new String(Base64.encodeBase64(auth.getBytes(Charset.forName("UTF-8")
+        ))));
         return headers;
     }
 
-    public static MultiValueMap<String, String> basicHeaders( String password) {
+    public static MultiValueMap<String, String> basicHeaders(String password) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        String auth =   password;
-        headers.add("X-Auth-Token",  auth);
+        String auth = password;
+        headers.add("X-Auth-Token", auth);
         return headers;
     }
 

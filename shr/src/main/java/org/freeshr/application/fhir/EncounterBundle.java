@@ -25,7 +25,7 @@ public class EncounterBundle {
     @JsonIgnore
     private EncounterContent encounterContent;
 
-    private String[] categories = new String[] {"encounter"};
+    private String[] categories = new String[]{"encounter"};
 
     private String title = "Encounter";
 
@@ -101,7 +101,7 @@ public class EncounterBundle {
     }
 
     public String[] getCategories() {
-        return categories != null ? categories : new String[] {};
+        return categories != null ? categories : new String[]{};
     }
 
     public void setTitle(String title) {

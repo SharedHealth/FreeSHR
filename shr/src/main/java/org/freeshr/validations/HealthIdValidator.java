@@ -15,7 +15,7 @@ public class HealthIdValidator implements Validator<EncounterValidationContext> 
     }
 
     @Override
-    public List<ValidationMessage> validate(EncounterValidationFragment<EncounterValidationContext> fragment) {
+    public List<ValidationMessage> validate(ValidationSubject<EncounterValidationContext> fragment) {
         EncounterValidationContext validationContext = fragment.extract();
         AtomFeed feed = validationContext.getFeed();
         String expectedHealthId = validationContext.getHealthId();
@@ -23,14 +23,15 @@ public class HealthIdValidator implements Validator<EncounterValidationContext> 
         for (AtomEntry<? extends Resource> atomEntry : feed.getEntryList()) {
             ResourceType resourceType = atomEntry.getResource().getResourceType();
             Property subject = atomEntry.getResource().getChildByName("subject");
-            if(resourceType.equals(ResourceType.Composition) && !subject.hasValues()){
+            if (resourceType.equals(ResourceType.Composition) && !subject.hasValues()) {
                 ValidationMessage validationMessage = createValidationMessage("healthId", "invalid",
                         "Composition must have patient's Health Id in subject.");
                 validationMessages.add(validationMessage);
                 return validationMessages;
             }
             if (!subject.hasValues()) continue;
-            String healthIdFromUrl = getHealthIdFromUrl(((ResourceReference) subject.getValues().get(0)).getReferenceSimple());
+            String healthIdFromUrl = getHealthIdFromUrl(((ResourceReference) subject.getValues().get(0))
+                    .getReferenceSimple());
             if (expectedHealthId.equals(healthIdFromUrl)) continue;
             ValidationMessage validationMessage = createValidationMessage("healthId", "invalid",
                     "Patient's Health Id does not match.");

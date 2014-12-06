@@ -67,24 +67,25 @@ public class EncounterController {
             @Override
             public void call(Throwable throwable) {
                 logger.error(throwable.getMessage());
-               deferredResult.setErrorResult(throwable.getMessage());
+                deferredResult.setErrorResult(throwable.getMessage());
             }
         });
 
         return deferredResult;
     }
 
-    @RequestMapping(value = "/patients/{healthId}/encounters", method = RequestMethod.GET, produces = {"application/json", "application/atom+xml"})
+    @RequestMapping(value = "/patients/{healthId}/encounters", method = RequestMethod.GET,
+            produces = {"application/json", "application/atom+xml"})
     public DeferredResult<EncounterSearchResponse> findEncountersForPatient(
             final HttpServletRequest request,
             @PathVariable String healthId,
-            @RequestParam(value = "updatedSince",required = false) String updatedSince) {
+            @RequestParam(value = "updatedSince", required = false) String updatedSince) {
         logger.debug("Find all encounters by health id: " + healthId);
         final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<EncounterSearchResponse>();
         try {
             final Date requestedDate = getRequestedDate(updatedSince);
             Observable<List<EncounterBundle>> encountersForPatient =
-               encounterService.findEncountersForPatient(healthId, requestedDate, 200);
+                    encounterService.findEncountersForPatient(healthId, requestedDate, 200);
             encountersForPatient.subscribe(new Action1<List<EncounterBundle>>() {
                 @Override
                 public void call(List<EncounterBundle> encounterBundles) {
@@ -105,14 +106,14 @@ public class EncounterController {
                     deferredResult.setErrorResult(throwable);
                 }
             });
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             deferredResult.setErrorResult(e);
         }
         return deferredResult;
     }
 
-    @RequestMapping(value = "/catchments/{catchment}/encounters", method = RequestMethod.GET, produces = {"application/json", "application/atom+xml"})
+    @RequestMapping(value = "/catchments/{catchment}/encounters", method = RequestMethod.GET,
+            produces = {"application/json", "application/atom+xml"})
     public DeferredResult<EncounterSearchResponse> findEncountersForCatchment(
             final HttpServletRequest request,
             @RequestHeader String facilityId,
@@ -150,32 +151,34 @@ public class EncounterController {
     }
 
 
-    @RequestMapping(value = "/patients/{healthId}/encounters/{encounterId}", method = RequestMethod.GET, produces = {"application/json", "application/xml"})
+    @RequestMapping(value = "/patients/{healthId}/encounters/{encounterId}", method = RequestMethod.GET,
+            produces = {"application/json", "application/xml"})
     public DeferredResult<EncounterBundle> findEncountersForPatient(
             @PathVariable String healthId, @PathVariable final String encounterId) {
         logger.debug(String.format("Find encounter %s for patient %s", encounterId, healthId));
         final DeferredResult<EncounterBundle> deferredResult = new DeferredResult<>();
-        Observable<EncounterBundle> observable = encounterService.findEncounter(healthId, encounterId).firstOrDefault(null);
+        Observable<EncounterBundle> observable = encounterService.findEncounter(healthId,
+                encounterId).firstOrDefault(null);
         observable.subscribe(new Action1<EncounterBundle>() {
-            @Override
-            public void call(EncounterBundle encounterBundle) {
-                if (encounterBundle != null) {
-                    logger.debug(encounterBundle.toString());
-                    deferredResult.setResult(encounterBundle);
-                } else {
-                    String errorMessage = String.format("Encounter %s not found", encounterId);
-                    logger.error(errorMessage);
-                    deferredResult.setErrorResult(new ResourceNotFound(errorMessage));
-                }
-            }
-        },
-        new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                logger.error(throwable.getMessage());
-                deferredResult.setErrorResult(throwable);
-            }
-        });
+                                 @Override
+                                 public void call(EncounterBundle encounterBundle) {
+                                     if (encounterBundle != null) {
+                                         logger.debug(encounterBundle.toString());
+                                         deferredResult.setResult(encounterBundle);
+                                     } else {
+                                         String errorMessage = String.format("Encounter %s not found", encounterId);
+                                         logger.error(errorMessage);
+                                         deferredResult.setErrorResult(new ResourceNotFound(errorMessage));
+                                     }
+                                 }
+                             },
+                new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        logger.error(throwable.getMessage());
+                        deferredResult.setErrorResult(throwable);
+                    }
+                });
 
         return deferredResult;
     }
@@ -185,7 +188,8 @@ public class EncounterController {
                                                                               String lastMarker, Date lastUpdateDate) {
         int encounterFetchLimit = EncounterService.getEncounterFetchLimit();
         Observable<List<EncounterBundle>> facilityCatchmentEncounters =
-                encounterService.findEncountersForFacilityCatchment(facilityId, catchment, lastUpdateDate, encounterFetchLimit * 2);
+                encounterService.findEncountersForFacilityCatchment(facilityId, catchment, lastUpdateDate,
+                        encounterFetchLimit * 2);
 
         return filterAfterMarker(facilityCatchmentEncounters, lastMarker, encounterFetchLimit);
     }
@@ -245,7 +249,8 @@ public class EncounterController {
         if (currentYear > requestedYear) { //advance to the next month's beginning date.
             requestedTime.add(Calendar.MONTH, 1);
 
-            String nextApplicableDate = String.format("%s-%02d-01", requestedTime.get(Calendar.YEAR), requestedTime.get(Calendar.MONTH) + 1);
+            String nextApplicableDate = String.format("%s-%02d-01", requestedTime.get(Calendar.YEAR),
+                    requestedTime.get(Calendar.MONTH) + 1);
             return UriComponentsBuilder.fromUriString(request.getRequestURL().toString())
                     .queryParam("updatedSince", nextApplicableDate).build().toString();
         }
@@ -266,7 +271,8 @@ public class EncounterController {
     }
 
 
-    private Observable<List<EncounterBundle>> filterAfterMarker(final Observable<List<EncounterBundle>> encounters, final String lastMarker, final int limit) {
+    private Observable<List<EncounterBundle>> filterAfterMarker(final Observable<List<EncounterBundle>> encounters,
+                                                                final String lastMarker, final int limit) {
 
         return encounters.map(new Func1<List<EncounterBundle>, List<EncounterBundle>>() {
             @Override
@@ -278,8 +284,10 @@ public class EncounterController {
                 int lastMarkerIndex = identifyLastMarker(lastMarker, encounterBundles);
                 if (lastMarkerIndex >= 0) {
                     if ((lastMarkerIndex + 1) <= encounterBundles.size()) {
-                        List<EncounterBundle> remainingEncounters = encounterBundles.subList(lastMarkerIndex + 1, encounterBundles.size());
-                        return remainingEncounters.size() > limit ? remainingEncounters.subList(0, limit) : remainingEncounters;
+                        List<EncounterBundle> remainingEncounters = encounterBundles.subList(lastMarkerIndex + 1,
+                                encounterBundles.size());
+                        return remainingEncounters.size() > limit ? remainingEncounters.subList(0,
+                                limit) : remainingEncounters;
                     }
                 }
                 return new ArrayList<>();

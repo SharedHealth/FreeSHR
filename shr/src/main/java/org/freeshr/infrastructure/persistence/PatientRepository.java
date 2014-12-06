@@ -35,7 +35,8 @@ public class PatientRepository {
     public Observable<Patient> find(String healthId) {
         Observable<ResultSet> observable = Observable.from(
                 cqlOperations.queryAsynchronously("SELECT " +
-                        " health_id, gender, division_id, district_id, upazila_id, city_corporation_id, union_urban_ward_id, address_line" +
+                        " health_id, gender, division_id, district_id, upazila_id, city_corporation_id, " +
+                        "union_urban_ward_id, address_line" +
                         " FROM patient WHERE health_id='" + healthId + "';"));
         return observable.map(new Func1<ResultSet, Patient>() {
             @Override
@@ -67,7 +68,8 @@ public class PatientRepository {
 
     public Observable<Boolean> save(Patient patient) {
         Observable<ResultSet> saveObservable = Observable.from(cqlOperations.executeAsynchronously(toCQL(patient)));
-        return saveObservable.flatMap(respondOnNext(true), RxMaps.<Boolean>logAndForwardError(logger), completeResponds(true));
+        return saveObservable.flatMap(respondOnNext(true), RxMaps.<Boolean>logAndForwardError(logger),
+                completeResponds(true));
     }
 
     private String toCQL(Patient patient) {
@@ -75,7 +77,8 @@ public class PatientRepository {
         String query = query(asList(patient.getHealthId(),
                 patient.getGender(), address.getLine(), address.getDistrict(),
                 address.getDivision(), address.getWard(), address.getUpazila(), address.getCityCorporation()));
-        return "INSERT into patient (health_id, gender, address_line, district_id, division_id, union_urban_ward_id, upazila_id, city_corporation_id) values  (" + query + ")";
+        return "INSERT into patient (health_id, gender, address_line, district_id, division_id, union_urban_ward_id, " +
+                "upazila_id, city_corporation_id) values  (" + query + ")";
     }
 
 

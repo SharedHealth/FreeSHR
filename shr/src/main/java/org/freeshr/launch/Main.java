@@ -29,7 +29,8 @@ public class Main {
             public void onStartup(ServletContext servletContext) throws ServletException {
                 ServletRegistration.Dynamic shr = servletContext.addServlet("shr", DispatcherServlet.class);
                 shr.addMapping("/");
-                shr.setInitParameter("contextClass", "org.springframework.web.context.support.AnnotationConfigWebApplicationContext");
+                shr.setInitParameter("contextClass", "org.springframework.web.context.support" +
+                        ".AnnotationConfigWebApplicationContext");
                 shr.setInitParameter("contextConfigLocation", "org.freeshr.launch.WebMvcConfig");
                 shr.setAsyncSupported(true);
             }

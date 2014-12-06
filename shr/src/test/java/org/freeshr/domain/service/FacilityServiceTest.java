@@ -1,4 +1,5 @@
 package org.freeshr.domain.service;
+
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.infrastructure.FacilityRegistryClient;
@@ -26,25 +27,28 @@ public class FacilityServiceTest {
     private FacilityService facilityService;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         initMocks(this);
         facilityService = new FacilityService(facilityRepository, facilityRegistryClient);
     }
 
     @Test
-    public void shouldNotQueryFacilityRegistryWrapperIfFacilityFoundInLocalDatabase() throws ExecutionException, InterruptedException {
-        Facility facility = new Facility("1", "foo", "bar","123",new Address());
-        Mockito.when(facilityRepository.find(facility.getFacilityId())) .thenReturn(Observable.just(facility));
+    public void shouldNotQueryFacilityRegistryWrapperIfFacilityFoundInLocalDatabase() throws ExecutionException,
+            InterruptedException {
+        Facility facility = new Facility("1", "foo", "bar", "123", new Address());
+        Mockito.when(facilityRepository.find(facility.getFacilityId())).thenReturn(Observable.just(facility));
         facilityService.ensurePresent(facility.getFacilityId());
         Mockito.verify(facilityRegistryClient, never()).getFacility(facility.getFacilityId());
     }
 
     @Test
-    public void shouldQueryFacilityRegistryWrapperIfFacilityNotFoundInLocalDatabase() throws ExecutionException, InterruptedException {
-        Facility facility = new Facility("1", "foo", "bar","123",new Address());
+    public void shouldQueryFacilityRegistryWrapperIfFacilityNotFoundInLocalDatabase() throws ExecutionException,
+            InterruptedException {
+        Facility facility = new Facility("1", "foo", "bar", "123", new Address());
 
         Mockito.when(facilityRepository.find(facility.getFacilityId())).thenReturn(Observable.<Facility>empty());
-        Mockito.when(facilityRegistryClient.getFacility(facility.getFacilityId())).thenReturn(Observable.just(facility));
+        Mockito.when(facilityRegistryClient.getFacility(facility.getFacilityId())).thenReturn(Observable.just
+                (facility));
         assertNotNull(facilityService.ensurePresent(facility.getFacilityId()));
 
     }

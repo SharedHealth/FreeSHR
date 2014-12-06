@@ -30,12 +30,15 @@ public class EncounterSearchResponseFeedConverter extends AbstractHttpMessageCon
     }
 
     @Override
-    protected EncounterSearchResponse readInternal(Class<? extends EncounterSearchResponse> clazz, HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
+    protected EncounterSearchResponse readInternal(Class<? extends EncounterSearchResponse> clazz,
+                                                   HttpInputMessage inputMessage) throws IOException,
+            HttpMessageNotReadableException {
         return null; //we never read
     }
 
     @Override
-    protected void writeInternal(EncounterSearchResponse result, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
+    protected void writeInternal(EncounterSearchResponse result, HttpOutputMessage outputMessage) throws IOException,
+            HttpMessageNotWritableException {
         Feed resultFeed = new EncounterFeedHelper().generateFeed(result, UUID.randomUUID().toString());
         String wireFeedEncoding = resultFeed.getEncoding();
         if (!StringUtils.hasLength(wireFeedEncoding)) {
@@ -53,8 +56,7 @@ public class EncounterSearchResponseFeedConverter extends AbstractHttpMessageCon
         try {
             Writer writer = new OutputStreamWriter(outputMessage.getBody(), wireFeedEncoding);
             feedOutput.output(resultFeed, writer);
-        }
-        catch (FeedException ex) {
+        } catch (FeedException ex) {
             throw new HttpMessageNotWritableException("Could not write WiredFeed: " + ex.getMessage(), ex);
         }
     }

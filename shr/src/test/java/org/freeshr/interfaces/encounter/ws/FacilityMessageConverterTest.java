@@ -38,9 +38,9 @@ public class FacilityMessageConverterTest {
         assertNotNull(facility);
         assertEquals("Dhaka Divisional Health Office", facility.getFacilityName());
         assertEquals(1, facility.getCatchments().size());
-        assertEquals("10000001",facility.getFacilityId());
-        assertEquals("Divisional Level Office",facility.getFacilityType());
-        assertEquals(new Address("30", "26", "01", "", ""),facility.getFacilityLocation());
+        assertEquals("10000001", facility.getFacilityId());
+        assertEquals("Divisional Level Office", facility.getFacilityType());
+        assertEquals(new Address("30", "26", "01", "", ""), facility.getFacilityLocation());
 
 
     }

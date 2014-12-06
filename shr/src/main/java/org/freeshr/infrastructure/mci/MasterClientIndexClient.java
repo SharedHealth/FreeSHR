@@ -21,7 +21,8 @@ public class MasterClientIndexClient {
     private SHRProperties shrProperties;
 
     @Autowired
-    public MasterClientIndexClient(@Qualifier("SHRRestTemplate") AsyncRestTemplate shrRestTemplate, SHRProperties shrProperties) {
+    public MasterClientIndexClient(@Qualifier("SHRRestTemplate") AsyncRestTemplate shrRestTemplate,
+                                   SHRProperties shrProperties) {
         this.shrRestTemplate = shrRestTemplate;
         this.shrProperties = shrProperties;
     }
@@ -42,7 +43,7 @@ public class MasterClientIndexClient {
                     return null;
                 }
             }
-        }) ;
+        });
     }
 
 }

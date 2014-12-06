@@ -9,7 +9,7 @@ public class EncounterSearchResponse {
     @JsonProperty("feedUrl")
     private String requestUrl;
     private String author = "FreeSHR";
-    private String title  = "Encounters";
+    private String title = "Encounters";
     private String nextUrl;
     private String prevUrl;
     private List<EncounterBundle> entries;

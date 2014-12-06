@@ -39,14 +39,15 @@ public class FacilityRepository {
                 .from("facilities")
                 .where(QueryBuilder.eq("facility_id", facilityId));
 
-        Observable<ResultSet> resultSet = Observable.from(cqlTemplate.queryAsynchronously(select.toString()), Schedulers.io());
+        Observable<ResultSet> resultSet = Observable.from(cqlTemplate.queryAsynchronously(select.toString()),
+                Schedulers.io());
 
         return resultSet.flatMap(new Func1<ResultSet, Observable<Facility>>() {
             @Override
             public Observable<Facility> call(ResultSet rows) {
                 Row facilityRow = rows.one();
-                if(facilityRow == null) return Observable.just(null);
-                    return Observable.just(read(facilityRow));
+                if (facilityRow == null) return Observable.just(null);
+                return Observable.just(read(facilityRow));
             }
         }, new Func1<Throwable, Observable<? extends Facility>>() {
             @Override

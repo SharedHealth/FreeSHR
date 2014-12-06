@@ -10,15 +10,10 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import rx.Observable;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.givenThat;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.freeshr.utils.FileUtil.asString;
 import static org.freeshr.utils.StringUtils.concat;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -32,7 +27,8 @@ public class TerminologyServerIntegrationTest {
     @Autowired
     private TerminologyServer trServer;
 
-    private static String REFERENCE_TERM_PATH = "/openmrs/ws/rest/v1/tr/referenceterms/fa460ea6-04c7-45af-a6fa-5072e7caed40";
+    private static String REFERENCE_TERM_PATH =
+            "/openmrs/ws/rest/v1/tr/referenceterms/fa460ea6-04c7-45af-a6fa-5072e7caed40";
     private static String CONCEPT_URL = "/openmrs/ws/rest/v1/tr/concepts/eddb01eb-61fc-4f9e-aca5-e44193509f35";
 
     @Before
@@ -54,13 +50,16 @@ public class TerminologyServerIntegrationTest {
     @Test
     public void shouldIdentifyValidReferenceTerms() throws Exception {
         assertTrue(trServer.isValid(concat("http://localhost:9997", REFERENCE_TERM_PATH), "S40").toBlocking().first());
-        assertFalse(trServer.isValid(concat("http://localhost:9997", REFERENCE_TERM_PATH), "invalid_ref_code").toBlocking().first());
+        assertFalse(trServer.isValid(concat("http://localhost:9997", REFERENCE_TERM_PATH),
+                "invalid_ref_code").toBlocking().first());
     }
 
     @Test
     public void shouldIdentifyValidConcepts() throws Exception {
-        assertTrue(trServer.isValid(concat("http://localhost:9997", CONCEPT_URL), "eddb01eb-61fc-4f9e-aca5-e44193509f35").toBlocking().first());
-        assertFalse(trServer.isValid(concat("http://localhost:9997", CONCEPT_URL), "invalid_uuid").toBlocking().first());
+        assertTrue(trServer.isValid(concat("http://localhost:9997", CONCEPT_URL),
+                "eddb01eb-61fc-4f9e-aca5-e44193509f35").toBlocking().first());
+        assertFalse(trServer.isValid(concat("http://localhost:9997", CONCEPT_URL), "invalid_uuid").toBlocking().first
+                ());
 
     }
 
@@ -77,9 +76,12 @@ public class TerminologyServerIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/encounter-type-case-sensitive.json"))));
 
-        assertTrue(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type", "REG").toBlocking().first());
-        assertFalse(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type", "reg").toBlocking().first());
-        assertFalse(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type", "friend").toBlocking().first());
+        assertTrue(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type",
+                "REG").toBlocking().first());
+        assertFalse(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type",
+                "reg").toBlocking().first());
+        assertFalse(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type",
+                "friend").toBlocking().first());
     }
 
     @Test
@@ -90,8 +92,11 @@ public class TerminologyServerIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/encounter-type-case-insensitive.json"))));
 
-        assertTrue(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type", "REG").toBlocking().first());
-        assertTrue(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type", "reg").toBlocking().first());
-        assertFalse(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type", "friend").toBlocking().first());
+        assertTrue(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type",
+                "REG").toBlocking().first());
+        assertTrue(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type",
+                "reg").toBlocking().first());
+        assertFalse(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type",
+                "friend").toBlocking().first());
     }
 }

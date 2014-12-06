@@ -22,7 +22,6 @@ public class CatchmentTest {
         assertEquals(1, cache.toBlocking().first().intValue());
 
 
-
         Catchment catchment = new Catchment("0102030405");
         assertEquals(5, catchment.getLevel());
         assertEquals(Catchment.UNION_OR_URBAN_WARD_ID, catchment.getType());

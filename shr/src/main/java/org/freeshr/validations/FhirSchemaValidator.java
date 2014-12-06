@@ -36,8 +36,8 @@ public class FhirSchemaValidator implements Validator<String> {
 
 
     @Override
-    public List<ValidationMessage> validate(EncounterValidationFragment<String> fragment) {
-        String sourceXml = fragment.extract();
+    public List<ValidationMessage> validate(ValidationSubject<String> subject) {
+        String sourceXml = subject.extract();
         try {
             return instanceValidator.validateInstance(document(sourceXml).getDocumentElement());
         } catch (Exception e) {

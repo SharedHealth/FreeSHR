@@ -6,11 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.utils.DateUtil;
 import org.freeshr.utils.atomfeed.FeedBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -143,10 +140,10 @@ public class EncounterFeedHelper {
         return Arrays.asList(content);
     }
 
-    private String wrapInCDATA(String contents){
-        if(contents == null){
+    private String wrapInCDATA(String contents) {
+        if (contents == null) {
             return null;
         }
-        return String.format("%s%s%s","<![CDATA[",contents,"]]>");
+        return String.format("%s%s%s", "<![CDATA[", contents, "]]>");
     }
 }

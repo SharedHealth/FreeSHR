@@ -1,7 +1,6 @@
 package org.freeshr.interfaces.encounter.ws;
 
 
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.freeshr.application.fhir.Error;

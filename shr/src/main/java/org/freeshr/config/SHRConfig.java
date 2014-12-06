@@ -54,7 +54,8 @@ public class SHRConfig {
         return new PropertySourcesPlaceholderConfigurer();
     }
 
-    /*TODO: Verify whether the codes are needed for validations by writing tests and then remove this bean if they are not.*/
+    /*TODO: Verify whether the codes are needed for validations by writing tests and then remove this bean if they
+    are not.*/
     @Bean(name = "hl7CodeProperties")
     public static PropertiesFactoryBean hl7() {
         PropertiesFactoryBean bean = new PropertiesFactoryBean();
@@ -66,7 +67,7 @@ public class SHRConfig {
     public CacheManager cacheManager() {
         SimpleCacheManager cacheManager = new SimpleCacheManager();
         cacheManager.setCaches(Arrays.asList(
-            new ConcurrentMapCache("refData")
+                new ConcurrentMapCache("refData")
         ));
         return cacheManager;
     }

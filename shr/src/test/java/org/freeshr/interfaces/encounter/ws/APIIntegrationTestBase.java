@@ -68,7 +68,8 @@ public abstract class APIIntegrationTestBase {
         cqlTemplate.execute("truncate enc_by_catchment");
     }
 
-    public void createEncounter(EncounterBundle encounter, Patient patient) throws ExecutionException, InterruptedException {
+    public void createEncounter(EncounterBundle encounter, Patient patient) throws ExecutionException,
+            InterruptedException {
         encounterRepository.save(encounter, patient).toBlocking().first();
     }
 

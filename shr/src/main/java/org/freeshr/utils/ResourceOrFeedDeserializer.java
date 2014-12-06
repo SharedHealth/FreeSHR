@@ -5,9 +5,10 @@ import org.hl7.fhir.instance.model.AtomFeed;
 
 import java.io.ByteArrayInputStream;
 
-public class ResourceOrFeedDeserializer  {
+public class ResourceOrFeedDeserializer {
 
-    public ResourceOrFeedDeserializer(){}
+    public ResourceOrFeedDeserializer() {
+    }
 
     public AtomFeed deserialize(String xml) {
         try {
