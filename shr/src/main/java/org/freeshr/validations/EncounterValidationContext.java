@@ -14,17 +14,42 @@ public class EncounterValidationContext {
         this.resourceOrFeedDeserializer = resourceOrFeedDeserializer;
     }
 
-    public String getSourceXml() {
-        return encounterBundle.getContent();
-    }
-
     public AtomFeed getFeed() {
+        //deserialize only once
         if(feed != null) return feed;
-        feed = resourceOrFeedDeserializer.deserialize(getSourceXml());
+        feed = resourceOrFeedDeserializer.deserialize(encounterBundle.getContent());
         return feed;
     }
 
     public String getHealthId() {
         return this.encounterBundle.getHealthId();
+    }
+
+
+    public EncounterValidationFragment<AtomFeed> feedFragment() {
+        return new EncounterValidationFragment<AtomFeed>() {
+            @Override
+            public AtomFeed extract() {
+                return getFeed();
+            }
+        };
+    }
+
+    public EncounterValidationFragment<EncounterValidationContext> context() {
+        return new EncounterValidationFragment<EncounterValidationContext>() {
+            @Override
+            public EncounterValidationContext extract() {
+                return EncounterValidationContext.this;
+            }
+        };
+    }
+
+    public EncounterValidationFragment<String> sourceFragment() {
+        return new EncounterValidationFragment<String>() {
+            @Override
+            public String extract() {
+                return encounterBundle.getContent();
+            }
+        };
     }
 }

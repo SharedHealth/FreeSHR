@@ -5,7 +5,6 @@ import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.application.fhir.FhirMessageFilter;
 import org.freeshr.utils.ResourceOrFeedDeserializer;
-import org.hl7.fhir.instance.model.AtomFeed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -42,45 +41,18 @@ public class EncounterValidator {
                     resourceOrFeedDeserializer);
 
             EncounterValidationResponse validationResponse = fromValidationMessages(fhirSchemaValidator.validate(
-                    sourceXml(validationContext)), fhirMessageFilter);
+                    validationContext.sourceFragment()), fhirMessageFilter);
             if (validationResponse.isNotSuccessful()) return validationResponse;
 
-            validationResponse = fromValidationMessages(structureValidator.validate(feed(validationContext)), fhirMessageFilter);
+            validationResponse = fromValidationMessages(structureValidator.validate(validationContext.feedFragment()), fhirMessageFilter);
             if (validationResponse.isNotSuccessful()) return validationResponse;
 
-            validationResponse = fromValidationMessages(resourceValidator.validate(feed(validationContext)), fhirMessageFilter);
-            return validationResponse.isSuccessful() ? fromValidationMessages(healthIdValidator.validate(context(validationContext)), fhirMessageFilter)
+            validationResponse = fromValidationMessages(resourceValidator.validate(validationContext.feedFragment()), fhirMessageFilter);
+            return validationResponse.isSuccessful() ? fromValidationMessages(healthIdValidator.validate(validationContext.context()), fhirMessageFilter)
                     : validationResponse;
         } catch (Exception e) {
             return createErrorResponse(e);
         }
-    }
-
-    private EncounterValidationFragment<EncounterValidationContext> context(final EncounterValidationContext validationContext) {
-        return new EncounterValidationFragment<EncounterValidationContext>() {
-            @Override
-            public EncounterValidationContext extract() {
-                return validationContext;
-            }
-        };
-    }
-
-    private EncounterValidationFragment<AtomFeed> feed(final EncounterValidationContext validationContext) {
-        return new EncounterValidationFragment<AtomFeed>() {
-            @Override
-            public AtomFeed extract() {
-                return validationContext.getFeed();
-            }
-        };
-    }
-
-    private EncounterValidationFragment<String> sourceXml(final EncounterValidationContext validationContext) {
-        return new EncounterValidationFragment<String>() {
-            @Override
-            public String extract() {
-                return validationContext.getSourceXml();
-            }
-        };
     }
 
 
