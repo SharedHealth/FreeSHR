@@ -1,0 +1,57 @@
+{
+  "names": [
+    {
+      "conceptNameType": "FULLY_SPECIFIED",
+      "conceptName": "Hemoglobin",
+      "locale": "en"
+    },
+    {
+      "conceptNameType": "SHORT",
+      "conceptName": "Hemoglobin",
+      "locale": "en"
+    }
+  ],
+  "uuid": "79647ed4-a60e-4cf5-ba68-cf4d55956cba",
+  "conceptClass": "Test",
+  "fullySpecifiedName": {
+    "conceptNameType": "FULLY_SPECIFIED",
+    "conceptName": "Hemoglobin",
+    "locale": "en"
+  },
+  "retireReason": null,
+  "retired": false,
+  "setMembers": [],
+  "version": null,
+  "conceptAnswers": [],
+  "referenceTerms": [
+    {
+      "uuid": "94f5e936-1b2d-421d-8f83-21048270bf32",
+      "retired": false,
+      "version": "1",
+      "code": "20563-3",
+      "conceptSource": {
+        "uuid": "cc1147c4-9312-45de-9357-5600d86179ac",
+        "hl7Code": "LOINC",
+        "description": "These are codes for tests",
+        "name": "LOINC"
+      },
+      "mapType": "SAME-AS",
+      "uri": "http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/referenceterms/94f5e936-1b2d-421d-8f83-21048270bf32",
+      "description": "Loinc code for Hemoglobin in Blood",
+      "name": "Carboxyhemoglobin/Hemoglobin.total:MFr:Pt:Bld:Qn"
+    }
+  ],
+  "datatypeName": "Numeric",
+  "uri": "http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba",
+  "description": {
+    "locale": "en",
+    "description": "Hemoglobin modified"
+  },
+  "properties": {
+    "NUMERIC_UNITS": "%",
+    "NORMAL_LOW": "0.0",
+    "NUMERIC_PRECISE": "false",
+    "NORMAL_HIGH": "2.3"
+  },
+  "set": false
+}

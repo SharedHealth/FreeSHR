@@ -50,11 +50,26 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/concept.json"))));
 
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/hemoglobin_diagnostic.json"))));
+
+        givenThat(get(urlEqualTo("openmrs/ws/rest/v1/tr/concepts/a8a58344-602e-44c6-9677-841deeeb4ab4"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/viral_pneumonia_diagnostic.json"))));
+
+
+
         givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/encounter-type"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/encounter-type-case-insensitive.json"))));
+
     }
 
     @Test
@@ -91,7 +106,17 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
     }
 
     @Test
-    public void shouldSaveTheEncounterWhenValidType() throws Exception {
+    public void shouldRejectAnEncounterWithInvalidDiagnosticCode() throws Exception {
+        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID + "/encounters")
+                .accept(MediaType.APPLICATION_XML)
+                .contentType(MediaType.APPLICATION_XML)
+                .characterEncoding(Charsets.UTF_8.name())
+                .content(asString("xmls/encounters/encounter_with_invalid_diagnostic_code.xml")))
+                .andExpect(request().asyncResult(new InstanceOf(UnProcessableEntity.class)));
+    }
+
+    @Test
+    public void shouldSaveTheEncodunterWhenValidType() throws Exception {
         mockMvc.perform(post("/patients/" + VALID_HEALTH_ID + "/encounters")
                 .accept(MediaType.APPLICATION_XML)
                 .contentType(MediaType.APPLICATION_XML)

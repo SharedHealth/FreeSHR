@@ -1,0 +1,57 @@
+{
+  "names": [
+    {
+      "conceptNameType": null,
+      "conceptName": "Viral pneumonia 605578 Syn",
+      "locale": "en"
+    },
+    {
+      "conceptNameType": "SHORT",
+      "conceptName": "ViralPneumonia605578",
+      "locale": "en"
+    },
+    {
+      "conceptNameType": "FULLY_SPECIFIED",
+      "conceptName": "Viral pneumonia 605578",
+      "locale": "en"
+    }
+  ],
+  "uuid": "a8a58344-602e-44c6-9677-841deeeb4ab4",
+  "conceptClass": "Diagnosis",
+  "fullySpecifiedName": {
+    "conceptNameType": "FULLY_SPECIFIED",
+    "conceptName": "Viral pneumonia 605578",
+    "locale": "en"
+  },
+  "retireReason": null,
+  "retired": false,
+  "setMembers": [],
+  "version": "1.0",
+  "conceptAnswers": [],
+  "referenceTerms": [
+    {
+      "uuid": "4ac61c1c-2e7f-4daa-b289-2607827bec7d",
+      "retired": false,
+      "version": "1.0",
+      "code": "J19.605578",
+      "conceptSource": {
+        "uuid": "acb344fa-9243-46fc-8581-d06d39c54d30",
+        "hl7Code": "ICD10-BD",
+        "description": "ICD10-BD",
+        "name": "ICD10-BD"
+      },
+      "mapType": "SAME-AS",
+      "uri": "http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/referenceterms/4ac61c1c-2e7f-4daa-b289-2607827bec7d",
+      "description": "Viral pneumonia, unspecified\r\nExcl.:\r\n605578",
+      "name": "Viral pneumonia 605578"
+    }
+  ],
+  "datatypeName": "N/A",
+  "uri": "http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/concepts/a8a58344-602e-44c6-9677-841deeeb4ab4",
+  "description": {
+    "locale": "en",
+    "description": "Viral pneumonia, unspecified \r\n 605578"
+  },
+  "properties": {},
+  "set": false
+}
