@@ -1,0 +1,39 @@
+{
+  "resourceType": "Medication",
+  "name": "Crocin 500mg",
+  "code": {
+    "coding": [
+      {
+        "display": "Paracetamol",
+        "system": "http://192.168.33.17:9080/openmrs/ws/rest/v1/tr/referenceterms/df2d10af-7bbd-49fe-951d-46f614ff6100",
+        "code": "N02BE01"
+      },
+      {
+        "display": "Paracetamol",
+        "system": "http://192.168.33.17:9080/openmrs/ws/rest/v1/tr/concepts/99110684-c97a-4a3b-9dad-5e5bf146867a",
+        "code": "99110684-c97a-4a3b-9dad-5e5bf146867a"
+      }
+    ]
+  },
+  "product": {
+    "form": {
+      "coding": [
+        {
+          "display": "Tablet",
+          "system": "http://192.168.33.17:9080/openmrs/ws/rest/v1/tr/concepts/88ba07cd-fc87-4d5a-9027-ea9652d68c11",
+          "code": "88ba07cd-fc87-4d5a-9027-ea9652d68c11"
+        }
+      ]
+    }
+  },
+  "extension" : [
+    {
+      "url" : "http://192.168.33.17:9080/openmrs/ws/rest/v1/tr/medication#med-extension-strength",
+      "valueString": "500 mg"
+    },
+    {
+      "url" : "http://192.168.33.17:9080/openmrs/ws/rest/v1/tr/medication#med-extension-identifier",
+      "valueString": "123"
+    }
+  ]
+}

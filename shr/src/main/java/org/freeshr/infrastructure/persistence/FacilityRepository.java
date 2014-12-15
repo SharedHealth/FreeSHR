@@ -74,7 +74,7 @@ public class FacilityRepository {
         address.setDistrict(result.getString("district_id"));
         address.setUpazila(result.getString("upazila_id"));
         address.setCityCorporation(result.getString("city_corporation_id"));
-        address.setWard(result.getString("union_urban_ward_id"));
+        address.setUnionOrUrbanWardId(result.getString("union_urban_ward_id"));
         facility.setFacilityLocation(address);
         return facility;
     }
@@ -114,7 +114,7 @@ public class FacilityRepository {
                 .value("district_id", facility.getFacilityLocation().getDistrict())
                 .value("upazila_id", facility.getFacilityLocation().getUpazila())
                 .value("city_corporation_id", facility.getFacilityLocation().getCityCorporation())
-                .value("union_urban_ward_id", facility.getFacilityLocation().getWard())
+                .value("union_urban_ward_id", facility.getFacilityLocation().getUnionOrUrbanWardId())
                 .value("catchments", facility.getCatchmentsAsCommaSeparatedString())
                 ;
     }

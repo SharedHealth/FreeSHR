@@ -17,26 +17,29 @@ public class Address {
     @JsonProperty("division_id")
     private String division;
 
-    @JsonProperty("ward_id")
-    private String ward;
-
-    @JsonProperty("upazilla_id")
+    @JsonProperty("upazila_id")
     private String upazila;
 
     @JsonProperty("city_corporation_id")
     private String cityCorporation;
+
+    @JsonProperty("union_or_urban_ward_id")
+    private String unionOrUrbanWardId;
+
+    @JsonProperty("country_code")
+    private String countryCode;
 
 
     public Address() {
 
     }
 
-    public Address(String division, String district, String upazila, String cityCorporation, String ward) {
+    public Address(String division, String district, String upazila, String cityCorporation, String unionOrUrbanWardId) {
         this.division = division;
         this.district = district;
         this.upazila = upazila;
         this.cityCorporation = cityCorporation;
-        this.ward = ward;
+        this.unionOrUrbanWardId = unionOrUrbanWardId;
     }
 
 
@@ -64,12 +67,12 @@ public class Address {
         this.division = division;
     }
 
-    public String getWard() {
-        return ward;
+    public String getUnionOrUrbanWardId() {
+        return unionOrUrbanWardId;
     }
 
-    public void setWard(String ward) {
-        this.ward = ward;
+    public void setUnionOrUrbanWardId(String unionOrUrbanWardId) {
+        this.unionOrUrbanWardId = unionOrUrbanWardId;
     }
 
     public String getUpazila() {
@@ -93,7 +96,7 @@ public class Address {
     }
 
     public String getConcatenatedWardId() {
-        return ward != null ? division + district + upazila + cityCorporation + ward : null;
+        return unionOrUrbanWardId != null ? division + district + upazila + cityCorporation + unionOrUrbanWardId : null;
     }
 
 
@@ -117,6 +120,14 @@ public class Address {
 
     public String getLocationCode() {
         return division + district + upazila + StringUtils.defaultString(cityCorporation) + StringUtils.defaultString
-                (ward);
+                (unionOrUrbanWardId);
+    }
+
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
     }
 }

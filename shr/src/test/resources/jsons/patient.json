@@ -10,9 +10,9 @@
         "address_line": "house30",
         "division_id": "30",
         "district_id": "56",
-        "upazilla_id": "10",
-        "ward_id": "17",
-        "city_corporation_id": "99"
+        "upazila_id": "10",
+        "city_corporation_id": "99",
+        "union_or_urban_ward_id": "17"
     },
     "permanent_address": null, "full_name": null
 }

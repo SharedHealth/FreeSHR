@@ -69,7 +69,7 @@ public class FacilityMessageConverter extends AbstractHttpMessageConverter<Facil
         address.setDistrict((String) linkedHashMap.get("district_code"));
         address.setUpazila((String) linkedHashMap.get("upazila_code"));
         address.setCityCorporation((String) linkedHashMap.get("paurasava_code"));
-        address.setWard((String) linkedHashMap.get("ward_code"));
+        address.setUnionOrUrbanWardId((String) linkedHashMap.get("ward_code"));
         return address;
     }
 
