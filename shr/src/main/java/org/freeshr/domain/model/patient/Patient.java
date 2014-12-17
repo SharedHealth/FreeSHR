@@ -54,4 +54,13 @@ public class Patient {
     public int hashCode() {
         return healthId.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return "Patient{" +
+                "healthId='" + healthId + '\'' +
+                ", address=" + address +
+                ", gender='" + gender + '\'' +
+                '}';
+    }
 }

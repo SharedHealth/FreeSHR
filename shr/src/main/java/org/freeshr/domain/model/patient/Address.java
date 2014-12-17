@@ -130,4 +130,17 @@ public class Address {
     public void setCountryCode(String countryCode) {
         this.countryCode = countryCode;
     }
+
+    @Override
+    public String toString() {
+        return "Address{" +
+                "line='" + line + '\'' +
+                ", district='" + district + '\'' +
+                ", division='" + division + '\'' +
+                ", upazila='" + upazila + '\'' +
+                ", cityCorporation='" + cityCorporation + '\'' +
+                ", unionOrUrbanWardId='" + unionOrUrbanWardId + '\'' +
+                ", countryCode='" + countryCode + '\'' +
+                '}';
+    }
 }

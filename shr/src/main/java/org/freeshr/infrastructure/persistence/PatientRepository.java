@@ -2,6 +2,8 @@ package org.freeshr.infrastructure.persistence;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
+import com.datastax.driver.core.querybuilder.Insert;
+import com.datastax.driver.core.querybuilder.QueryBuilder;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.utils.CollectionUtils;
@@ -67,26 +69,23 @@ public class PatientRepository {
     }
 
     public Observable<Boolean> save(Patient patient) {
-        Observable<ResultSet> saveObservable = Observable.from(cqlOperations.executeAsynchronously(toCQL(patient)));
+        logger.debug("Saving patient locally: " + patient);
+        Observable<ResultSet> saveObservable = Observable.from(cqlOperations.executeAsynchronously(buildPatientInsertQuery(patient)));
         return saveObservable.flatMap(respondOnNext(true), RxMaps.<Boolean>logAndForwardError(logger),
                 completeResponds(true));
     }
 
-    private String toCQL(Patient patient) {
+    private Insert buildPatientInsertQuery(Patient patient) {
         Address address = patient.getAddress();
-        String query = query(asList(patient.getHealthId(),
-                patient.getGender(), address.getLine(), address.getDistrict(),
-                address.getDivision(), address.getUnionOrUrbanWardId(), address.getUpazila(), address.getCityCorporation()));
-        return "INSERT into patient (health_id, gender, address_line, district_id, division_id, union_urban_ward_id, " +
-                "upazila_id, city_corporation_id) values  (" + query + ")";
-    }
+        return QueryBuilder.insertInto("patient")
+                .value("health_id", patient.getHealthId())
+                .value("gender", patient.getGender())
+                .value("address_line", address.getLine())
+                .value("division_id", address.getDivision())
+                .value("district_id", address.getDistrict())
+                .value("upazila_id", address.getUpazila())
+                .value("city_corporation_id", address.getCityCorporation())
+                .value("union_urban_ward_id", address.getUnionOrUrbanWardId());
 
-
-    private String query(List<String> values) {
-        return join(map(values, new CollectionUtils.Fn<String, String>() {
-            public String call(String input) {
-                return "'" + input + "'";
-            }
-        }), ",");
     }
 }
