@@ -69,7 +69,6 @@ public class PatientRepository {
     }
 
     public Observable<Boolean> save(Patient patient) {
-        logger.debug("Saving patient locally: " + patient);
         Observable<ResultSet> saveObservable = Observable.from(cqlOperations.executeAsynchronously(buildPatientInsertQuery(patient)));
         return saveObservable.flatMap(respondOnNext(true), RxMaps.<Boolean>logAndForwardError(logger),
                 completeResponds(true));
