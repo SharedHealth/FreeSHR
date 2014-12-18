@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Encounter</title>
+    <id>urn:050a8d39-ac21-4e09-94b9-ed83a6f3b484</id>
+    <updated>2014-12-17T18:26:46+05:30</updated>
+    <entry>
+        <title>Composition</title>
+        <id>urn:9b23ac83-61d4-473c-9c14-cddfd6e49e74</id>
+        <updated>2014-12-17T18:28:46.885+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <Composition xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:9b23ac83-61d4-473c-9c14-cddfd6e49e74"/>
+                </identifier>
+                <date value="2014-12-17T18:26:46+05:30"/>
+                <status value="final"/>
+                <subject>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <display value="5893922485019082753"/>
+                </subject>
+                <encounter>
+                    <reference value="urn:d0d7cb77-13eb-43ee-bd68-382940f98de8"/>
+                    <display value="Encounter"/>
+                </encounter>
+                <section>
+                    <content>
+                        <reference value="urn:d0d7cb77-13eb-43ee-bd68-382940f98de8"/>
+                        <display value="Encounter"/>
+                    </content>
+                </section>
+                <section>
+                    <content>
+                        <reference value="urn:5fc6d0d9-9520-4015-87cb-ab0cfa7e4b50"/>
+                        <display value="Medication Prescription"/>
+                    </content>
+                </section>
+            </Composition>
+        </content>
+    </entry>
+    <entry>
+        <title>Encounter</title>
+        <id>urn:d0d7cb77-13eb-43ee-bd68-382940f98de8</id>
+        <updated>2014-12-17T18:28:46.885+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <Encounter xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:d0d7cb77-13eb-43ee-bd68-382940f98de8"/>
+                </identifier>
+                <status value="finished"/>
+                <class value="outpatient"/>
+                <type>
+                    <text value="Consultation"/>
+                </type>
+                <subject>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <display value="5893922485019082753"/>
+                </subject>
+                <participant>
+                    <individual>
+                        <reference value="20ba5ebe-6f06-11e4-b8c1-080027b662ec"/>
+                    </individual>
+                </participant>
+                <indication>
+                    <reference value="urn:d0d7cb77-13eb-43ee-bd68-382940f98de8"/>
+                    <display value="Encounter"/>
+                </indication>
+                <serviceProvider>
+                    <reference value="http://pagani.websitewelcome.com/~stagedgh/dghshrml4/public/api/1.0/api/1.0//facilities/10000069.json"/>
+                </serviceProvider>
+            </Encounter>
+        </content>
+    </entry>
+    <entry>
+        <title>Medication Prescription</title>
+        <id>urn:5fc6d0d9-9520-4015-87cb-ab0cfa7e4b50</id>
+        <updated>2014-12-17T18:28:48.892+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <MedicationPrescription xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:5fc6d0d9-9520-4015-87cb-ab0cfa7e4b50"/>
+                </identifier>
+                <dateWritten value="2014-12-17T18:26:46+05:30"/>
+                <patient>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <display value="5893922485019082753"/>
+                </patient>
+                <medication>
+                    <display value="Lactic Acid"/>
+                </medication>
+                <dosageInstruction>
+                    <timingSchedule>
+                        <repeat>
+                            <frequency value="2"/>
+                            <duration value="1"/>
+                            <units value="d"/>
+                            <count value="4"/>
+                        </repeat>
+                    </timingSchedule>
+                    <route>
+                        <coding>
+                            <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/Route-of-Administration"/>
+                            <code value="implant"/>
+                            <display value="implant"/>
+                        </coding>
+                    </route>
+                    <doseQuantity>
+                        <value value="3"/>
+                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/Quantity-Units"/>
+                        <code value="TU"/>
+                    </doseQuantity>
+                </dosageInstruction>
+            </MedicationPrescription>
+        </content>
+    </entry>
+</feed>

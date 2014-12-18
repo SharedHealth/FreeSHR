@@ -222,4 +222,12 @@ public class EncounterValidatorIntegrationTest {
         assertTrue(encounterValidationResponse.isSuccessful());
     }
 
+    @Test
+    public void shouldValidateMedicationPrescription() throws Exception {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/medication_prescription.xml"));
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
+        assertTrue(validationResponse.isSuccessful());
+    }
 }

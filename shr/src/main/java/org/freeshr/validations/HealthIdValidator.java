@@ -21,8 +21,18 @@ public class HealthIdValidator implements Validator<EncounterValidationContext> 
         String expectedHealthId = validationContext.getHealthId();
         List<ValidationMessage> validationMessages = new ArrayList<>();
         for (AtomEntry<? extends Resource> atomEntry : feed.getEntryList()) {
-            ResourceType resourceType = atomEntry.getResource().getResourceType();
-            Property subject = atomEntry.getResource().getChildByName("subject");
+            Resource resource = atomEntry.getResource();
+            ResourceType resourceType = resource.getResourceType();
+            Property subject = resource.getChildByName("subject");
+            if(subject == null) {
+                subject = resource.getChildByName("patient");
+            }
+            if(subject == null) {
+                ValidationMessage validationMessage = createValidationMessage("healthId", "invalid",
+                        "Patient's Health Id is not present.");
+                validationMessages.add(validationMessage);
+                continue;
+            }
             if (resourceType.equals(ResourceType.Composition) && !subject.hasValues()) {
                 ValidationMessage validationMessage = createValidationMessage("healthId", "invalid",
                         "Composition must have patient's Health Id in subject.");
@@ -33,6 +43,7 @@ public class HealthIdValidator implements Validator<EncounterValidationContext> 
             String healthIdFromUrl = getHealthIdFromUrl(((ResourceReference) subject.getValues().get(0))
                     .getReferenceSimple());
             if (expectedHealthId.equals(healthIdFromUrl)) continue;
+
             ValidationMessage validationMessage = createValidationMessage("healthId", "invalid",
                     "Patient's Health Id does not match.");
             validationMessages.add(validationMessage);
