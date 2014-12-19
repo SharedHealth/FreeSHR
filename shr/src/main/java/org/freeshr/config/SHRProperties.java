@@ -11,6 +11,10 @@ import java.net.URISyntaxException;
 public class SHRProperties {
 
     public static final int ONE_DAY = 86400;
+    @Value("${MCI_PATIENT_PATH}")
+    private String mciPatientPath;
+    @Value("${MCI_SCHEMA}")
+    private String mciSchema;
     @Value("${MCI_HOST}")
     private String mciHost;
     @Value("${MCI_PORT}")
@@ -52,7 +56,7 @@ public class SHRProperties {
 
 
     public String getMCIPatientUrl() {
-        return String.format("http://%s:%s/api/v1/patients", mciHost, mciPort);
+        return String.format("%s://%s:%s/%s",mciSchema,mciHost,mciPort,mciPatientPath);
     }
 
     public String getCassandraKeySpace() {
