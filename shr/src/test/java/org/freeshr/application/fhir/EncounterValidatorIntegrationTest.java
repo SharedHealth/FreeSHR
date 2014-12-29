@@ -150,12 +150,22 @@ public class EncounterValidatorIntegrationTest {
     }
 
     @Test
+    public void shouldValidateSpecimenWithDiagnosticOrder() throws Exception {
+        encounterBundle= EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,FileUtil.asString("xmls/encounters/diagnostic_order_with_specimen.xml"));
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+        EncounterValidationResponse encounterValidationResponse= validator.validate(encounterBundle);
+        verify(trConceptLocator,times(3)).verifiesSystem(anyString());
+
+        assertTrue(encounterValidationResponse.isSuccessful());
+    }
+
+    @Test
     public void shouldValidateDiagnosticReport() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/diagnostic_report.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
-        verify(trConceptLocator, times(3)).verifiesSystem(anyString());
+        verify(trConceptLocator, times(4)).verifiesSystem(anyString());
         assertTrue(encounterValidationResponse.isSuccessful());
     }
 

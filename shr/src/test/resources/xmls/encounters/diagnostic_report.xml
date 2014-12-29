@@ -118,6 +118,13 @@
         </author>
         <content type="text/xml">
             <DiagnosticReport xmlns="http://hl7.org/fhir">
+                <serviceCategory>
+                    <coding>
+                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/referenceterms/94f5e936-1b2d-421d-8f83-21048270bf32"/>
+                        <code value="94f5e936-1b2d-421d-8f83-21048270bf32"/>
+                        <display value="hematology"/>
+                    </coding>
+                </serviceCategory>
                 <name>
                     <coding>
                         <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/referenceterms/94f5e936-1b2d-421d-8f83-21048270bf32"/>

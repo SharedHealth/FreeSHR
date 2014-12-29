@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Encounter</title>
+    <id>urn:da97f24e-3587-4495-b16e-ebef3c438467</id>
+    <updated>2014-12-04T16:28:33+05:30</updated>
+    <entry>
+        <title>Composition</title>
+        <id>urn:0c16f3e5-608a-466e-b8af-48df5e9cbd9c</id>
+        <updated>2014-12-04T16:28:59.067+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <Composition xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:0c16f3e5-608a-466e-b8af-48df5e9cbd9c"/>
+                </identifier>
+                <date value="2014-12-04T16:28:33+05:30"/>
+                <status value="final"/>
+                <subject>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <display value="5893922485019082753"/>
+                </subject>
+                <encounter>
+                    <reference value="urn:087d7afd-3dc5-4f4a-b576-617c47ce54b2"/>
+                    <display value="Encounter"/>
+                </encounter>
+                <section>
+                    <content>
+                        <reference value="urn:087d7afd-3dc5-4f4a-b576-617c47ce54b2"/>
+                        <display value="Encounter"/>
+                    </content>
+                </section>
+                <section>
+                    <content>
+                        <reference value="urn:8a59e01b-ead9-41a0-b770-4d7c6ecfc00c"/>
+                        <display value="Diagnostic Order"/>
+                    </content>
+                </section>
+                <section>
+                    <content>
+                        <reference value="urn:e9a1f917-598e-4d2a-915f-7afa4fba7467"/>
+                        <display value="Specimen"/>
+                    </content>
+                </section>
+            </Composition>
+        </content>
+    </entry>
+    <entry>
+        <title>Encounter</title>
+        <id>urn:087d7afd-3dc5-4f4a-b576-617c47ce54b2</id>
+        <updated>2014-12-04T16:28:59.068+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <Encounter xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:087d7afd-3dc5-4f4a-b576-617c47ce54b2"/>
+                </identifier>
+                <status value="finished"/>
+                <class value="outpatient"/>
+                <type>
+                    <text value="INVESTIGATION"/>
+                </type>
+                <subject>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <display value="5893922485019082753"/>
+                </subject>
+                <participant>
+                    <individual>
+                        <reference value="224d8853-6f04-11e4-b8c1-080027b662ec"/>
+                    </individual>
+                </participant>
+                <indication>
+                    <reference value="urn:087d7afd-3dc5-4f4a-b576-617c47ce54b2"/>
+                    <display value="Encounter"/>
+                </indication>
+                <serviceProvider>
+                    <reference
+                            value="http://http://pagani.websitewelcome.com/~stagedgh/dghshrml4/public/api/1.0//facilities/10000069.json"/>
+                </serviceProvider>
+            </Encounter>
+        </content>
+    </entry>
+    <entry>
+        <title>Diagnostic Order</title>
+        <id>urn:8a59e01b-ead9-41a0-b770-4d7c6ecfc00c</id>
+        <updated>2014-12-04T16:29:06.010+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <DiagnosticOrder xmlns="http://hl7.org/fhir">
+                <subject>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <display value="5893922485019082753"/>
+                </subject>
+                <orderer>
+                    <reference value="224d8853-6f04-11e4-b8c1-080027b662ec"/>
+                </orderer>
+                <identifier>
+                    <value value="urn:8a59e01b-ead9-41a0-b770-4d7c6ecfc00c"/>
+                </identifier>
+                <encounter>
+                    <reference value="urn:087d7afd-3dc5-4f4a-b576-617c47ce54b2"/>
+                    <display value="Encounter"/>
+                </encounter>
+                <specimen>
+                    <reference value="urn:e9a1f917-598e-4d2a-915f-7afa4fba7467"/>
+                </specimen>
+                <specimen>
+                    <reference value="urn:e9a1f917-598e-4d2a-915f-7afa4fba7467"/>
+                </specimen>
+                <status value="requested"/>
+                <priority value="asap"/>
+                <item>
+                    <code>
+                        <coding>
+                            <system value="http://172.18.46.53:9080/openmrs/ws/rest/v1/tr/referenceterms/0f688282-c020-428e-92b7-4a1853946860"/>
+                            <code value="627b6c75-24ea-40ae-b8b4-e9a95017a25f5555"/>
+                            <display value="Platelets Count"/>
+                        </coding>
+                    </code>
+                    <bodySite>
+                        <coding>
+                            <system value="http://172.18.46.53:9080/openmrs/ws/rest/v1/tr/concepts/627b6c75-24ea-40ae-b8b4-e9a95017a25e"/>
+                            <code value="627b6c75-24ea-40ae-b8b4-e9a95017a25e"/>
+                            <display value="Leg"/>
+                        </coding>
+                    </bodySite>
+                    <specimen>
+                        <reference value="urn:e9a1f917-598e-4d2a-915f-7afa4fba7467"/>
+                    </specimen>
+                    <status value="requested"/>
+                </item>
+            </DiagnosticOrder>
+        </content>
+    </entry>
+    <entry>
+        <title>Specimen</title>
+        <id>urn:e9a1f917-598e-4d2a-915f-7afa4fba7467</id>
+        <updated>2014-12-04T16:29:06.010+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <Specimen xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:e9a1f917-598e-4d2a-915f-7afa4fba7467"/>
+                </identifier>
+                <type>
+                    <coding>
+                        <system value="http://172.18.46.53:9080/openmrs/ws/rest/v1/tr/concepts/627b6c75-24ea-40ae-b8b4-e9a95017a25e"/>
+                        <code value="627b6c75-24ea-40ae-b8b4-e9a95017a25f"/>
+                        <display value="Bld"/>
+                    </coding>
+                </type>
+                <subject>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <display value="5893922485019082753"/>
+                </subject>
+                <accessionIdentifier>
+                    <value value="urn:087d7afd-3dc5-4f4a-b576-617c47ce54b2"/>
+                </accessionIdentifier>
+                <receivedTime value="2014-12-04T16:28:33+05:30"/>
+            </Specimen>
+        </content>
+    </entry>
+</feed>
