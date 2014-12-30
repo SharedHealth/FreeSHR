@@ -7,6 +7,7 @@ import org.springframework.boot.context.embedded.ServletContextInitializer;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.web.servlet.DispatcherServlet;
 
 import javax.servlet.ServletContext;
@@ -18,6 +19,7 @@ import static java.lang.Integer.valueOf;
 import static java.lang.System.getenv;
 
 @Configuration
+@Import(WebMvcConfig.class)
 public class Main {
 
     @Bean
@@ -27,14 +29,17 @@ public class Main {
         factory.addInitializers(new ServletContextInitializer() {
             @Override
             public void onStartup(ServletContext servletContext) throws ServletException {
+
                 ServletRegistration.Dynamic shr = servletContext.addServlet("shr", DispatcherServlet.class);
                 shr.addMapping("/");
                 shr.setInitParameter("contextClass", "org.springframework.web.context.support" +
                         ".AnnotationConfigWebApplicationContext");
                 shr.setInitParameter("contextConfigLocation", "org.freeshr.launch.WebMvcConfig");
                 shr.setAsyncSupported(true);
+
             }
         });
+
         String bdshr_port = env.get("BDSHR_PORT");
         factory.setPort(valueOf(bdshr_port));
         return factory;

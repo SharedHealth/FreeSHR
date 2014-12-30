@@ -327,10 +327,17 @@ public class EncounterController {
         return new ErrorInfo(HttpStatus.NOT_FOUND, resourceNotFound.getErrorMessage());
     }
 
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
+    @ResponseBody
+    @ExceptionHandler(Unauthorized.class)
+    public ErrorInfo unauthorized(Unauthorized unauthorized) {
+        return new ErrorInfo(HttpStatus.UNAUTHORIZED, unauthorized.getErrorMessage());
+    }
+
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
     @ExceptionHandler(Exception.class)
-    public ErrorInfo resourceNotFound(Exception exception) {
+    public ErrorInfo catchAll(Exception exception) {
         return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, exception.getLocalizedMessage());
     }
 

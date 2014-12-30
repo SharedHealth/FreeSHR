@@ -44,11 +44,16 @@ test.finalizedBy(stopMockClientIndex)
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-web:1.1.1.RELEASE') {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+        exclude group: 'ch.qos.logback', module: "logback-classic"
     }
     compile libraries.snappy, libraries.spring_data_cassandra, libraries.spring_boot_logging,
             libraries.apache_commons_io, libraries.spring_framework, libraries.fhir_validator,
             libraries.jackson, libraries.saxon, libraries.rxjava,
-            libraries.netflix_astyanax, libraries.rome, libraries.time_uuid
+            libraries.netflix_astyanax, libraries.rome, libraries.time_uuid, libraries.spring_security
+
+    compile(libraries.spring_boot_security){
+        exclude group: 'ch.qos.logback', module: "logback-classic"
+    }
     compile('io.netty:netty:3.9.0.Final') {
         force = 'true'
     }

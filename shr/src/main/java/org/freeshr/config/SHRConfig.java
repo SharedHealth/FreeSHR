@@ -19,7 +19,7 @@ import org.springframework.web.client.AsyncRestTemplate;
 import java.util.Arrays;
 
 @Configuration
-@Import(SHRCassandraConfig.class)
+@Import({SHRSecurityConfig.class, SHRCassandraConfig.class})
 @ComponentScan(basePackages = {"org.freeshr.config",
         "org.freeshr.infrastructure",
         "org.freeshr.interfaces",
@@ -27,7 +27,6 @@ import java.util.Arrays;
         "org.freeshr.application.fhir",
         "org.freeshr.validations"})
 public class SHRConfig {
-
     @Autowired
     private SHRProperties shrProperties;
 
