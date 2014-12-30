@@ -97,9 +97,9 @@
                 <prescriber>
                     <reference value="e8a8bdb9-9fdd-4e66-81ca-5abbb6308ccd"/>
                 </prescriber>
-                <medication>
+               <medication>
                     <reference value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>
-                    <display value="Lactic Acid"/>
+                    <display value="Paracetamol1"/>
                 </medication>
                 <dosageInstruction>
                     <timingSchedule>
@@ -112,14 +112,14 @@
                     </timingSchedule>
                     <route>
                         <coding>
-                            <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/Route-of-Administration"/>
+                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration"/>
                             <code value="implant"/>
                             <display value="implant"/>
                         </coding>
                     </route>
                     <doseQuantity>
                         <value value="3"/>
-                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/Quantity-Units"/>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Quantity-Units"/>
                         <code value="TU"/>
                     </doseQuantity>
                 </dosageInstruction>

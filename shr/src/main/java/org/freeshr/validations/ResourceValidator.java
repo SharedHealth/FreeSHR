@@ -6,6 +6,7 @@ import org.hl7.fhir.instance.model.AtomFeed;
 import org.hl7.fhir.instance.model.Resource;
 import org.hl7.fhir.instance.model.ResourceType;
 import org.hl7.fhir.instance.validation.ValidationMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -21,9 +22,11 @@ public class ResourceValidator implements Validator<AtomFeed> {
 
     private Map<ResourceType, Validator<AtomEntry<? extends Resource>>> resourceTypeValidatorMap = new HashMap<>();
 
-    public ResourceValidator() {
+    @Autowired
+    public ResourceValidator(ConditionValidator conditionValidator, MedicationValidator medicationValidator) {
         assignDefaultValidatorToAllResourceTypes();
-        resourceTypeValidatorMap.put(ResourceType.Condition, new ConditionValidator());
+        resourceTypeValidatorMap.put(ResourceType.Condition, conditionValidator);
+        resourceTypeValidatorMap.put(ResourceType.MedicationPrescription, medicationValidator);
     }
 
     private void assignDefaultValidatorToAllResourceTypes() {

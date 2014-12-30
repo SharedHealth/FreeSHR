@@ -2,6 +2,8 @@ package org.freeshr.application.fhir;
 
 import org.freeshr.utils.FileUtil;
 import org.freeshr.utils.ResourceOrFeedDeserializer;
+import org.freeshr.validations.ConditionValidator;
+import org.freeshr.validations.MedicationValidator;
 import org.freeshr.validations.ResourceValidator;
 import org.freeshr.validations.ValidationSubject;
 import org.hl7.fhir.instance.model.AtomFeed;
@@ -9,20 +11,26 @@ import org.hl7.fhir.instance.model.OperationOutcome;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 public class ResourceValidatorTest {
 
     private ResourceValidator resourceValidator;
     ResourceOrFeedDeserializer resourceOrFeedDeserializer;
 
+    @Mock
+    MedicationValidator medicationValidator;
+
     @Before
     public void setup() {
-        resourceValidator = new ResourceValidator();
+        initMocks(this);
+        resourceValidator = new ResourceValidator(new ConditionValidator(), medicationValidator);
         resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
     }
 

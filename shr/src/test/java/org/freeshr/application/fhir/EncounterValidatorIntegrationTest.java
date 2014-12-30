@@ -1,15 +1,18 @@
 package org.freeshr.application.fhir;
 
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.data.EncounterBundleData;
 import org.freeshr.infrastructure.tr.ValueSetCodeValidator;
+import org.freeshr.utils.CollectionUtils;
 import org.freeshr.utils.FileUtil;
 import org.freeshr.validations.*;
-import org.hl7.fhir.instance.model.OperationOutcome;
+import org.hl7.fhir.instance.model.*;
 import org.hl7.fhir.instance.utils.ConceptLocator;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -17,8 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.lang.Boolean;
 import java.util.List;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.freeshr.utils.FileUtil.asString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
@@ -57,6 +63,9 @@ public class EncounterValidatorIntegrationTest {
 
     EncounterBundle encounterBundle;
 
+    @Rule
+    public WireMockRule wireMockRule = new WireMockRule(9997);
+
     @Before
     public void setup() throws Exception {
         initMocks(this);
@@ -64,6 +73,12 @@ public class EncounterValidatorIntegrationTest {
         validator = new EncounterValidator(fhirMessageFilter, fhirSchemaValidator, resourceValidator,
                 healthIdValidator, structureValidator);
         encounterBundle = EncounterBundleData.withValidEncounter();
+
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/medication_paracetamol.json"))));
     }
 
     @Test
@@ -81,7 +96,8 @@ public class EncounterValidatorIntegrationTest {
         EncounterValidationResponse response = validator.validate(encounterBundle);
         assertFalse(response.isSuccessful());
         assertEquals(1, response.getErrors().size());
-        assertEquals("Condition-status", response.getErrors().get(0).getField());
+        //assertEquals("Condition-status", response.getErrors().get(0).getField());
+        assertEquals("Unknown", response.getErrors().get(0).getField());
     }
 
     @Test
@@ -240,4 +256,60 @@ public class EncounterValidatorIntegrationTest {
         EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
         assertTrue(validationResponse.isSuccessful());
     }
+
+    @Test
+    public void shouldValidatePrescriptionWithInvalidMedicationReference() {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/medication_prescription_invalid.xml"));
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+
+
+        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
+        assertFalse("Invalid medication prescription should have failed validation", validationResponse.isSuccessful());
+        List<Error> invalidUrlError = CollectionUtils.filter(validationResponse.getErrors(), new CollectionUtils.Fn<Error, Boolean>() {
+            @Override
+            public Boolean call(Error e) {
+                return e.getReason().equals(MedicationValidator.INVALID_MEDICATION_REFERENCE_URL);
+            }
+        });
+        assertEquals("Should have found one invalid medication url", 2, invalidUrlError.size());
+
+/*
+        ResourceOrFeedDeserializer resourceOrFeedDeserializer= new ResourceOrFeedDeserializer();
+        final String xml = FileUtil.asString("xmls/encounters/medication_prescription_invalid.xml");
+        AtomFeed feed = resourceOrFeedDeserializer.deserialize(xml);
+
+        for (AtomEntry<? extends Resource> atomEntry : feed.getEntryList()) {
+            Resource resource = atomEntry.getResource();
+            ResourceType resourceType = resource.getResourceType();
+            Property medication = resource.getChildByName("medication");
+            assertNotNull(medication);
+            ResourceReference medicationRefValue = ((ResourceReference) medication.getValues().get(0));
+            assertNotNull(medicationRefValue);
+
+        }*/
+
+    }
+
+    @Test
+    public void shouldValidatePrescriptionWithValidMedicationReference() {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/medication_prescription_valid.xml"));
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
+        assertTrue("Medication prescription pass through validation", validationResponse.isSuccessful());
+    }
+
+    @Test
+    public void shouldValidateRouteInMedicationPrescription(){
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/medication_prescription_valid.xml"));
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+        EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
+        verify(trConceptLocator, times(1)).verifiesSystem("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration");
+        verify(trConceptLocator, times(1)).validate("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration","implant", "implant");
+        assertTrue(encounterValidationResponse.isSuccessful());
+    }
+
+
 }

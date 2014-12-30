@@ -1,0 +1,39 @@
+{
+  "resourceType": "Medication",
+  "name": "Paracetamol1",
+  "code": {
+    "coding": [
+      {
+        "code": "N02BE01",
+        "system": "http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/referenceterms/e6d19e1c-0d81-4652-ba6e-d8815ef72380",
+        "display": "paracetamol"
+      },
+      {
+        "code": "23d7e743-75bd-4a25-8f34-bd849bd50394",
+        "system": "http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/concepts/23d7e743-75bd-4a25-8f34-bd849bd50394",
+        "display": "Paracetamol"
+      }
+    ]
+  },
+  "product": {
+    "form": {
+      "coding": [
+        {
+          "code": "81ebb8d5-e3b8-437c-9132-0e19b011031a",
+          "system": "http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/concepts/81ebb8d5-e3b8-437c-9132-0e19b011031a",
+          "display": "Tablet1"
+        }
+      ]
+    }
+  },
+  "extension": [
+    {
+      "valueString": "12",
+      "url": "http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/medication#strength"
+    },
+    {
+      "valueString": "false",
+      "url": "http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/medication#retired"
+    }
+  ]
+}

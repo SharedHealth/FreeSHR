@@ -16,11 +16,14 @@ public class ConditionValidator implements Validator<AtomEntry<? extends Resourc
     public static final String DIAGNOSIS = "Diagnosis";
     public static final String CATEGORY = "category";
 
+
+
     @Override
     public List<ValidationMessage> validate(ValidationSubject<AtomEntry<? extends Resource>> subject) {
         AtomEntry<? extends Resource> atomEntry = subject.extract();
         ArrayList<ValidationMessage> validationMessages = new ArrayList<>();
         for (Property property : atomEntry.getResource().children()) {
+
             if (verifyIfPropertyIsARelatedItem(validationMessages, property, atomEntry.getId())) continue;
             checkCodeableConcept(validationMessages, property, atomEntry);
         }
@@ -77,6 +80,11 @@ public class ConditionValidator implements Validator<AtomEntry<? extends Resourc
             bothSystemAndCodePresent |= (coding.getSystem() != null && coding.getCode() != null);
         }
         return bothSystemAndCodePresent;
+    }
+
+    private boolean checkMedicationPrescription(){
+
+        return true;
     }
 
 }

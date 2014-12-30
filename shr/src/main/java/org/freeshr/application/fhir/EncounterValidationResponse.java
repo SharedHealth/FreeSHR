@@ -44,7 +44,7 @@ public class EncounterValidationResponse {
 
     public static EncounterValidationResponse createErrorResponse(Exception e) {
         EncounterValidationResponse encounterValidationResponse = new EncounterValidationResponse();
-        encounterValidationResponse.addError(new Error("Condition-status", "invalid", e.getMessage()));
+        encounterValidationResponse.addError(new Error("Unknown", "invalid", e.getMessage()));
         return encounterValidationResponse;
     }
 
