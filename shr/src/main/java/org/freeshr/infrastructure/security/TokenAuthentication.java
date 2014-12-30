@@ -1,7 +1,9 @@
 package org.freeshr.infrastructure.security;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -11,10 +13,13 @@ public class TokenAuthentication implements Authentication {
     private String token;
     private List<? extends GrantedAuthority> roles;
 
-    public TokenAuthentication(String name, String token, List<? extends GrantedAuthority> roles) {
-        this.name = name;
-        this.token = token;
-        this.roles = roles;
+    public TokenAuthentication(UserInfo userInfo, String token) {
+        this.name = userInfo.getName();
+        this.token= token;
+
+        String commaSeparateRoles = StringUtils.join(userInfo.getRoles(), ",");
+        this.roles = AuthorityUtils.commaSeparatedStringToAuthorityList
+                (commaSeparateRoles);
     }
 
     public String getName() {
@@ -70,7 +75,7 @@ public class TokenAuthentication implements Authentication {
 
     @Override
     public String toString() {
-        return "UserInfo{" +
+        return "TokenAuthentication{" +
                 "name='" + name + '\'' +
                 ", token='" + token + '\'' +
                 ", roles=" + roles +

@@ -54,9 +54,15 @@ public class SHRProperties {
     @Value("${TR_SERVER_BASE_URL}")
     private String trServerBaseUrl;
 
+    @Value("${IDENTITY_SERVER_BASE_URL}")
+    private String identityServerBaseUrl;
 
     public String getMCIPatientUrl() {
         return String.format("%s://%s:%s/%s",mciSchema,mciHost,mciPort,mciPatientPath);
+    }
+
+    public String getIdentityServerBaseUrl(){
+        return identityServerBaseUrl;
     }
 
     public String getCassandraKeySpace() {

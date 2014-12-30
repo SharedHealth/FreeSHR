@@ -6,14 +6,12 @@ import org.mockito.Mock;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -78,9 +76,6 @@ public class TokenAuthenticationFilterTest {
     }
 
     private TokenAuthentication tokenAuthentication(UUID token) {
-        ArrayList<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("MCI_ADMIN"));
-        authorities.add(new SimpleGrantedAuthority("SHR_USER"));
-        return new TokenAuthentication("foo", token.toString(), authorities);
+        return new TokenAuthentication(new UserInfo("foo", Arrays.asList("MCI_ADMIN", "SHR_USER")), token.toString());
     }
 }
