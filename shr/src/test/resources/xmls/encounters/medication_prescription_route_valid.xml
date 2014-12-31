@@ -38,6 +38,12 @@
                         <display value="Medication Prescription"/>
                     </content>
                 </section>
+                <section>
+                    <content>
+                        <reference value="urn:6dc6d0d9-9520-4015-87cb-ab0cfa7e4b50"/>
+                        <display value="Medication Prescription"/>
+                    </content>
+                </section>
             </Composition>
         </content>
     </entry>
@@ -97,7 +103,7 @@
                 <prescriber>
                     <reference value="http://localhost:9997/e8a8bdb9-9fdd-4e66-81ca-5abbb6308ccd"/>
                 </prescriber>
-               <medication>
+                <medication>
                     <reference value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>
                     <display value="Paracetamol1"/>
                 </medication>
@@ -117,12 +123,106 @@
                             <display value="implant"/>
                         </coding>
                     </route>
+                    <method>
+                        <coding>
+                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/administration-method-codes"/>
+                            <code value="320276009"/>
+                            <display value="Salmeterol+fluticasone 25/250ug inhaler"/>
+                        </coding>
+                    </method>
+                    <asNeededBoolean value="true"/>
                     <doseQuantity>
                         <value value="3"/>
-                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Quantity-Units"/>
+                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/Quantity-Units"/>
                         <code value="TU"/>
                     </doseQuantity>
                 </dosageInstruction>
+                <dispense>
+                    <validityPeriod>
+                        <start value="2011-05-01"/>
+                    </validityPeriod>
+                    <quantity>
+                        <value value="90"/>
+                        <system value="http://snomed.info/sct"/>
+                        <code value="46992007"/>
+                    </quantity>
+                </dispense>
+            </MedicationPrescription>
+        </content>
+    </entry>
+    <entry>
+        <title>Medication Prescription</title>
+        <id>urn:6dc6d0d9-9520-4015-87cb-ab0cfa7e4b50</id>
+        <updated>2014-12-17T18:28:48.892+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <MedicationPrescription xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:6dc6d0d9-9520-4015-87cb-ab0cfa7e4b50"/>
+                </identifier>
+                <dateWritten value="2014-12-17T18:26:46+05:30"/>
+                <patient>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <display value="5893922485019082753"/>
+                </patient>
+                <prescriber>
+                    <reference value="http://localhost:9997/e8a8bdb9-9fdd-4e66-81ca-5abbb6308ccd"/>
+                </prescriber>
+                <medication>
+                    <reference value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>
+                    <display value="Paracetamol1"/>
+                </medication>
+                <reasonCodeableConcept>
+                    <coding>
+                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/prescription-reason"/>
+                        <code value="38341003"/>
+                        <display value="High blood pressure"/>
+                    </coding>
+                </reasonCodeableConcept>
+                <dosageInstruction>
+                    <timingSchedule>
+                        <repeat>
+                            <frequency value="2"/>
+                            <duration value="1"/>
+                            <units value="d"/>
+                            <count value="4"/>
+                        </repeat>
+                    </timingSchedule>
+                    <route>
+                        <coding>
+                            <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/Route-of-Administration"/>
+                            <code value="implant"/>
+                            <display value="implant"/>
+                        </coding>
+                    </route>
+                    <site>
+                        <coding>
+                            <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/dosageInstruction-site"/>
+                            <code value="181220002"/>
+                            <display value="Entire oral cavity"/>
+                        </coding>
+                    </site>
+                    <doseQuantity>
+                        <value value="3"/>
+                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/Quantity-Units"/>
+                        <code value="TU"/>
+                    </doseQuantity>
+                    <asNeededCodeableConcept>
+                            <coding>
+                                <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba"/>
+                                <code value="79647ed4-a60e-4cf5-ba68-cf4d55956cba"/>
+                                <display value="Hemoglobin"/>
+                            </coding>
+                    </asNeededCodeableConcept>
+                </dosageInstruction>
+                <dispense>
+                    <medication>
+                        <reference value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>
+                        <display value="Paracetamol1"/>
+                    </medication>
+                </dispense>
             </MedicationPrescription>
         </content>
     </entry>

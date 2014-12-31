@@ -54,6 +54,7 @@ public class EncounterValidator {
                     (validationContext.context()), fhirMessageFilter)
                     : validationResponse;
         } catch (Exception e) {
+            e.printStackTrace();
             return createErrorResponse(e);
         }
     }

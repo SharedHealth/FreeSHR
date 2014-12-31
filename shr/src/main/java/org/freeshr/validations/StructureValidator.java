@@ -22,11 +22,8 @@ public class StructureValidator implements Validator<AtomFeed> {
             return validationMessages;
         }
 
-        List<String> compositionSectionIds = populateSectionIdsFromComposition(compositionEntry, validationMessages);
-
-        List<String> entryReferenceIds = verifyEntryReferenceIds(feed.getEntryList(), compositionSectionIds,
-                validationMessages);
-
+        List<String> compositionSectionIds = identifySectionIdsFromComposition(compositionEntry);
+        List<String> entryReferenceIds = verifyEntryReferenceIds(feed.getEntryList(), compositionSectionIds, validationMessages);
         compositionSectionIds.removeAll(entryReferenceIds);
 
         //Add error for each section with no entry.
@@ -60,8 +57,7 @@ public class StructureValidator implements Validator<AtomFeed> {
         return resourceDetailsList;
     }
 
-    private List<String> populateSectionIdsFromComposition(AtomEntry<? extends Resource> compositionEntry,
-                                                           List<ValidationMessage> validationMessages) {
+    private List<String> identifySectionIdsFromComposition(AtomEntry<? extends Resource> compositionEntry) {
         List<Element> sections = compositionEntry.getResource().getChildByName("section").getValues();
         List<String> compositionSectionList = new ArrayList<>();
         for (Element section : sections) {
@@ -77,7 +73,7 @@ public class StructureValidator implements Validator<AtomFeed> {
         for (AtomEntry<? extends Resource> atomEntry : entryList) {
             Resource resource = atomEntry.getResource();
             if (resource.getResourceType().equals(ResourceType.Composition)) {
-                compositionEntry = atomEntry.getResource().getChildByName("encounter").hasValues() ? atomEntry : null;
+                compositionEntry = resource.getChildByName("encounter").hasValues() ? atomEntry : null;
                 break;
             }
         }

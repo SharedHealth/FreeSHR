@@ -9,7 +9,7 @@ import org.freeshr.infrastructure.tr.ValueSetCodeValidator;
 import org.freeshr.utils.CollectionUtils;
 import org.freeshr.utils.FileUtil;
 import org.freeshr.validations.*;
-import org.hl7.fhir.instance.model.*;
+import org.hl7.fhir.instance.model.OperationOutcome;
 import org.hl7.fhir.instance.utils.ConceptLocator;
 import org.junit.Before;
 import org.junit.Rule;
@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.lang.Boolean;
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -30,6 +29,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -49,6 +49,9 @@ public class EncounterValidatorIntegrationTest {
 
     @Autowired
     private HealthIdValidator healthIdValidator;
+
+    @Autowired
+    private MedicationValidator medicationValidator;
 
     @Autowired
     private StructureValidator structureValidator;
@@ -167,10 +170,10 @@ public class EncounterValidatorIntegrationTest {
 
     @Test
     public void shouldValidateSpecimenWithDiagnosticOrder() throws Exception {
-        encounterBundle= EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,FileUtil.asString("xmls/encounters/diagnostic_order_with_specimen.xml"));
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, FileUtil.asString("xmls/encounters/diagnostic_order_with_specimen.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        EncounterValidationResponse encounterValidationResponse= validator.validate(encounterBundle);
-        verify(trConceptLocator,times(3)).verifiesSystem(anyString());
+        EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
+        verify(trConceptLocator, times(3)).verifiesSystem(anyString());
 
         assertTrue(encounterValidationResponse.isSuccessful());
     }
@@ -274,21 +277,6 @@ public class EncounterValidatorIntegrationTest {
         });
         assertEquals("Should have found one invalid medication url", 2, invalidUrlError.size());
 
-/*
-        ResourceOrFeedDeserializer resourceOrFeedDeserializer= new ResourceOrFeedDeserializer();
-        final String xml = FileUtil.asString("xmls/encounters/medication_prescription_invalid.xml");
-        AtomFeed feed = resourceOrFeedDeserializer.deserialize(xml);
-
-        for (AtomEntry<? extends Resource> atomEntry : feed.getEntryList()) {
-            Resource resource = atomEntry.getResource();
-            ResourceType resourceType = resource.getResourceType();
-            Property medication = resource.getChildByName("medication");
-            assertNotNull(medication);
-            ResourceReference medicationRefValue = ((ResourceReference) medication.getValues().get(0));
-            assertNotNull(medicationRefValue);
-
-        }*/
-
     }
 
     @Test
@@ -301,14 +289,119 @@ public class EncounterValidatorIntegrationTest {
     }
 
     @Test
-    public void shouldValidateRouteInMedicationPrescription(){
+    public void shouldValidateRouteInMedicationPrescription() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/medication_prescription_valid.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+
         EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
         verify(trConceptLocator, times(1)).verifiesSystem("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration");
-        verify(trConceptLocator, times(1)).validate("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration","implant", "implant");
+        verify(trConceptLocator, times(1)).validate("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration", "implant", "implant");
         assertTrue(encounterValidationResponse.isSuccessful());
+    }
+
+    @Test
+    public void shouldValidateSiteAndReasonInMedicationPrescription() {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/medication_prescription_route_valid.xml"));
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
+        verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/dosageInstruction-site", "181220002", "Entire oral cavity");
+        verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/prescription-reason", "38341003", "High blood pressure");
+        assertTrue(validationResponse.isSuccessful());
+
+    }
+
+    //TODO: Same as Medication & Prescriber
+    @Test
+    public void shouldValidatePrescriberMedicationInMedicationPrescription() {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/medication_prescription_substitution_type_reason.xml"));
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
+        assertTrue("Medication-prescription,Prescriber pass through validation", validationResponse.isSuccessful());
+
+    }
+
+    @Test
+    public void shouldValidatePrescriptionWithInvalidPrescriber() {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/medication_prescription_prescriber_invalid.xml"));
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
+        assertFalse("Invalid Prescriber Should have failed validation", validationResponse.isSuccessful());
+        List<Error> errorList = CollectionUtils.filter(validationResponse.getErrors(), new CollectionUtils.Fn<Error, Boolean>() {
+            @Override
+            public Boolean call(Error e) {
+                return e.getReason().equals(MedicationValidator.INVALID_PRESCRIBER_REFERENCE_URL);
+            }
+        });
+
+        assertEquals("Should Have found one Invalid prescriber Url", 1, errorList.size());
+
+    }
+
+    @Test
+    public void shouldValidateDispenseAndAdditionalInstructionsInMedicationPrescription() {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/medication_prescription_dispense_addinformation_valid.xml"));
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
+        verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/additional-instructions",
+                "79647ed4-a60e-4cf5-ba68-cf4d55956xyz", "Take With Water");
+        assertTrue("Should Validate Valid Encounter In MedicationPrescription", validationResponse.isSuccessful());
+    }
+
+    @Test
+    public void shouldValidateInvalidDispenseInMedicationPrescription() {
+        encounterBundle= EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                  FileUtil.asString("xmls/encounters/medication_prescription_dispense_addinformation_invalid.xml"));
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+        EncounterValidationResponse validationResponse= validator.validate(encounterBundle);
+        assertFalse("Invalid Dispense Should Fail",validationResponse.isSuccessful());
+        List<Error> errorList= CollectionUtils.filter(validationResponse.getErrors(), new CollectionUtils.Fn<Error, Boolean>() {
+            @Override
+            public Boolean call(Error e) {
+                return e.getReason().equals(MedicationValidator.INVALID_DISPENSE_MEDICATION_REFERENCE_URL);
+            }
+        });
+
+        assertEquals("Should Have Found One Invalid Dispense-Mediaction Url",1,errorList.size());
+    }
+
+    @Test
+    public void shouldValidateSubstitutionTypeAndReasonInMedicationPrescription() {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/medication_prescription_substitution_type_reason.xml"));
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
+        verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/substitution-type", "291220002", "Paracetamol");
+        verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/substitution-reason", "301220005"
+                , "Paracetamol can be taken in place of this drug");
+        assertTrue(validationResponse.isSuccessful());
+
+
+    }
+
+
+    @Test
+    public void shouldValidateMethodAndAsNeededXInMedicationPrescription() {
+
+        /**
+         * medication_prescription_route_valid.xml has
+         * 2 medication prescribed with asNeeded (boolean true), and asNeeded with CodeableConcept
+         *
+         */
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/medication_prescription_route_valid.xml"));
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
+        verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba",
+                "79647ed4-a60e-4cf5-ba68-cf4d55956cba", "Hemoglobin");
+        verify(trConceptLocator, times(1)).validate("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/administration-method-codes",
+                "320276009", "Salmeterol+fluticasone 25/250ug inhaler");
+        assertTrue(validationResponse.isSuccessful());
+
     }
 
 
