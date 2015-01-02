@@ -39,6 +39,7 @@ public class Sample {
         DoSomething proxy = (DoSomething) Proxy.newProxyInstance(DoSomething.class.getClassLoader(), new Class[]{DoSomething.class}, handler);
         proxy.execute();
         proxy.unDo();
+
     }
 
 }

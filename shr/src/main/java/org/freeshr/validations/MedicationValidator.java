@@ -23,7 +23,6 @@ public class MedicationValidator implements Validator<AtomEntry<? extends Resour
 
     private static final String MEDICATION = "medication";
     private static final String PRESCRIBER = "prescriber";
-    private static final String ENCOUNTER = "encounter";
     private static final String DISPENSE = "dispense";
 
     private static final Logger logger = LoggerFactory.getLogger(MedicationValidator.class);
@@ -31,8 +30,6 @@ public class MedicationValidator implements Validator<AtomEntry<? extends Resour
     public static final String UNSPECIFIED_MEDICATION = "Unspecified Medication";
 
     public static final String INVALID_PRESCRIBER_REFERENCE_URL = "Invalid Prescriber reference URL";
-
-    public static final String INVALID_ENCOUNTER_REFERENCE_URL = "Invalid Encounter reference URL";
 
     public static final String INVALID_DISPENSE_MEDICATION_REFERENCE_URL = "Invalid Dispense-Medication reference URL";
 
@@ -68,19 +65,12 @@ public class MedicationValidator implements Validator<AtomEntry<? extends Resour
             return validationMessages;
         }
 
-        /* for validating Encounter [for Time being left it]*/
-/*        result = validateEncounter(atomEntry, validationMessages);
-        if (!result) {
-            return validationMessages;
-        }*/
 
 
         return validationMessages;
     }
 
-    public void setAtomFeed(AtomFeed atomFeed) {
-        this.atomFeed = atomFeed;
-    }
+
 
     private boolean validateDispenseMedication(AtomEntry<? extends Resource> atomEntry, ArrayList<ValidationMessage> validationMessages) {
 
@@ -105,32 +95,6 @@ public class MedicationValidator implements Validator<AtomEntry<? extends Resour
         return true;
     }
 
-    private boolean validateEncounter(AtomEntry<? extends Resource> atomEntry, ArrayList<ValidationMessage> validationMessages) {
-        String id = atomEntry.getId();
-        Property encounter = atomEntry.getResource().getChildByName(ENCOUNTER);
-        if (encounter == null || !encounter.hasValues()) {
-            return true;
-        }
-
-        //TODO: to figure out how to get the ID of entire feed(through getter || by passing as func param)
-        String encounterRef = getReferenceUrl(encounter);
-        if (!isAnyMatchingRefIdPresent(encounterRef)) {
-            validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, id, INVALID_ENCOUNTER_REFERENCE_URL, IssueSeverity.error));
-            return false;
-        }
-
-        return true;
-    }
-
-    private boolean isAnyMatchingRefIdPresent(String refUrl) {
-        for (AtomEntry<? extends Resource> atomEntry : atomFeed.getEntryList()) {
-            if (atomEntry.getId().equals(refUrl)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     private boolean validatePrescriber(AtomEntry<? extends Resource> atomEntry, ArrayList<ValidationMessage> validationMessages) {
         String id = atomEntry.getId();
