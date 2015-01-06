@@ -1,0 +1,13 @@
+{
+ "resourceType": "ValueSet",
+ "define": {
+  "system": "http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Quantity-Units",
+  "caseSensitive": true,
+  "concept": [
+   {
+    "code": "TU",
+    "definition": ""
+   }
+  ]
+ }
+}

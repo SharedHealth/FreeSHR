@@ -82,6 +82,13 @@ public class EncounterValidatorIntegrationTest {
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/medication_paracetamol.json"))));
+
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/Quantity-Units"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/code.json"))));
+
     }
 
     @Test
@@ -285,6 +292,7 @@ public class EncounterValidatorIntegrationTest {
                 FileUtil.asString("xmls/encounters/medication_prescription_valid.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
+        verify(trConceptLocator, times(1)).validate("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration", "implant", "implant");
         assertTrue("Medication prescription pass through validation", validationResponse.isSuccessful());
     }
 
@@ -324,24 +332,6 @@ public class EncounterValidatorIntegrationTest {
     }
 
     @Test
-    public void shouldValidatePrescriptionWithInvalidPrescriber() {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/medication_prescription_prescriber_invalid.xml"));
-        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
-        assertFalse("Invalid Prescriber Should have failed validation", validationResponse.isSuccessful());
-        List<Error> errorList = CollectionUtils.filter(validationResponse.getErrors(), new CollectionUtils.Fn<Error, Boolean>() {
-            @Override
-            public Boolean call(Error e) {
-                return e.getReason().equals(MedicationValidator.INVALID_PRESCRIBER_REFERENCE_URL);
-            }
-        });
-
-        assertEquals("Should Have found one Invalid prescriber Url", 1, errorList.size());
-
-    }
-
-    @Test
     public void shouldValidateDispenseAndAdditionalInstructionsInMedicationPrescription() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/medication_prescription_dispense_addinformation_valid.xml"));
@@ -354,19 +344,19 @@ public class EncounterValidatorIntegrationTest {
 
     @Test
     public void shouldValidateInvalidDispenseInMedicationPrescription() {
-        encounterBundle= EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                  FileUtil.asString("xmls/encounters/medication_prescription_dispense_addinformation_invalid.xml"));
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/medication_prescription_dispense_addinformation_invalid.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        EncounterValidationResponse validationResponse= validator.validate(encounterBundle);
-        assertFalse("Invalid Dispense Should Fail",validationResponse.isSuccessful());
-        List<Error> errorList= CollectionUtils.filter(validationResponse.getErrors(), new CollectionUtils.Fn<Error, Boolean>() {
+        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
+        assertFalse("Invalid Dispense Should Fail", validationResponse.isSuccessful());
+        List<Error> errorList = CollectionUtils.filter(validationResponse.getErrors(), new CollectionUtils.Fn<Error, Boolean>() {
             @Override
             public Boolean call(Error e) {
-                return e.getReason().equals(MedicationValidator.INVALID_DISPENSE_MEDICATION_REFERENCE_URL);
+                return e.getReason().equals(MedicationValidator.INVALID_DOSAGE_QUANTITY);
             }
         });
 
-        assertEquals("Should Have Found One Invalid Dispense-Mediaction Url",1,errorList.size());
+        assertEquals("Should Have Found One Invalid Dispense-Mediaction Url", 1, errorList.size());
     }
 
     @Test
@@ -401,6 +391,17 @@ public class EncounterValidatorIntegrationTest {
         verify(trConceptLocator, times(1)).validate("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/administration-method-codes",
                 "320276009", "Salmeterol+fluticasone 25/250ug inhaler");
         assertTrue(validationResponse.isSuccessful());
+
+    }
+
+    @Test
+    public void shouldValidateInvalidDosageQuantityInMedicationPrescription() {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/medication_prescription_invalid_dosage_quantity.xml"));
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
+        List<Error> errors = validationResponse.getErrors();
+        assertEquals("Invalid Dosage Quantity", 1, errors.size());
 
     }
 
