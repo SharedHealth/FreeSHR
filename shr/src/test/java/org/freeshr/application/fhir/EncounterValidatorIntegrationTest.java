@@ -350,11 +350,11 @@ public class EncounterValidatorIntegrationTest {
         EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
         assertFalse("Invalid Dispense Should Fail", validationResponse.isSuccessful());
         List<Error> errorList = CollectionUtils.filter(validationResponse.getErrors(), new CollectionUtils.Fn<Error, Boolean>() {
-            @Override
-            public Boolean call(Error e) {
-                return e.getReason().equals(MedicationValidator.INVALID_DOSAGE_QUANTITY);
-            }
-        });
+                    @Override
+                    public Boolean call(Error e) {
+                        return e.getReason().equals(MedicationValidator.INVALID_DISPENSE_MEDICATION_REFERENCE_URL);
+                    }
+            });
 
         assertEquals("Should Have Found One Invalid Dispense-Mediaction Url", 1, errorList.size());
     }
