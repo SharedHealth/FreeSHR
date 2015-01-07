@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -25,5 +26,8 @@ public class CodeValidatorFactoryIntegrationTest {
                 HttpCodeValidator);
         assertTrue(factory.getValidator("http://tr.shr.com/openmrs/ws/rest/v1/tr/vs/ref1") instanceof
                 ValueSetCodeValidator);
+        assertTrue(factory.getValidator("http://tr.shr.com/openmrs/ws/rest/v1/tr/drugs/ref1") instanceof
+                MedicationCodeValidator);
+        assertNull(factory.getValidator("http://tr.shr.com/openmrs/something"));
     }
 }
