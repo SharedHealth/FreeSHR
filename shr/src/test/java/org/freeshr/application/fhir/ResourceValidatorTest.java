@@ -3,7 +3,7 @@ package org.freeshr.application.fhir;
 import org.freeshr.utils.FileUtil;
 import org.freeshr.utils.ResourceOrFeedDeserializer;
 import org.freeshr.validations.ConditionValidator;
-import org.freeshr.validations.MedicationValidator;
+import org.freeshr.validations.MedicationPrescriptionValidator;
 import org.freeshr.validations.ResourceValidator;
 import org.freeshr.validations.ValidationSubject;
 import org.hl7.fhir.instance.model.AtomFeed;
@@ -25,12 +25,12 @@ public class ResourceValidatorTest {
     ResourceOrFeedDeserializer resourceOrFeedDeserializer;
 
     @Mock
-    MedicationValidator medicationValidator;
+    MedicationPrescriptionValidator medicationPrescriptionValidator;
 
     @Before
     public void setup() {
         initMocks(this);
-        resourceValidator = new ResourceValidator(new ConditionValidator(), medicationValidator);
+        resourceValidator = new ResourceValidator(new ConditionValidator(), medicationPrescriptionValidator);
         resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
     }
 

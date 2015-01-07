@@ -21,25 +21,24 @@ import java.util.List;
 import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity;
 
 @Component
-public class MedicationValidator implements Validator<AtomEntry<? extends Resource>> {
+public class MedicationPrescriptionValidator implements Validator<AtomEntry<? extends Resource>> {
 
     public static final String DOSAGE_INSTRUCTION = "dosageInstruction";
     public static final String DOSE_QUANTITY = "doseQuantity";
     public static final String INVALID_MEDICATION_REFERENCE_URL = "Invalid Medication Reference URL";
     public static final String UNSPECIFIED_MEDICATION = "Unspecified Medication";
     public static final String INVALID_DOSAGE_QUANTITY = "Invalid Dosage Quantity";
+    public static final String INVALID_DISPENSE_MEDICATION_REFERENCE_URL = "Invalid Dispense-Medication Reference URL";
     private static final String MEDICATION = "medication";
     private static final String DISPENSE = "dispense";
-    public static final String INVALID_DISPENSE_MEDICATION_REFERENCE_URL = "Invalid Dispense-Medication Reference URL";
-    private static final Logger logger = LoggerFactory.getLogger(MedicationValidator.class);
+    private static final Logger logger = LoggerFactory.getLogger(MedicationPrescriptionValidator.class);
     private MedicationCodeValidator codeValidator;
-  
+
     private ConceptLocator trConceptLocator;
 
 
-
     @Autowired
-    public MedicationValidator(MedicationCodeValidator codeValidator, TRConceptLocator trConceptLocator) {
+    public MedicationPrescriptionValidator(MedicationCodeValidator codeValidator, TRConceptLocator trConceptLocator) {
         this.codeValidator = codeValidator;
         this.trConceptLocator = trConceptLocator;
     }
@@ -114,7 +113,7 @@ public class MedicationValidator implements Validator<AtomEntry<? extends Resour
             return true;
         }
         String dispenseMedicationRefUrl = getReferenceUrl(dispenseMedication);
-        if ((dispenseMedicationRefUrl == null)){
+        if ((dispenseMedicationRefUrl == null)) {
             return true;
         }
         if ((!isValidReferenceUrl(dispenseMedicationRefUrl))) {
@@ -123,7 +122,7 @@ public class MedicationValidator implements Validator<AtomEntry<? extends Resour
             return false;
         }
 
-        if(!isValidCodeableConceptUrl(dispenseMedicationRefUrl,"")){
+        if (!isValidCodeableConceptUrl(dispenseMedicationRefUrl, "")) {
             validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, id, INVALID_DISPENSE_MEDICATION_REFERENCE_URL, IssueSeverity.error));
             return false;
         }
@@ -142,7 +141,7 @@ public class MedicationValidator implements Validator<AtomEntry<? extends Resour
 
         String medicationRefUrl = getReferenceUrl(medication);
         //now to check for valid or invalid
-        if ((medicationRefUrl == null) ){
+        if ((medicationRefUrl == null)) {
             return true;
         }
         if ((!isValidReferenceUrl(medicationRefUrl))) {
@@ -151,7 +150,7 @@ public class MedicationValidator implements Validator<AtomEntry<? extends Resour
             return false;
         }
 
-        if(!isValidCodeableConceptUrl(medicationRefUrl,"")){
+        if (!isValidCodeableConceptUrl(medicationRefUrl, "")) {
             validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, id, INVALID_MEDICATION_REFERENCE_URL, IssueSeverity.error));
             return false;
         }
@@ -159,7 +158,7 @@ public class MedicationValidator implements Validator<AtomEntry<? extends Resour
         return true;
     }
 
-    private boolean isValidCodeableConceptUrl(String url,String code){
+    private boolean isValidCodeableConceptUrl(String url, String code) {
 
         Observable<Boolean> obs = codeValidator.isValid(url, code);
         Boolean result = obs.toBlocking().first();

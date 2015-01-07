@@ -23,10 +23,10 @@ public class ResourceValidator implements Validator<AtomFeed> {
     private Map<ResourceType, Validator<AtomEntry<? extends Resource>>> resourceTypeValidatorMap = new HashMap<>();
 
     @Autowired
-    public ResourceValidator(ConditionValidator conditionValidator, MedicationValidator medicationValidator) {
+    public ResourceValidator(ConditionValidator conditionValidator, MedicationPrescriptionValidator medicationPrescriptionValidator) {
         assignDefaultValidatorToAllResourceTypes();
         resourceTypeValidatorMap.put(ResourceType.Condition, conditionValidator);
-        resourceTypeValidatorMap.put(ResourceType.MedicationPrescription, medicationValidator);
+        resourceTypeValidatorMap.put(ResourceType.MedicationPrescription, medicationPrescriptionValidator);
     }
 
     private void assignDefaultValidatorToAllResourceTypes() {

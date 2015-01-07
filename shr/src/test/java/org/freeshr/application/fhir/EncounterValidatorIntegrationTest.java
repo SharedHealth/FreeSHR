@@ -51,7 +51,7 @@ public class EncounterValidatorIntegrationTest {
     private HealthIdValidator healthIdValidator;
 
     @Autowired
-    private MedicationValidator medicationValidator;
+    private MedicationPrescriptionValidator medicationPrescriptionValidator;
 
     @Autowired
     private StructureValidator structureValidator;
@@ -106,7 +106,6 @@ public class EncounterValidatorIntegrationTest {
         EncounterValidationResponse response = validator.validate(encounterBundle);
         assertFalse(response.isSuccessful());
         assertEquals(1, response.getErrors().size());
-        //assertEquals("Condition-status", response.getErrors().get(0).getField());
         assertEquals("Unknown", response.getErrors().get(0).getField());
     }
 
@@ -279,7 +278,7 @@ public class EncounterValidatorIntegrationTest {
         List<Error> invalidUrlError = CollectionUtils.filter(validationResponse.getErrors(), new CollectionUtils.Fn<Error, Boolean>() {
             @Override
             public Boolean call(Error e) {
-                return e.getReason().equals(MedicationValidator.INVALID_MEDICATION_REFERENCE_URL);
+                return e.getReason().equals(MedicationPrescriptionValidator.INVALID_MEDICATION_REFERENCE_URL);
             }
         });
         assertEquals("Should have found one invalid medication url", 2, invalidUrlError.size());
@@ -320,7 +319,7 @@ public class EncounterValidatorIntegrationTest {
 
     }
 
-    //TODO: Same as Medication & Prescriber
+
     @Test
     public void shouldValidatePrescriberMedicationInMedicationPrescription() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
@@ -352,7 +351,7 @@ public class EncounterValidatorIntegrationTest {
         List<Error> errorList = CollectionUtils.filter(validationResponse.getErrors(), new CollectionUtils.Fn<Error, Boolean>() {
                     @Override
                     public Boolean call(Error e) {
-                        return e.getReason().equals(MedicationValidator.INVALID_DISPENSE_MEDICATION_REFERENCE_URL);
+                        return e.getReason().equals(MedicationPrescriptionValidator.INVALID_DISPENSE_MEDICATION_REFERENCE_URL);
                     }
             });
 
@@ -404,6 +403,70 @@ public class EncounterValidatorIntegrationTest {
         assertEquals("Invalid Dosage Quantity", 1, errors.size());
 
     }
+
+    @Test
+    public void shouldValidateDischargeSummaryEncounter(){
+        encounterBundle= EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                         FileUtil.asString("xmls/encounters/discharge_summary_encounter.xml"));
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+        EncounterValidationResponse validationResponse= validator.validate(encounterBundle);
+
+
+        verify(trConceptLocator, times(1)).validate("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration", "implant", "implant");
+        verify(trConceptLocator, times(3)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba",
+                "79647ed4-a60e-4cf5-ba68-cf4d55956cba", "Hemoglobin");
+        verify(trConceptLocator, times(1)).validate("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/administration-method-codes",
+                "320276009", "Salmeterol+fluticasone 25/250ug inhaler");
+        verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/additional-instructions",
+                "79647ed4-a60e-4cf5-ba68-cf4d55956xyz", "Take With Water");
+        verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/dosageInstruction-site", "181220002", "Entire oral cavity");
+        verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/prescription-reason", "38341003", "High blood pressure");
+
+        verify(trConceptLocator, times(1)).validate("http://hl7.org/fhir/condition-category",
+                "diagnosis", "Diagnosis");
+        verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/concepts/2218636a-0ef0-4fb1-ac7e-cf2a915b0ee4",
+                "2218636a-0ef0-4fb1-ac7e-cf2a915b0ee4", "Fracture in upper arm");
+
+        assertTrue(validationResponse.isSuccessful());
+
+
+    }
+
+    @Test
+    public void shouldValidateInvalidSchemaInDischargeSummaryEncounter(){
+        encounterBundle= EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/discharge_summary_encounter_invalid.xml"));
+
+        EncounterValidationResponse validationResponse= validator.validate(encounterBundle);
+        assertFalse(validationResponse.isSuccessful());
+    }
+
+    @Test
+    public void shouldValidateInvalidMedicationInDischargeSummaryEncounter(){
+        encounterBundle= EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/discharge_summary_encounter_medication_invalid.xml"));
+
+        EncounterValidationResponse validationResponse= validator.validate(encounterBundle);
+        assertFalse(validationResponse.isSuccessful());
+        List<Error> errors = validationResponse.getErrors();
+        assertEquals(1,errors.size());
+        assertEquals("Invalid Medication Reference URL", errors.get(0).getReason());
+    }
+
+    @Test
+    public void shouldValidateInvalidCodeInDischargeSummaryEncounter(){
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+        when(trConceptLocator.validate(anyString(), eq("a6e20fe1-4044-4ce7-8440-577f7f814765-invalid"),
+                anyString())).thenReturn(new ConceptLocator.ValidationResult(OperationOutcome.IssueSeverity.error,
+                "Invalid code"));
+
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/discharge_summary_encounter_code_invalid.xml"));
+        EncounterValidationResponse validationResponse= validator.validate(encounterBundle);
+        assertFalse(validationResponse.isSuccessful());
+        assertEquals(5,validationResponse.getErrors().size());
+    }
+
 
 
 }
