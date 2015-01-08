@@ -762,7 +762,7 @@
                 <dateAsserted value="2015-01-07T12:00:15+05:30"/>
                 <code>
                     <coding>
-                        <system value="http://hl7.org/fhir/condition-category-invalid"/>
+                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/concepts/2218636a-0ef0-4fb1-ac7e-cf2a915b0ee4"/>
                         <code value="2218636a-0ef0-4fb1-ac7e-cf2a915b0ee4"/>
                         <display value="Fracture in upper arm"/>
                     </coding>

@@ -208,13 +208,6 @@
                         <display value="Diagnostic Report"/>
                     </content>
                 </section>
-                <section>
-                    <content>
-                        <reference value="urn:299531be-4e43-4349-9eb0-a48213e10692"/>
-                        <display value="Immunization"/>
-                    </content>
-                </section>
-
             </Composition>
         </content>
     </entry>
@@ -1055,7 +1048,7 @@
                     </timingSchedule>
                     <route>
                         <coding>
-                            <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/Route-of-Administration"/>
+                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration"/>
                             <code value="implant"/>
                             <display value="implant"/>
                         </coding>
@@ -1077,7 +1070,7 @@
                     <asNeededBoolean value="true"/>
                     <doseQuantity>
                         <value value="3"/>
-                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Quantity-Units"/>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Quantity-Units-invalid"/>
                         <code value="TU"/>
                     </doseQuantity>
                     <asNeededCodeableConcept>
@@ -1241,66 +1234,4 @@
             </DiagnosticReport>
         </content>
     </entry>
-    <entry>
-        <title>Immunization</title>
-        <id>urn:299531be-4e43-4349-9eb0-a48213e10692</id>
-        <updated>2015-01-07T17:05:30.336+05:30</updated>
-        <author>
-            <name>bahmni</name>
-        </author>
-        <content type="text/xml">
-            <Immunization
-                    xmlns="http://hl7.org/fhir">
-                <identifier>
-                    <value value="urn:299531be-4e43-4349-9eb0-a48213e10692"/>
-                </identifier>
-                <date value="2014-12-03T00:00:00+05:30"/>
-                <vaccineType>
-                    <coding>
-                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/drugs/c7a6e6e8-dde5-4194-8f60-4e090d34c00f"/>
-                        <code value="c7a6e6e8-dde5-4194-8f60-4e090d34c00f"/>
-                        <display value="Abarelix"/>
-                    </coding>
-                </vaccineType>
-                <subject>
-                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
-                    <display value="5893922485019082753"/>
-                </subject>
-                <refusedIndicator value="true"/>
-                <reported value="true"/>
-                <requester>
-                    <reference value="20ba5ebe-6f06-11e4-b8c1-080027b662ec"/>
-                </requester>
-                <route>
-                    <coding>
-                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/Route-of-Administration"/>
-                        <code value="implant"/>
-                        <display value="implant"/>
-                    </coding>
-                </route>
-                <doseQuantity>
-                    <value value="3.0"/>
-                    <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/Quantity-Units"/>
-                    <code value="ml"/>
-                </doseQuantity>
-                <explanation>
-                    <reason>
-                        <coding>
-                            <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/Immunization-Reason"/>
-                            <code value="281657000"/>
-                            <display value="Travel vaccinations"/>
-                        </coding>
-                    </reason>
-                    <refusalReason>
-                        <coding>
-                            <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/No-Immunization-Reason"/>
-                            <code value="PATOBJ"/>
-                            <display value="patient objection"/>
-                        </coding>
-                    </refusalReason>
-                </explanation>
-            </Immunization>
-        </content>
-    </entry>
-
 </feed>

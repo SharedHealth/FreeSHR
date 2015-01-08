@@ -185,7 +185,8 @@
                 </section>
                 <section>
                     <content>
-                        <reference value="urn:5fc6d0d9-9520-4015-87cb-ab0cfa7e4b50"/>
+                        <reference
+                                value="urn:5fc6d0d9-9520-4015-87cb-ab0cfa7e4b50"/>
                         <display value="Medication Prescription"/>
                     </content>
                 </section>
@@ -198,19 +199,22 @@
                 </section>
                 <section>
                     <content>
-                        <reference value="a86018fa-e15d-4004-85bc-a1ee713dc923"/>
+                        <reference
+                                value="a86018fa-e15d-4004-85bc-a1ee713dc923"/>
                         <display value="Diagnostic Order"/>
                     </content>
                 </section>
                 <section>
                     <content>
-                        <reference value="24030c01-f6dd-42a1-a7d9-acb5dc5d04d1"/>
+                        <reference
+                                value="24030c01-f6dd-42a1-a7d9-acb5dc5d04d1"/>
                         <display value="Diagnostic Report"/>
                     </content>
                 </section>
                 <section>
                     <content>
-                        <reference value="urn:299531be-4e43-4349-9eb0-a48213e10692"/>
+                        <reference
+                                value="urn:299531be-4e43-4349-9eb0-a48213e10692"/>
                         <display value="Immunization"/>
                     </content>
                 </section>
@@ -1027,14 +1031,17 @@
                 </identifier>
                 <dateWritten value="2014-12-17T18:26:46+05:30"/>
                 <patient>
-                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference
+                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </patient>
                 <prescriber>
-                    <reference value="http://localhost:9997/e8a8bdb9-9fdd-4e66-81ca-5abbb6308ccd"/>
+                    <reference
+                            value="http://localhost:9997/e8a8bdb9-9fdd-4e66-81ca-5abbb6308ccd"/>
                 </prescriber>
                 <medication>
-                    <reference value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>
+                    <reference
+                            value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>
                     <display value="Lactic Acid"/>
                 </medication>
                 <reasonCodeableConcept>
@@ -1071,7 +1078,8 @@
                         <coding>
                             <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/administration-method-codes"/>
                             <code value="320276009"/>
-                            <display value="Salmeterol+fluticasone 25/250ug inhaler"/>
+                            <display
+                                    value="Salmeterol+fluticasone 25/250ug inhaler"/>
                         </coding>
                     </method>
                     <asNeededBoolean value="true"/>
@@ -1110,7 +1118,7 @@
                     xmlns="http://hl7.org/fhir">
                 <name>
                     <coding>
-                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/concepts/1f828577-2a6f-4803-bd37-647aec0bf210"/>
+                        <system value=""/>
                         <code value="1f828577-2a6f-4803-bd37-647aec0bf210"/>
                         <display value="Discharge - Summary"/>
                     </coding>
@@ -1232,7 +1240,8 @@
                     <value value="24030c01-f6dd-42a1-a7d9-acb5dc5d04d1"/>
                 </identifier>
                 <requestDetail>
-                    <reference value="urn:encounter/781e2b52-ad92-411c-a7c6-eb3fea53e566orders"/>
+                    <reference
+                            value="urn:encounter/781e2b52-ad92-411c-a7c6-eb3fea53e566orders"/>
                 </requestDetail>
                 <diagnosticDateTime value="2014-10-13T14:38:22+05:30"/>
                 <result>
@@ -1263,7 +1272,8 @@
                     </coding>
                 </vaccineType>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference
+                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <refusedIndicator value="true"/>
