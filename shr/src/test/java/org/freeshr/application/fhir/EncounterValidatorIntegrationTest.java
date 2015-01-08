@@ -51,8 +51,6 @@ public class EncounterValidatorIntegrationTest {
     @Autowired
     private HealthIdValidator healthIdValidator;
     @Autowired
-    private MedicationPrescriptionValidator medicationPrescriptionValidator;
-    @Autowired
     private StructureValidator structureValidator;
     @Autowired
     private FhirMessageFilter fhirMessageFilter;
