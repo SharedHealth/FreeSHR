@@ -1,6 +1,7 @@
 package org.freeshr.validations;
 
 
+import org.freeshr.domain.ErrorMessage;
 import org.freeshr.infrastructure.tr.MedicationCodeValidator;
 import org.hl7.fhir.instance.model.*;
 import org.hl7.fhir.instance.utils.ConceptLocator;
@@ -23,7 +24,6 @@ public class MedicationPrescriptionValidator implements Validator<AtomEntry<? ex
     public static final String DOSAGE_INSTRUCTION = "dosageInstruction";
     public static final String INVALID_MEDICATION_REFERENCE_URL = "Invalid Medication Reference URL";
     public static final String UNSPECIFIED_MEDICATION = "Unspecified Medication";
-    public static final String INVALID_DOSAGE_QUANTITY = "Invalid Dosage Quantity";
     public static final String INVALID_DISPENSE_MEDICATION_REFERENCE_URL = "Invalid Dispense-Medication Reference URL";
     private static final String MEDICATION = "medication";
     private static final String DISPENSE = "dispense";
@@ -47,24 +47,17 @@ public class MedicationPrescriptionValidator implements Validator<AtomEntry<? ex
         AtomEntry<? extends Resource> atomEntry = subject.extract();
         ArrayList<ValidationMessage> validationMessages = new ArrayList<>();
 
-
-        boolean result = validateMedication(atomEntry, validationMessages);
-        if (!result) {
+        if (!validateMedication(atomEntry, validationMessages)) {
             return validationMessages;
         }
 
-
-        result = validateDosageQuantity(atomEntry, validationMessages);
-        if (!result) {
+        if (!validateDosageQuantity(atomEntry, validationMessages)) {
             return validationMessages;
         }
 
-
-        result = validateDispenseMedication(atomEntry, validationMessages);
-        if (!result) {
+        if (!validateDispenseMedication(atomEntry, validationMessages)) {
             return validationMessages;
         }
-
 
         return validationMessages;
     }
@@ -89,7 +82,7 @@ public class MedicationPrescriptionValidator implements Validator<AtomEntry<? ex
                 ConceptLocator.ValidationResult validationResult = doseQuantityValidator.validate(doseQuantity);
                 if (validationResult != null) {
                     logger.error("Medication-Prescription DosageQuantity Code is invalid:");
-                    validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, id, INVALID_DOSAGE_QUANTITY, IssueSeverity.error));
+                    validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, id, ErrorMessage.INVALID_DOSAGE_QUANTITY, IssueSeverity.error));
                     return false;
                 }
             }

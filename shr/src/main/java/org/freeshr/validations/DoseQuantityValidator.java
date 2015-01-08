@@ -12,8 +12,12 @@ public class DoseQuantityValidator {
 
     public static final String DOSE_QUANTITY = "doseQuantity";
 
-    @Autowired
     private TRConceptLocator trConceptLocator;
+
+    @Autowired
+    public DoseQuantityValidator(TRConceptLocator trConceptLocator) {
+        this.trConceptLocator = trConceptLocator;
+    }
 
     public boolean isReferenceUrlNotFound(Quantity doseQuantity) {
         String url = null;
