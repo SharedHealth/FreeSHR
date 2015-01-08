@@ -1,7 +1,6 @@
 package org.freeshr.validations;
 
 
-import org.freeshr.application.fhir.TRConceptLocator;
 import org.freeshr.infrastructure.tr.MedicationCodeValidator;
 import org.hl7.fhir.instance.model.*;
 import org.hl7.fhir.instance.utils.ConceptLocator;
@@ -13,8 +12,6 @@ import org.springframework.stereotype.Component;
 import rx.Observable;
 
 import java.lang.Boolean;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +21,6 @@ import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity;
 public class MedicationPrescriptionValidator implements Validator<AtomEntry<? extends Resource>> {
 
     public static final String DOSAGE_INSTRUCTION = "dosageInstruction";
-    public static final String DOSE_QUANTITY = "doseQuantity";
     public static final String INVALID_MEDICATION_REFERENCE_URL = "Invalid Medication Reference URL";
     public static final String UNSPECIFIED_MEDICATION = "Unspecified Medication";
     public static final String INVALID_DOSAGE_QUANTITY = "Invalid Dosage Quantity";
@@ -34,13 +30,15 @@ public class MedicationPrescriptionValidator implements Validator<AtomEntry<? ex
     private static final Logger logger = LoggerFactory.getLogger(MedicationPrescriptionValidator.class);
     private MedicationCodeValidator codeValidator;
 
-    private ConceptLocator trConceptLocator;
-
+    private DoseQuantityValidator doseQuantityValidator;
+    private UrlValidator urlValidator;
 
     @Autowired
-    public MedicationPrescriptionValidator(MedicationCodeValidator codeValidator, TRConceptLocator trConceptLocator) {
+    public MedicationPrescriptionValidator(MedicationCodeValidator codeValidator,
+                                           DoseQuantityValidator doseQuantityValidator, UrlValidator urlValidator) {
         this.codeValidator = codeValidator;
-        this.trConceptLocator = trConceptLocator;
+        this.doseQuantityValidator = doseQuantityValidator;
+        this.urlValidator = urlValidator;
     }
 
     @Override
@@ -79,15 +77,16 @@ public class MedicationPrescriptionValidator implements Validator<AtomEntry<? ex
 
             if (dosageInstructionValue instanceof MedicationPrescription.MedicationPrescriptionDosageInstructionComponent) {
                 Quantity doseQuantity = ((MedicationPrescription.MedicationPrescriptionDosageInstructionComponent) dosageInstructionValue).getDoseQuantity();
-                String url = null;
-                if (doseQuantity == null || (url = doseQuantity.getSystemSimple()) == null || url.isEmpty()) {
+
+                if(doseQuantityValidator.isReferenceUrlNotFound(doseQuantity)){
                     return true;
                 }
 
-                if (!isValidReferenceUrl(url)) {
+                if(!urlValidator.isValid(doseQuantity.getSystemSimple())){
                     return false;
                 }
-                ConceptLocator.ValidationResult validationResult = trConceptLocator.validate(url, doseQuantity.getCodeSimple(), DOSE_QUANTITY);
+
+                ConceptLocator.ValidationResult validationResult = doseQuantityValidator.validate(doseQuantity);
                 if (validationResult != null) {
                     logger.error("Medication-Prescription DosageQuantity Code is invalid:");
                     validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, id, INVALID_DOSAGE_QUANTITY, IssueSeverity.error));
@@ -116,7 +115,7 @@ public class MedicationPrescriptionValidator implements Validator<AtomEntry<? ex
         if ((dispenseMedicationRefUrl == null)) {
             return true;
         }
-        if ((!isValidReferenceUrl(dispenseMedicationRefUrl))) {
+        if ((!urlValidator.isValid(dispenseMedicationRefUrl))) {
             logger.error("Dispense-Medication URL is invalid:" + dispenseMedicationRefUrl);
             validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, id, INVALID_DISPENSE_MEDICATION_REFERENCE_URL, IssueSeverity.error));
             return false;
@@ -144,7 +143,7 @@ public class MedicationPrescriptionValidator implements Validator<AtomEntry<? ex
         if ((medicationRefUrl == null)) {
             return true;
         }
-        if ((!isValidReferenceUrl(medicationRefUrl))) {
+        if ((!urlValidator.isValid(medicationRefUrl))) {
             logger.error("Medication URL is invalid:" + medicationRefUrl);
             validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, id, INVALID_MEDICATION_REFERENCE_URL, IssueSeverity.error));
             return false;
@@ -177,13 +176,6 @@ public class MedicationPrescriptionValidator implements Validator<AtomEntry<? ex
         return null;
     }
 
-    private boolean isValidReferenceUrl(final String url) {
-        try {
-            new URL(url);
-            return true;
-        } catch (MalformedURLException e) {
-        }
-        return false;
-    }
+
 
 }
