@@ -7,6 +7,8 @@ import org.hl7.fhir.instance.utils.ConceptLocator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
 @Component
 public class DoseQuantityValidator {
 
@@ -20,15 +22,11 @@ public class DoseQuantityValidator {
     }
 
     public boolean isReferenceUrlNotFound(Quantity doseQuantity) {
-        String url = null;
-        if (doseQuantity == null || (url = doseQuantity.getSystemSimple()) == null || url.isEmpty()) {
-            return true;
-        }
-        return false;
+        return doseQuantity == null || isEmpty(doseQuantity.getSystemSimple());
     }
 
     public ConceptLocator.ValidationResult validate(Quantity doseQuantity) {
-        String url = doseQuantity.getSystemSimple();
-        return trConceptLocator.validate(url, doseQuantity.getCodeSimple(), DOSE_QUANTITY);
+        return trConceptLocator.validate(doseQuantity.getSystemSimple(),
+                doseQuantity.getCodeSimple(), DOSE_QUANTITY);
     }
 }
