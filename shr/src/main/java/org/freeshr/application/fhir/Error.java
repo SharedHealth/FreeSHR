@@ -3,10 +3,17 @@ package org.freeshr.application.fhir;
 
 import com.google.gson.Gson;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class Error {
 
+    @XmlElement
     private String field;
+    @XmlElement
     private String type;
+    @XmlElement
     private String reason;
 
     public Error() {
