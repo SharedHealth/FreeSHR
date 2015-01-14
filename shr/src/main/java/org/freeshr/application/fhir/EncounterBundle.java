@@ -3,34 +3,32 @@ package org.freeshr.application.fhir;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.eclipse.persistence.oxm.annotations.XmlCDATA;
 
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import java.util.Arrays;
 
 @XmlRootElement(name = "encounter")
 public class EncounterBundle {
 
     @JsonProperty("id")
+    @XmlAttribute(name = "id")
     private String encounterId;
 
 
     private String healthId;
 
     @JsonProperty("publishedDate")
+    @XmlAttribute(name = "updated")
     private String receivedDate;
 
     @JsonIgnore
-    @XmlTransient
     private EncounterContent encounterContent;
 
     private String[] categories = new String[]{"encounter"};
 
     private String title = "Encounter";
 
-    @XmlElement(name = "id")
     public String getEncounterId() {
         return encounterId;
     }
@@ -47,7 +45,6 @@ public class EncounterBundle {
         this.healthId = healthId;
     }
 
-    @XmlElement(name = "updated")
     public String getReceivedDate() {
         return receivedDate;
     }
@@ -87,14 +84,13 @@ public class EncounterBundle {
     }
 
     @JsonProperty("content")
-    @XmlElement(name = "content")
-    @XmlCDATA
+    @XmlAttribute(name = "content")
     public String getContent() {
         return this.encounterContent.toString();
     }
 
     @JsonProperty("link")
-    @XmlElement(name = "link")
+    @XmlAttribute(name = "link")
     public String getLink() {
         return String.format("/patients/%s/encounters/%s", getHealthId(), getEncounterId());
     }

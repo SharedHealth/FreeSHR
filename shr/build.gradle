@@ -49,8 +49,7 @@ dependencies {
     compile libraries.snappy, libraries.spring_data_cassandra, libraries.spring_boot_logging,
             libraries.apache_commons_io, libraries.spring_framework, libraries.fhir_validator,
             libraries.jackson, libraries.saxon, libraries.rxjava,
-            libraries.netflix_astyanax, libraries.rome, libraries.time_uuid, libraries.spring_security,
-            libraries.spring_web, libraries.eclipse_moxy
+            libraries.netflix_astyanax, libraries.rome, libraries.time_uuid, libraries.spring_security
 
     compile(libraries.spring_boot_security){
         exclude group: 'ch.qos.logback', module: "logback-classic"
@@ -131,6 +130,7 @@ task dist(dependsOn: 'exportProperties', type: Rpm) {
 }
 
 war {
+    from sourceSets.main.resources
     manifest {
         attributes('Main-Class': mainClassName)
     }
