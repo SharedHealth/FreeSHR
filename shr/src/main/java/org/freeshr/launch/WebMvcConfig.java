@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -31,6 +32,8 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
         converters.add(new EncounterBundleMessageConverter());
         converters.add(new EncounterSearchResponseFeedConverter());
         converters.add(new MappingJackson2HttpMessageConverter());
+        converters.add(new Jaxb2RootElementHttpMessageConverter());
+
     }
 
     @Override

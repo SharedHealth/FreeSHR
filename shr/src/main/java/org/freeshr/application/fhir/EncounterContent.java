@@ -2,7 +2,9 @@ package org.freeshr.application.fhir;
 
 public class EncounterContent {
 
-    private final String content;
+    private String content = null;
+
+    public EncounterContent() {};
 
     public EncounterContent(String content) {
         this.content = content;
