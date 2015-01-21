@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import rx.Observable;
 
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertNotNull;
@@ -33,30 +34,30 @@ public class PatientServiceTest {
     @Test
     public void shouldQueryAllPatientsToVerifyValidity() throws ExecutionException, InterruptedException {
         String healthId = "healthId";
-
+        String securityToken = UUID.randomUUID().toString();
         when(patientRepository.find(healthId)).thenReturn(Observable.just(new Patient()));
-        assertNotNull(patientService.ensurePresent(healthId).toBlocking().first());
+        assertNotNull(patientService.ensurePresent(healthId, securityToken).toBlocking().first());
         verify(patientRepository).find(healthId);
     }
 
     @Test
     public void shouldNotQueryMasterClientIndexEagerly() throws ExecutionException, InterruptedException {
         String healthId = "healthId";
-
+        String securityToken = UUID.randomUUID().toString();
         when(patientRepository.find(healthId)).thenReturn(Observable.just(new Patient()));
-        patientService.ensurePresent(healthId);
-        verify(masterClientIndexClient, never()).getPatient(healthId);
+        patientService.ensurePresent(healthId, securityToken);
+        verify(masterClientIndexClient, never()).getPatient(healthId, securityToken);
     }
 
     @Test
     public void shouldReturnTrueWhenPatientIsNotFoundLocallyButFoundInTheClientIndex() throws ExecutionException,
             InterruptedException {
         String healthId = "healthId";
-
+        String securityToken = UUID.randomUUID().toString();
         when(patientRepository.find(healthId)).thenReturn(Observable.<Patient>just(null));
         Patient somePatient = new Patient();
-        when(masterClientIndexClient.getPatient(healthId)).thenReturn(Observable.just(somePatient));
-        assertNotNull(patientService.ensurePresent(healthId).toBlocking().first());
+        when(masterClientIndexClient.getPatient(healthId, securityToken)).thenReturn(Observable.just(somePatient));
+        assertNotNull(patientService.ensurePresent(healthId, securityToken).toBlocking().first());
         verify(patientRepository).save(somePatient);
     }
 
@@ -64,10 +65,11 @@ public class PatientServiceTest {
     public void shouldReturnNullWhenPatientIsNotFoundEitherLocallyOrInTheClientIndex() throws ExecutionException,
             InterruptedException {
         String healthId = "healthId";
+        String securityToken = UUID.randomUUID().toString();
 
         when(patientRepository.find(healthId)).thenReturn(Observable.<Patient>just(null));
-        when(masterClientIndexClient.getPatient(healthId)).thenReturn(Observable.<Patient>just(null));
-        assertTrue(null == patientService.ensurePresent(healthId).toBlocking().first());
+        when(masterClientIndexClient.getPatient(healthId, securityToken)).thenReturn(Observable.<Patient>just(null));
+        assertTrue(null == patientService.ensurePresent(healthId, securityToken).toBlocking().first());
     }
 
 

@@ -3,6 +3,7 @@ package org.freeshr.interfaces.encounter.ws;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
+import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.service.EncounterService;
 import org.freeshr.utils.DateUtil;
 import org.slf4j.Logger;
@@ -41,12 +42,14 @@ public class EncounterController {
     @RequestMapping(value = "/patients/{healthId}/encounters", method = RequestMethod.POST)
     public DeferredResult<EncounterResponse> create(
             @PathVariable String healthId,
-            @RequestBody EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
+            @RequestBody EncounterBundle encounterBundle,
+            HttpServletRequest request) throws ExecutionException, InterruptedException {
         logger.debug("Create encounter. " + encounterBundle.getContent());
         encounterBundle.setHealthId(healthId);
 
         final DeferredResult<EncounterResponse> deferredResult = new DeferredResult<>();
-        Observable<EncounterResponse> encounterResponse = encounterService.ensureCreated(encounterBundle);
+        String securityToken = getSecurityToken(request);
+        Observable<EncounterResponse> encounterResponse = encounterService.ensureCreated(encounterBundle, securityToken);
 
         encounterResponse.subscribe(new Action1<EncounterResponse>() {
             @Override
@@ -72,6 +75,11 @@ public class EncounterController {
         });
 
         return deferredResult;
+    }
+
+    private String getSecurityToken(HttpServletRequest request) {
+        //if the request has reached here, the token is guaranteed to be present
+        return request.getHeader(SHRProperties.SECURITY_TOKEN_HEADER);
     }
 
     @RequestMapping(value = "/patients/{healthId}/encounters", method = RequestMethod.GET,

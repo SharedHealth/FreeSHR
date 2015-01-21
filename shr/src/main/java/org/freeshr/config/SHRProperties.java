@@ -11,6 +11,8 @@ import java.net.URISyntaxException;
 public class SHRProperties {
 
     public static final int ONE_DAY = 86400;
+    public static final String SECURITY_TOKEN_HEADER = "X-Auth-Token";
+
     @Value("${MCI_PATIENT_PATH}")
     private String mciPatientPath;
     @Value("${MCI_SCHEMA}")

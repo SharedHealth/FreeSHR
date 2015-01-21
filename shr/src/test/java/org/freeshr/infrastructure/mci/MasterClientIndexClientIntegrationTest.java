@@ -3,6 +3,7 @@ package org.freeshr.infrastructure.mci;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
+import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
 import org.junit.Rule;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -32,13 +34,15 @@ public class MasterClientIndexClientIntegrationTest {
     @Test
     public void shouldFetchAPatientByHealthId() throws ExecutionException, InterruptedException {
         String heathId = "5893922485019082753";
+        String securityToken = UUID.randomUUID().toString();
         givenThat(get(urlEqualTo("/api/v1/patients/" + heathId))
+                .withHeader(SHRProperties.SECURITY_TOKEN_HEADER, equalTo(securityToken))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/patient.json"))));
 
-        Patient patient = mci.getPatient(heathId).toBlocking().first();
+        Patient patient = mci.getPatient(heathId, securityToken).toBlocking().first();
 
         assertThat(patient, is(notNullValue()));
         assertThat(patient.getHealthId(), is(heathId));

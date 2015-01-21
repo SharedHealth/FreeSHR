@@ -1,5 +1,6 @@
 package org.freeshr.infrastructure.security;
 
+import org.freeshr.config.SHRProperties;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -38,7 +39,7 @@ public class TokenAuthenticationFilterTest {
 
     @Test
     public void shouldFilterOutRequestsWithoutToken() throws Exception {
-        when(request.getHeader(TokenAuthenticationFilter.TOKEN_HEADER)).thenReturn("");
+        when(request.getHeader(SHRProperties.SECURITY_TOKEN_HEADER)).thenReturn("");
         TokenAuthenticationFilter tokenAuthenticationFilter = new TokenAuthenticationFilter(authenticationManager);
         tokenAuthenticationFilter.doFilter(request, response, chain);
         verify(authenticationManager, never()).authenticate(any(Authentication.class));
@@ -49,7 +50,7 @@ public class TokenAuthenticationFilterTest {
     @Test
     public void shouldFilterOutRequestsWithInvalidToken() throws Exception {
         String invalidToken = UUID.randomUUID().toString();
-        when(request.getHeader(TokenAuthenticationFilter.TOKEN_HEADER)).thenReturn(invalidToken);
+        when(request.getHeader(SHRProperties.SECURITY_TOKEN_HEADER)).thenReturn(invalidToken);
         when(authenticationManager.authenticate(any(Authentication.class))).thenThrow(new BadCredentialsException
                 ("bar"));
 
@@ -66,7 +67,7 @@ public class TokenAuthenticationFilterTest {
     @Test
     public void shouldSetAuthenticationAndPropagateChainOnSuccess() throws Exception {
         UUID token = UUID.randomUUID();
-        when(request.getHeader(TokenAuthenticationFilter.TOKEN_HEADER)).thenReturn(token.toString());
+        when(request.getHeader(SHRProperties.SECURITY_TOKEN_HEADER)).thenReturn(token.toString());
         when(authenticationManager.authenticate(any(Authentication.class))).thenReturn(tokenAuthentication(token));
         TokenAuthenticationFilter tokenAuthenticationFilter = new TokenAuthenticationFilter(authenticationManager);
         tokenAuthenticationFilter.doFilter(request, response, chain);

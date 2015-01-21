@@ -8,6 +8,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.AsyncRestTemplate;
 import rx.Observable;
 import rx.functions.Func1;
@@ -27,11 +28,15 @@ public class MasterClientIndexClient {
         this.shrProperties = shrProperties;
     }
 
-    public Observable<Patient> getPatient(String healthId) {
+    public Observable<Patient> getPatient(String healthId, String securityToken) {
+        MultiValueMap<String, String> headers = basicAuthHeaders(shrProperties.getMciUser(), shrProperties
+                .getMciPassword());
+        headers.add(SHRProperties.SECURITY_TOKEN_HEADER, securityToken);
+
         Observable<ResponseEntity<Patient>> responseEntityObservable = Observable.from(shrRestTemplate.exchange(
                 shrProperties.getMCIPatientUrl() + "/" + healthId,
                 HttpMethod.GET,
-                new HttpEntity(basicAuthHeaders(shrProperties.getMciUser(), shrProperties.getMciPassword())),
+                new HttpEntity(headers),
                 Patient.class));
 
         return responseEntityObservable.map(new Func1<ResponseEntity<Patient>, Patient>() {

@@ -12,7 +12,10 @@ import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.persistence.FacilityRepository;
 import org.freeshr.infrastructure.persistence.PatientRepository;
 import org.freeshr.util.ValidationFailures;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -110,14 +113,18 @@ public class EncounterServiceIntegrationTest {
 
     @Test
     public void shouldRejectEncounterWithInvalidReferenceCode() throws Exception {
-        EncounterResponse response = encounterService.ensureCreated(withInvalidReferenceTerm()).toBlocking().first();
+        String securityToken = UUID.randomUUID().toString();
+        EncounterResponse response = encounterService.ensureCreated(withInvalidReferenceTerm(), securityToken)
+                .toBlocking().first();
         assertTrue(new ValidationFailures(response).matches(new
                 String[]{"/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "code-unknown", null}));
     }
 
     @Test
     public void shouldRejectEncounterWithInvalidConceptCode() throws Exception {
-        EncounterResponse response = encounterService.ensureCreated(withInvalidConcept()).toBlocking().first();
+        String securityToken = UUID.randomUUID().toString();
+        EncounterResponse response = encounterService.ensureCreated(withInvalidConcept(), securityToken).toBlocking()
+                .first();
         assertTrue(new ValidationFailures(response).matches(new
                 String[]{"/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "code-unknown",
                 "Viral pneumonia 314247"}));
@@ -125,16 +132,17 @@ public class EncounterServiceIntegrationTest {
 
     @Test
     public void shouldRejectEncountersForUnknownPatients() throws ExecutionException, InterruptedException {
+        String securityToken = UUID.randomUUID().toString();
         Observable<EncounterResponse> encounterResponseObservable = encounterService.ensureCreated
-                (encounterForUnknownPatient());
+                (encounterForUnknownPatient(), securityToken);
         EncounterResponse response = encounterResponseObservable.toBlocking().first();
         assertThat(true, is(response.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition)));
     }
 
     @Test
     public void shouldCaptureAnEncounterAlongWithPatientDetails() throws Exception {
-
-        Observable<EncounterResponse> response = encounterService.ensureCreated(withValidEncounter());
+        String securityToken = UUID.randomUUID().toString();
+        Observable<EncounterResponse> response = encounterService.ensureCreated(withValidEncounter(), securityToken);
         TestSubscriber<EncounterResponse> encounterResponseSubscriber = new TestSubscriber<>();
         response.subscribe(encounterResponseSubscriber);
         encounterResponseSubscriber.awaitTerminalEvent();
@@ -162,11 +170,12 @@ public class EncounterServiceIntegrationTest {
     @Test
     public void shouldReturnUniqueListOfEncountersForGivenListOfCatchments() throws ExecutionException,
             InterruptedException, ParseException {
+        String securityToken = UUID.randomUUID().toString();
         Facility facility = new Facility("4", "facility1", "Main hospital", "305610", new Address("1", "2", "3",
                 null, null));
         Date date = new Date();
         facilityRepository.save(facility).toBlocking().first();
-        encounterService.ensureCreated(withValidEncounter()).toBlocking().first();
+        encounterService.ensureCreated(withValidEncounter(), securityToken).toBlocking().first();
 
         List<EncounterBundle> encounterBundles = encounterService.findEncountersForFacilityCatchment("4", "305610",
                 date, 20).toBlocking().first();
@@ -177,6 +186,7 @@ public class EncounterServiceIntegrationTest {
     @Test
     public void shouldReturnUniqueListOfEncountersForFacilityCatchment() throws ExecutionException,
             InterruptedException, ParseException {
+        String securityToken = UUID.randomUUID().toString();
         Date date = new Date();
 
         Facility facility = new Facility("3", "facility", "Main hospital", "305610,3056", new Address("1", "2", "3",
@@ -184,8 +194,8 @@ public class EncounterServiceIntegrationTest {
         facilityRepository.save(facility).toBlocking().first();
 
         assertNotNull(facilityRepository.find("3").toBlocking().first());
-        assertTrue(encounterService.ensureCreated(withValidEncounter()).toBlocking().first().isSuccessful());
-        assertTrue(encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW)).toBlocking().first()
+        assertTrue(encounterService.ensureCreated(withValidEncounter(), securityToken).toBlocking().first().isSuccessful());
+        assertTrue(encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW), securityToken).toBlocking().first()
                 .isSuccessful());
 
         assertEquals(1, encounterService.findEncountersForPatient(VALID_HEALTH_ID, null,
@@ -202,11 +212,12 @@ public class EncounterServiceIntegrationTest {
 
     @Test
     public void shouldReturnEncounterIfPresentForHealthId() throws ExecutionException, InterruptedException {
+        String securityToken = UUID.randomUUID().toString();
         Facility facility = new Facility("3", "facility", "Main hospital", "305610,3056", new Address("1", "2", "3",
                 null, null));
         facilityRepository.save(facility).toBlocking().first();
 
-        EncounterResponse first = encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW))
+        EncounterResponse first = encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW), securityToken)
                 .toBlocking().first();
         String encounterId = first.getEncounterId();
         EncounterBundle encounterBundle = encounterService.findEncounter(VALID_HEALTH_ID_NEW,
@@ -216,11 +227,12 @@ public class EncounterServiceIntegrationTest {
 
     @Test
     public void shouldReturnEmptyIfNotPresentForHealthId() throws ExecutionException, InterruptedException {
+        String securityToken = UUID.randomUUID().toString();
         Facility facility = new Facility("3", "facility", "Main hospital", "305610,3056", new Address("1", "2", "3",
                 null, null));
         facilityRepository.save(facility).toBlocking().first();
 
-        EncounterResponse first = encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW))
+        EncounterResponse first = encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW), securityToken)
                 .toBlocking().first();
         String encounterId = first.getEncounterId();
 

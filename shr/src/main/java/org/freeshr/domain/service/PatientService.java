@@ -27,19 +27,19 @@ public class PatientService {
         this.masterClientIndexClient = masterClientIndexClient;
     }
 
-    public Observable<Patient> ensurePresent(final String healthId) throws ExecutionException, InterruptedException {
+    public Observable<Patient> ensurePresent(final String healthId, final String securityToken) throws ExecutionException, InterruptedException {
         Observable<Patient> patient = patientRepository.find(healthId);
         return patient.flatMap(new Func1<Patient, Observable<Patient>>() {
             @Override
             public Observable<Patient> call(Patient patient) {
                 if (null != patient) return Observable.just(patient);
-                return findRemote(healthId);
+                return findRemote(healthId, securityToken);
             }
         });
     }
 
-    private Observable<Patient> findRemote(String healthId) {
-        Observable<Patient> remotePatient = masterClientIndexClient.getPatient(healthId);
+    private Observable<Patient> findRemote(String healthId, String securityToken) {
+        Observable<Patient> remotePatient = masterClientIndexClient.getPatient(healthId, securityToken);
         savePatient(remotePatient);
         return remotePatient.onErrorReturn(new Func1<Throwable, Patient>() {
             @Override

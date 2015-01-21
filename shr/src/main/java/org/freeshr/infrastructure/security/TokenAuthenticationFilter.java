@@ -1,5 +1,6 @@
 package org.freeshr.infrastructure.security;
 
+import org.freeshr.config.SHRProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,7 +23,6 @@ import static org.springframework.util.StringUtils.isEmpty;
 
 
 public class TokenAuthenticationFilter extends GenericFilterBean {
-    public static final String TOKEN_HEADER = "X-Auth-Token";
     private AuthenticationManager authenticationManager;
     private final static Logger logger = LoggerFactory.getLogger(TokenAuthenticationFilter.class);
 
@@ -35,7 +35,7 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
             ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
-        String token = httpRequest.getHeader(TOKEN_HEADER);
+        String token = httpRequest.getHeader(SHRProperties.SECURITY_TOKEN_HEADER);
         if (isEmpty(token)) {
             httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token not provided");
             return;
