@@ -20,7 +20,6 @@ public class ProcedureValidatorTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
         procedureValidator = new ProcedureValidator(new DateValidator());
     }
 
