@@ -4,6 +4,7 @@ package org.freeshr.validations;
 import org.hl7.fhir.instance.model.*;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.springframework.stereotype.Component;
+import static org.freeshr.domain.ErrorMessageBuilder.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,15 +29,11 @@ public class HealthIdValidator implements Validator<EncounterValidationContext> 
                 subject = resource.getChildByName("patient");
             }
             if(subject == null) {
-                ValidationMessage validationMessage = createValidationMessage("healthId", "invalid",
-                        "Patient's Health Id is not present.");
-                validationMessages.add(validationMessage);
+                validationMessages.add(buildValidationMessage("healthId", "invalid", HEALTH_ID_NOT_PRESENT, OperationOutcome.IssueSeverity.error));
                 continue;
             }
             if (resourceType.equals(ResourceType.Composition) && !subject.hasValues()) {
-                ValidationMessage validationMessage = createValidationMessage("healthId", "invalid",
-                        "Composition must have patient's Health Id in subject.");
-                validationMessages.add(validationMessage);
+                validationMessages.add(buildValidationMessage("healthId", "invalid", HEALTH_ID_NOT_PRESENT_IN_COMPOSITION, OperationOutcome.IssueSeverity.error));
                 return validationMessages;
             }
             if (!subject.hasValues()) continue;
@@ -44,21 +41,10 @@ public class HealthIdValidator implements Validator<EncounterValidationContext> 
                     .getReferenceSimple());
             if (expectedHealthId.equals(healthIdFromUrl)) continue;
 
-            ValidationMessage validationMessage = createValidationMessage("healthId", "invalid",
-                    "Patient's Health Id does not match.");
-            validationMessages.add(validationMessage);
+            validationMessages.add(buildValidationMessage("healthId", "invalid", HEALTH_ID_NOT_MATCH, OperationOutcome.IssueSeverity.error));
         }
 
         return validationMessages;
-    }
-
-    private ValidationMessage createValidationMessage(String location, String type, String message) {
-        ValidationMessage validationMessage = new ValidationMessage();
-        validationMessage.setLocation(location);
-        validationMessage.setType(type);
-        validationMessage.setMessage(message);
-        validationMessage.setLevel(OperationOutcome.IssueSeverity.error);
-        return validationMessage;
     }
 
     private String getHealthIdFromUrl(String url) {

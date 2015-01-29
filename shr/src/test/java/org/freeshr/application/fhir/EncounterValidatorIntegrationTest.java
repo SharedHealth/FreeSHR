@@ -1,10 +1,12 @@
 package org.freeshr.application.fhir;
 
+import ch.qos.logback.classic.util.ContextInitializer;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.data.EncounterBundleData;
+import static org.freeshr.domain.ErrorMessageBuilder.*;
 import org.freeshr.infrastructure.tr.ValueSetCodeValidator;
 import org.freeshr.utils.CollectionUtils;
 import org.freeshr.utils.FileUtil;
@@ -20,6 +22,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 
 import java.util.List;
 
@@ -266,7 +269,7 @@ public class EncounterValidatorIntegrationTest {
         List<Error> invalidUrlError = CollectionUtils.filter(validationResponse.getErrors(), new CollectionUtils.Fn<Error, Boolean>() {
             @Override
             public Boolean call(Error e) {
-                return e.getReason().equals(MedicationPrescriptionValidator.INVALID_MEDICATION_REFERENCE_URL);
+                return e.getReason().equals(INVALID_MEDICATION_REFERENCE_URL);
             }
         });
         assertEquals("Should have found one invalid medication url", 2, invalidUrlError.size());
@@ -339,7 +342,7 @@ public class EncounterValidatorIntegrationTest {
         List<Error> errorList = CollectionUtils.filter(validationResponse.getErrors(), new CollectionUtils.Fn<Error, Boolean>() {
             @Override
             public Boolean call(Error e) {
-                return e.getReason().equals(MedicationPrescriptionValidator.INVALID_DISPENSE_MEDICATION_REFERENCE_URL);
+                return e.getReason().equals(INVALID_DISPENSE_MEDICATION_REFERENCE_URL);
             }
         });
 
@@ -457,6 +460,14 @@ public class EncounterValidatorIntegrationTest {
         EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
         assertFalse(validationResponse.isSuccessful());
         assertEquals("Should Fail For Missing System Url", 1, validationResponse.getErrors().size());
+    }
+
+    @Test
+    public void shouldValidateProcedure() {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/procedure/encounter_Procedure.xml"));
+        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
+        assertTrue(validationResponse.isSuccessful());
     }
 
 

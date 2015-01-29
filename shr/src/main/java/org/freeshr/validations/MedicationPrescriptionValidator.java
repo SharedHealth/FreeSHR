@@ -1,7 +1,7 @@
 package org.freeshr.validations;
 
 
-import org.freeshr.domain.ErrorMessage;
+import org.freeshr.domain.ErrorMessageBuilder;
 import org.freeshr.infrastructure.tr.MedicationCodeValidator;
 import org.hl7.fhir.instance.model.*;
 import org.hl7.fhir.instance.utils.ConceptLocator;
@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import static org.freeshr.domain.ErrorMessageBuilder.*;
 import rx.Observable;
 
 import java.lang.Boolean;
@@ -22,9 +23,6 @@ import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity;
 public class MedicationPrescriptionValidator implements Validator<AtomEntry<? extends Resource>> {
 
     public static final String DOSAGE_INSTRUCTION = "dosageInstruction";
-    public static final String INVALID_MEDICATION_REFERENCE_URL = "Invalid Medication Reference URL";
-    public static final String UNSPECIFIED_MEDICATION = "Unspecified Medication";
-    public static final String INVALID_DISPENSE_MEDICATION_REFERENCE_URL = "Invalid Dispense-Medication Reference URL";
     private static final String MEDICATION = "medication";
     private static final String DISPENSE = "dispense";
     private static final Logger logger = LoggerFactory.getLogger(MedicationPrescriptionValidator.class);
@@ -82,7 +80,7 @@ public class MedicationPrescriptionValidator implements Validator<AtomEntry<? ex
                 ConceptLocator.ValidationResult validationResult = doseQuantityValidator.validate(doseQuantity);
                 if (validationResult != null) {
                     logger.error("Medication-Prescription DosageQuantity Code is invalid:");
-                    validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, id, ErrorMessage.INVALID_DOSAGE_QUANTITY, IssueSeverity.error));
+                    validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, ErrorMessageBuilder.INVALID_DOSAGE_QUANTITY, IssueSeverity.error));
                     return false;
                 }
             }
@@ -110,12 +108,12 @@ public class MedicationPrescriptionValidator implements Validator<AtomEntry<? ex
         }
         if ((!urlValidator.isValid(dispenseMedicationRefUrl))) {
             logger.error("Dispense-Medication URL is invalid:" + dispenseMedicationRefUrl);
-            validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, id, INVALID_DISPENSE_MEDICATION_REFERENCE_URL, IssueSeverity.error));
+            validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, INVALID_DISPENSE_MEDICATION_REFERENCE_URL, IssueSeverity.error));
             return false;
         }
 
         if (!isValidCodeableConceptUrl(dispenseMedicationRefUrl, "")) {
-            validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, id, INVALID_DISPENSE_MEDICATION_REFERENCE_URL, IssueSeverity.error));
+            validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, INVALID_DISPENSE_MEDICATION_REFERENCE_URL, IssueSeverity.error));
             return false;
         }
 
@@ -127,7 +125,7 @@ public class MedicationPrescriptionValidator implements Validator<AtomEntry<? ex
         String id = atomEntry.getId();
         Property medication = atomEntry.getResource().getChildByName(MEDICATION);
         if ((medication == null) || (!medication.hasValues())) {
-            validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, id, UNSPECIFIED_MEDICATION, IssueSeverity.error));
+            validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, UNSPECIFIED_MEDICATION, IssueSeverity.error));
             return false;
         }
 
@@ -138,12 +136,12 @@ public class MedicationPrescriptionValidator implements Validator<AtomEntry<? ex
         }
         if ((!urlValidator.isValid(medicationRefUrl))) {
             logger.error("Medication URL is invalid:" + medicationRefUrl);
-            validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, id, INVALID_MEDICATION_REFERENCE_URL, IssueSeverity.error));
+            validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, INVALID_MEDICATION_REFERENCE_URL, IssueSeverity.error));
             return false;
         }
 
         if (!isValidCodeableConceptUrl(medicationRefUrl, "")) {
-            validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, id, INVALID_MEDICATION_REFERENCE_URL, IssueSeverity.error));
+            validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, INVALID_MEDICATION_REFERENCE_URL, IssueSeverity.error));
             return false;
         }
 

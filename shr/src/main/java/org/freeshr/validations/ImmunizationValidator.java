@@ -12,7 +12,8 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.freeshr.domain.ErrorMessage.INVALID_DOSAGE_QUANTITY;
+import static org.freeshr.domain.ErrorMessageBuilder.INVALID_DOSAGE_QUANTITY;
+import static org.freeshr.domain.ErrorMessageBuilder.buildValidationMessage;
 
 @Component
 public class ImmunizationValidator implements Validator<AtomEntry<? extends Resource>> {
@@ -56,7 +57,7 @@ public class ImmunizationValidator implements Validator<AtomEntry<? extends Reso
             ConceptLocator.ValidationResult validationResult = doseQuantityValidator.validate(doseQuantity);
             if (validationResult != null) {
                 logger.error("Medication-Prescription DosageQuantity Code is invalid:");
-                validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, id, INVALID_DOSAGE_QUANTITY, OperationOutcome.IssueSeverity.error));
+                validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, INVALID_DOSAGE_QUANTITY, OperationOutcome.IssueSeverity.error));
             }
         }
     }

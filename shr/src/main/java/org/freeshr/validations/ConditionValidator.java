@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity;
+import static org.freeshr.domain.ErrorMessageBuilder.*;
 
 @Component
 public class ConditionValidator implements Validator<AtomEntry<? extends Resource>> {
@@ -41,8 +42,7 @@ public class ConditionValidator implements Validator<AtomEntry<? extends Resourc
                 .ConditionRelationshipTypeEnumFactory();
         try {
             if (conditionRelationshipTypeEnumFactory.toCode(relatedItem).equals("?")) {
-                validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, id,
-                        "Unknown ConditionRelationshipType code", IssueSeverity.error));
+                validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, UNKNOWN_CONDITION_RELATION_CODE, IssueSeverity.error));
             }
             return true;
         } catch (Exception e) {

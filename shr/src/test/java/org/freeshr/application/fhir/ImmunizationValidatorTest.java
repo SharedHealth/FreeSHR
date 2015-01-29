@@ -9,6 +9,7 @@ import org.freeshr.validations.ValidationSubject;
 import org.hl7.fhir.instance.model.AtomEntry;
 import org.hl7.fhir.instance.model.OperationOutcome;
 import org.hl7.fhir.instance.model.Resource;
+import org.hl7.fhir.instance.model.ResourceType;
 import org.hl7.fhir.instance.utils.ConceptLocator;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.junit.Before;
@@ -20,7 +21,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
-import static org.freeshr.domain.ErrorMessage.INVALID_DOSAGE_QUANTITY;
+import static org.freeshr.domain.ErrorMessageBuilder.INVALID_DOSAGE_QUANTITY;
 import static org.freeshr.utils.AtomFeedHelper.getAtomFeed;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -49,7 +50,7 @@ public class ImmunizationValidatorTest {
 
     @Test
     public void shouldValidateImmunization() throws Exception {
-        ValidationSubject<AtomEntry<? extends Resource>> feed = getAtomFeed("xmls/encounters/immunization/immunization_valid.xml");
+        ValidationSubject<AtomEntry<? extends Resource>> feed = getAtomFeed("xmls/encounters/immunization/immunization_valid.xml", ResourceType.Immunization);
 
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         ImmunizationValidator immunizationValidator = getValidator();
@@ -62,7 +63,7 @@ public class ImmunizationValidatorTest {
     @Test
     public void shouldRejectInvalidDoseQuantityType() {
 
-        ValidationSubject<AtomEntry<? extends Resource>> feed = getAtomFeed("xmls/encounters/immunization/immunization_invalid_dose_quantity.xml");
+        ValidationSubject<AtomEntry<? extends Resource>> feed = getAtomFeed("xmls/encounters/immunization/immunization_invalid_dose_quantity.xml",ResourceType.Immunization);
 
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         when(trConceptLocator.validate(anyString(), eq("INVALID-CODE"),

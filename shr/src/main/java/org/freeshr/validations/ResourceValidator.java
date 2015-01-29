@@ -25,11 +25,13 @@ public class ResourceValidator implements Validator<AtomFeed> {
     @Autowired
     public ResourceValidator(ConditionValidator conditionValidator,
                              MedicationPrescriptionValidator medicationPrescriptionValidator,
-                             Validator<AtomEntry<? extends Resource>> immunizationValidator) {
+                             Validator<AtomEntry<? extends Resource>> immunizationValidator,Validator<AtomEntry<? extends Resource>> procedureValidator) {
         assignDefaultValidatorToAllResourceTypes();
         resourceTypeValidatorMap.put(ResourceType.Condition, conditionValidator);
         resourceTypeValidatorMap.put(ResourceType.MedicationPrescription, medicationPrescriptionValidator);
         resourceTypeValidatorMap.put(ResourceType.Immunization, immunizationValidator);
+        resourceTypeValidatorMap.put(ResourceType.Procedure, procedureValidator);
+
     }
 
     private void assignDefaultValidatorToAllResourceTypes() {
@@ -42,6 +44,7 @@ public class ResourceValidator implements Validator<AtomFeed> {
     public List<ValidationMessage> validate(ValidationSubject<AtomFeed> subject) {
         AtomFeed feed = subject.extract();
         List<ValidationMessage> validationMessages = new ArrayList<>();
+
         for (final AtomEntry<? extends Resource> atomEntry : feed.getEntryList()) {
             Validator<AtomEntry<? extends Resource>> validator =
                     resourceTypeValidatorMap.get(atomEntry.getResource().getResourceType());

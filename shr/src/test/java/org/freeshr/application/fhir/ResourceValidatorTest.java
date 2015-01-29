@@ -25,11 +25,13 @@ public class ResourceValidatorTest {
     MedicationPrescriptionValidator medicationPrescriptionValidator;
     @Mock
     ImmunizationValidator immunizationValidator;
+    @Mock
+    ProcedureValidator procedureValidator;
 
     @Before
     public void setup() {
         initMocks(this);
-        resourceValidator = new ResourceValidator(new ConditionValidator(), medicationPrescriptionValidator, immunizationValidator);
+        resourceValidator = new ResourceValidator(new ConditionValidator(), medicationPrescriptionValidator, immunizationValidator, procedureValidator);
         resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
     }
 
