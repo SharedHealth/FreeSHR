@@ -17,6 +17,11 @@ repositories {
     mavenCentral()
 }
 
+
+configurations.all {
+    exclude group: 'org.jboss.netty', module: 'netty'
+}
+
 test {
     testLogging {
         exceptionFormat "full" // default is "short"
@@ -66,9 +71,6 @@ dependencies {
             testLibraries.wiremock, testLibraries.hamcrest_core
 }
 
-configurations.all {
-    exclude group: 'org.jboss.netty', module: 'netty'
-}
 
 //build artifact
 private Properties loadConfig() {
@@ -136,6 +138,26 @@ war {
         attributes('Main-Class': mainClassName)
     }
 }
+
+task runSHR(type: JavaExec){
+    Properties properties = new Properties();
+    properties.load(new FileInputStream(file('../env/local.properties')))
+    main = mainClassName
+    jvmArgs = ['-DSHR_LOG_LEVEL=INFO']
+    classpath = sourceSets.main.runtimeClasspath
+    environment properties
+}
+
+task debugSHR(type: JavaExec){
+    Properties properties = new Properties();
+    properties.load(new FileInputStream(file('../env/local.properties')))
+    main = mainClassName
+    jvmArgs = ['-DSHR_LOG_LEVEL=DEBUG']
+    classpath = sourceSets.main.runtimeClasspath
+    environment properties
+    debug = true
+}
+
 
 buildscript {
     repositories {

@@ -17,13 +17,13 @@
         <!--</layout>-->
     <!--</appender>-->
 
-    <logger name="org.freeshr">
-        <level value="info"/>
+    <logger name="org.freeshr" additivity="false">
+        <level value="${SHR_LOG_LEVEL}"/>
         <appender-ref ref="CONSOLE"/>
     </logger>
 
     <root>
-        <priority value="info"/>
+        <priority value="${SHR_LOG_LEVEL}"/>
         <appender-ref ref="CONSOLE"/>
     </root>
 
