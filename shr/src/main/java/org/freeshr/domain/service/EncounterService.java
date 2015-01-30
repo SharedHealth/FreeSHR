@@ -83,14 +83,16 @@ public class EncounterService {
                 if (patient != null) {
                     encounterBundle.setEncounterId(UUID.randomUUID().toString());
                     Observable<Boolean> save = encounterRepository.save(encounterBundle, patient);
-                    return save.map(new Func1<Boolean, EncounterResponse>() {
+
+                    return save.flatMap(new Func1<Boolean, Observable<EncounterResponse>>() {
                         @Override
-                        public EncounterResponse call(Boolean aBoolean) {
+                        public Observable<EncounterResponse> call(Boolean aBoolean) {
                             if (aBoolean)
                                 response.setEncounterId(encounterBundle.getEncounterId());
-                            return response;
+                            return Observable.just(response);
                         }
-                    });
+                    }, error(), complete());
+
                 } else {
                     return Observable.just(response.preconditionFailure("healthId", "invalid",
                             "Patient not available in patient registry"));

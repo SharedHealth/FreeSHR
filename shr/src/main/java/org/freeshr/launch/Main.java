@@ -1,5 +1,6 @@
 package org.freeshr.launch;
 
+import org.freeshr.infrastructure.TomcatCustomization;
 import org.freeshr.utils.cassandra.Migrations;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
@@ -26,6 +27,7 @@ public class Main {
     public EmbeddedServletContainerFactory getFactory() {
         Map<String, String> env = getenv();
         TomcatEmbeddedServletContainerFactory factory = new TomcatEmbeddedServletContainerFactory();
+        factory.addConnectorCustomizers(new TomcatCustomization());
         factory.addInitializers(new ServletContextInitializer() {
             @Override
             public void onStartup(ServletContext servletContext) throws ServletException {
