@@ -1,4 +1,4 @@
-package org.freeshr.infrastructure;
+package org.freeshr.launch;
 
 import org.apache.catalina.connector.Connector;
 import org.springframework.boot.context.embedded.tomcat.TomcatConnectorCustomizer;

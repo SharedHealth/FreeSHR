@@ -1,6 +1,5 @@
 package org.freeshr.launch;
 
-import org.freeshr.infrastructure.TomcatCustomization;
 import org.freeshr.utils.cassandra.Migrations;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
