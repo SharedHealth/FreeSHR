@@ -19,7 +19,7 @@ import org.springframework.web.client.AsyncRestTemplate;
 import java.util.Arrays;
 
 @Configuration
-@Import({SHRSecurityConfig.class, SHRCassandraConfig.class})
+@Import({SHRSecurityConfig.class, SHRCassandraConfig.class, SHRCacheConfiguration.class})
 @ComponentScan(basePackages = {"org.freeshr.config",
         "org.freeshr.infrastructure",
         "org.freeshr.interfaces",
@@ -60,14 +60,5 @@ public class SHRConfig {
         PropertiesFactoryBean bean = new PropertiesFactoryBean();
         bean.setLocation(new ClassPathResource("/hl7codes.properties"));
         return bean;
-    }
-
-    @Bean
-    public CacheManager cacheManager() {
-        SimpleCacheManager cacheManager = new SimpleCacheManager();
-        cacheManager.setCaches(Arrays.asList(
-                new ConcurrentMapCache("refData")
-        ));
-        return cacheManager;
     }
 }

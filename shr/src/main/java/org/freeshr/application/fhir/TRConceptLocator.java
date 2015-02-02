@@ -7,6 +7,8 @@ import org.hl7.fhir.instance.model.OperationOutcome;
 import org.hl7.fhir.instance.model.ValueSet;
 import org.hl7.fhir.instance.utils.ConceptLocator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -45,6 +47,7 @@ public class TRConceptLocator implements ConceptLocator {
     }
 
     @Override
+    @Cacheable(value="shrCache")
     public ValidationResult validate(String system, String code, String display) {
         if (locate(system, code) == null) {
             return new ValidationResult(OperationOutcome.IssueSeverity.error, display);

@@ -55,7 +55,7 @@ dependencies {
             libraries.apache_commons_io, libraries.spring_framework, libraries.fhir_validator,
             libraries.jackson, libraries.saxon, libraries.rxjava,
             libraries.netflix_astyanax, libraries.rome, libraries.time_uuid, libraries.spring_security,
-            libraries.spring_web, libraries.eclipse_moxy
+            libraries.spring_web, libraries.eclipse_moxy, libraries.spring_context_support, libraries.ehcache_core
 
     compile(libraries.spring_boot_security){
         exclude group: 'ch.qos.logback', module: "logback-classic"
