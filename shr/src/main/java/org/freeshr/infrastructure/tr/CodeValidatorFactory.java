@@ -10,13 +10,11 @@ import java.util.Map;
 
 import static org.freeshr.infrastructure.tr.MedicationCodeValidator.MEDICATION_URL_PATTERN;
 import static org.freeshr.infrastructure.tr.ValueSetCodeValidator.VALUE_SET_PATTERN;
+import static org.freeshr.infrastructure.tr.HttpCodeValidator.CONCEPT_PATTERN;
+import static org.freeshr.infrastructure.tr.HttpCodeValidator.REF_TERM_PATTERN;
 
 @Component
 public class CodeValidatorFactory {
-
-    private static final String REF_TERM_PATTERN = "/openmrs/ws/rest/v1/tr/referenceterms/";
-    private static final String CONCEPT_PATTERN = "/openmrs/ws/rest/v1/tr/concepts/";
-
 
     private Map<String, CodeValidator> codeValidatorMap;
 
@@ -41,4 +39,5 @@ public class CodeValidatorFactory {
         }
         return null;
     }
+
 }

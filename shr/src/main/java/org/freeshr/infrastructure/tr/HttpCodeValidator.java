@@ -16,6 +16,9 @@ import static org.freeshr.utils.HttpUtil.basicAuthHeaders;
 
 public class HttpCodeValidator implements CodeValidator {
 
+    public static final String REF_TERM_PATTERN = "/openmrs/ws/rest/v1/tr/referenceterms/";
+    public static final String CONCEPT_PATTERN = "/openmrs/ws/rest/v1/tr/concepts/";
+
     private String path;
     private final AsyncRestTemplate shrRestTemplate;
     private SHRProperties shrProperties;

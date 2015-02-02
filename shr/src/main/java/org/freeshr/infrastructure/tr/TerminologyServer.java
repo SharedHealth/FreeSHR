@@ -21,4 +21,8 @@ public class TerminologyServer {
         }
         return Observable.just(false);
     }
+
+    public boolean verifiesSystem(String system) {
+        return factory.getValidator(system) != null;
+    }
 }

@@ -12,10 +12,12 @@ public class DateUtil {
     public static final String SIMPLE_DATE_WITH_SECS_FORMAT = "yyyy-MM-dd HH:mm:ss";
     public static final String SIMPLE_DATE_FORMAT = "yyyy-MM-dd";
     public static final String ISO_DATE_IN_MILLIS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-    public static final String ISO_DATE_IN_SECS_FORMAT = "yyyy-mm-dd'T'HH:mm:ssZ";
+    public static final String ISO_DATE_IN_SECS_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
+    public static final String ISO_DATE_IN_HOUR_MIN_FORMAT="yyyy-MM-dd'T'HH:mmZ";
 
     public static final String[] DATE_FORMATS = new String[]{
             ISO_DATE_IN_MILLIS_FORMAT, ISO_DATE_IN_SECS_FORMAT,
+            ISO_DATE_IN_HOUR_MIN_FORMAT,
             UTC_DATE_IN_MILLIS_FORMAT, UTC_DATE_IN_SECS_FORMAT,
             SIMPLE_DATE_WITH_SECS_FORMAT, SIMPLE_DATE_FORMAT};
 

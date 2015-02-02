@@ -1,6 +1,5 @@
 package org.freeshr.application.fhir;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.freeshr.infrastructure.tr.TerminologyServer;
 import org.hl7.fhir.instance.model.Code;
@@ -55,7 +54,8 @@ public class TRConceptLocator implements ConceptLocator {
 
     @Override
     public boolean verifiesSystem(String system) {
-        return StringUtils.contains(system, "openmrs");
+        //return StringUtils.contains(system, "openmrs");
+        return terminologyServer.verifiesSystem(system);
     }
 
     @Override

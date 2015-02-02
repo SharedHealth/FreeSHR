@@ -5,9 +5,10 @@ import com.google.gson.Gson;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 @XmlRootElement
-public class Error {
+public class Error implements Serializable {
 
     @XmlElement
     private String field;
