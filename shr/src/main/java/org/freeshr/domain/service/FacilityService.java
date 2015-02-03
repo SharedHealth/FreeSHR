@@ -49,7 +49,7 @@ public class FacilityService {
             @Override
             public Observable<? extends Facility> call(Throwable throwable) {
                 logger.info(throwable.getMessage());
-                return Observable.just(null);
+                return Observable.error(throwable);
             }
         }, new Func0<Observable<? extends Facility>>() {
             @Override
