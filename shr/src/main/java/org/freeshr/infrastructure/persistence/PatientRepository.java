@@ -15,6 +15,7 @@ import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.stereotype.Component;
 import rx.Observable;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 import java.util.List;
 
@@ -69,7 +70,8 @@ public class PatientRepository {
     }
 
     public Observable<Boolean> save(Patient patient) {
-        Observable<ResultSet> saveObservable = Observable.from(cqlOperations.executeAsynchronously(buildPatientInsertQuery(patient)));
+        Observable<ResultSet> saveObservable = Observable.from(
+                cqlOperations.executeAsynchronously(buildPatientInsertQuery(patient)), Schedulers.io());
         return saveObservable.flatMap(respondOnNext(true), RxMaps.<Boolean>logAndForwardError(logger),
                 completeResponds(true));
     }

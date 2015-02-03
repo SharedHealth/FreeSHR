@@ -82,7 +82,8 @@ public class FacilityRepository {
     public Observable<Facility> save(final Facility facility) {
         Insert insert = buildInsertStatement(facility);
 
-        Observable<ResultSet> saveObservable = Observable.from(cqlTemplate.executeAsynchronously(insert));
+        Observable<ResultSet> saveObservable = Observable.from(cqlTemplate.executeAsynchronously(insert),
+                Schedulers.io());
 
         return saveObservable.flatMap(new Func1<ResultSet, Observable<Facility>>() {
             @Override

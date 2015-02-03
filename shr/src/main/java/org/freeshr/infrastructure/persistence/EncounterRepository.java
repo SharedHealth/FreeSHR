@@ -1,6 +1,9 @@
 package org.freeshr.infrastructure.persistence;
 
-import com.datastax.driver.core.*;
+import com.datastax.driver.core.RegularStatement;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.SimpleStatement;
 import com.datastax.driver.core.querybuilder.Batch;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
@@ -19,6 +22,7 @@ import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.stereotype.Component;
 import rx.Observable;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -70,7 +74,8 @@ public class EncounterRepository {
         RegularStatement encByPatientStmt = new SimpleStatement(encByPatientInsertQuery);
 
         Batch batch = QueryBuilder.batch(insertEncounterStmt, encCatchmentStmt, encByPatientStmt);
-        Observable<ResultSet> saveObservable = Observable.from(cqlOperations.executeAsynchronously(batch));
+        Observable<ResultSet> saveObservable = Observable.from(cqlOperations.executeAsynchronously(batch),
+                Schedulers.io());
 
         return saveObservable.flatMap(respondOnNext(true), RxMaps.<Boolean>logAndForwardError(logger),
                 completeResponds(true));
@@ -79,8 +84,9 @@ public class EncounterRepository {
     public Observable<List<EncounterBundle>> findEncountersForCatchment(Catchment catchment, Date updatedSince,
                                                                         int limit) {
         String identifyEncountersQuery = buildCatchmentSearchQuery(catchment, updatedSince, limit);
-        ResultSetFuture resultSet = cqlOperations.queryAsynchronously(identifyEncountersQuery);
-        Observable<ResultSet> resultSetObservable = Observable.from(resultSet);
+        Observable<ResultSet> resultSetObservable = Observable.from(
+                cqlOperations.queryAsynchronously(identifyEncountersQuery), Schedulers.io());
+
         return resultSetObservable.concatMap(new Func1<ResultSet, Observable<List<EncounterBundle>>>() {
             @Override
             public Observable<List<EncounterBundle>> call(ResultSet rows) {
@@ -101,7 +107,7 @@ public class EncounterRepository {
                 .where(eq("encounter_id", encounterId))
                 .limit(1);
 
-        return Observable.from(cqlOperations.queryAsynchronously(findEncounter)).flatMap(
+        return Observable.from(cqlOperations.queryAsynchronously(findEncounter), Schedulers.io()).flatMap(
                 new Func1<ResultSet, Observable<EncounterBundle>>() {
                     @Override
                     public Observable<EncounterBundle> call(ResultSet rows) {
@@ -165,7 +171,7 @@ public class EncounterRepository {
     }
 
     private Observable<List<EncounterBundle>> executeFindQuery(final String cql) {
-        return Observable.from(cqlOperations.queryAsynchronously(cql)).map(new Func1<ResultSet,
+        return Observable.from(cqlOperations.queryAsynchronously(cql), Schedulers.io()).map(new Func1<ResultSet,
                 List<EncounterBundle>>() {
             @Override
             public List<EncounterBundle> call(ResultSet rows) {
@@ -194,7 +200,7 @@ public class EncounterRepository {
             InterruptedException {
         StringBuilder queryBuilder = buildQuery(healthId, updatedSince, limit);
         Observable<LinkedHashSet<String>> encounterIdsObservable = Observable.from(cqlOperations.queryAsynchronously
-                (queryBuilder.toString()))
+                (queryBuilder.toString()), Schedulers.io())
                 .map(new Func1<ResultSet, LinkedHashSet<String>>() {
                     @Override
                     public LinkedHashSet<String> call(ResultSet rows) {
