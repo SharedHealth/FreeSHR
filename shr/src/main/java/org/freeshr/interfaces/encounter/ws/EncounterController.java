@@ -15,6 +15,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.util.UriComponentsBuilder;
 import rx.Observable;
 import rx.functions.Action1;
+import rx.functions.Func0;
 import rx.functions.Func1;
 
 import javax.servlet.http.HttpServletRequest;
@@ -49,7 +50,8 @@ public class EncounterController {
 
         final DeferredResult<EncounterResponse> deferredResult = new DeferredResult<>();
         String securityToken = getSecurityToken(request);
-        Observable<EncounterResponse> encounterResponse = encounterService.ensureCreated(encounterBundle, securityToken);
+        Observable<EncounterResponse> encounterResponse = encounterService.ensureCreated(encounterBundle,
+                securityToken);
 
         encounterResponse.subscribe(new Action1<EncounterResponse>() {
             @Override
@@ -282,11 +284,13 @@ public class EncounterController {
     private Observable<List<EncounterBundle>> filterAfterMarker(final Observable<List<EncounterBundle>> encounters,
                                                                 final String lastMarker, final int limit) {
 
-        return encounters.map(new Func1<List<EncounterBundle>, List<EncounterBundle>>() {
+
+        return encounters.flatMap(new Func1<List<EncounterBundle>, Observable<? extends List<EncounterBundle>>>() {
             @Override
-            public List<EncounterBundle> call(List<EncounterBundle> encounterBundles) {
+            public Observable<? extends List<EncounterBundle>> call(List<EncounterBundle> encounterBundles) {
                 if (StringUtils.isBlank(lastMarker)) {
-                    return encounterBundles.size() > limit ? encounterBundles.subList(0, limit) : encounterBundles;
+                    return Observable.just(encounterBundles.size() > limit ? encounterBundles.subList(0, limit) :
+                            encounterBundles);
                 }
 
                 int lastMarkerIndex = identifyLastMarker(lastMarker, encounterBundles);
@@ -294,13 +298,25 @@ public class EncounterController {
                     if ((lastMarkerIndex + 1) <= encounterBundles.size()) {
                         List<EncounterBundle> remainingEncounters = encounterBundles.subList(lastMarkerIndex + 1,
                                 encounterBundles.size());
-                        return remainingEncounters.size() > limit ? remainingEncounters.subList(0,
-                                limit) : remainingEncounters;
+                        return Observable.just(remainingEncounters.size() > limit ? remainingEncounters.subList(0,
+                                limit) : remainingEncounters);
                     }
                 }
-                return new ArrayList<>();
+                return Observable.just(new ArrayList<EncounterBundle>());
+            }
+        }, new Func1<Throwable, Observable<? extends List<EncounterBundle>>>() {
+            @Override
+            public Observable<? extends List<EncounterBundle>> call(Throwable throwable) {
+                logger.error(throwable.getMessage());
+                return Observable.error(throwable);
+            }
+        }, new Func0<Observable<? extends List<EncounterBundle>>>() {
+            @Override
+            public Observable<? extends List<EncounterBundle>> call() {
+                return null;
             }
         });
+
     }
 
     private int identifyLastMarker(String lastMarker, final List<EncounterBundle> encountersByCatchment) {

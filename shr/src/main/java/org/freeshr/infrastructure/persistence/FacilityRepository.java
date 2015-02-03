@@ -98,7 +98,7 @@ public class FacilityRepository {
         }, new Func0<Observable<Facility>>() {
             @Override
             public Observable<Facility> call() {
-                return Observable.just(facility);
+                return Observable.just(null);
             }
         });
     }
