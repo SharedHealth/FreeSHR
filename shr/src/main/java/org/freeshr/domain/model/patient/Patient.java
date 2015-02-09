@@ -16,6 +16,8 @@ public class Patient {
     @JsonProperty("gender")
     private String gender;
 
+    private boolean isConfidential;
+
     public String getHealthId() {
         return healthId;
     }
@@ -38,6 +40,21 @@ public class Patient {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+
+    public boolean isConfidential() {
+        return isConfidential;
+    }
+
+    //this is bad. done this way because MCI chooses to send booleans as yes/no
+    public void setConfidential(boolean isConfidential) {
+        this.isConfidential = isConfidential ;
+    }
+
+    @JsonProperty("confidential")
+    public void setConfidential(String confidential) {
+        this.isConfidential = "YES".equalsIgnoreCase(confidential);
     }
 
     @Override
@@ -63,4 +80,5 @@ public class Patient {
                 ", gender='" + gender + '\'' +
                 '}';
     }
+
 }

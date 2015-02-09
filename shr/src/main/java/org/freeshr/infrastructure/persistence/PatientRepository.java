@@ -39,7 +39,7 @@ public class PatientRepository {
         Observable<ResultSet> observable = Observable.from(
                 cqlOperations.queryAsynchronously("SELECT " +
                         " health_id, gender, division_id, district_id, upazila_id, city_corporation_id, " +
-                        "union_urban_ward_id, address_line" +
+                        "union_urban_ward_id, address_line, confidential" +
                         " FROM patient WHERE health_id='" + healthId + "';"));
         return observable.map(new Func1<ResultSet, Patient>() {
             @Override
@@ -56,6 +56,7 @@ public class PatientRepository {
             Address address = new Address();
             patient.setHealthId(result.getString("health_id"));
             patient.setGender(result.getString("gender"));
+            patient.setConfidential(result.getBool("confidential"));
             address.setDivision(result.getString("division_id"));
             address.setDistrict(result.getString("district_id"));
             address.setUpazila(result.getString("upazila_id"));
@@ -86,7 +87,8 @@ public class PatientRepository {
                 .value("district_id", address.getDistrict())
                 .value("upazila_id", address.getUpazila())
                 .value("city_corporation_id", address.getCityCorporation())
-                .value("union_urban_ward_id", address.getUnionOrUrbanWardId());
+                .value("union_urban_ward_id", address.getUnionOrUrbanWardId())
+                .value("confidential", patient.isConfidential());
 
     }
 }

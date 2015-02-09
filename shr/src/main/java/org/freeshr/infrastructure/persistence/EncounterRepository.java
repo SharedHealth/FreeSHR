@@ -52,7 +52,6 @@ public class EncounterRepository {
         insertEncounterStmt.value("encounter_id", encounterBundle.getEncounterId());
         insertEncounterStmt.value("health_id", encounterBundle.getHealthId());
         insertEncounterStmt.value("received_date", DateUtil.getCurrentTimeInISOString()); //TODO check timefunction
-//        insertEncounterStmt.value("received_date", System.currentTimeMillis());
         insertEncounterStmt.value("content", encounterBundle.getEncounterContent().toString());
         insertEncounterStmt.value("patient_location_code", address.getLocationCode());
 

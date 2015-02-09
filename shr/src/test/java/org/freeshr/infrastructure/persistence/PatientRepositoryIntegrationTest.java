@@ -33,18 +33,21 @@ public class PatientRepositoryIntegrationTest {
 
     @Test
     public void shouldFindPatientWithMatchingHealthId() throws ExecutionException, InterruptedException {
-        patientRepository.save(patient(healthId)).toBlocking().first();
+        patientRepository.save(patient(healthId, true)).toBlocking().first();
         Patient patient = patientRepository.find(healthId).toBlocking().first();
         assertNotNull(patient);
-        assertThat(patient, is(patient(healthId)));
+        assertThat(patient, is(patient(healthId, false)));
         assertThat(patient.getAddress(), is(address()));
+        assertTrue(patient.isConfidential());
+
     }
 
-    private Patient patient(String healthId) {
+    private Patient patient(String healthId, boolean confidential) {
         Patient patient = new Patient();
         patient.setHealthId(healthId);
         patient.setGender("1");
         patient.setAddress(address());
+        patient.setConfidential(confidential);
         return patient;
     }
 

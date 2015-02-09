@@ -21,6 +21,7 @@ import static org.freeshr.utils.FileUtil.asString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
@@ -47,12 +48,13 @@ public class MasterClientIndexClientIntegrationTest {
         assertThat(patient, is(notNullValue()));
         assertThat(patient.getHealthId(), is(heathId));
         assertThat(patient.getGender(), is("1"));
-        Address adddress = patient.getAddress();
-        assertThat(adddress.getLine(), is("house30"));
-        assertThat(adddress.getDistrict(), is("56"));
-        assertThat(adddress.getDivision(), is("30"));
-        assertThat(adddress.getUpazila(), is("10"));
-        assertThat(adddress.getUnionOrUrbanWardId(), is("17"));
-        assertThat(adddress.getCityCorporation(), is("99"));
+        assertTrue(patient.isConfidential());
+        Address address = patient.getAddress();
+        assertThat(address.getLine(), is("house30"));
+        assertThat(address.getDistrict(), is("56"));
+        assertThat(address.getDivision(), is("30"));
+        assertThat(address.getUpazila(), is("10"));
+        assertThat(address.getUnionOrUrbanWardId(), is("17"));
+        assertThat(address.getCityCorporation(), is("99"));
     }
 }

@@ -23,6 +23,7 @@ public class FacilityService {
         this.facilityRegistryClient = facilityRegistryClient;
     }
 
+
     public Observable<Facility> ensurePresent(final String facilityId) {
         Observable<Facility> facility = facilityRepository.find(facilityId);
         return facility.flatMap(findRemoteNotFound(facilityId));
