@@ -54,10 +54,14 @@ dependencies {
     compile libraries.snappy, libraries.spring_data_cassandra, libraries.spring_boot_logging,
             libraries.apache_commons_io, libraries.spring_framework, libraries.fhir_validator,
             libraries.jackson, libraries.saxon, libraries.rxjava,
-            libraries.netflix_astyanax, libraries.rome, libraries.time_uuid, libraries.spring_security,
-            libraries.spring_web, libraries.eclipse_moxy, libraries.spring_context_support, libraries.ehcache_core
+            libraries.netflix_astyanax, libraries.rome, libraries.rome_tools, libraries.time_uuid,
+            libraries.spring_security, libraries.spring_web, libraries.eclipse_moxy,
+            libraries.spring_context_support, libraries.ehcache_core
 
     compile(libraries.spring_boot_security){
+        exclude group: 'ch.qos.logback', module: "logback-classic"
+    }
+    compile(libraries.spring_boot_actuator){
         exclude group: 'ch.qos.logback', module: "logback-classic"
     }
     compile('io.netty:netty:3.9.0.Final') {
@@ -143,7 +147,7 @@ task runSHR(type: JavaExec){
     Properties properties = new Properties();
     properties.load(new FileInputStream(file('../env/local.properties')))
     main = mainClassName
-    jvmArgs = ['-DSHR_LOG_LEVEL=INFO']
+    jvmArgs = ['-DSHR_LOG_LEVEL=DEBUG']
     classpath = sourceSets.main.runtimeClasspath
     environment properties
 }

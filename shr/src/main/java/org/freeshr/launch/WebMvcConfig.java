@@ -4,6 +4,8 @@ package org.freeshr.launch;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.interfaces.encounter.ws.EncounterBundleMessageConverter;
 import org.freeshr.interfaces.encounter.ws.EncounterSearchResponseFeedConverter;
+import org.springframework.boot.autoconfigure.web.HttpMessageConverters;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -15,6 +17,7 @@ import org.springframework.web.servlet.config.annotation.DefaultServletHandlerCo
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
@@ -29,15 +32,22 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.add(new EncounterBundleMessageConverter());
-        converters.add(new EncounterSearchResponseFeedConverter());
-        converters.add(new MappingJackson2HttpMessageConverter());
-        converters.add(new Jaxb2RootElementHttpMessageConverter());
+        converters.addAll(messageConverters().getConverters());
     }
 
     @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer contentNegotiator) {
         super.configureContentNegotiation(contentNegotiator);
         contentNegotiator.mediaType("application", MediaType.APPLICATION_ATOM_XML);
+    }
+
+    @Bean
+    public HttpMessageConverters messageConverters(){
+        List<HttpMessageConverter<?>> converters = new ArrayList<>();
+        converters.add(new EncounterBundleMessageConverter());
+        converters.add(new EncounterSearchResponseFeedConverter());
+        converters.add(new MappingJackson2HttpMessageConverter());
+        converters.add(new Jaxb2RootElementHttpMessageConverter());
+        return new HttpMessageConverters(converters);
     }
 }

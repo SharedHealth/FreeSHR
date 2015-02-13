@@ -33,7 +33,7 @@ subprojects {
 ext.libraries = [
         spring_framework     : "org.springframework:spring-core:4.1.0.RELEASE",
         spring_boot_logging  : "org.springframework.boot:spring-boot-starter-log4j:1.2.0.RELEASE",
-        spring_boot_logging  : "org.springframework.boot:spring-boot-starter-actuator:1.2.0.RELEASE",
+        spring_boot_actuator  : "org.springframework.boot:spring-boot-starter-actuator:1.2.0.RELEASE",
         spring_data_cassandra: "org.springframework.data:spring-data-cassandra:1.2.+",
         spring_context_support : "org.springframework:spring-context-support:4.1.0.RELEASE",
         mutagen_cassandra    : "com.toddfast.mutagen:mutagen-cassandra:0.4.0",
@@ -50,6 +50,7 @@ ext.libraries = [
         rxjava               : 'io.reactivex:rxjava:1.+',
         netflix_astyanax     : "com.netflix.astyanax:astyanax:1.56.48",
         rome                 : "rome:rome:1.0",
+        rome_tools           : "com.rometools:rome:1.5.0",
         time_uuid            : "com.eaio.uuid:uuid:3.2",
         spring_security      : "org.springframework.security:spring-security-web:3.2.5.RELEASE",
         spring_boot_security : "org.springframework.boot:spring-boot-starter-security:1.2.0.RELEASE",

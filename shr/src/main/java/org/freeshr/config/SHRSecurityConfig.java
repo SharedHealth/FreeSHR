@@ -30,9 +30,12 @@ public class SHRSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .anonymous().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().authorizeRequests().anyRequest().hasRole("SHR_USER")
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+        http
+                .authorizeRequests()
+                .antMatchers("/manage/**").anonymous()
+                .antMatchers("/patients/**", "/catchments/**").hasRole("SHR_USER")
                 .and().addFilterBefore(new TokenAuthenticationFilter(authenticationManager()),
                 BasicAuthenticationFilter.class)
                 .exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint());
