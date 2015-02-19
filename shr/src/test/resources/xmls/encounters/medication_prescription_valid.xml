@@ -71,9 +71,6 @@
                     <reference value="urn:d0d7cb77-13eb-43ee-bd68-382940f98de8"/>
                     <display value="Encounter"/>
                 </indication>
-                <serviceProvider>
-                    <reference value="http://pagani.websitewelcome.com/~stagedgh/dghshrml4/public/api/1.0/api/1.0//facilities/10000069.json"/>
-                </serviceProvider>
             </Encounter>
         </content>
     </entry>

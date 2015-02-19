@@ -103,9 +103,6 @@
                     <reference value="urn:de67d58e-1d6d-4103-b6b4-119ab1a4c47a"/>
                     <display value="Encounter - de67d58e-1d6d-4103-b6b4-119ab1a4c47a"/>
                 </indication>
-                <serviceProvider>
-                    <reference value="http://hrm.dghs.gov.bd/api/1.0//facilities/10000069.json"/>
-                </serviceProvider>
             </Encounter>
         </content>
     </entry>

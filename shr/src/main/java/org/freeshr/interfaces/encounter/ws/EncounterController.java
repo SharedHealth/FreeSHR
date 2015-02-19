@@ -17,7 +17,6 @@ import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;

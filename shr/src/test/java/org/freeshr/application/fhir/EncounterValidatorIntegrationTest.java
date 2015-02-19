@@ -1,12 +1,10 @@
 package org.freeshr.application.fhir;
 
-import ch.qos.logback.classic.util.ContextInitializer;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.data.EncounterBundleData;
-import static org.freeshr.domain.ErrorMessageBuilder.*;
 import org.freeshr.infrastructure.tr.ValueSetCodeValidator;
 import org.freeshr.utils.CollectionUtils;
 import org.freeshr.utils.FileUtil;
@@ -23,10 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.freeshr.domain.ErrorMessageBuilder.INVALID_DISPENSE_MEDICATION_REFERENCE_URL;
+import static org.freeshr.domain.ErrorMessageBuilder.INVALID_MEDICATION_REFERENCE_URL;
 import static org.freeshr.utils.FileUtil.asString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
@@ -58,14 +57,18 @@ public class EncounterValidatorIntegrationTest {
     private StructureValidator structureValidator;
     @Autowired
     private FhirMessageFilter fhirMessageFilter;
+    @Autowired
+    private FacilityValidator facilityValidator;
+
     private FhirSchemaValidator fhirSchemaValidator;
+
 
     @Before
     public void setup() throws Exception {
         initMocks(this);
         fhirSchemaValidator = new FhirSchemaValidator(trConceptLocator, shrProperties);
         validator = new EncounterValidator(fhirMessageFilter, fhirSchemaValidator, resourceValidator,
-                healthIdValidator, structureValidator);
+                healthIdValidator, structureValidator, facilityValidator);
         encounterBundle = EncounterBundleData.withValidEncounter();
 
         givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"))
@@ -80,6 +83,43 @@ public class EncounterValidatorIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/code.json"))));
 
+        givenThat(get(urlEqualTo("/facilities/10000069.json"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/facility10000069.json"))));
+
+        givenThat(get(urlEqualTo("/facilities/100000603.json"))
+                .willReturn(aResponse()
+                        .withStatus(404)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/facility100000603.json"))));
+
+    }
+
+
+    @Test
+    public void shouldValidateEncounterIfItHasAValidFacility() throws Exception {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/encounterWithValidFacility.xml"));
+        EncounterValidationResponse validate = validator.validate(encounterBundle);
+        assertTrue(validate.isSuccessful());
+    }
+
+    @Test
+    public void shouldFailIfNotAValidFacility() throws Exception {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/encounterWithInvalidFacility.xml"));
+        EncounterValidationResponse validate = validator.validate(encounterBundle);
+        assertTrue(validate.isNotSuccessful());
+    }
+
+    @Test
+    public void shouldFailIfFacilityUrlIsInvalid() throws Exception {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/encounterWithInvalidFacilityUrl.xml"));
+        EncounterValidationResponse validate = validator.validate(encounterBundle);
+        assertTrue(validate.isNotSuccessful());
     }
 
     @Test
@@ -469,6 +509,4 @@ public class EncounterValidatorIntegrationTest {
         EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
         assertTrue(validationResponse.isSuccessful());
     }
-
-
 }

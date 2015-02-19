@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity;
+import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity.error;
 
 @Component
 public class MedicationPrescriptionValidator implements Validator<AtomEntry<? extends Resource>> {
@@ -80,7 +81,7 @@ public class MedicationPrescriptionValidator implements Validator<AtomEntry<? ex
                 ConceptLocator.ValidationResult validationResult = doseQuantityValidator.validate(doseQuantity);
                 if (validationResult != null) {
                     logger.error("Medication-Prescription DosageQuantity Code is invalid:");
-                    validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, ErrorMessageBuilder.INVALID_DOSAGE_QUANTITY, IssueSeverity.error));
+                    validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, INVALID_DOSAGE_QUANTITY, error));
                     return false;
                 }
             }
@@ -108,12 +109,12 @@ public class MedicationPrescriptionValidator implements Validator<AtomEntry<? ex
         }
         if ((!urlValidator.isValid(dispenseMedicationRefUrl))) {
             logger.error("Dispense-Medication URL is invalid:" + dispenseMedicationRefUrl);
-            validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, INVALID_DISPENSE_MEDICATION_REFERENCE_URL, IssueSeverity.error));
+            validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, INVALID_DISPENSE_MEDICATION_REFERENCE_URL, error));
             return false;
         }
 
         if (!isValidCodeableConceptUrl(dispenseMedicationRefUrl, "")) {
-            validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, INVALID_DISPENSE_MEDICATION_REFERENCE_URL, IssueSeverity.error));
+            validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, INVALID_DISPENSE_MEDICATION_REFERENCE_URL, error));
             return false;
         }
 
@@ -125,7 +126,7 @@ public class MedicationPrescriptionValidator implements Validator<AtomEntry<? ex
         String id = atomEntry.getId();
         Property medication = atomEntry.getResource().getChildByName(MEDICATION);
         if ((medication == null) || (!medication.hasValues())) {
-            validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, UNSPECIFIED_MEDICATION, IssueSeverity.error));
+            validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, UNSPECIFIED_MEDICATION, error));
             return false;
         }
 
@@ -136,12 +137,12 @@ public class MedicationPrescriptionValidator implements Validator<AtomEntry<? ex
         }
         if ((!urlValidator.isValid(medicationRefUrl))) {
             logger.error("Medication URL is invalid:" + medicationRefUrl);
-            validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, INVALID_MEDICATION_REFERENCE_URL, IssueSeverity.error));
+            validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, INVALID_MEDICATION_REFERENCE_URL, error));
             return false;
         }
 
         if (!isValidCodeableConceptUrl(medicationRefUrl, "")) {
-            validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, INVALID_MEDICATION_REFERENCE_URL, IssueSeverity.error));
+            validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, INVALID_MEDICATION_REFERENCE_URL, error));
             return false;
         }
 

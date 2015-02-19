@@ -70,9 +70,6 @@
                     <reference value="d3cc23c3-1f12-4b89-a415-356feeba0690"/>
                     <display value="encounter"/>
                 </indication>
-                <serviceProvider>
-                    <reference value="Bahmni"/>
-                </serviceProvider>
             </Encounter>
         </content>
     </entry>

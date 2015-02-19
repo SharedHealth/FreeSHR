@@ -1,0 +1,43 @@
+{
+  "name": "Dohar Upazila Health Complex",
+  "url": "",
+  "id": "10000069",
+  "active": 1,
+  "createdAt": "",
+  "updatedAt": "2014-09-01 12:12:12",
+  "coordinates": [
+    "23.5846912",
+    "90.1401381000001"
+  ],
+  "identifiers": {
+    "agency": "DGHS",
+    "context": "HRM",
+    "id": 65
+  },
+  "properties": {
+    "ownership": "Fully Government-owned",
+    "org_type": "Upazila Health Complex",
+    "org_level": "Upazila",
+    "care_level": "",
+    "deleted_at": null,
+    "services": [],
+    "locations": {
+      "division_code": "30",
+      "district_code": "26",
+      "upazila_code": "18",
+      "paurasava_code": "",
+      "union_code": "",
+      "ward_code": ""
+    },
+    "contacts": {
+      "name": "",
+      "email": "dohar@uhfpo.dghs.gov.bd",
+      "phone": "27768188",
+      "mobile": "1711706371",
+      "fax": null
+    },
+    "catchment": [
+      "302618"
+    ]
+  }
+}

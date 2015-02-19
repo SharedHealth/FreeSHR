@@ -20,18 +20,21 @@ public class EncounterValidator {
     private ResourceValidator resourceValidator;
     private HealthIdValidator healthIdValidator;
     private StructureValidator structureValidator;
+    private FacilityValidator facilityValidator;
 
     @Autowired
     public EncounterValidator(FhirMessageFilter fhirMessageFilter,
                               FhirSchemaValidator fhirSchemaValidator,
                               ResourceValidator resourceValidator,
                               HealthIdValidator healthIdValidator,
-                              StructureValidator structureValidator) {
+                              StructureValidator structureValidator,
+                              FacilityValidator facilityValidator) {
         this.fhirMessageFilter = fhirMessageFilter;
         this.fhirSchemaValidator = fhirSchemaValidator;
         this.resourceValidator = resourceValidator;
         this.healthIdValidator = healthIdValidator;
         this.structureValidator = structureValidator;
+        this.facilityValidator = facilityValidator;
         this.resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
     }
 
@@ -48,8 +51,12 @@ public class EncounterValidator {
                     , fhirMessageFilter);
             if (validationResponse.isNotSuccessful()) return validationResponse;
 
-            validationResponse = fromValidationMessages(resourceValidator.validate(validationContext.feedFragment()),
-                    fhirMessageFilter);
+            validationResponse = fromValidationMessages(facilityValidator.validate(validationContext.feedFragment())
+                    , fhirMessageFilter);
+            if (validationResponse.isNotSuccessful()) return validationResponse;
+
+            validationResponse = fromValidationMessages(resourceValidator.validate(validationContext.feedFragment())
+                    , fhirMessageFilter);
             return validationResponse.isSuccessful() ? fromValidationMessages(healthIdValidator.validate
                     (validationContext.context()), fhirMessageFilter)
                     : validationResponse;

@@ -50,6 +50,5 @@ public class FacilityServiceTest {
         Mockito.when(facilityRegistryClient.getFacility(facility.getFacilityId())).thenReturn(Observable.just
                 (facility));
         assertNotNull(facilityService.ensurePresent(facility.getFacilityId()));
-
     }
 }
