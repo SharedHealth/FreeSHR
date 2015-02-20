@@ -22,10 +22,12 @@ import rx.schedulers.Schedulers;
 public class FacilityRepository {
     private Logger logger = Logger.getLogger(FacilityRepository.class);
     private CqlTemplate cqlTemplate;
+    private SHRProperties shrProperties;
 
     @Autowired
-    public FacilityRepository(@Qualifier("SHRCassandraTemplate") CqlTemplate cqlOperations) {
+    public FacilityRepository(@Qualifier("SHRCassandraTemplate") CqlTemplate cqlOperations, SHRProperties shrProperties) {
         this.cqlTemplate = cqlOperations;
+        this.shrProperties = shrProperties;
     }
 
     public Observable<Facility> find(String facilityId) {
@@ -107,7 +109,7 @@ public class FacilityRepository {
     private Insert buildInsertStatement(Facility facility) {
         return QueryBuilder
                 .insertInto("facilities")
-                .using(QueryBuilder.ttl(SHRProperties.ONE_DAY))
+                .using(QueryBuilder.ttl(shrProperties.getFacilityCacheTTL()))
                 .value("facility_id", facility.getFacilityId())
                 .value("facility_name", facility.getFacilityName())
                 .value("facility_type", facility.getFacilityType())

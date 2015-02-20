@@ -60,6 +60,9 @@ public class SHRProperties {
     @Value("${IDENTITY_SERVER_BASE_URL}")
     private String identityServerBaseUrl;
 
+    @Value("${FACILITY_CACHE_TTL_SECONDS}")
+    private String facilityCacheTTL;
+
     public String getMCIPatientUrl() {
         return String.format("%s://%s:%s/%s",mciSchema,mciHost,mciPort,mciPatientPath);
     }
@@ -132,4 +135,9 @@ public class SHRProperties {
         return trServerBaseUrl;
 
     }
+
+    public int getFacilityCacheTTL() {
+        return facilityCacheTTL != null ? Integer.parseInt(facilityCacheTTL) : ONE_DAY;
+    }
+
 }
