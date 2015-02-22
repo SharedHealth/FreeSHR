@@ -12,7 +12,7 @@ public class SHRProperties {
 
     public static final int ONE_DAY = 86400;
     public static final String SECURITY_TOKEN_HEADER = "X-Auth-Token";
-    public static final String DIAGNOSTICS_SERVLET_PATH = "/diagnostics/";
+    public static final String DIAGNOSTICS_SERVLET_PATH = "/diagnostics/health";
 
     @Value("${MCI_PATIENT_PATH}")
     private String mciPatientPath;
