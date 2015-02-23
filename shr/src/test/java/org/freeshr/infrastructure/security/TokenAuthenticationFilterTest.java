@@ -48,15 +48,6 @@ public class TokenAuthenticationFilterTest {
     }
 
     @Test
-    public void shouldNotFilterOutRequestsForDiagnostics() throws Exception {
-        when(request.getHeader(SHRProperties.SECURITY_TOKEN_HEADER)).thenReturn("");
-        when(request.getServletPath()).thenReturn(SHRProperties.DIAGNOSTICS_SERVLET_PATH);
-        TokenAuthenticationFilter tokenAuthenticationFilter = new TokenAuthenticationFilter(authenticationManager);
-        tokenAuthenticationFilter.doFilter(request, response, chain);
-        verify(response, times(0)).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token not provided");
-    }
-
-    @Test
     public void shouldFilterOutRequestsWithInvalidToken() throws Exception {
         String invalidToken = UUID.randomUUID().toString();
         when(request.getHeader(SHRProperties.SECURITY_TOKEN_HEADER)).thenReturn(invalidToken);

@@ -14,11 +14,13 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.util.matcher.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 
 @Configuration
 @EnableWebSecurity
@@ -30,15 +32,24 @@ public class SHRSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
+                .anonymous().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http
+                .requestMatcher(new AndRequestMatcher(new ArrayList<RequestMatcher>(){{
+                    add(new NegatedRequestMatcher(new AntPathRequestMatcher(SHRProperties.DIAGNOSTICS_SERVLET_PATH)));
+                    add(new AntPathRequestMatcher("/**"));
+                    }
+                }))
                 .authorizeRequests()
-                .antMatchers(SHRProperties.DIAGNOSTICS_SERVLET_PATH).anonymous()
-                .antMatchers("/patients/**", "/catchments/**").hasRole("SHR_USER")
-                .and().addFilterBefore(new TokenAuthenticationFilter(authenticationManager()),
-                BasicAuthenticationFilter.class)
+                .anyRequest().hasRole("SHR_USER")
+                .and()
+                .addFilterBefore(new TokenAuthenticationFilter(authenticationManager()), BasicAuthenticationFilter
+                        .class)
                 .exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint());
+
+
+
     }
 
     @Bean
