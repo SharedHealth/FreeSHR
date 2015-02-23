@@ -34,7 +34,7 @@ public class SHRSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .authorizeRequests()
-                .antMatchers("/manage/**").anonymous()
+                .antMatchers(SHRProperties.DIAGNOSTICS_SERVLET_PATH).anonymous()
                 .antMatchers("/patients/**", "/catchments/**").hasRole("SHR_USER")
                 .and().addFilterBefore(new TokenAuthenticationFilter(authenticationManager()),
                 BasicAuthenticationFilter.class)
