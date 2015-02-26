@@ -79,6 +79,7 @@ dependencies {
     }
 
     compile project(":fhir")
+    testCompile project(":schema")
     testCompile testLibraries.mockito, testLibraries.junit, testLibraries.spring_test, testLibraries.cassandra_unit_spring,
             testLibraries.wiremock, testLibraries.hamcrest_core
 }

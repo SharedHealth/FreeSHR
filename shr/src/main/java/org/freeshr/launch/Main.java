@@ -1,6 +1,5 @@
 package org.freeshr.launch;
 
-import org.freeshr.utils.cassandra.Migrations;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
 import org.springframework.boot.context.embedded.ServletContextInitializer;
@@ -48,7 +47,6 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception {
-        new Migrations().migrate();
         SpringApplication.run(Main.class, args);
     }
 }

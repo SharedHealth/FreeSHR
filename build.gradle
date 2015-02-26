@@ -37,6 +37,7 @@ ext.libraries = [
         spring_data_cassandra: "org.springframework.data:spring-data-cassandra:1.2.+",
         spring_context_support : "org.springframework:spring-context-support:4.1.0.RELEASE",
         mutagen                : "com.toddfast.mutagen:mutagen:0.3.0",
+        mutagen                : "com.toddfast.mutagen:mutagen:0.3.0",
         mutagen_cassandra    : "com.toddfast.mutagen:mutagen-cassandra:0.4.2-SNAPSHOT",
         snappy               : 'org.xerial.snappy:snappy-java:1.1.1-M1',
         commons_codec        : 'commons-codec:commons-codec:1.9',
@@ -60,7 +61,6 @@ ext.libraries = [
         commons_lang         : "org.apache.commons:commons-lang3:3.3.2",
         joda_time            : "joda-time:joda-time:2.7",
         lz4                  : "net.jpountz.lz4:lz4:1.3.0"
-
 ]
 
 ext.testLibraries = [
@@ -72,7 +72,7 @@ ext.testLibraries = [
         spring_test   : "org.springframework:spring-test:4.1.1.RELEASE",
         cassandra_unit_spring: "org.cassandraunit:cassandra-unit-spring:2.0.2.2",
         wiremock      : "com.github.tomakehurst:wiremock:1.51",
-        hamcrest_core : "org.hamcrest:hamcrest-all:1.3",
+        hamcrest_core : "org.hamcrest:hamcrest-all:1.3"
 ]
 
 

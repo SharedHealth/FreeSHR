@@ -1,4 +1,4 @@
-package org.freeshr.utils.cassandra;
+package org.freeshr.cassandra;
 
 import com.datastax.driver.core.*;
 import com.datastax.driver.core.policies.ConstantReconnectionPolicy;

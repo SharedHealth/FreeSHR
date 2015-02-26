@@ -1,0 +1,25 @@
+apply plugin: 'java'
+
+
+repositories {
+    mavenCentral()
+}
+
+def mainClassName = "org.freeshr.cassandra.Migrations"
+
+jar {
+    baseName = 'shr-schema'
+    version = '0.1-SNAPSHOT'
+    manifest{
+        attributes('Main-Class': mainClassName)
+    }
+}
+
+
+dependencies {
+    compile('com.toddfast.mutagen:mutagen-cassandra:0.4.0') {
+        exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+    }
+    compile libraries.netflix_astyanax
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
