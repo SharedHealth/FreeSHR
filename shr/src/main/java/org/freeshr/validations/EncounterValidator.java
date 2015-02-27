@@ -53,10 +53,10 @@ public class EncounterValidator {
             validationResponse = fromValidationMessages(structureValidator.validate(validationContext.feedFragment())
                     , fhirMessageFilter);
             if (validationResponse.isNotSuccessful()) return validationResponse;
-
-            validationResponse = fromValidationMessages(facilityValidator.validate(validationContext.feedFragment())
-                    , fhirMessageFilter);
-            if (validationResponse.isNotSuccessful()) return validationResponse;
+//          TODO : fix the way we query hrm server, then uncomment this validation
+//            validationResponse = fromValidationMessages(facilityValidator.validate(validationContext.feedFragment())
+//                    , fhirMessageFilter);
+//            if (validationResponse.isNotSuccessful()) return validationResponse;
 
             validationResponse = fromValidationMessages(providerValidator.validate(validationContext.feedFragment())
                     , fhirMessageFilter);
