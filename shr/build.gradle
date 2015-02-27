@@ -84,7 +84,6 @@ dependencies {
             testLibraries.wiremock, testLibraries.hamcrest_core
 }
 
-
 //build artifact
 private Properties loadConfig() {
     Properties properties = new Properties()
