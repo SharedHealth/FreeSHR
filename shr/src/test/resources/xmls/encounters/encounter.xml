@@ -63,7 +63,7 @@
                 </subject>
                 <participant>
                     <individual>
-                        <reference value="456e6c79-35be-11e4-9d09-08002773bf1c"/>
+                        <reference value="http://127.0.0.1:9997/providers/18.json"/>
                     </individual>
                 </participant>
                 <indication>
@@ -94,7 +94,7 @@
                     <display value="encounter"/>
                 </encounter>
                 <asserter>
-                    <reference value="7e2bd1c6-2370-418c-b2f7-1e46febc4ee0"/>
+                    <reference value="http://127.0.0.1:9997/providers/18.json"/>
                 </asserter>
                 <dateAsserted value="2014-07-25T16:51:37+05:30"/>
                 <code>

@@ -60,6 +60,9 @@ public class EncounterValidatorIntegrationTest {
     @Autowired
     private FacilityValidator facilityValidator;
 
+    @Autowired
+    private ProviderValidator providerValidator;
+
     private FhirSchemaValidator fhirSchemaValidator;
 
 
@@ -68,7 +71,7 @@ public class EncounterValidatorIntegrationTest {
         initMocks(this);
         fhirSchemaValidator = new FhirSchemaValidator(trConceptLocator, shrProperties);
         validator = new EncounterValidator(fhirMessageFilter, fhirSchemaValidator, resourceValidator,
-                healthIdValidator, structureValidator, facilityValidator);
+                healthIdValidator, structureValidator, facilityValidator, providerValidator);
         encounterBundle = EncounterBundleData.withValidEncounter();
 
         givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"))
@@ -207,7 +210,8 @@ public class EncounterValidatorIntegrationTest {
 
     @Test
     public void shouldValidateSpecimenWithDiagnosticOrder() throws Exception {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, FileUtil.asString("xmls/encounters/diagnostic_order_with_specimen.xml"));
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/diagnostic_order_with_specimen.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
         verify(trConceptLocator, times(3)).verifiesSystem(anyString());

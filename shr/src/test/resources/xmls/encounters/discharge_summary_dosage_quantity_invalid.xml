@@ -237,7 +237,7 @@
                 <participant>
                     <individual>
                         <reference
-                                value="3accd17c-7561-11e4-a8f7-005056826e54"/>
+                                value="http://127.0.0.1:9997/providers/18.json"/>
                     </individual>
                 </participant>
                 <indication>
@@ -449,7 +449,7 @@
                     <display value="Encounter"/>
                 </encounter>
                 <asserter>
-                    <reference value="3accd17c-7561-11e4-a8f7-005056826e54"/>
+                    <reference value="http://127.0.0.1:9997/providers/18.json"/>
                 </asserter>
                 <dateAsserted value="2015-01-07T12:00:15+05:30"/>
                 <code>
@@ -1020,7 +1020,7 @@
                     <display value="5893922485019082753"/>
                 </patient>
                 <prescriber>
-                    <reference value="http://localhost:9997/e8a8bdb9-9fdd-4e66-81ca-5abbb6308ccd"/>
+                    <reference value="http://127.0.0.1:9997/providers/18.json"/>
                 </prescriber>
                 <medication>
                     <reference value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>
@@ -1158,7 +1158,7 @@
                     <reference value="http://mci/patients/5893922485019082753"/>
                 </subject>
                 <orderer>
-                    <reference value="456e6c79-35be-11e4-9d09-08002773bf1c"/>
+                    <reference value="http://127.0.0.1:9997/providers/18.json"/>
                 </orderer>
                 <identifier>
                     <value value="a86018fa-e15d-4004-85bc-a1ee713dc923"/>

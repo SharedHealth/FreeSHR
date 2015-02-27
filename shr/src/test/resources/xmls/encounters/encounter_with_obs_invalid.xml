@@ -96,7 +96,7 @@
                 </subject>
                 <participant>
                     <individual>
-                        <reference value="e8a8bdb9-9fdd-4e66-81ca-5abbb6308ccd"/>
+                        <reference value="http://127.0.0.1:9997/providers/18.json"/>
                     </individual>
                 </participant>
                 <indication>

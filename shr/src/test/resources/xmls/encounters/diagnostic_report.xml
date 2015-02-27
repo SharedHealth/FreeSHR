@@ -68,7 +68,7 @@
                 </subject>
                 <participant>
                     <individual>
-                        <reference value="456e6c79-35be-11e4-9d09-08002773bf1c"/>
+                        <reference value="http://127.0.0.1:9997/providers/18.json"/>
                     </individual>
                 </participant>
                 <indication>
@@ -140,7 +140,7 @@
                     <reference value="5893922485019082753"/>
                 </subject>
                 <performer>
-                    <reference value="456e6c79-35be-11e4-9d09-08002773bf1c"/>
+                    <reference value="http://127.0.0.1:9997/providers/18.json"/>
                 </performer>
                 <identifier>
                     <value value="24030c01-f6dd-42a1-a7d9-acb5dc5d04d1"/>

@@ -67,7 +67,7 @@
                 </subject>
                 <participant>
                     <individual>
-                        <reference value="456e6c79-35be-11e4-9d09-08002773bf1c"/>
+                        <reference value="http://127.0.0.1:9997/providers/18.json"/>
                     </individual>
                 </participant>
                 <indication>
@@ -90,7 +90,7 @@
                     <reference value="http://mci/patients/5893922485019082753"/>
                 </subject>
                 <orderer>
-                    <reference value="456e6c79-35be-11e4-9d09-08002773bf1c"/>
+                    <reference value="http://127.0.0.1:9997/providers/18.json"/>
                 </orderer>
                 <identifier>
                     <value value="a86018fa-e15d-4004-85bc-a1ee713dc923"/>

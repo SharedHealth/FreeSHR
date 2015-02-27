@@ -68,11 +68,11 @@
                     <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
-                <participant>
-                    <individual>
-                        <reference value="20ba5ebe-6f06-11e4-b8c1-080027b662ec"/>
-                    </individual>
-                </participant>
+                <!--<participant>-->
+                    <!--<individual>-->
+                        <!--<reference value="http://127.0.0.1:9997/providers/18.json"/>-->
+                    <!--</individual>-->
+                <!--</participant>-->
                 <indication>
                     <reference value="urn:d0d7cb77-13eb-43ee-bd68-382940f98de8"/>
                     <display value="Encounter"/>
@@ -97,9 +97,9 @@
                     <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </patient>
-                <!--                <prescriber>
-                                    <reference value="http://localhost:9997/e8a8bdb9-9fdd-4e66-81ca-5abbb6308ccd"/>
-                                </prescriber>-->
+                <prescriber>
+                    <reference value="http://127.0.0.1:9997/providers/18.json"/>
+                </prescriber>
                 <encounter>
                     <reference value="urn:d0d7cb77-13eb-43ee-bd68-382940f98dek"/>
                     <display value="encounter who leads to this priscription"/>
@@ -165,9 +165,9 @@
                     <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </patient>
-                <prescriber>
-                    <reference value="http://localhost:9997/e8a8bdb9-9fdd-4e66-81ca-5abb6308ccdb"/>
-                </prescriber>
+                <!--<prescriber>-->
+                    <!--<reference value="http://localhost:9997/e8a8bdb9-9fdd-4e66-81ca-5abb6308ccdb"/>-->
+                <!--</prescriber>-->
                 <encounter>
                     <reference value="urn:d0d7cb77-13eb-43ee-bd68-382940f98de8"/>
                     <display value="encounter who leads to this priscription"/>

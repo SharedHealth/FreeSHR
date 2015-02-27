@@ -62,8 +62,6 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/viral_pneumonia_diagnostic.json"))));
 
-
-
         givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/encounter-type"))
                 .willReturn(aResponse()
                         .withStatus(200)

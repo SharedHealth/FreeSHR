@@ -37,7 +37,6 @@ public class HealthIdValidatorTest {
                 is(true));
     }
 
-
     @Test
     public void shouldNotAcceptEncounterIfNoHealthIdIsPresentInComposition() {
         String xml = FileUtil.asString("xmls/encounters/invalid_composition.xml");
@@ -71,7 +70,6 @@ public class HealthIdValidatorTest {
         assertThat(response.getErrors().get(0).getType(), is(ResourceValidator.INVALID));
         assertThat(response.getErrors().get(0).getReason(), is("Patient's Health Id does not match."));
     }
-
 
     private ValidationSubject<EncounterValidationContext> getEncounterContext(final String xml, final String healthId) {
         return new ValidationSubject<EncounterValidationContext>() {

@@ -64,7 +64,7 @@
                 </subject>
                 <participant>
                     <individual>
-                        <reference value="20ba5ebe-6f06-11e4-b8c1-080027b662ec"/>
+                        <reference value="http://127.0.0.1:9997/providers/18.json"/>
                     </individual>
                 </participant>
                 <indication>
@@ -92,7 +92,7 @@
                     <display value="5893922485019082753"/>
                 </patient>
                 <prescriber>
-                    <reference value="http://localhost:9997/e8a8bdb9-9fdd-4e66-81ca-5abbb6308ccd"/>
+                    <reference value="http://127.0.0.1:9997/providers/18.json"/>
                 </prescriber>
                <medication>
                     <reference value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>

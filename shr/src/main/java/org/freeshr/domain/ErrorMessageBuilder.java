@@ -23,6 +23,7 @@ public class ErrorMessageBuilder {
     public static final String INVALID_DIAGNOSTIC_REPORT_REFERNECE = "Invalid Diagnostic Report Reference";
     public static final String INVALID_FACILITY_URL = "Invalid Facility URL";
     public static final String INVALID_FACILITY = "Invalid Facility";
+    public static final String INVALID_PROVIDER_URL_PATTERN = "Invalid Provider URL Pattern";
 
     public static ValidationMessage buildValidationMessage(String path, String type, String message, OperationOutcome.IssueSeverity level) {
         ValidationMessage validationMessage = new ValidationMessage();

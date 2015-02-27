@@ -70,7 +70,7 @@
                 </subject>
                 <participant>
                     <individual>
-                        <reference value="20ba5ebe-6f06-11e4-b8c1-080027b662ec"/>
+                        <reference value="http://127.0.0.1:9997/providers/18.json"/>
                     </individual>
                 </participant>
                 <indication>
@@ -101,7 +101,7 @@
                     <display value="5893922485019082753"/>
                 </subject>
                 <performer>
-                    <reference value="20ba5ebe-6f06-11e4-b8c1-080027b662ec"/>
+                    <reference value="http://127.0.0.1:9997/providers/18.json"/>
                 </performer>
                 <identifier>
                     <value value="urn:06a87681-68dd-455d-8dd3-5d4f34842905"/>

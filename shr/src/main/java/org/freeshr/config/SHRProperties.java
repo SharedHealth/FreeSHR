@@ -49,6 +49,9 @@ public class SHRProperties {
     @Value("${FACILITY_REGISTRY_AUTH_TOKEN}")
     private String facilityRegistryAuthToken;
 
+    @Value("${PROVIDER_REGISTRY_URL}")
+    private String providerRegistryUrl;
+
     @Value("${ENCOUNTER_FETCH_LIMIT}")
     private int encounterFetchLimit;
     @Value("${SERVER_CONNECTION_TIMEOUT}")
@@ -115,6 +118,10 @@ public class SHRProperties {
         return facilityRegistryAuthToken;
     }
 
+    public String getProviderRegistryUrl() {
+        return providerRegistryUrl;
+    }
+
     public String getValidationFilePath() throws URISyntaxException {
         if (StringUtils.isNotBlank(validationZipPath)) {
             return validationZipPath;
@@ -133,7 +140,6 @@ public class SHRProperties {
 
     public String getTrServerBaseUrl() {
         return trServerBaseUrl;
-
     }
 
     public int getFacilityCacheTTL() {

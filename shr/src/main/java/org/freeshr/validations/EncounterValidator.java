@@ -21,6 +21,7 @@ public class EncounterValidator {
     private HealthIdValidator healthIdValidator;
     private StructureValidator structureValidator;
     private FacilityValidator facilityValidator;
+    private ProviderValidator providerValidator;
 
     @Autowired
     public EncounterValidator(FhirMessageFilter fhirMessageFilter,
@@ -28,7 +29,8 @@ public class EncounterValidator {
                               ResourceValidator resourceValidator,
                               HealthIdValidator healthIdValidator,
                               StructureValidator structureValidator,
-                              FacilityValidator facilityValidator) {
+                              FacilityValidator facilityValidator,
+                              ProviderValidator providerValidator) {
         this.fhirMessageFilter = fhirMessageFilter;
         this.fhirSchemaValidator = fhirSchemaValidator;
         this.resourceValidator = resourceValidator;
@@ -36,6 +38,7 @@ public class EncounterValidator {
         this.structureValidator = structureValidator;
         this.facilityValidator = facilityValidator;
         this.resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
+        this.providerValidator= providerValidator;
     }
 
     public EncounterValidationResponse validate(EncounterBundle encounterBundle) {
@@ -52,6 +55,10 @@ public class EncounterValidator {
             if (validationResponse.isNotSuccessful()) return validationResponse;
 
             validationResponse = fromValidationMessages(facilityValidator.validate(validationContext.feedFragment())
+                    , fhirMessageFilter);
+            if (validationResponse.isNotSuccessful()) return validationResponse;
+
+            validationResponse = fromValidationMessages(providerValidator.validate(validationContext.feedFragment())
                     , fhirMessageFilter);
             if (validationResponse.isNotSuccessful()) return validationResponse;
 
