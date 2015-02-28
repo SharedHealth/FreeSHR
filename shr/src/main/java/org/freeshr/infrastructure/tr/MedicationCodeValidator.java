@@ -10,7 +10,7 @@ import org.springframework.web.client.AsyncRestTemplate;
 import rx.Observable;
 import rx.functions.Func1;
 
-import static org.apache.commons.lang.StringUtils.substringAfterLast;
+import static org.apache.commons.lang3.StringUtils.substringAfterLast;
 import static org.freeshr.utils.HttpUtil.basicAuthHeaders;
 import static org.springframework.util.StringUtils.isEmpty;
 

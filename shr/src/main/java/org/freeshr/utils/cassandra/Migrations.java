@@ -1,22 +1,17 @@
 package org.freeshr.utils.cassandra;
 
-import com.netflix.astyanax.AstyanaxContext;
-import com.netflix.astyanax.Keyspace;
-import com.netflix.astyanax.connectionpool.exceptions.BadRequestException;
-import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
-import com.netflix.astyanax.connectionpool.impl.ConnectionPoolConfigurationImpl;
-import com.netflix.astyanax.connectionpool.impl.CountingConnectionPoolMonitor;
-import com.netflix.astyanax.impl.AstyanaxConfigurationImpl;
-import com.netflix.astyanax.thrift.ThriftFamilyFactory;
+import com.datastax.driver.core.*;
+import com.datastax.driver.core.policies.ConstantReconnectionPolicy;
+import com.datastax.driver.core.policies.RoundRobinPolicy;
 import com.toddfast.mutagen.Plan;
 import com.toddfast.mutagen.cassandra.CassandraMutagen;
+import com.toddfast.mutagen.cassandra.CassandraSubject;
 import com.toddfast.mutagen.cassandra.impl.CassandraMutagenImpl;
+import org.freeshr.config.SHRProperties;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
-import static java.lang.Integer.valueOf;
 import static java.lang.System.getenv;
 
 public class Migrations {
@@ -32,11 +27,15 @@ public class Migrations {
         this.env = env;
     }
 
-    public void migrate() throws IOException, ConnectionException {
-        CassandraMutagen mutagen = new CassandraMutagenImpl();
+    public void migrate() throws IOException {
+        String freeSHRKeyspace = env.get("CASSANDRA_KEYSPACE");
+        Session session = connectKeyspace();
+
+        CassandraMutagen mutagen = new CassandraMutagenImpl(freeSHRKeyspace);
         mutagen.initialize(env.get("CASSANDRA_MIGRATIONS_PATH"));
-        Keyspace keyspace = getKeySpace();
-        Plan.Result<Integer> result = mutagen.mutate(keyspace);
+        com.toddfast.mutagen.Plan.Result<Integer> result = mutagen.mutate(new CassandraSubject(session,
+                freeSHRKeyspace));
+
         if (result.getException() != null) {
             throw new RuntimeException(result.getException());
         } else if (!result.isMutationComplete()) {
@@ -44,44 +43,47 @@ public class Migrations {
         }
     }
 
-    private Keyspace getKeySpace() throws ConnectionException {
-        AstyanaxContext<Keyspace> context = buildContext();
-        context.start();
-        return createKeyspaceIfNoneExist(context);
+    private Session connectKeyspace() {
+        Cluster cluster = connectCluster();
+        return createSession(cluster);
     }
 
-    protected AstyanaxContext<Keyspace> buildContext() {
-        return new AstyanaxContext.Builder()
-                .forKeyspace(env.get("CASSANDRA_KEYSPACE"))
-                .withAstyanaxConfiguration(new AstyanaxConfigurationImpl()
-                                .setCqlVersion(env.get("CQL_VERSION"))
-                                .setTargetCassandraVersion(env.get("CASSANDRA_VERSION"))
-                )
-                .withConnectionPoolConfiguration(new ConnectionPoolConfigurationImpl(MUTAGEN_CONNECTION_POOL_NAME)
-                                .setPort(valueOf(env.get("MUTAGEN_CONNECTION_POOL_PORT")))
-                                .setMaxConnsPerHost(1)
-                                .setSeeds(env.get("MUTAGEN_SEEDS"))
-                )
-                .withConnectionPoolMonitor(new CountingConnectionPoolMonitor())
-                .buildKeyspace(ThriftFamilyFactory.getInstance());
+    protected Cluster connectCluster() {
+        Cluster.Builder clusterBuilder = new Cluster.Builder();
+
+        QueryOptions queryOptions = new QueryOptions();
+        queryOptions.setConsistencyLevel(ConsistencyLevel.QUORUM);
+
+        clusterBuilder
+                .withPort(Integer.parseInt(env.get("CASSANDRA_PORT")))
+                .withClusterName(env.get("CASSANDRA_KEYSPACE"))
+                .withLoadBalancingPolicy(new RoundRobinPolicy())
+                .withPoolingOptions(new PoolingOptions())
+                .withProtocolVersion(Integer.parseInt(env.get("CASSANDRA_VERSION")))
+                .withQueryOptions(queryOptions)
+                .withReconnectionPolicy(new ConstantReconnectionPolicy(SHRProperties.ONE_MINUTE))
+                .addContactPoint(env.get("CASSANDRA_HOST"));
+        return clusterBuilder.build();
+
     }
 
-    protected Keyspace createKeyspaceIfNoneExist(AstyanaxContext<Keyspace> context) throws ConnectionException {
-        Keyspace keyspace = context.getClient();
-        try {
-            keyspace.describeKeyspace();
-        } catch (BadRequestException e) {
-            keyspace.createKeyspace(new HashMap<String, Object>() {{
-                put("strategy_options", new HashMap<String, Object>() {{
-                    put("replication_factor", "1");
-                }});
-                put("strategy_class", "SimpleStrategy");
-            }});
-        }
-        return keyspace;
+    protected Session createSession(Cluster cluster) {
+        String keyspace = env.get("CASSANDRA_KEYSPACE");
+        String replicationStrategy = env.get("CASSANDRA_REPLICATION_STRATEGY");
+        String replicationFactor = env.get("CASSANDRA_REPLICATION_FACTOR");
+
+        Session session = cluster.connect();
+        session.execute(
+                String.format(
+                        "CREATE KEYSPACE IF NOT EXISTS %s " +
+                                "WITH replication = {'class':'%s', 'replication_factor':%s}; ",
+                        keyspace, replicationStrategy, replicationFactor)
+        );
+        session.close();
+        return cluster.connect(keyspace);
     }
 
-    public static void main(String[] args) throws IOException, ConnectionException {
+    public static void main(String[] args) throws IOException {
         new Migrations().migrate();
     }
 }

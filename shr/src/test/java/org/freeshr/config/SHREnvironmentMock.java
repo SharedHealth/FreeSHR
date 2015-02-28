@@ -1,6 +1,7 @@
 package org.freeshr.config;
 
 import org.cassandraunit.utils.EmbeddedCassandraServerHelper;
+import org.freeshr.utils.cassandra.Migrations;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;

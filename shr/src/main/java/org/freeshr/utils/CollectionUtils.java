@@ -3,7 +3,7 @@ package org.freeshr.utils;
 
 import java.util.*;
 
-import static org.apache.commons.lang.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.*;
 
 public class CollectionUtils {
 

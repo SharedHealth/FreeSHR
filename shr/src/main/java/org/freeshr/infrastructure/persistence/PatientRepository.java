@@ -6,7 +6,6 @@ import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
-import org.freeshr.utils.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +16,8 @@ import rx.Observable;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-import java.util.List;
-
-import static java.util.Arrays.asList;
-import static org.apache.commons.lang.StringUtils.join;
 import static org.freeshr.infrastructure.persistence.RxMaps.completeResponds;
 import static org.freeshr.infrastructure.persistence.RxMaps.respondOnNext;
-import static org.freeshr.utils.CollectionUtils.map;
 
 @Component
 public class PatientRepository {

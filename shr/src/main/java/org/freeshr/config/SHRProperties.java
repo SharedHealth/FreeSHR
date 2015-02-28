@@ -1,6 +1,6 @@
 package org.freeshr.config;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +11,7 @@ import java.net.URISyntaxException;
 public class SHRProperties {
 
     public static final int ONE_DAY = 86400;
+    public static final int ONE_MINUTE = 6000;
     public static final String SECURITY_TOKEN_HEADER = "X-Auth-Token";
     public static final String DIAGNOSTICS_SERVLET_PATH = "/diagnostics/health";
 

@@ -15,6 +15,9 @@ jar {
 repositories {
     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     mavenCentral()
+    flatDir {
+        dirs 'lib'
+    }
 }
 
 
@@ -54,9 +57,10 @@ dependencies {
     compile libraries.snappy, libraries.spring_data_cassandra, libraries.spring_boot_logging,
             libraries.apache_commons_io, libraries.spring_framework, libraries.fhir_validator,
             libraries.jackson, libraries.saxon, libraries.rxjava,
-            libraries.netflix_astyanax, libraries.rome, libraries.rome_tools, libraries.time_uuid,
+            libraries.rome, libraries.rome_tools, libraries.time_uuid,
             libraries.spring_security, libraries.spring_web, libraries.eclipse_moxy,
-            libraries.spring_context_support, libraries.ehcache_core
+            libraries.spring_context_support, libraries.ehcache_core, libraries.commons_lang,
+            libraries.joda_time, libraries.lz4
 
     compile(libraries.spring_boot_security){
         exclude group: 'ch.qos.logback', module: "logback-classic"
@@ -67,9 +71,14 @@ dependencies {
     compile('io.netty:netty:3.9.0.Final') {
         force = 'true'
     }
-    compile('com.toddfast.mutagen:mutagen-cassandra:0.4.0') {
+
+    compile(libraries.mutagen) {
         exclude group: 'org.slf4j', module: 'slf4j-log4j12'
     }
+    compile(libraries.mutagen_cassandra) {
+        exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+    }
+
     compile project(":fhir")
     testCompile testLibraries.mockito, testLibraries.junit, testLibraries.spring_test, testLibraries.cassandra_unit_spring,
             testLibraries.wiremock, testLibraries.hamcrest_core
