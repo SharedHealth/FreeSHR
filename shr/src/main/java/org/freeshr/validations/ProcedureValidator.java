@@ -1,7 +1,6 @@
 package org.freeshr.validations;
 
 
-import org.freeshr.domain.ErrorMessageBuilder;
 import org.hl7.fhir.instance.model.*;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.slf4j.Logger;
@@ -12,14 +11,10 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.freeshr.domain.ErrorMessageBuilder.buildValidationMessage;
-
 @Component
 public class ProcedureValidator implements Validator<AtomEntry<? extends Resource>> {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcedureValidator.class);
-    private static String DATE = "date";
-    private static String REPORT = "report";
     private DateValidator dateValidator;
 
     @Autowired
@@ -32,61 +27,48 @@ public class ProcedureValidator implements Validator<AtomEntry<? extends Resourc
         AtomEntry<? extends Resource> atomEntry = subject.extract();
         List<ValidationMessage> validationMessages = new ArrayList<>();
 
+        validationMessages.addAll(validateDate(atomEntry));
+        if (validationMessages.size() > 0) return validationMessages;
 
-        if (!validateDate(atomEntry, validationMessages)) {
-            return validationMessages;
-
-        }
-
-        if (!validateDiagnosticReport(atomEntry, validationMessages)) {
-            return validationMessages;
-
-        }
-
+        validationMessages.addAll(validateDiagnosticReport(atomEntry));
         return validationMessages;
     }
 
-    //TODO: Decide if this func should be written(checks if link is present in the entire feed (Now checking for whether the link is not empty)
-    private boolean validateDiagnosticReport(AtomEntry<? extends Resource> atomEntry, List<ValidationMessage> validationMessages) {
-        String id = atomEntry.getId();
-        Property report = atomEntry.getResource().getChildByName(REPORT);
+    private List<ValidationMessage> validateDiagnosticReport(AtomEntry<? extends Resource> atomEntry) {
+        Property report = atomEntry.getResource().getChildByName("report");
         List<Element> reportElements = report.getValues();
         for (Element reportElement : reportElements) {
-            if (reportElement instanceof ResourceReference) {
-                ResourceReference reference = (ResourceReference) reportElement;
-                if (reference.getReferenceSimple() == null || reference.getReferenceSimple().isEmpty()) {
-                    logger.error("Should have reference to Diagnostic Report resource");
-                    validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, ErrorMessageBuilder.INVALID_DIAGNOSTIC_REPORT_REFERNECE, OperationOutcome.IssueSeverity.error));
-                    return false;
-                }
+            if (!(reportElement instanceof ResourceReference)) continue;
+            ResourceReference reference = (ResourceReference) reportElement;
+            if (reference.getReferenceSimple() == null || reference.getReferenceSimple().isEmpty()) {
+                return validationMessages(new ValidationMessage(null, ResourceValidator.INVALID, atomEntry.getId(), ValidationMessages
+                        .INVALID_DIAGNOSTIC_REPORT_REFERENCE, OperationOutcome.IssueSeverity.error));
             }
         }
-
-
-        return true;
+        return new ArrayList<>();
 
     }
 
-    private boolean validateDate(AtomEntry<? extends Resource> atomEntry, List<ValidationMessage> validationMessages) {
-        String id = atomEntry.getId();
-        Property date = atomEntry.getResource().getChildByName(DATE);
-        List<Element> dateElements = date.getValues();
-        for (Element element : dateElements) {
-            if (element instanceof Period) {
-                Period period = (Period) element;
-                DateAndTime endDate = period.getEndSimple();
-                DateAndTime startDate = period.getStartSimple();
+    private List<ValidationMessage> validateDate(AtomEntry<? extends Resource> atomEntry) {
+        Property date = atomEntry.getResource().getChildByName("date");
+        for (Element element : date.getValues()) {
+            if (!(element instanceof Period)) continue;
 
+            Period period = (Period) element;
+            DateAndTime endDate = period.getEndSimple();
+            DateAndTime startDate = period.getStartSimple();
 
-                if (!dateValidator.isValidPeriod(startDate, endDate)) {
-                    logger.error("Invalid Period Date. ");
-                    validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, ErrorMessageBuilder.INVALID_PERIOD, OperationOutcome.IssueSeverity.error));
-                    return false;
-                }
-
-            }
+            if (!dateValidator.isValidPeriod(startDate, endDate))
+                return validationMessages(new ValidationMessage(null, ResourceValidator.INVALID, atomEntry.getId(), ValidationMessages
+                        .INVALID_PERIOD, OperationOutcome.IssueSeverity.error));
         }
 
-        return true;
+        return new ArrayList<>();
+    }
+
+    private List<ValidationMessage> validationMessages(ValidationMessage message) {
+        List<ValidationMessage> validationMessages = new ArrayList<>();
+        validationMessages.add(message);
+        return validationMessages;
     }
 }

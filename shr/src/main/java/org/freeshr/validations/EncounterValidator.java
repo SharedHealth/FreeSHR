@@ -20,7 +20,6 @@ public class EncounterValidator {
     private ResourceValidator resourceValidator;
     private HealthIdValidator healthIdValidator;
     private StructureValidator structureValidator;
-    private FacilityValidator facilityValidator;
     private ProviderValidator providerValidator;
 
     @Autowired
@@ -29,16 +28,14 @@ public class EncounterValidator {
                               ResourceValidator resourceValidator,
                               HealthIdValidator healthIdValidator,
                               StructureValidator structureValidator,
-                              FacilityValidator facilityValidator,
                               ProviderValidator providerValidator) {
         this.fhirMessageFilter = fhirMessageFilter;
         this.fhirSchemaValidator = fhirSchemaValidator;
         this.resourceValidator = resourceValidator;
         this.healthIdValidator = healthIdValidator;
         this.structureValidator = structureValidator;
-        this.facilityValidator = facilityValidator;
         this.resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
-        this.providerValidator= providerValidator;
+        this.providerValidator = providerValidator;
     }
 
     public EncounterValidationResponse validate(EncounterBundle encounterBundle) {

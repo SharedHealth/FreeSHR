@@ -21,7 +21,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
-import static org.freeshr.domain.ErrorMessageBuilder.INVALID_DOSAGE_QUANTITY;
+import static org.freeshr.validations.ValidationMessages.INVALID_DOSAGE_QUANTITY;
 import static org.freeshr.utils.AtomFeedHelper.getAtomFeed;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

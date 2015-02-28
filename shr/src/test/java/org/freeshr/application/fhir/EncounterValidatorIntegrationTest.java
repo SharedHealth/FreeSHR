@@ -24,8 +24,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.freeshr.domain.ErrorMessageBuilder.INVALID_DISPENSE_MEDICATION_REFERENCE_URL;
-import static org.freeshr.domain.ErrorMessageBuilder.INVALID_MEDICATION_REFERENCE_URL;
+import static org.freeshr.validations.ValidationMessages.INVALID_DISPENSE_MEDICATION_REFERENCE_URL;
+import static org.freeshr.validations.ValidationMessages.INVALID_MEDICATION_REFERENCE_URL;
 import static org.freeshr.utils.FileUtil.asString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
@@ -58,20 +58,15 @@ public class EncounterValidatorIntegrationTest {
     @Autowired
     private FhirMessageFilter fhirMessageFilter;
     @Autowired
-    private FacilityValidator facilityValidator;
-
-    @Autowired
     private ProviderValidator providerValidator;
-
-    private FhirSchemaValidator fhirSchemaValidator;
 
 
     @Before
     public void setup() throws Exception {
         initMocks(this);
-        fhirSchemaValidator = new FhirSchemaValidator(trConceptLocator, shrProperties);
+        FhirSchemaValidator fhirSchemaValidator = new FhirSchemaValidator(trConceptLocator, shrProperties);
         validator = new EncounterValidator(fhirMessageFilter, fhirSchemaValidator, resourceValidator,
-                healthIdValidator, structureValidator, facilityValidator, providerValidator);
+                healthIdValidator, structureValidator, providerValidator);
         encounterBundle = EncounterBundleData.withValidEncounter();
 
         givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"))

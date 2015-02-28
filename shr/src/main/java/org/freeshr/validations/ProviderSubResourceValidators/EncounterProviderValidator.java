@@ -10,15 +10,15 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
-public class EncounterProvider extends SubResourceProvider {
+public class EncounterProviderValidator extends ProviderSubresourceValidator {
 
     @Override
-    boolean canHandle(Resource resource) {
+    protected boolean validates(Resource resource) {
         return (resource instanceof Encounter);
     }
 
     @Override
-    List<String> extractUrls(Resource resource) {
+    protected List<String> extractUrls(Resource resource) {
         List<Encounter.EncounterParticipantComponent> participants = ((Encounter) resource).getParticipant();
         String url = null;
         if (!CollectionUtils.isEmpty(participants)) {

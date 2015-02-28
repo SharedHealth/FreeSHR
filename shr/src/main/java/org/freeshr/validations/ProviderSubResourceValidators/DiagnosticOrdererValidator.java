@@ -10,15 +10,15 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
-public class DiagnosticOrderer extends SubResourceProvider {
+public class DiagnosticOrdererValidator extends ProviderSubresourceValidator {
 
     @Override
-    boolean canHandle(Resource resource) {
+    protected boolean validates(Resource resource) {
         return (resource instanceof DiagnosticOrder);
     }
 
     @Override
-    List<String> extractUrls(Resource resource) {
+    protected List<String> extractUrls(Resource resource) {
         ResourceReference orderer = ((DiagnosticOrder) resource).getOrderer();
         String url = null;
         if (orderer != null) {

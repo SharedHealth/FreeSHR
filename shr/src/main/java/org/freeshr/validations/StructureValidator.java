@@ -8,8 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.freeshr.domain.ErrorMessageBuilder.buildValidationMessage;
-import static org.freeshr.domain.ErrorMessageBuilder.FEED_MUST_HAVE_COMPOSITION;
+import static org.freeshr.validations.ValidationMessages.FEED_MUST_HAVE_COMPOSITION;
 
 @Component
 public class StructureValidator implements Validator<AtomFeed> {
@@ -21,7 +20,9 @@ public class StructureValidator implements Validator<AtomFeed> {
         AtomEntry<? extends Resource> compositionEntry = hasCompositionWithEncounter(feed.getEntryList());
 
         if (compositionEntry == null) {
-            validationMessages.add(buildValidationMessage("Feed", ResourceValidator.INVALID, FEED_MUST_HAVE_COMPOSITION, OperationOutcome.IssueSeverity.error));
+
+            validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, "Feed",
+                    FEED_MUST_HAVE_COMPOSITION, OperationOutcome.IssueSeverity.error));
             return validationMessages;
         }
 
@@ -31,7 +32,11 @@ public class StructureValidator implements Validator<AtomFeed> {
 
         //Add error for each section with no entry.
         for (String entryReferenceId : compositionSectionIds) {
-            validationMessages.add(buildValidationMessage(entryReferenceId, ResourceValidator.INVALID, String.format("No entry present for the section with id %s", entryReferenceId), OperationOutcome.IssueSeverity.error));
+
+            validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, entryReferenceId, String
+                    .format
+                    ("No entry present" +
+                            " for the section with id %s", entryReferenceId), OperationOutcome.IssueSeverity.error));
         }
 
         return validationMessages;
@@ -50,8 +55,10 @@ public class StructureValidator implements Validator<AtomFeed> {
 
                 if (compositionSectionIds.contains(identifier)) continue;
 
-                validationMessages.add(buildValidationMessage(identifier, ResourceValidator.INVALID, String.format("Entry with id %s is not present in the composition section list.",
-                        identifier), OperationOutcome.IssueSeverity.error));
+                validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, identifier, String.format
+                        ("Entry with id %s " +
+                                        "is not present in the composition section list.",
+                                identifier), OperationOutcome.IssueSeverity.error));
             }
         }
         return resourceDetailsList;

@@ -11,11 +11,8 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Component
 public class DoseQuantityValidator {
-
     public static final String DOSE_QUANTITY = "doseQuantity";
-
     private TRConceptLocator trConceptLocator;
-
     @Autowired
     public DoseQuantityValidator(TRConceptLocator trConceptLocator) {
         this.trConceptLocator = trConceptLocator;

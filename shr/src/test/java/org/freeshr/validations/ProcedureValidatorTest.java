@@ -1,6 +1,5 @@
 package org.freeshr.validations;
 
-import org.freeshr.domain.ErrorMessageBuilder;
 import org.freeshr.utils.AtomFeedHelper;
 import org.hl7.fhir.instance.model.AtomEntry;
 import org.hl7.fhir.instance.model.Resource;
@@ -12,7 +11,6 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.mockito.MockitoAnnotations.initMocks;
 
 public class ProcedureValidatorTest {
 
@@ -38,7 +36,7 @@ public class ProcedureValidatorTest {
         ValidationSubject<AtomEntry<? extends Resource>> feed = AtomFeedHelper.getAtomFeed("xmls/encounters/procedure/encounter_invalid_period_Procedure.xml", ResourceType.Procedure);
         List<ValidationMessage> validationMessages = procedureValidator.validate(feed);
         assertFalse(validationMessages.isEmpty());
-        assertEquals(ErrorMessageBuilder.INVALID_PERIOD, validationMessages.get(0).getMessage());
+        assertEquals(ValidationMessages.INVALID_PERIOD, validationMessages.get(0).getMessage());
 
 
     }
@@ -49,7 +47,7 @@ public class ProcedureValidatorTest {
         ValidationSubject<AtomEntry<? extends Resource>> feed = AtomFeedHelper.getAtomFeed("xmls/encounters/procedure/encounter_invalid_report_reference_Procedure.xml", ResourceType.Procedure);
         List<ValidationMessage> validationMessages = procedureValidator.validate(feed);
         assertFalse(validationMessages.isEmpty());
-        assertEquals(ErrorMessageBuilder.INVALID_DIAGNOSTIC_REPORT_REFERNECE, validationMessages.get(0).getMessage());
+        assertEquals(ValidationMessages.INVALID_DIAGNOSTIC_REPORT_REFERENCE, validationMessages.get(0).getMessage());
 
     }
 

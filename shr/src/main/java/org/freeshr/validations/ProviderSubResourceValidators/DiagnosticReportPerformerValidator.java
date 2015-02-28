@@ -10,14 +10,14 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
-public class DiagnosticReportPerformer extends SubResourceProvider {
+public class DiagnosticReportPerformerValidator extends ProviderSubresourceValidator {
     @Override
-    boolean canHandle(Resource resource) {
+    protected boolean validates(Resource resource) {
         return (resource instanceof DiagnosticReport);
     }
 
     @Override
-    List<String> extractUrls(Resource resource) {
+    protected List<String> extractUrls(Resource resource) {
         ResourceReference performer = ((DiagnosticReport) resource).getPerformer();
         String url = null;
         if (performer != null) {

@@ -1,7 +1,6 @@
 package org.freeshr.validations;
 
 
-import org.freeshr.domain.ErrorMessageBuilder;
 import org.freeshr.infrastructure.tr.MedicationCodeValidator;
 import org.hl7.fhir.instance.model.*;
 import org.hl7.fhir.instance.utils.ConceptLocator;
@@ -10,14 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import static org.freeshr.domain.ErrorMessageBuilder.*;
-import rx.Observable;
 
-import java.lang.Boolean;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity;
+import static org.freeshr.validations.ValidationMessages.*;
 import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity.error;
 
 @Component
@@ -28,7 +24,6 @@ public class MedicationPrescriptionValidator implements Validator<AtomEntry<? ex
     private static final String DISPENSE = "dispense";
     private static final Logger logger = LoggerFactory.getLogger(MedicationPrescriptionValidator.class);
     private MedicationCodeValidator codeValidator;
-
     private DoseQuantityValidator doseQuantityValidator;
     private UrlValidator urlValidator;
 
@@ -44,130 +39,88 @@ public class MedicationPrescriptionValidator implements Validator<AtomEntry<? ex
     public List<ValidationMessage> validate(ValidationSubject<AtomEntry<? extends Resource>> subject) {
 
         AtomEntry<? extends Resource> atomEntry = subject.extract();
-        ArrayList<ValidationMessage> validationMessages = new ArrayList<>();
+        List<ValidationMessage> validationMessages = new ArrayList<>();
 
-        if (!validateMedication(atomEntry, validationMessages)) {
-            return validationMessages;
-        }
+        validationMessages.addAll(validateMedication(atomEntry));
+        if (validationMessages.size() > 0) return validationMessages;
 
-        if (!validateDosageQuantity(atomEntry, validationMessages)) {
-            return validationMessages;
-        }
+        validationMessages.addAll(validateDosageQuantity(atomEntry));
+        if (validationMessages.size() > 0) return validationMessages;
 
-        if (!validateDispenseMedication(atomEntry, validationMessages)) {
-            return validationMessages;
-        }
-
+        validationMessages.addAll(validateDispenseMedication(atomEntry));
         return validationMessages;
     }
 
-    private boolean validateDosageQuantity(AtomEntry<? extends Resource> atomEntry, ArrayList<ValidationMessage> validationMessages) {
-        String id = atomEntry.getId();
+    private List<ValidationMessage> validateDosageQuantity(AtomEntry<? extends Resource> atomEntry) {
         Property dosageInstruction = atomEntry.getResource().getChildByName(DOSAGE_INSTRUCTION);
         List<Element> dosageInstructionValues = dosageInstruction.getValues();
         for (Element dosageInstructionValue : dosageInstructionValues) {
+            if (!(dosageInstructionValue instanceof MedicationPrescription
+                    .MedicationPrescriptionDosageInstructionComponent)) continue;
 
-            if (dosageInstructionValue instanceof MedicationPrescription.MedicationPrescriptionDosageInstructionComponent) {
-                Quantity doseQuantity = ((MedicationPrescription.MedicationPrescriptionDosageInstructionComponent) dosageInstructionValue).getDoseQuantity();
-
-                if(doseQuantityValidator.isReferenceUrlNotFound(doseQuantity)){
-                    return true;
-                }
-
-                if(!urlValidator.isValid(doseQuantity.getSystemSimple())){
-                    return false;
-                }
-
-                ConceptLocator.ValidationResult validationResult = doseQuantityValidator.validate(doseQuantity);
-                if (validationResult != null) {
-                    logger.error("Medication-Prescription DosageQuantity Code is invalid:");
-                    validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, INVALID_DOSAGE_QUANTITY, error));
-                    return false;
-                }
-            }
+            Quantity doseQuantity = ((MedicationPrescription.MedicationPrescriptionDosageInstructionComponent)
+                    dosageInstructionValue).getDoseQuantity();
+            if (doseQuantityValidator.isReferenceUrlNotFound(doseQuantity)) return new ArrayList<>();
+            if (!urlValidator.isValid(doseQuantity.getSystemSimple()))
+                return validationMessages(new ValidationMessage(null, ResourceValidator.INVALID, atomEntry.getId(),
+                        INVALID_DOSAGE_QUANTITY_REFERENCE, error));
+            ConceptLocator.ValidationResult validationResult = doseQuantityValidator.validate(doseQuantity);
+            if (validationResult != null)
+                return validationMessages(new ValidationMessage(null, ResourceValidator.INVALID, atomEntry.getId(),
+                        INVALID_DOSAGE_QUANTITY, error));
         }
-
-        return true;
+        return new ArrayList<>();
     }
 
 
-    private boolean validateDispenseMedication(AtomEntry<? extends Resource> atomEntry, ArrayList<ValidationMessage> validationMessages) {
-
-        String id = atomEntry.getId();
+    private List<ValidationMessage> validateDispenseMedication(AtomEntry<? extends Resource> atomEntry) {
         Property dispense = atomEntry.getResource().getChildByName(DISPENSE);
-        /* Not a Mandatory Field.Skip it if not present */
-        if (dispense == null || (!dispense.hasValues())) {
-            return true;
-        }
+        if (dispense == null || (!dispense.hasValues())) return new ArrayList<>();
         Property dispenseMedication = dispense.getValues().get(0).getChildByName(MEDICATION);
-        if (dispenseMedication == null || !dispenseMedication.hasValues()) {
-            return true;
-        }
+        if (dispenseMedication == null || !dispenseMedication.hasValues()) return new ArrayList<>();
         String dispenseMedicationRefUrl = getReferenceUrl(dispenseMedication);
-        if ((dispenseMedicationRefUrl == null)) {
-            return true;
-        }
-        if ((!urlValidator.isValid(dispenseMedicationRefUrl))) {
-            logger.error("Dispense-Medication URL is invalid:" + dispenseMedicationRefUrl);
-            validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, INVALID_DISPENSE_MEDICATION_REFERENCE_URL, error));
-            return false;
-        }
-
-        if (!isValidCodeableConceptUrl(dispenseMedicationRefUrl, "")) {
-            validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, INVALID_DISPENSE_MEDICATION_REFERENCE_URL, error));
-            return false;
-        }
-
-        return true;
+        if ((dispenseMedicationRefUrl == null)) return new ArrayList<>();
+        if (!urlValidator.isValid(dispenseMedicationRefUrl))
+            return validationMessages(new ValidationMessage(null, ResourceValidator.INVALID, atomEntry.getId(),
+                    INVALID_DISPENSE_MEDICATION_REFERENCE_URL, error));
+        if (!isValidCodeableConceptUrl(dispenseMedicationRefUrl, ""))
+            return validationMessages(new ValidationMessage(null, ResourceValidator.INVALID, atomEntry.getId(),
+                    INVALID_DISPENSE_MEDICATION_REFERENCE_URL, error));
+        return new ArrayList<>();
     }
 
 
-    private boolean validateMedication(AtomEntry<? extends Resource> atomEntry, List<ValidationMessage> validationMessages) {
-        String id = atomEntry.getId();
+    private List<ValidationMessage> validateMedication(AtomEntry<? extends Resource> atomEntry) {
         Property medication = atomEntry.getResource().getChildByName(MEDICATION);
-        if ((medication == null) || (!medication.hasValues())) {
-            validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, UNSPECIFIED_MEDICATION, error));
-            return false;
-        }
-
+        if ((medication == null) || (!medication.hasValues()))
+            return validationMessages(new ValidationMessage(null, ResourceValidator.INVALID, atomEntry.getId(),
+                    UNSPECIFIED_MEDICATION,
+                    error));
         String medicationRefUrl = getReferenceUrl(medication);
-        //now to check for valid or invalid
-        if ((medicationRefUrl == null)) {
-            return true;
-        }
-        if ((!urlValidator.isValid(medicationRefUrl))) {
-            logger.error("Medication URL is invalid:" + medicationRefUrl);
-            validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, INVALID_MEDICATION_REFERENCE_URL, error));
-            return false;
-        }
+        if ((medicationRefUrl == null)) return new ArrayList<>();
+        if (!urlValidator.isValid(medicationRefUrl))
+            return validationMessages(new ValidationMessage(null, ResourceValidator.INVALID, atomEntry.getId(),
+                    INVALID_MEDICATION_REFERENCE_URL, error));
+        if (!isValidCodeableConceptUrl(medicationRefUrl, ""))
+            return validationMessages(new ValidationMessage(null, ResourceValidator.INVALID, atomEntry.getId(),
+                    INVALID_MEDICATION_REFERENCE_URL, error));
+        return new ArrayList<>();
+    }
 
-        if (!isValidCodeableConceptUrl(medicationRefUrl, "")) {
-            validationMessages.add(buildValidationMessage(id, ResourceValidator.INVALID, INVALID_MEDICATION_REFERENCE_URL, error));
-            return false;
-        }
-
-        return true;
+    private List<ValidationMessage> validationMessages(ValidationMessage message) {
+        List<ValidationMessage> validationMessages = new ArrayList<>();
+        validationMessages.add(message);
+        return validationMessages;
     }
 
     private boolean isValidCodeableConceptUrl(String url, String code) {
-
-        Observable<Boolean> obs = codeValidator.isValid(url, code);
-        Boolean result = obs.toBlocking().first();
-        if (!result) {
-            return false;
-        }
-        return true;
+        return codeValidator.isValid(url, code).toBlocking().first();
     }
-
 
     private String getReferenceUrl(Property medication) {
         Element element = medication.getValues().get(0);
-        if (element instanceof ResourceReference) {
-            return ((ResourceReference) element).getReferenceSimple();
-        }
-        return null;
+        return element instanceof ResourceReference ? ((ResourceReference) element).getReferenceSimple() : null;
     }
-
 
 
 }

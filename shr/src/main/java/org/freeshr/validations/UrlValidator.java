@@ -12,7 +12,7 @@ public class UrlValidator {
         try {
             new URL(url);
             return true;
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException ignored) {
         }
         return false;
     }

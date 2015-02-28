@@ -1,8 +1,7 @@
 package org.freeshr.validations;
 
 import org.freeshr.config.SHRProperties;
-import org.freeshr.domain.ErrorMessageBuilder;
-import org.freeshr.validations.ProviderSubResourceValidators.SubResourceProvider;
+import org.freeshr.validations.ProviderSubResourceValidators.ProviderSubresourceValidator;
 import org.hl7.fhir.instance.model.AtomEntry;
 import org.hl7.fhir.instance.model.AtomFeed;
 import org.hl7.fhir.instance.model.Resource;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.freeshr.domain.ErrorMessageBuilder.buildValidationMessage;
 import static org.freeshr.validations.ResourceValidator.INVALID;
 import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity.error;
 
@@ -21,13 +19,13 @@ import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity.error;
 public class ProviderValidator implements Validator<AtomFeed> {
 
 
-    private List<SubResourceProvider> subResourceProviders;
+    private List<ProviderSubresourceValidator> providerSubresourceValidators;
     private SHRProperties shrProperties;
 
     @Autowired
-    public ProviderValidator(List<SubResourceProvider> subResourceProviders,
+    public ProviderValidator(List<ProviderSubresourceValidator> providerSubresourceValidators,
                              SHRProperties shrProperties) {
-        this.subResourceProviders = subResourceProviders;
+        this.providerSubresourceValidators = providerSubresourceValidators;
         this.shrProperties = shrProperties;
     }
 
@@ -38,13 +36,12 @@ public class ProviderValidator implements Validator<AtomFeed> {
         List<ValidationMessage> validationMessages = new ArrayList<>();
         for (AtomEntry<? extends Resource> entry : entryList) {
             Resource resource = entry.getResource();
-            for (SubResourceProvider subResourceProvider : subResourceProviders) {
-                if (!subResourceProvider.validateProvider(resource, shrProperties)) {
-                    validationMessages.add(buildValidationMessage(entry.getId(), INVALID,
-                            ErrorMessageBuilder.INVALID_PROVIDER_URL_PATTERN + " in " +
-                                    resource.getResourceType().getPath(), error));
-                    return validationMessages;
-                }
+            for (ProviderSubresourceValidator providerSubresourceValidator : providerSubresourceValidators) {
+                if (providerSubresourceValidator.isValid(resource, shrProperties)) continue;
+                validationMessages.add(new ValidationMessage(null, INVALID, entry.getId(), ValidationMessages
+                        .INVALID_PROVIDER_URL_PATTERN + " in " +
+                        resource.getResourceType().getPath(), error));
+                return validationMessages;
             }
         }
         return validationMessages;

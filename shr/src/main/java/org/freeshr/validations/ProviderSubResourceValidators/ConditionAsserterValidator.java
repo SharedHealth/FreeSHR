@@ -10,15 +10,15 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
-public class ConditionAsserter extends SubResourceProvider {
+public class ConditionAsserterValidator extends ProviderSubresourceValidator {
 
     @Override
-    boolean canHandle(Resource resource) {
+    protected boolean validates(Resource resource) {
         return (resource instanceof Condition);
     }
 
     @Override
-    List<String> extractUrls(Resource resource) {
+    protected List<String> extractUrls(Resource resource) {
         ResourceReference asserter = ((Condition) resource).getAsserter();
         String url = null;
         if (asserter != null) {

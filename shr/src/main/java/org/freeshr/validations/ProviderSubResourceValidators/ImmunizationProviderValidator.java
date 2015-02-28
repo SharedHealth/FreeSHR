@@ -10,15 +10,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class ImmunizationProvider extends SubResourceProvider {
+public class ImmunizationProviderValidator extends ProviderSubresourceValidator {
 
     @Override
-    boolean canHandle(Resource resource) {
+    protected boolean validates(Resource resource) {
         return (resource instanceof Immunization);
     }
 
     @Override
-    List<String> extractUrls(Resource resource) {
+    protected List<String> extractUrls(Resource resource) {
         List<String> urls = new ArrayList<>();
 
         ResourceReference requester = ((Immunization) resource).getRequester();
