@@ -1,6 +1,6 @@
 package org.freeshr.validations.ProviderSubResourceValidators;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.MedicationPrescription;
 import org.hl7.fhir.instance.model.Resource;
 import org.hl7.fhir.instance.model.ResourceReference;
