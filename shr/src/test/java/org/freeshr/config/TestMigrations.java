@@ -3,7 +3,7 @@ package org.freeshr.config;
 import com.datastax.driver.core.*;
 import com.datastax.driver.core.policies.ConstantReconnectionPolicy;
 import com.datastax.driver.core.policies.RoundRobinPolicy;
-import org.freeshr.utils.cassandra.Migrations;
+import org.freeshr.cassandra.Migrations;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;

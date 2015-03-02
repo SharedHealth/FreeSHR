@@ -15,7 +15,7 @@ repositories {
     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     mavenCentral()
     flatDir {
-        dirs 'lib'
+        dirs '../lib'
     }
 }
 
@@ -69,13 +69,6 @@ dependencies {
     }
     compile('io.netty:netty:3.9.0.Final') {
         force = 'true'
-    }
-
-    compile(libraries.mutagen) {
-        exclude group: 'org.slf4j', module: 'slf4j-log4j12'
-    }
-    compile(libraries.mutagen_cassandra) {
-        exclude group: 'org.slf4j', module: 'slf4j-log4j12'
     }
 
     compile project(":fhir")

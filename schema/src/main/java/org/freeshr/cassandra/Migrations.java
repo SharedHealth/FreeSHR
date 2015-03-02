@@ -1,13 +1,12 @@
 package org.freeshr.cassandra;
 
+
 import com.datastax.driver.core.*;
 import com.datastax.driver.core.policies.ConstantReconnectionPolicy;
 import com.datastax.driver.core.policies.RoundRobinPolicy;
-import com.toddfast.mutagen.Plan;
 import com.toddfast.mutagen.cassandra.CassandraMutagen;
 import com.toddfast.mutagen.cassandra.CassandraSubject;
 import com.toddfast.mutagen.cassandra.impl.CassandraMutagenImpl;
-import org.freeshr.config.SHRProperties;
 
 import java.io.IOException;
 import java.util.Map;
@@ -17,6 +16,8 @@ import static java.lang.System.getenv;
 public class Migrations {
 
     private static final String MUTAGEN_CONNECTION_POOL_NAME = "shrMigrationConnectionPool";
+    public static final int ONE_MINUTE = 6000;
+
     protected final Map<String, String> env;
 
     public Migrations() {
@@ -61,7 +62,7 @@ public class Migrations {
                 .withPoolingOptions(new PoolingOptions())
                 .withProtocolVersion(Integer.parseInt(env.get("CASSANDRA_VERSION")))
                 .withQueryOptions(queryOptions)
-                .withReconnectionPolicy(new ConstantReconnectionPolicy(SHRProperties.ONE_MINUTE))
+                .withReconnectionPolicy(new ConstantReconnectionPolicy(ONE_MINUTE))
                 .addContactPoint(env.get("CASSANDRA_HOST"));
         return clusterBuilder.build();
 
