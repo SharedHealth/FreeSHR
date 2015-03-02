@@ -130,6 +130,11 @@ task dist(dependsOn: 'exportProperties', type: Rpm) {
         into 'lib'
     }
 
+    from("${rootDir}/schema/build/libs") {
+        fileMode = 0755
+        into 'lib'
+    }
+
     from("scripts/rpm") {
         fileMode = 0755
         exclude 'bdshr'
