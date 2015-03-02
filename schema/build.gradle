@@ -28,13 +28,9 @@ jar {
 
 
 dependencies {
-    compile(libraries.mutagen) {
-        exclude group: 'org.slf4j', module: 'slf4j-log4j12'
-    }
-    compile(libraries.mutagen_cassandra) {
-        exclude group: 'org.slf4j', module: 'slf4j-log4j12'
-    }
-    compile libraries.spring_data_cassandra
+    compile libraries.mutagen
+    compile libraries.mutagen_cassandra,libraries.commons_lang
+    compile libraries.spring_data_cassandra,libraries.lz4,libraries.snappy
     compile(libraries.spring_core){
         force = true
     }

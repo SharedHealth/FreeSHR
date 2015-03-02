@@ -30,8 +30,8 @@ public class Migrations {
 
     public void migrate() throws IOException {
         String freeSHRKeyspace = env.get("CASSANDRA_KEYSPACE");
-        Session session = connectKeyspace();
-
+        Cluster cluster = connectKeyspace();
+        Session session = createSession(cluster);
         CassandraMutagen mutagen = new CassandraMutagenImpl(freeSHRKeyspace);
         mutagen.initialize(env.get("CASSANDRA_MIGRATIONS_PATH"));
         com.toddfast.mutagen.Plan.Result<Integer> result = mutagen.mutate(new CassandraSubject(session,
@@ -42,11 +42,11 @@ public class Migrations {
         } else if (!result.isMutationComplete()) {
             throw new RuntimeException("Failed to apply cassandra migrations");
         }
+        cluster.close();
     }
 
-    private Session connectKeyspace() {
-        Cluster cluster = connectCluster();
-        return createSession(cluster);
+    private Cluster connectKeyspace() {
+        return connectCluster();
     }
 
     protected Cluster connectCluster() {
