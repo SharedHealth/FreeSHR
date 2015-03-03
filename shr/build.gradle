@@ -3,7 +3,6 @@ apply plugin: 'spring-boot'
 apply plugin: 'war'
 apply plugin: 'rpm'
 apply plugin: 'idea'
-apply plugin: 'cobertura'
 
 mainClassName = "org.freeshr.launch.Main"
 
@@ -187,12 +186,3 @@ buildscript {
         )
     }
 }
-
-cobertura {
-    coverageFormats = ['html', 'xml']
-    coverageIgnoreTrivial = true
-    coverageIgnores = ['org.slf4j.Logger.*']
-    coverageReportDir = new File("$buildDir/reports/cobertura")
-}
-
-test.finalizedBy(project.tasks.cobertura)
