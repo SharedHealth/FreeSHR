@@ -29,19 +29,27 @@ public class Migrations {
     }
 
     public void migrate() throws IOException {
-        String freeSHRKeyspace = env.get("CASSANDRA_KEYSPACE");
-        Cluster cluster = connectKeyspace();
-        Session session = createSession(cluster);
-        CassandraMutagen mutagen = new CassandraMutagenImpl(freeSHRKeyspace);
-        mutagen.initialize(env.get("CASSANDRA_MIGRATIONS_PATH"));
-        com.toddfast.mutagen.Plan.Result<Integer> result = mutagen.mutate(new CassandraSubject(session,
-                freeSHRKeyspace));
+        try {
+            String freeSHRKeyspace = env.get("CASSANDRA_KEYSPACE");
+            Cluster cluster = connectKeyspace();
+            Session session = createSession(cluster);
+            CassandraMutagen mutagen = new CassandraMutagenImpl(freeSHRKeyspace);
+            mutagen.initialize(env.get("CASSANDRA_MIGRATIONS_PATH"));
+            com.toddfast.mutagen.Plan.Result<Integer> result = mutagen.mutate(new CassandraSubject(session,
+                    freeSHRKeyspace));
 
-        if (result.getException() != null) {
-            throw new RuntimeException(result.getException());
-        } else if (!result.isMutationComplete()) {
-            throw new RuntimeException("Failed to apply cassandra migrations");
+            if (result.getException() != null) {
+                throw new RuntimeException(result.getException());
+            } else if (!result.isMutationComplete()) {
+                throw new RuntimeException("Failed to apply cassandra migrations");
+            }
+        } finally {
+            closeConnection(cluster, session);
         }
+    }
+
+    private void closeConnection(Cluster cluster, Session session) {
+        session.close();
         cluster.close();
     }
 
