@@ -59,6 +59,8 @@ public class EncounterValidatorIntegrationTest {
     private FhirMessageFilter fhirMessageFilter;
     @Autowired
     private ProviderValidator providerValidator;
+    @Autowired
+    private FacilityValidator facilityValidator;
 
 
     @Before
@@ -66,7 +68,7 @@ public class EncounterValidatorIntegrationTest {
         initMocks(this);
         FhirSchemaValidator fhirSchemaValidator = new FhirSchemaValidator(trConceptLocator, shrProperties);
         validator = new EncounterValidator(fhirMessageFilter, fhirSchemaValidator, resourceValidator,
-                healthIdValidator, structureValidator, providerValidator);
+                healthIdValidator, structureValidator, providerValidator, facilityValidator);
         encounterBundle = EncounterBundleData.withValidEncounter();
 
         givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"))
@@ -82,6 +84,8 @@ public class EncounterValidatorIntegrationTest {
                         .withBody(asString("jsons/code.json"))));
 
         givenThat(get(urlEqualTo("/facilities/10000069.json"))
+                .withHeader("client_id", matching("18550"))
+                .withHeader("X-Auth-Token", matching("c6e6fd3a26313eb250e1019519af33e743808f5bb50428ae5423b8ee278e6fa5"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
@@ -104,24 +108,20 @@ public class EncounterValidatorIntegrationTest {
         assertTrue(validate.isSuccessful());
     }
 
-//    TODO : fix the hrm query, then run the following test
-    @Ignore
     @Test
     public void shouldFailIfNotAValidFacility() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/encounterWithInvalidFacility.xml"));
-        EncounterValidationResponse validate = validator.validate(encounterBundle);
-        assertTrue(validate.isNotSuccessful());
+        EncounterValidationResponse response = validator.validate(encounterBundle);
+        assertFailureFromResponseErrors("urn:d3cc23c3-1f12-4b89-a415-356feeba0690", FacilityValidator.INVALID_SERVICE_PROVIDER, response.getErrors());
     }
 
-//    TODO : fix the hrm query, then run the following test
-    @Ignore
     @Test
     public void shouldFailIfFacilityUrlIsInvalid() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/encounterWithInvalidFacilityUrl.xml"));
-        EncounterValidationResponse validate = validator.validate(encounterBundle);
-        assertTrue(validate.isNotSuccessful());
+        EncounterValidationResponse response = validator.validate(encounterBundle);
+        assertFailureFromResponseErrors("urn:d3cc23c3-1f12-4b89-a415-356feeba0690", FacilityValidator.INVALID_SERVICE_PROVIDER_URL, response.getErrors());
     }
 
     @Test
@@ -140,6 +140,7 @@ public class EncounterValidatorIntegrationTest {
         assertFalse(response.isSuccessful());
         assertEquals(1, response.getErrors().size());
         assertEquals("Unknown", response.getErrors().get(0).getField());
+        assertTrue("Should have failed for unknown ConditionStatus code", response.getErrors().get(0).getReason().contains("ConditionStatus code"));
     }
 
     @Test
@@ -147,11 +148,12 @@ public class EncounterValidatorIntegrationTest {
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         when(trConceptLocator.validate(anyString(), eq("invalid-eddb01eb-61fc-4f9e-aca5"),
                 anyString())).thenReturn(new ConceptLocator.ValidationResult(OperationOutcome.IssueSeverity.error,
-                "Invalid code"));
+                "Invalid code invalid-eddb01eb-61fc-4f9e-aca5"));
 
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/invalid_concept.xml"));
-        assertFalse(validator.validate(encounterBundle).isSuccessful());
+        EncounterValidationResponse response = validator.validate(encounterBundle);
+        assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "Invalid code invalid-eddb01eb-61fc-4f9e-aca5", response.getErrors());
     }
 
     @Test
@@ -159,18 +161,22 @@ public class EncounterValidatorIntegrationTest {
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         when(trConceptLocator.validate(anyString(), eq("INVALID_REFERENCE_TERM"),
                 anyString())).thenReturn(new ConceptLocator.ValidationResult(OperationOutcome.IssueSeverity.error,
-                "Invalid code"));
+                "INVALID_REFERENCE_TERM"));
 
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/invalid_ref.xml"));
-        assertFalse(validator.validate(encounterBundle).isSuccessful());
+        EncounterValidationResponse response = validator.validate(encounterBundle);
+        assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "INVALID_REFERENCE_TERM", response.getErrors());
     }
 
     @Test
     public void shouldRejectEncounterWithMissingSystemForDiagnosis() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/diagnosis_system_missing.xml"));
-        assertFalse(validator.validate(encounterBundle).isSuccessful());
+        EncounterValidationResponse response = validator.validate(encounterBundle);
+        assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:category/f:coding/f:system", "@value cannot be empty", response.getErrors());
+        assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:category",
+                "None of the codes are in the expected value set http://hl7.org/fhir/vs/condition-category (http://hl7.org/fhir/vs/condition-category)", response.getErrors());
     }
 
     @Test
@@ -434,7 +440,7 @@ public class EncounterValidatorIntegrationTest {
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
         List<Error> errors = validationResponse.getErrors();
-        assertEquals("Invalid Dosage Quantity", 1, errors.size());
+        assertFailureFromResponseErrors("urn:5fc6d0d9-9520-4015-87cb-ab0cfa7e4b50", "Invalid Dosage Quantity", errors);
 
     }
 
@@ -511,5 +517,15 @@ public class EncounterValidatorIntegrationTest {
                 FileUtil.asString("xmls/encounters/procedure/encounter_Procedure.xml"));
         EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
         assertTrue(validationResponse.isSuccessful());
+    }
+
+    private void assertFailureFromResponseErrors(String fieldName, String reason, List<Error> errors) {
+        for (Error error : errors) {
+            if (error.getField().equals(fieldName)) {
+                assertEquals(reason, error.getReason());
+                return;
+            }
+        }
+        fail(String.format("Couldn't find expected error with fieldName [%s] reason [%s]", fieldName, reason));
     }
 }

@@ -36,6 +36,8 @@ public class FacilityRegistryClientIntegrationTest {
     @Test
     public void shouldFetchFacility() throws ExecutionException, InterruptedException {
         givenThat(get(urlEqualTo("/facilities/10000001.json"))
+                .withHeader("client_id", matching("18550"))
+                .withHeader("X-Auth-Token", matching("c6e6fd3a26313eb250e1019519af33e743808f5bb50428ae5423b8ee278e6fa5"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")

@@ -17,4 +17,6 @@ public class DateUtilTest {
         String format = String.format("%d-%02d-%02d", date.getYear(), date.getMonthOfYear(), date.getDayOfMonth());
         assertThat(dateUtil.getCurrentTimeInUTCString().startsWith(format), is(true));
     }
+
+
 }

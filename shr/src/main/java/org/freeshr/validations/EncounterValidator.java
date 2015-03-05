@@ -20,6 +20,7 @@ public class EncounterValidator {
     private ResourceValidator resourceValidator;
     private HealthIdValidator healthIdValidator;
     private StructureValidator structureValidator;
+    private FacilityValidator facilityValidator;
     private ProviderValidator providerValidator;
 
     @Autowired
@@ -28,12 +29,14 @@ public class EncounterValidator {
                               ResourceValidator resourceValidator,
                               HealthIdValidator healthIdValidator,
                               StructureValidator structureValidator,
-                              ProviderValidator providerValidator) {
+                              ProviderValidator providerValidator,
+                              FacilityValidator facilityValidator) {
         this.fhirMessageFilter = fhirMessageFilter;
         this.fhirSchemaValidator = fhirSchemaValidator;
         this.resourceValidator = resourceValidator;
         this.healthIdValidator = healthIdValidator;
         this.structureValidator = structureValidator;
+        this.facilityValidator = facilityValidator;
         this.resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
         this.providerValidator = providerValidator;
     }
@@ -43,26 +46,28 @@ public class EncounterValidator {
             final EncounterValidationContext validationContext = new EncounterValidationContext(encounterBundle,
                     resourceOrFeedDeserializer);
 
-            EncounterValidationResponse validationResponse = fromValidationMessages(fhirSchemaValidator.validate(
-                    validationContext.sourceFragment()), fhirMessageFilter);
+
+            EncounterValidationResponse validationResponse = fromValidationMessages(
+                    fhirSchemaValidator.validate(validationContext.sourceFragment()), fhirMessageFilter);
             if (validationResponse.isNotSuccessful()) return validationResponse;
 
-            validationResponse = fromValidationMessages(structureValidator.validate(validationContext.feedFragment())
-                    , fhirMessageFilter);
-            if (validationResponse.isNotSuccessful()) return validationResponse;
-//          TODO : fix the way we query hrm server, then uncomment this validation
-//            validationResponse = fromValidationMessages(facilityValidator.validate(validationContext.feedFragment())
-//                    , fhirMessageFilter);
-//            if (validationResponse.isNotSuccessful()) return validationResponse;
-
-            validationResponse = fromValidationMessages(providerValidator.validate(validationContext.feedFragment())
-                    , fhirMessageFilter);
+            validationResponse = fromValidationMessages(
+                    structureValidator.validate(validationContext.feedFragment()), fhirMessageFilter);
             if (validationResponse.isNotSuccessful()) return validationResponse;
 
-            validationResponse = fromValidationMessages(resourceValidator.validate(validationContext.feedFragment())
-                    , fhirMessageFilter);
-            return validationResponse.isSuccessful() ? fromValidationMessages(healthIdValidator.validate
-                    (validationContext.context()), fhirMessageFilter)
+            validationResponse = fromValidationMessages(
+                    facilityValidator.validate(validationContext.feedFragment()), fhirMessageFilter);
+            if (validationResponse.isNotSuccessful()) return validationResponse;
+
+            validationResponse = fromValidationMessages(
+                    providerValidator.validate(validationContext.feedFragment()), fhirMessageFilter);
+            if (validationResponse.isNotSuccessful()) return validationResponse;
+
+            validationResponse = fromValidationMessages(
+                    resourceValidator.validate(validationContext.feedFragment()), fhirMessageFilter);
+
+            return validationResponse.isSuccessful()
+                    ? fromValidationMessages(healthIdValidator.validate(validationContext.context()), fhirMessageFilter)
                     : validationResponse;
         } catch (Exception e) {
             e.printStackTrace();

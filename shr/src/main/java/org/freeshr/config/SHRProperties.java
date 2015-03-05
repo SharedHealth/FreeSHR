@@ -47,6 +47,8 @@ public class SHRProperties {
 
     @Value("${FACILITY_REGISTRY_URL}")
     private String facilityRegistryUrl;
+
+    //TODO: remove
     @Value("${FACILITY_REGISTRY_AUTH_TOKEN}")
     private String facilityRegistryAuthToken;
 
@@ -66,6 +68,12 @@ public class SHRProperties {
 
     @Value("${FACILITY_CACHE_TTL_SECONDS}")
     private String facilityCacheTTL;
+
+    @Value("${IDP_CLIENT_ID}")
+    private String idPClientId;
+
+    @Value("${IDP_AUTH_TOKEN}")
+    private String idPAuthToken;
 
     public String getMCIPatientUrl() {
         return String.format("%s://%s:%s/%s",mciSchema,mciHost,mciPort,mciPatientPath);
@@ -147,4 +155,11 @@ public class SHRProperties {
         return facilityCacheTTL != null ? Integer.parseInt(facilityCacheTTL) : ONE_DAY;
     }
 
+    public String getIdPClientId() {
+        return idPClientId;
+    }
+
+    public String getIdPAuthToken() {
+        return idPAuthToken;
+    }
 }

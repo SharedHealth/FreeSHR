@@ -1,7 +1,7 @@
 package org.freeshr.validations;
 
 import org.freeshr.config.SHRProperties;
-import org.freeshr.validations.ProviderSubResourceValidators.ProviderSubresourceValidator;
+import org.freeshr.validations.providerIdentifiers.ClinicalResourceProviderIdentifier;
 import org.hl7.fhir.instance.model.AtomEntry;
 import org.hl7.fhir.instance.model.AtomFeed;
 import org.hl7.fhir.instance.model.Resource;
@@ -19,13 +19,13 @@ import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity.error;
 public class ProviderValidator implements Validator<AtomFeed> {
 
 
-    private List<ProviderSubresourceValidator> providerSubresourceValidators;
+    private List<ClinicalResourceProviderIdentifier> clinicalResourceProviderIdentifiers;
     private SHRProperties shrProperties;
 
     @Autowired
-    public ProviderValidator(List<ProviderSubresourceValidator> providerSubresourceValidators,
+    public ProviderValidator(List<ClinicalResourceProviderIdentifier> clinicalResourceProviderIdentifiers,
                              SHRProperties shrProperties) {
-        this.providerSubresourceValidators = providerSubresourceValidators;
+        this.clinicalResourceProviderIdentifiers = clinicalResourceProviderIdentifiers;
         this.shrProperties = shrProperties;
     }
 
@@ -36,12 +36,13 @@ public class ProviderValidator implements Validator<AtomFeed> {
         List<ValidationMessage> validationMessages = new ArrayList<>();
         for (AtomEntry<? extends Resource> entry : entryList) {
             Resource resource = entry.getResource();
-            for (ProviderSubresourceValidator providerSubresourceValidator : providerSubresourceValidators) {
-                if (providerSubresourceValidator.isValid(resource, shrProperties)) continue;
-                validationMessages.add(new ValidationMessage(null, INVALID, entry.getId(), ValidationMessages
-                        .INVALID_PROVIDER_URL_PATTERN + " in " +
-                        resource.getResourceType().getPath(), error));
-                return validationMessages;
+            for (ClinicalResourceProviderIdentifier clinicalResourceProviderIdentifier : clinicalResourceProviderIdentifiers) {
+                if (!clinicalResourceProviderIdentifier.isValid(resource, shrProperties)) {
+                    validationMessages.add(new ValidationMessage(ValidationMessage.Source.ProfileValidator,
+                            INVALID, entry.getId(),
+                            ValidationMessages.INVALID_PROVIDER_URL + " in " + resource.getResourceType().getPath(),
+                            error));
+                }
             }
         }
         return validationMessages;
