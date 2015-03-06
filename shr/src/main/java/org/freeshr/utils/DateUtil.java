@@ -7,19 +7,29 @@ import java.util.Date;
 
 public class DateUtil {
 
-    public static final String UTC_DATE_IN_MILLIS_FORMAT = "yyyy-MM-dd HH:mm:ss.SSSZ";
-    public static final String UTC_DATE_IN_SECS_FORMAT = "yyyy-MM-dd HH:mm:ssZ";
-    public static final String SIMPLE_DATE_WITH_SECS_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    public static final String SIMPLE_DATE_FORMAT = "yyyy-MM-dd";
-    public static final String ISO_DATE_IN_MILLIS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-    public static final String ISO_DATE_IN_SECS_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
-    public static final String ISO_DATE_IN_HOUR_MIN_FORMAT="yyyy-MM-dd'T'HH:mmZ";
+    public static final String UTC_DATE_IN_MILLIS_FORMAT = "yyyy-MM-dd HH:mm:ss.SSSZ"; //2015-02-17 11:32:24.638+0530
+    public static final String UTC_DATE_IN_SECS_FORMAT = "yyyy-MM-dd HH:mm:ssZ"; //2015-02-17 11:35:17+0530
+    public static final String SIMPLE_DATE_WITH_SECS_FORMAT = "yyyy-MM-dd HH:mm:ss"; //2015-02-17 11:35:36
+    public static final String SIMPLE_DATE_FORMAT = "yyyy-MM-dd"; //2015-02-17
+    public static final String ISO_DATE_IN_MILLIS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"; //2015-02-17T11:36:11.587+0530
+    public static final String ISO_DATE_IN_SECS_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"; //2015-02-17T11:37:16+0530
+    public static final String ISO_DATE_IN_HOUR_MIN_FORMAT="yyyy-MM-dd'T'HH:mmZ"; //2015-02-17T11:37+0530
+
+    public static final String UTC_DATE_MILLIS_TZD_FORMAT    = "yyyy-MM-dd'T'HH:mm:ss.SSSX"; //2011-04-15T20:08:18.032Z
+    public static final String UTC_DATE_IN_SECS_TZD_FORMAT   = "yyyy-MM-dd'T'HH:mm:ssX"; //2011-04-15T20:08:18Z;
+    public static final String UTC_DATE_IN_MIN_TZD_FORMAT    = "yyyy-MM-dd'T'HH:mmX"; //2011-04-15T20:08Z
+    public static final String UTC_DATE_IN_HOUR_TZD_FORMAT   = "yyyy-MM-dd'T'HHX"; //2011-04-15T20Z
+    public static final String UTC_DATE_IN_DATE_TZD_FORMAT   = "yyyy-MM-dd'T'X"; //2011-04-15TZ
+    public static final String UTC_DATE_IN_SIMPLE_TZD_FORMAT = "yyyy-MM-ddX"; //2011-04-15Z
 
     public static final String[] DATE_FORMATS = new String[]{
             ISO_DATE_IN_MILLIS_FORMAT, ISO_DATE_IN_SECS_FORMAT,
             ISO_DATE_IN_HOUR_MIN_FORMAT,
             UTC_DATE_IN_MILLIS_FORMAT, UTC_DATE_IN_SECS_FORMAT,
-            SIMPLE_DATE_WITH_SECS_FORMAT, SIMPLE_DATE_FORMAT};
+            SIMPLE_DATE_WITH_SECS_FORMAT, SIMPLE_DATE_FORMAT,
+            UTC_DATE_MILLIS_TZD_FORMAT, UTC_DATE_IN_SECS_TZD_FORMAT,
+            UTC_DATE_IN_MIN_TZD_FORMAT, UTC_DATE_IN_HOUR_TZD_FORMAT,
+            UTC_DATE_IN_DATE_TZD_FORMAT, UTC_DATE_IN_SIMPLE_TZD_FORMAT};
 
     public static String getCurrentTimeInUTCString() {
         SimpleDateFormat dateFormat = new SimpleDateFormat(UTC_DATE_IN_MILLIS_FORMAT);
