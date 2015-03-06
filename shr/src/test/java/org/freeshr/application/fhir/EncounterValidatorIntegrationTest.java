@@ -6,13 +6,17 @@ import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.data.EncounterBundleData;
 import org.freeshr.infrastructure.tr.ValueSetCodeValidator;
-import org.freeshr.utils.CollectionUtils;
 import org.freeshr.utils.FileUtil;
-import org.freeshr.validations.*;
+import org.freeshr.validations.EncounterValidator;
+import org.freeshr.validations.FacilityValidator;
+import org.freeshr.validations.FhirSchemaValidator;
+import org.freeshr.validations.HealthIdValidator;
+import org.freeshr.validations.ProviderValidator;
+import org.freeshr.validations.ResourceValidator;
+import org.freeshr.validations.StructureValidator;
 import org.hl7.fhir.instance.model.OperationOutcome;
 import org.hl7.fhir.instance.utils.ConceptLocator;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,15 +28,16 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.freeshr.utils.FileUtil.asString;
 import static org.freeshr.validations.ValidationMessages.INVALID_DISPENSE_MEDICATION_REFERENCE_URL;
 import static org.freeshr.validations.ValidationMessages.INVALID_MEDICATION_REFERENCE_URL;
-import static org.freeshr.utils.FileUtil.asString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -350,6 +355,27 @@ public class EncounterValidatorIntegrationTest {
     }
 
     @Test
+    public void shouldValidateRouteInMedicationReference() {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/medication_prescription_valid.xml"));
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
+        verify(trConceptLocator, times(1)).validate("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration", "implant", "implant");
+        assertTrue("Medication prescription pass through validation", validationResponse.isSuccessful());
+    }
+
+    @Test
+    public void shouldValidateDispenseMedicationInMedicationPrescription() {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/medication_prescription_substitution_type_reason.xml"));
+        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
+        assertTrue("Medication-prescription,Prescriber pass through validation", validationResponse.isSuccessful());
+
+    }
+
+
+    @Test
     public void shouldValidateSiteAndReasonInMedicationPrescription() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/medication_prescription_route_valid.xml"));
@@ -441,7 +467,7 @@ public class EncounterValidatorIntegrationTest {
     @Test
     public void shouldValidateInvalidSchemaInDischargeSummaryEncounter() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/discharge_summary_encounter_invalid.xml"));
+                FileUtil.asString("xmls/encounters/discharge_summary_encounter_invalid_schema.xml"));
 
         EncounterValidationResponse response = validator.validate(encounterBundle);
         List<Error> errors = response.getErrors();
@@ -506,9 +532,28 @@ public class EncounterValidatorIntegrationTest {
         assertTrue(validationResponse.isSuccessful());
     }
 
+    @Test
+    public void shouldValidateInvalidEncounterWithAllResources() {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/encounter_invalid_with_all_resources.xml"));
+        EncounterValidationResponse response = validator.validate(encounterBundle);
+        assertFalse(response.isSuccessful());
+        List<Error> errors = response.getErrors();
+        assertFailureFromResponseErrors("urn:07f02524-7647-43c1-a579-0c2c80f285ed", "Invalid Service Provider",
+                errors);
+        assertFailureFromResponseErrors("urn:07f02524-7647-43c1-a579-0c2c80f285ed", "Invalid Provider URL in encounter",
+                errors);
+        assertFailureFromResponseErrors("urn:06a87681-68dd-455d-8dd3-5d4f34842905", "Invalid Provider URL in diagnosticreport",
+                errors);
+        assertFailureFromResponseErrors("urn:299531be-4e43-4349-9eb0-a48213e10692", "Invalid Dosage Quantity",
+                errors);
+        assertFailureFromResponseErrors("7urn:b9b8da08-1d9a-4968-b5be-0d47e518b2ec", "Invalid Period",
+                errors);
+    }
+
     private void assertFailureFromResponseErrors(String fieldName, String reason, List<Error> errors) {
         for (Error error : errors) {
-            if (error.getField().equals(fieldName)) {
+            if (error.getReason().equals(reason)) {
                 assertEquals(reason, error.getReason());
                 return;
             }
