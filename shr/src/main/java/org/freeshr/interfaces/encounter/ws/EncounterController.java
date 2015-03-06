@@ -3,13 +3,16 @@ package org.freeshr.interfaces.encounter.ws;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
-import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.service.EncounterService;
+import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.utils.DateUtil;
+import org.freeshr.utils.HttpUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -44,7 +47,9 @@ public class EncounterController {
     public DeferredResult<EncounterResponse> create(
             @PathVariable String healthId,
             @RequestBody EncounterBundle encounterBundle,
-            HttpServletRequest request) throws ExecutionException, InterruptedException {
+            HttpServletRequest request,
+            @AuthenticationPrincipal UserInfo userInfo) throws ExecutionException, InterruptedException {
+        
         logger.debug("Create encounter. " + encounterBundle.getContent());
         encounterBundle.setHealthId(healthId);
 
@@ -81,7 +86,7 @@ public class EncounterController {
 
     private String getSecurityToken(HttpServletRequest request) {
         //if the request has reached here, the token is guaranteed to be present
-        return request.getHeader(SHRProperties.SECURITY_TOKEN_HEADER);
+        return request.getHeader(HttpUtil.AUTH_TOKEN_KEY);
     }
 
     @RequestMapping(value = "/patients/{healthId}/encounters", method = RequestMethod.GET,
@@ -89,7 +94,8 @@ public class EncounterController {
     public DeferredResult<EncounterSearchResponse> findEncountersForPatient(
             final HttpServletRequest request,
             @PathVariable String healthId,
-            @RequestParam(value = "updatedSince", required = false) String updatedSince) {
+            @RequestParam(value = "updatedSince", required = false) String updatedSince,
+            @AuthenticationPrincipal UserInfo userInfo) {
         logger.debug("Find all encounters by health id: " + healthId);
         final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<EncounterSearchResponse>();
         try {

@@ -1,5 +1,7 @@
 package org.freeshr.infrastructure.security;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -10,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TokenAuthenticationProvider implements AuthenticationProvider {
-
+    private final static Logger logger = LoggerFactory.getLogger(TokenAuthenticationFilter.class);
     @Autowired
     private IdentityServiceClient identityServiceClient;
 
@@ -23,18 +25,18 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        String token = (String) authentication.getPrincipal();
         try {
-            return identityServiceClient.authenticate(token);
+            return identityServiceClient.authenticate((UserAuthInfo) authentication.getPrincipal(), (String) authentication.getCredentials());
         }
         catch (AuthenticationException ex){
-            throw new BadCredentialsException("Invalid token or token expired");
+            logger.error(ex.getMessage());
+            throw new BadCredentialsException(ex.getMessage());
         }
         catch (Exception ex){
+            logger.error(ex.getMessage());
             throw new BadCredentialsException(ex.getMessage());
         }
     }
-
 
     @Override
     public boolean supports(Class<?> authentication) {

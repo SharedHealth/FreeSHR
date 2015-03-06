@@ -2,6 +2,7 @@ package org.freeshr.infrastructure.mci;
 
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.patient.Patient;
+import org.freeshr.utils.HttpUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
@@ -31,7 +32,7 @@ public class MasterClientIndexClient {
     public Observable<Patient> getPatient(String healthId, String securityToken) {
         MultiValueMap<String, String> headers = basicAuthHeaders(shrProperties.getMciUser(), shrProperties
                 .getMciPassword());
-        headers.add(SHRProperties.SECURITY_TOKEN_HEADER, securityToken);
+        headers.add(HttpUtil.AUTH_TOKEN_KEY, securityToken);
 
         Observable<ResponseEntity<Patient>> responseEntityObservable = Observable.from(shrRestTemplate.exchange(
                 shrProperties.getMCIPatientUrl() + "/" + healthId,

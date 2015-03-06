@@ -31,6 +31,4 @@ public class HttpUtil {
         httpHeaders.add(AUTH_TOKEN_KEY, shrProperties.getIdPAuthToken());
         return httpHeaders;
     }
-
-
 }

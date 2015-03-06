@@ -9,31 +9,37 @@ import java.util.Collection;
 import java.util.List;
 
 public class TokenAuthentication implements Authentication {
-    private String name;
-    private String token;
-    private List<? extends GrantedAuthority> roles;
+    private UserInfo userInfo;
+    private List<? extends GrantedAuthority> groups;
+    private boolean isAuthenticated;
 
-    public TokenAuthentication(UserInfo userInfo, String token) {
-        this.name = userInfo.getName();
-        this.token= token;
-
-        String commaSeparateRoles = StringUtils.join(userInfo.getRoles(), ",");
-        this.roles = AuthorityUtils.commaSeparatedStringToAuthorityList
-                (commaSeparateRoles);
+    public TokenAuthentication(UserInfo userInfo, boolean isAuthenticated) {
+        this.userInfo = userInfo;
+        this.isAuthenticated = isAuthenticated;
+        this.groups = getUserGroups(userInfo);
     }
 
-    public String getName() {
-        return name;
+    private List<GrantedAuthority> getUserGroups(UserInfo userInfo) {
+        List<String> userGroups = userInfo.getGroups();
+        for (int index = 0; index < userGroups.size(); index++) {
+            String group = userGroups.get(index);
+            group = "ROLE_" + group;
+            userGroups.set(index, group);
+        }
+
+        String commaSeparateRoles = StringUtils.join(userInfo.getGroups(), ",");
+        return AuthorityUtils.commaSeparatedStringToAuthorityList
+                (commaSeparateRoles);
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles;
+        return groups;
     }
 
     @Override
     public Object getCredentials() {
-        return null;
+        return userInfo.getAccessToken();
     }
 
     @Override
@@ -43,17 +49,17 @@ public class TokenAuthentication implements Authentication {
 
     @Override
     public Object getPrincipal() {
-        return token;
+        return userInfo;
     }
 
     @Override
     public boolean isAuthenticated() {
-        return true;
+        return isAuthenticated;
     }
 
     @Override
     public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
-
+        this.isAuthenticated = isAuthenticated;
     }
 
     @Override
@@ -63,22 +69,18 @@ public class TokenAuthentication implements Authentication {
 
         TokenAuthentication tokenAuthentication = (TokenAuthentication) o;
 
-        if (!token.equals(tokenAuthentication.token)) return false;
+        if (!userInfo.equals(tokenAuthentication.userInfo)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return token.hashCode();
+        return userInfo.hashCode();
     }
 
     @Override
-    public String toString() {
-        return "TokenAuthentication{" +
-                "name='" + name + '\'' +
-                ", token='" + token + '\'' +
-                ", roles=" + roles +
-                '}';
+    public String getName() {
+        return userInfo.getName();
     }
 }

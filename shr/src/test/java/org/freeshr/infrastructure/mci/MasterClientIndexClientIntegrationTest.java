@@ -3,9 +3,9 @@ package org.freeshr.infrastructure.mci;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
-import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
+import org.freeshr.utils.HttpUtil;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,7 +37,7 @@ public class MasterClientIndexClientIntegrationTest {
         String heathId = "5893922485019082753";
         String securityToken = UUID.randomUUID().toString();
         givenThat(get(urlEqualTo("/api/v1/patients/" + heathId))
-                .withHeader(SHRProperties.SECURITY_TOKEN_HEADER, equalTo(securityToken))
+                .withHeader(HttpUtil.AUTH_TOKEN_KEY, equalTo(securityToken))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")

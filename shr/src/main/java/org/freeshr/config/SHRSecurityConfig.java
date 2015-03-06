@@ -14,7 +14,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.util.matcher.*;
+import org.springframework.security.web.util.matcher.AndRequestMatcher;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -34,22 +37,19 @@ public class SHRSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .anonymous().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
         http
-                .requestMatcher(new AndRequestMatcher(new ArrayList<RequestMatcher>(){{
-                    add(new NegatedRequestMatcher(new AntPathRequestMatcher(SHRProperties.DIAGNOSTICS_SERVLET_PATH)));
-                    add(new AntPathRequestMatcher("/**"));
+                .requestMatcher(new AndRequestMatcher(new ArrayList<RequestMatcher>() {
+                    {
+                        add(new NegatedRequestMatcher(new AntPathRequestMatcher(SHRProperties.DIAGNOSTICS_SERVLET_PATH)));
+                        add(new AntPathRequestMatcher("/**"));
                     }
                 }))
                 .authorizeRequests()
-                .anyRequest().hasRole("SHR_USER")
+                .anyRequest().hasRole("Facility Admin")
                 .and()
                 .addFilterBefore(new TokenAuthenticationFilter(authenticationManager()), BasicAuthenticationFilter
                         .class)
                 .exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint());
-
-
-
     }
 
     @Bean
