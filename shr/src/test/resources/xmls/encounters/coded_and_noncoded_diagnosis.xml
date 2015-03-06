@@ -6,7 +6,7 @@
     <updated>2014-07-25T16:50:29+05:30</updated>
     <entry>
         <title>Composition</title>
-        <id>urn:Encounter - c41cabed-3c47-4260-bd70-ac4893b97ee8</id>
+        <id>urn:encounter</id>
         <updated>2014-09-22T18:40:07.504+05:30</updated>
         <author>
             <name>bahmni</name>
@@ -22,36 +22,48 @@
                     <reference value="http://mci/patients/5893922485019082753"/>
                 </subject>
                 <encounter>
-                    <reference value="c41cabed-3c47-4260-bd70-ac4893b97ee8"/>
+                    <reference value="urn:c41cabed-3c47-4260-bd70-ac4893b97ee8"/>
                     <display value="encounter"/>
                 </encounter>
                 <section>
                     <content>
-                        <reference value="c41cabed-3c47-4260-bd70-ac4893b97ee8"/>
+                        <reference value="urn:c41cabed-3c47-4260-bd70-ac4893b97ee8"/>
                         <display value="Encounter"/>
                     </content>
                 </section>
                 <section>
                     <content>
-                        <reference value="5f982a33-4454-4b74-9236-b8157aa8effd"/>
+                        <reference value="urn:5f982a33-4454-4b74-9236-b8157aa8effd"/>
                         <display value="Condition"/>
                     </content>
                 </section>
                 <section>
                     <content>
-                        <reference value="5f982a33-4454-4b74-9236-b8157aa8e123"/>
+                        <reference value="urn:5f982a33-4454-4b74-9236-b8157aa8e123"/>
                         <display value="Condition"/>
                     </content>
                 </section>
                 <section>
                     <content>
-                        <reference value="5f982a33-4454-4b74-9236-b8157aa8e678"/>
+                        <reference value="urn:5f982a33-4454-4b74-9236-b8157aa8e678"/>
                         <display value="Condition"/>
                     </content>
                 </section>
                 <section>
                     <content>
-                        <reference value="9826cf0c-66d6-4e33-bed1-91381ab200b5"/>
+                        <reference value="urn:9826cf0c-66d6-4e33-bed1-91381ab200b5"/>
+                        <display value="Condition"/>
+                    </content>
+                </section>
+                <section>
+                    <content>
+                        <reference value="urn:b741c977-833c-4252-9992-50907c297c05"/>
+                        <display value="Condition"/>
+                    </content>
+                </section>
+                <section>
+                    <content>
+                        <reference value="urn:c811c977-833c-4252-9992-50907c297c05"/>
                         <display value="Condition"/>
                     </content>
                 </section>
@@ -60,7 +72,7 @@
     </entry>
     <entry>
         <title>Encounter</title>
-        <id>urn:d3cc23c3-1f12-4b89-a415-356feeba0690</id>
+        <id>urn:c41cabed-3c47-4260-bd70-ac4893b97ee8</id>
         <updated>2014-10-14T12:29:14.212+05:30</updated>
         <author>
             <name>bahmni</name>
@@ -68,7 +80,7 @@
         <content type="text/xml">
             <Encounter xmlns="http://hl7.org/fhir">
                 <identifier>
-                    <value value="c41cabed-3c47-4260-bd70-ac4893b97ee8"/>
+                    <value value="urn:c41cabed-3c47-4260-bd70-ac4893b97ee8"/>
                 </identifier>
                 <status value="finished"/>
                 <class value="outpatient"/>
@@ -76,7 +88,7 @@
                     <text value="LAB_RESULT"/>
                 </type>
                 <subject>
-                    <reference value="http://mci/patients/5893922485019082753"/>
+                    <reference value="http://127.0.0.1:9997/patients/5893922485019082753"/>
                 </subject>
                 <participant>
                     <individual>
@@ -92,7 +104,7 @@
     </entry>
     <entry>
         <title>Diagnosis</title>
-        <id>http://localhost/diagnosis/5f982a33-4454-4b74-9236-b8157aa8effd</id>
+        <id>urn:5f982a33-4454-4b74-9236-b8157aa8effd</id>
         <updated>2014-07-25T16:51:37+05:30</updated>
         <author>
             <name>test author</name>
@@ -100,7 +112,7 @@
         <content type="text/xml">
             <Condition xmlns="http://hl7.org/fhir">
                 <identifier>
-                    <value value="5f982a33-4454-4b74-9236-b8157aa8effd"/>
+                    <value value="urn:5f982a33-4454-4b74-9236-b8157aa8effd"/>
                 </identifier>
                 <subject>
                     <reference value="5893922485019082753"/>
@@ -131,7 +143,7 @@
     </entry>
     <entry>
         <title>Diagnosis</title>
-        <id>urn:9826cf0c-66d6-4e33-bed1-91381ab200b5</id>
+        <id>urn:5f982a33-4454-4b74-9236-b8157aa8e123</id>
         <updated>2014-10-31T17:03:37.136+05:30</updated>
         <author>
             <name>bahmni</name>
@@ -139,7 +151,7 @@
         <content type="text/xml">
             <Condition xmlns="http://hl7.org/fhir">
                 <identifier>
-                    <value value="5f982a33-4454-4b74-9236-b8157aa8e123"/>
+                    <value value="urn:5f982a33-4454-4b74-9236-b8157aa8e123"/>
                 </identifier>
                 <subject>
                     <reference value="5893922485019082753"/>
@@ -172,7 +184,7 @@
     </entry>
     <entry>
         <title>Diagnosis</title>
-        <id>urn:9826cf0c-66d6-4e33-bed1-91381ab200b5</id>
+        <id>urn:5f982a33-4454-4b74-9236-b8157aa8e678</id>
         <updated>2014-10-31T17:03:37.136+05:30</updated>
         <author>
             <name>bahmni</name>
@@ -180,7 +192,7 @@
         <content type="text/xml">
             <Condition xmlns="http://hl7.org/fhir">
                 <identifier>
-                    <value value="5f982a33-4454-4b74-9236-b8157aa8e678"/>
+                    <value value="urn:5f982a33-4454-4b74-9236-b8157aa8e678"/>
                 </identifier>
                 <subject>
                     <reference value="5893922485019082753"/>
@@ -220,7 +232,7 @@
         <content type="text/xml">
             <Condition xmlns="http://hl7.org/fhir">
                 <identifier>
-                    <value value="9826cf0c-66d6-4e33-bed1-91381ab200b5"/>
+                    <value value="urn:9826cf0c-66d6-4e33-bed1-91381ab200b5"/>
                 </identifier>
                 <subject>
                     <reference value="5893922485019082753"/>
@@ -235,7 +247,7 @@
                 <dateAsserted value="2014-10-31T17:02:51+05:30"/>
                 <code>
                     <coding>
-                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/referenceterms/b8d6be25-9547-462a-b858-0252ad04d4b3"/>
+                        <system value="http://127.0.0.1:9997/openmrs/ws/rest/v1/tr/referenceterms/b8d6be25-9547-462a-b858-0252ad04d4b3"/>
                         <code value="368009"/>
                         <display value="Heart valve disorder"/>
                     </coding>
@@ -280,6 +292,96 @@
                 </relatedItem>
             </Condition>
 
+        </content>
+    </entry>
+    <entry>
+        <title>complaint</title>
+        <id>urn:b741c977-833c-4252-9992-50907c297c05</id>
+        <updated>2015-01-07T12:00:40.215+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <Condition
+                    xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:b741c977-833c-4252-9992-50907c297c05"/>
+                </identifier>
+                <subject>
+                    <reference
+                            value="http://127.0.0.1:9997/patients/5893922485019082753"/>
+                    <display value="5893922485019082753"/>
+                </subject>
+                <encounter>
+                    <reference
+                            value="urn:07f02524-7647-43c1-a579-0c2c80f285ed"/>
+                    <display value="Encounter"/>
+                </encounter>
+                <asserter>
+                    <reference value="http://127.0.0.1:9997/providers/18.json"/>
+                </asserter>
+                <dateAsserted value="2015-01-07T12:00:15+05:30"/>
+                <code>
+                    <coding>
+                        <system value="http://127.0.0.1:9997/openmrs/ws/rest/v1/tr/concepts/e8816d09-9735-4f08-ad05-471c1f7b4b88"/>
+                        <code value="e8816d09-9735-4f08-ad05-471c1f7b4b88"/>
+                        <display value="Fever"/>
+                    </coding>
+                </code>
+                <category>
+                    <coding>
+                        <system value="http://hl7.org/fhir/condition-category"/>
+                        <code value="complaint"/>
+                        <display value="Complaint"/>
+                    </coding>
+                </category>
+                <status value="confirmed"/>
+                <onsetDateTime value="2014-12-24T12:00:15+05:30"/>
+            </Condition>
+        </content>
+    </entry>
+    <entry>
+        <title>complaint</title>
+        <id>urn:c811c977-833c-4252-9992-50907c297c05</id>
+        <updated>2015-01-07T12:00:40.215+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <Condition
+                    xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:c811c977-833c-4252-9992-50907c297c05"/>
+                </identifier>
+                <subject>
+                    <reference
+                            value="http://127.0.0.1:9997/patients/5893922485019082753"/>
+                    <display value="5893922485019082753"/>
+                </subject>
+                <encounter>
+                    <reference
+                            value="urn:07f02524-7647-43c1-a579-0c2c80f285ed"/>
+                    <display value="Encounter"/>
+                </encounter>
+                <asserter>
+                    <reference value="http://127.0.0.1:9997/providers/18.json"/>
+                </asserter>
+                <dateAsserted value="2015-01-07T12:00:15+05:30"/>
+                <code>
+                    <coding>
+                        <display value="Fever"/>
+                    </coding>
+                </code>
+                <category>
+                    <coding>
+                        <system value="http://hl7.org/fhir/condition-category"/>
+                        <code value="complaint"/>
+                        <display value="Complaint"/>
+                    </coding>
+                </category>
+                <status value="confirmed"/>
+                <onsetDateTime value="2014-12-24T12:00:15+05:30"/>
+            </Condition>
         </content>
     </entry>
 </feed>

@@ -14,7 +14,8 @@ import org.springframework.web.client.AsyncRestTemplate;
 import rx.Observable;
 import rx.functions.Func1;
 
-import static org.freeshr.utils.HttpUtil.basicHeaders;
+import static org.freeshr.utils.HttpUtil.getIdentityHeaders;
+
 
 @Component
 public class FacilityRegistryClient {
@@ -37,7 +38,7 @@ public class FacilityRegistryClient {
         Observable<ResponseEntity<Facility>> response = Observable.from(shrRestTemplate.exchange(
                 getFacilityUrl(facilityId),
                 HttpMethod.GET,
-                new HttpEntity(basicHeaders(shrProperties.getFacilityRegistryAuthToken())),
+                new HttpEntity(getIdentityHeaders(shrProperties)),
                 Facility.class));
 
         return response.map(parseResponse());

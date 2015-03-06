@@ -207,6 +207,25 @@
                         <display value="Diagnostic Report"/>
                     </content>
                 </section>
+                <section>
+                    <content>
+                        <reference value="urn:299531be-4e43-4349-9eb0-a48213e10692"/>
+                        <display value="Immunization"/>
+                    </content>
+                </section>
+                <section>
+                    <content>
+                        <reference value="urn:06a87681-68dd-455d-8dd3-5d4f34842905"/>
+                        <display value="Diagnostic Report"/>
+                    </content>
+                </section>
+                <section>
+                    <content>
+                        <reference value="urn:b9b8da08-1d9a-4968-b5be-0d47e518b2ec"/>
+                        <display value="Procedures"/>
+                    </content>
+                </section>
+
             </Composition>
         </content>
     </entry>
@@ -229,19 +248,19 @@
                     <text value="DISCHARGE"/>
                 </type>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <participant>
                     <individual>
-                        <reference
-                                value="http://127.0.0.1:9997/providers/18.json"/>
+                        <reference value="http://127.0.0.1:9997/providers"/>
                     </individual>
                 </participant>
+                <serviceProvider>
+                    <reference value="http://127.0.0.1:9997/facilities/*.json" />
+                </serviceProvider>
                 <indication>
-                    <reference
-                            value="urn:07f02524-7647-43c1-a579-0c2c80f285ed"/>
+                    <reference value="urn:07f02524-7647-43c1-a579-0c2c80f285ed"/>
                     <display value="Encounter"/>
                 </indication>
             </Encounter>
@@ -271,8 +290,7 @@
                     <value value="urn:a175b480-f703-4de6-9f1a-9838dc24e431"/>
                 </identifier>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -301,8 +319,7 @@
                     <value value="urn:01e9d0d0-4636-4215-9c6b-09294878f18e"/>
                 </identifier>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -332,8 +349,7 @@
                     <value value="urn:d918c92a-5a96-4a93-9920-4d6cbc24bd33"/>
                 </identifier>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -367,29 +383,25 @@
                     <value value="urn:82611657-d212-4d72-9a68-1c2fd14a9642"/>
                 </identifier>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <related>
                     <type value="has-component"/>
                     <target>
-                        <reference
-                                value="urn:a175b480-f703-4de6-9f1a-9838dc24e431"/>
+                        <reference value="urn:a175b480-f703-4de6-9f1a-9838dc24e431"/>
                     </target>
                 </related>
                 <related>
                     <type value="has-component"/>
                     <target>
-                        <reference
-                                value="urn:01e9d0d0-4636-4215-9c6b-09294878f18e"/>
+                        <reference value="urn:01e9d0d0-4636-4215-9c6b-09294878f18e"/>
                     </target>
                 </related>
                 <related>
                     <type value="has-component"/>
                     <target>
-                        <reference
-                                value="urn:d918c92a-5a96-4a93-9920-4d6cbc24bd33"/>
+                        <reference value="urn:d918c92a-5a96-4a93-9920-4d6cbc24bd33"/>
                     </target>
                 </related>
             </Observation>
@@ -417,8 +429,7 @@
                     <value value="urn:b91319de-382d-41a2-951c-c0e6c00c97e1"/>
                 </identifier>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -438,13 +449,11 @@
                     <value value="urn:b741c977-833c-4252-9992-50907c297c05"/>
                 </identifier>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <encounter>
-                    <reference
-                            value="urn:07f02524-7647-43c1-a579-0c2c80f285ed"/>
+                    <reference value="urn:07f02524-7647-43c1-a579-0c2c80f285ed"/>
                     <display value="Encounter"/>
                 </encounter>
                 <asserter>
@@ -484,8 +493,7 @@
                     <value value="urn:4ea22196-932a-4ad9-b880-5ed57b7dde47"/>
                 </identifier>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <relation>
@@ -533,8 +541,7 @@
                     <value value="urn:1a38ed9e-b19d-40df-9ba3-092655387464"/>
                 </identifier>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -564,8 +571,7 @@
                     <value value="urn:5e88c7b2-469b-4b7c-b87f-184f61a4c5cc"/>
                 </identifier>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -594,22 +600,19 @@
                     <value value="urn:772fb91f-a460-4053-9886-703819d58bed"/>
                 </identifier>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <related>
                     <type value="has-component"/>
                     <target>
-                        <reference
-                                value="urn:1a38ed9e-b19d-40df-9ba3-092655387464"/>
+                        <reference value="urn:1a38ed9e-b19d-40df-9ba3-092655387464"/>
                     </target>
                 </related>
                 <related>
                     <type value="has-component"/>
                     <target>
-                        <reference
-                                value="urn:5e88c7b2-469b-4b7c-b87f-184f61a4c5cc"/>
+                        <reference value="urn:5e88c7b2-469b-4b7c-b87f-184f61a4c5cc"/>
                     </target>
                 </related>
             </Observation>
@@ -639,8 +642,7 @@
                     <value value="urn:293e2936-7ad6-4fa5-bffa-68626f2fb421"/>
                 </identifier>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -670,8 +672,7 @@
                     <value value="urn:40b43d8a-b582-4080-8c04-93697b82a795"/>
                 </identifier>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -700,29 +701,25 @@
                     <value value="urn:83078e46-e7c2-4b4f-808b-42e64fe2cb79"/>
                 </identifier>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <related>
                     <type value="has-component"/>
                     <target>
-                        <reference
-                                value="urn:772fb91f-a460-4053-9886-703819d58bed"/>
+                        <reference value="urn:772fb91f-a460-4053-9886-703819d58bed"/>
                     </target>
                 </related>
                 <related>
                     <type value="has-component"/>
                     <target>
-                        <reference
-                                value="urn:293e2936-7ad6-4fa5-bffa-68626f2fb421"/>
+                        <reference value="urn:293e2936-7ad6-4fa5-bffa-68626f2fb421"/>
                     </target>
                 </related>
                 <related>
                     <type value="has-component"/>
                     <target>
-                        <reference
-                                value="urn:40b43d8a-b582-4080-8c04-93697b82a795"/>
+                        <reference value="urn:40b43d8a-b582-4080-8c04-93697b82a795"/>
                     </target>
                 </related>
             </Observation>
@@ -742,13 +739,11 @@
                     <value value="urn:e45dbdca-4e39-4a79-b1b8-fd622fdff6e3"/>
                 </identifier>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <encounter>
-                    <reference
-                            value="urn:07f02524-7647-43c1-a579-0c2c80f285ed"/>
+                    <reference value="urn:07f02524-7647-43c1-a579-0c2c80f285ed"/>
                     <display value="Encounter"/>
                 </encounter>
                 <asserter>
@@ -795,8 +790,7 @@
                     <value value="urn:13b177c1-fca0-48e8-9f80-ce05a7c03ef4"/>
                 </identifier>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -828,8 +822,7 @@
                     <value value="urn:e0316ce9-7d96-45db-af97-024ce52516f6"/>
                 </identifier>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -856,22 +849,19 @@
                     <value value="urn:e7d9d7f2-38a1-4619-b581-6d1dfabe1936"/>
                 </identifier>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <related>
                     <type value="has-component"/>
                     <target>
-                        <reference
-                                value="urn:13b177c1-fca0-48e8-9f80-ce05a7c03ef4"/>
+                        <reference value="urn:13b177c1-fca0-48e8-9f80-ce05a7c03ef4"/>
                     </target>
                 </related>
                 <related>
                     <type value="has-component"/>
                     <target>
-                        <reference
-                                value="urn:e0316ce9-7d96-45db-af97-024ce52516f6"/>
+                        <reference value="urn:e0316ce9-7d96-45db-af97-024ce52516f6"/>
                     </target>
                 </related>
             </Observation>
@@ -901,8 +891,7 @@
                     <value value="urn:251e944b-6713-4b6d-821a-3d40f7f646d2"/>
                 </identifier>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -932,8 +921,7 @@
                     <value value="urn:0ea771b2-7bf3-47cc-93ad-8cb273f567e9"/>
                 </identifier>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -963,8 +951,7 @@
                     <value value="urn:23e8c7b9-4007-4da2-bae9-d14695adef96"/>
                 </identifier>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -994,8 +981,7 @@
                     <value value="urn:8670c03c-a12b-4a53-bf38-c87ab63d96b6"/>
                 </identifier>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -1043,7 +1029,7 @@
                     </timingSchedule>
                     <route>
                         <coding>
-                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration"/>
+                            <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/Route-of-Administration"/>
                             <code value="implant"/>
                             <display value="implant"/>
                         </coding>
@@ -1065,7 +1051,7 @@
                     <asNeededBoolean value="true"/>
                     <doseQuantity>
                         <value value="3"/>
-                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Quantity-Units-invalid"/>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Quantity-Units"/>
                         <code value="TU"/>
                     </doseQuantity>
                     <asNeededCodeableConcept>
@@ -1109,36 +1095,31 @@
                     <value value="urn:1fccab13-1c50-4f0b-840e-d5ed763d626d"/>
                 </identifier>
                 <subject>
-                    <reference
-                            value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <related>
                     <type value="has-component"/>
                     <target>
-                        <reference
-                                value="urn:251e944b-6713-4b6d-821a-3d40f7f646d2"/>
+                        <reference value="urn:251e944b-6713-4b6d-821a-3d40f7f646d2"/>
                     </target>
                 </related>
                 <related>
                     <type value="has-component"/>
                     <target>
-                        <reference
-                                value="urn:0ea771b2-7bf3-47cc-93ad-8cb273f567e9"/>
+                        <reference value="urn:0ea771b2-7bf3-47cc-93ad-8cb273f567e9"/>
                     </target>
                 </related>
                 <related>
                     <type value="has-component"/>
                     <target>
-                        <reference
-                                value="urn:23e8c7b9-4007-4da2-bae9-d14695adef96"/>
+                        <reference value="urn:23e8c7b9-4007-4da2-bae9-d14695adef96"/>
                     </target>
                 </related>
                 <related>
                     <type value="has-component"/>
                     <target>
-                        <reference
-                                value="urn:8670c03c-a12b-4a53-bf38-c87ab63d96b6"/>
+                        <reference value="urn:8670c03c-a12b-4a53-bf38-c87ab63d96b6"/>
                     </target>
                 </related>
             </Observation>
@@ -1227,6 +1208,156 @@
                     <reference value="ce6c6ac9-ca55-44a2-9c41-c1227d55c730"/>
                 </result>
             </DiagnosticReport>
+        </content>
+    </entry>
+    <entry>
+        <title>Immunization</title>
+        <id>urn:299531be-4e43-4349-9eb0-a48213e10692</id>
+        <updated>2015-01-07T17:05:30.336+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <Immunization
+                    xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:299531be-4e43-4349-9eb0-a48213e10692"/>
+                </identifier>
+                <date value="2014-12-03T00:00:00+05:30"/>
+                <vaccineType>
+                    <coding>
+                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/drugs/c7a6e6e8-dde5-4194-8f60-4e090d34c00f"/>
+                        <code value="c7a6e6e8-dde5-4194-8f60-4e090d34c00f"/>
+                        <display value="Abarelix"/>
+                    </coding>
+                </vaccineType>
+                <subject>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <display value="5893922485019082753"/>
+                </subject>
+                <refusedIndicator value="true"/>
+                <reported value="true"/>
+                <requester>
+                    <reference value="http://127.0.0.1:9997/providers/18.json"/>
+                </requester>
+                <route>
+                    <coding>
+                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/Route-of-Administration"/>
+                        <code value="implant"/>
+                        <display value="implant"/>
+                    </coding>
+                </route>
+                <doseQuantity>
+                    <value value="3"/>
+                    <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/"/>
+                    <code value="TU"/>
+                </doseQuantity>
+                <explanation>
+                    <reason>
+                        <coding>
+                            <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/Immunization-Reason"/>
+                            <code value="281657000"/>
+                            <display value="Travel vaccinations"/>
+                        </coding>
+                    </reason>
+                    <refusalReason>
+                        <coding>
+                            <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/No-Immunization-Reason"/>
+                            <code value="PATOBJ"/>
+                            <display value="patient objection"/>
+                        </coding>
+                    </refusalReason>
+                </explanation>
+            </Immunization>
+        </content>
+    </entry>
+    <entry>
+        <title>Diagnostic Report</title>
+        <id>urn:06a87681-68dd-455d-8dd3-5d4f34842905</id>
+        <updated>2015-01-21T17:45:04.716+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <DiagnosticReport xmlns="http://hl7.org/fhir">
+                <name>
+                    <coding>
+                        <display value="Test A"/>
+                    </coding>
+                </name>
+                <status value="final"/>
+                <issued value="2015-01-21T17:39:37+05:30"/>
+                <subject>
+                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <display value="5893922485019082753"/>
+                </subject>
+                <performer>
+                    <reference value="http://127.0.0.1:9997/providers/18."/>
+                </performer>
+                <identifier>
+                    <value value="urn:06a87681-68dd-455d-8dd3-5d4f34842905"/>
+                </identifier>
+                <diagnosticDateTime value="2015-01-21T17:39:37+05:30"/>
+                <result>
+                    <display value="positive"/>
+                </result>
+                <codedDiagnosis>
+                    <coding>
+                        <display value="Viral pneumonia 406475"/>
+                    </coding>
+                </codedDiagnosis>
+            </DiagnosticReport>
+        </content>
+    </entry>
+    <entry>
+        <title>Procedures</title>
+        <id>urn:b9b8da08-1d9a-4968-b5be-0d47e518b2ec</id>
+        <updated>2015-01-21T17:45:04.716+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <Procedure xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:b9b8da08-1d9a-4968-b5be-0d47e518b2ec"/>
+                </identifier>
+                <subject>
+                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <display value="5893922485019082753"/>
+                </subject>
+                <type>
+                    <coding>
+                        <system value="http://192.168.33.17:9080/openmrs/ws/rest/v1/tr/referenceterms/838b3372-0fe8-4c09-acce-30248abe71ef"/>
+                        <code value="7W09X0Z"/>
+                        <display value="ProcedureAnswer1"/>
+                    </coding>
+                    <coding>
+                        <system value="http://192.168.33.17:9080/openmrs/ws/rest/v1/tr/concepts/bfbcf165-2414-4f33-92fd-80d61bc191ba"/>
+                        <code value="bfbcf165-2414-4f33-92fd-80d61bc191ba"/>
+                        <display value="ProcedureAnswer1"/>
+                    </coding>
+                </type>
+                <bodySite>
+                    <coding>
+                        <system value="http://192.168.33.17:9080/openmrs/ws/rest/v1/tr/concepts/83030008"/>
+                        <code value="83030008"/>
+                        <display value="Retropharyngeal area"/>
+                    </coding>
+                </bodySite>
+                <indication>
+                    <text value="ensure breathing during surgery"/>
+                </indication>
+                <date>
+                    <start value="2014-12-31T00:00:00+05:30"/>
+                    <end value="2013-01-13T00:00:00+05:30"/>
+                </date>
+                <outcome value="Little johny wants to play"/>
+                <report>
+                    <reference value="urn:06a87681-68dd-455d-8dd3-5d4f34842905"/>
+                    <display value="Diagnostic Report"/>
+                </report>
+                <followUp value="Come again another day"/>
+            </Procedure>
         </content>
     </entry>
 </feed>

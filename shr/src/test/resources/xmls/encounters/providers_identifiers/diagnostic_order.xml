@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Encounter</title>
+    <id>urn:1faa88db-ef1a-4729-b0bf-6870dbd8590b</id>
+    <link rel="fhir-base" href="http://localhost/"/>
+    <updated>2014-09-22T13:48:18+05:30</updated>
+    <entry>
+        <title>Diagnostic Order</title>
+        <id>urn:a86018fa-e15d-4004-85bc-a1ee713dc923</id>
+        <updated>2014-09-22T18:40:07.525+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <DiagnosticOrder xmlns="http://hl7.org/fhir">
+                <subject>
+                    <reference value="http://mci/patients/5893922485019082753"/>
+                </subject>
+                <orderer>
+                    <reference value="http://127.0.0.1:9997/providers/18.json"/>
+                </orderer>
+                <identifier>
+                    <value value="a86018fa-e15d-4004-85bc-a1ee713dc923"/>
+                </identifier>
+                <encounter>
+                    <reference value="c41cabed-3c47-4260-bd70-ac4893b97ee8"/>
+                    <display value="encounter"/>
+                </encounter>
+                <status value="requested"/>
+                <item>
+                    <code>
+                        <coding>
+                            <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba"/>
+                            <code value="79647ed4-a60e-4cf5-ba68-cf4d55956cba"/>
+                            <display value="Hemoglobin"/>
+                        </coding>
+                    </code>
+                    <status value="requested"/>
+                </item>
+            </DiagnosticOrder>
+        </content>
+    </entry>
+</feed>

@@ -18,6 +18,6 @@ public class ValidationMessages {
     public static final String UNKNOWN_CONDITION_RELATION_CODE = "Unknown ConditionRelationshipType code";
     public static final String INVALID_PERIOD = "Invalid Period";
     public static final String INVALID_DIAGNOSTIC_REPORT_REFERENCE = "Invalid Diagnostic Report Reference";
-    public static final String INVALID_PROVIDER_URL_PATTERN = "Invalid Provider URL Pattern";
+    public static final String INVALID_PROVIDER_URL = "Invalid Provider URL";
 
 }

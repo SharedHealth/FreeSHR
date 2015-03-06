@@ -1,4 +1,4 @@
-package org.freeshr.validations.ProviderSubResourceValidators;
+package org.freeshr.validations.providerIdentifiers;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.Immunization;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class ImmunizationProviderValidator extends ProviderSubresourceValidator {
+public class ImmunizationProviderIdentifier extends ClinicalResourceProviderIdentifier {
 
     @Override
     protected boolean validates(Resource resource) {

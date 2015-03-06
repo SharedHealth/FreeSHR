@@ -1,4 +1,4 @@
-package org.freeshr.validations.ProviderSubResourceValidators;
+package org.freeshr.validations.providerIdentifiers;
 
 import org.freeshr.config.SHRProperties;
 import org.freeshr.utils.CollectionUtils;
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class ProviderSubresourceValidator {
+public abstract class ClinicalResourceProviderIdentifier {
     private static final String START_MARKER = "^";
     private static final String END_MARKER = "$";
     private static final String PROVIDER_ID_MATCHER = "([0-9]+)";

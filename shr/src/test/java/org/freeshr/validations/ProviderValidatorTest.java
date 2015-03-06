@@ -1,7 +1,7 @@
 package org.freeshr.validations;
 
-import org.freeshr.application.fhir.EncounterBundle;
-import org.freeshr.application.fhir.FhirMessageFilter;
+import org.freeshr.application.fhir.*;
+import org.freeshr.application.fhir.Error;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.utils.FileUtil;
@@ -18,6 +18,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -48,7 +49,10 @@ public class ProviderValidatorTest {
         final String xml = FileUtil.asString("xmls/encounters/encounter_with_invalid_participant_and_orderer.xml");
         List<ValidationMessage> validationMessages = providerValidator.validate(getEncounterContext(xml, "5893922485019082753")
                 .extract().feedFragment());
-        assertEquals(1, validationMessages.size());
+        assertFailureFromResponseErrors("urn:c41cabed-3c47-4260-bd70-ac4893b97ee8", "Invalid Provider URL in encounter",
+                validationMessages);
+        assertFailureFromResponseErrors("urn:a86018fa-e15d-4004-85bc-a1ee713dc923", "Invalid Provider URL in diagnosticorder",
+                validationMessages);
     }
 
     @Test
@@ -70,5 +74,15 @@ public class ProviderValidatorTest {
 
             }
         };
+    }
+
+    private void assertFailureFromResponseErrors(String fieldName, String reason,List<ValidationMessage> validationMessages) {
+        for (ValidationMessage msg : validationMessages) {
+            if (msg.getMessage().equals(reason)) {
+                assertEquals(reason, msg.getMessage());
+                return;
+            }
+        }
+        fail(String.format("Couldn't find expected error with fieldName [%s] reason [%s]", fieldName, reason));
     }
 }

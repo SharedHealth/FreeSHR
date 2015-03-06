@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed
+        xmlns="http://www.w3.org/2005/Atom">
+    <title>Encounter</title>
+    <id>urn:79bc174a-dc34-4485-886f-d681a768e0c1</id>
+    <updated>2014-12-03T10:48:25+05:30</updated>
+    <entry>
+        <title>Vitals</title>
+        <id>urn:decb2690-0e18-41c9-a6ce-36ad78f8fce6</id>
+        <updated>2014-12-03T10:48:40.690+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <Observation
+                    xmlns="http://hl7.org/fhir">
+                <name>
+                    <coding>
+                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/concepts/44c245dd-d234-4991-a8b2-3c4a54d5092b"/>
+                        <code value="44c245dd-d234-4991-a8b2-3c4a54d5092b"/>
+                        <display value="Vitals"/>
+                    </coding>
+                </name>
+                <status value="final"/>
+                <reliability value="ok"/>
+                <identifier>
+                    <value value="decb2690-0e18-41c9-a6ce-36ad78f8fce6"/>
+                </identifier>
+                <subject>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <display value="5893922485019082753"/>
+                </subject>
+                <performer>
+                    <reference value="http://127.0.0.1:9997/providers/18.json"/>
+                </performer>
+                <related>
+                    <type value="has-component"/>
+                    <target>
+                        <reference value="5b6ae635-c9b4-49e5-b891-e02b494105c8"/>
+                    </target>
+                </related>
+                <related>
+                    <type value="has-component"/>
+                    <target>
+                        <reference value="962a51c3-e7df-4dfe-ba61-98a40a063f3f"/>
+                    </target>
+                </related>
+                <related>
+                    <type value="has-component"/>
+                    <target>
+                        <reference value="8eea4ab7-156f-411e-b111-db59ab8364af"/>
+                    </target>
+                </related>
+            </Observation>
+        </content>
+    </entry>
+</feed>
