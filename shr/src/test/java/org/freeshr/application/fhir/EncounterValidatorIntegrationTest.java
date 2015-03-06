@@ -114,6 +114,7 @@ public class EncounterValidatorIntegrationTest {
                 FileUtil.asString("xmls/encounters/encounterWithInvalidFacility.xml"));
         EncounterValidationResponse response = validator.validate(encounterBundle);
         assertFailureFromResponseErrors("urn:d3cc23c3-1f12-4b89-a415-356feeba0690", FacilityValidator.INVALID_SERVICE_PROVIDER, response.getErrors());
+        assertEquals(1, response.getErrors().size());
     }
 
     @Test
@@ -122,6 +123,7 @@ public class EncounterValidatorIntegrationTest {
                 FileUtil.asString("xmls/encounters/encounterWithInvalidFacilityUrl.xml"));
         EncounterValidationResponse response = validator.validate(encounterBundle);
         assertFailureFromResponseErrors("urn:d3cc23c3-1f12-4b89-a415-356feeba0690", FacilityValidator.INVALID_SERVICE_PROVIDER_URL, response.getErrors());
+        assertEquals(1, response.getErrors().size());
     }
 
     @Test
@@ -154,6 +156,7 @@ public class EncounterValidatorIntegrationTest {
                 FileUtil.asString("xmls/encounters/invalid_concept.xml"));
         EncounterValidationResponse response = validator.validate(encounterBundle);
         assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "Invalid code invalid-eddb01eb-61fc-4f9e-aca5", response.getErrors());
+        assertEquals(1, response.getErrors().size());
     }
 
     @Test
@@ -167,6 +170,7 @@ public class EncounterValidatorIntegrationTest {
                 FileUtil.asString("xmls/encounters/invalid_ref.xml"));
         EncounterValidationResponse response = validator.validate(encounterBundle);
         assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "INVALID_REFERENCE_TERM", response.getErrors());
+        assertEquals(1, response.getErrors().size());
     }
 
     @Test
@@ -177,6 +181,7 @@ public class EncounterValidatorIntegrationTest {
         assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:category/f:coding/f:system", "@value cannot be empty", response.getErrors());
         assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:category",
                 "None of the codes are in the expected value set http://hl7.org/fhir/vs/condition-category (http://hl7.org/fhir/vs/condition-category)", response.getErrors());
+        assertEquals(2, response.getErrors().size());
     }
 
     @Test
@@ -186,6 +191,7 @@ public class EncounterValidatorIntegrationTest {
         EncounterValidationResponse response = validator.validate(encounterBundle);
         assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:category/f:coding",
                 "Unknown Code System http://hl7.org/fhir/condition-category-invalid", response.getErrors());
+        assertEquals(2, response.getErrors().size());
     }
 
     @Test
@@ -199,6 +205,7 @@ public class EncounterValidatorIntegrationTest {
         assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:category/f:coding",
                 "Unknown Code System http://hl7.org/fhir/condition-category-invalid",
                 response.getErrors());
+        assertEquals(2, response.getErrors().size());
     }
 
     @Test
@@ -213,6 +220,7 @@ public class EncounterValidatorIntegrationTest {
         assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:category/f:coding",
                 "Unknown Code (http://hl7.org/fhir/condition-category#invalid)",
                 response.getErrors());
+        assertEquals(2, response.getErrors().size());
 
     }
 
@@ -281,7 +289,7 @@ public class EncounterValidatorIntegrationTest {
         EncounterValidationResponse response = validator.validate(encounterBundle);
         assertFailureFromResponseErrors("/f:entry[3]/f:content/f:Observation/f:Observation/f:name/f:coding",
                 "Invalid code 77405a73-b915-4a93-87a7-f29fe6697fb4-INVALID", response.getErrors());
-
+        assertEquals(1, response.getErrors().size());
 
     }
 
@@ -327,6 +335,7 @@ public class EncounterValidatorIntegrationTest {
         EncounterValidationResponse response = validator.validate(encounterBundle);
         assertFailureFromResponseErrors("urn:5fc6d0d9-9520-4015-87cb-ab0cfa7e4b50", INVALID_MEDICATION_REFERENCE_URL,
                 response.getErrors());
+        assertEquals(1, response.getErrors().size());
     }
 
     @Test
@@ -371,6 +380,7 @@ public class EncounterValidatorIntegrationTest {
         EncounterValidationResponse response = validator.validate(encounterBundle);
         assertFailureFromResponseErrors("urn:6dc6d0d9-9520-4015-87cb-ab0cfa7e4b50", INVALID_DISPENSE_MEDICATION_REFERENCE_URL,
                 response.getErrors());
+        assertEquals(1, response.getErrors().size());
     }
 
     @Test
@@ -416,6 +426,7 @@ public class EncounterValidatorIntegrationTest {
         EncounterValidationResponse response = validator.validate(encounterBundle);
         assertFailureFromResponseErrors("urn:5fc6d0d9-9520-4015-87cb-ab0cfa7e4b50", "Invalid Dosage Quantity",
                 response.getErrors());
+        assertEquals(1, response.getErrors().size());
     }
 
     @Test
@@ -444,9 +455,10 @@ public class EncounterValidatorIntegrationTest {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/discharge_summary_encounter_medication_invalid.xml"));
 
-        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
+        EncounterValidationResponse response = validator.validate(encounterBundle);
         assertFailureFromResponseErrors("urn:5fc6d0d9-9520-4015-87cb-ab0cfa7e4b50", "Invalid Medication Reference URL",
-                validationResponse.getErrors());
+                response.getErrors());
+        assertEquals(1, response.getErrors().size());
     }
 
     @Test
@@ -457,6 +469,7 @@ public class EncounterValidatorIntegrationTest {
         EncounterValidationResponse response = validator.validate(encounterBundle);
         assertFailureFromResponseErrors("urn:5fc6d0d9-9520-4015-87cb-ab0cfa7e4b50", "Invalid Dosage Quantity",
                 response.getErrors());
+        assertEquals(1, response.getErrors().size());
     }
 
     @Test
@@ -471,6 +484,8 @@ public class EncounterValidatorIntegrationTest {
         EncounterValidationResponse response = validator.validate(encounterBundle);
         assertFailureFromResponseErrors("/f:entry[2]/f:content/f:Observation/f:Observation/f:name/f:coding",
                 "Invalid code a6e20fe1-4044-4ce7-8440-577f7f814765-invalid", response.getErrors());
+        verify(trConceptLocator, times(5)).validate(anyString(),eq("a6e20fe1-4044-4ce7-8440-577f7f814765-invalid"), anyString());
+        assertEquals(5, response.getErrors().size());
     }
 
     @Test
@@ -480,6 +495,7 @@ public class EncounterValidatorIntegrationTest {
         EncounterValidationResponse response = validator.validate(encounterBundle);
         assertFailureFromResponseErrors("/f:entry[24]/f:content/f:Observation/f:Observation/f:name/f:coding/f:system",
                 "@value cannot be empty", response.getErrors());
+        assertEquals(1, response.getErrors().size());
     }
 
     @Test

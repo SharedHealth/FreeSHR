@@ -55,16 +55,16 @@ public class EncounterValidator {
                     structureValidator.validate(validationContext.feedFragment()), fhirMessageFilter);
             if (validationResponse.isNotSuccessful()) return validationResponse;
 
-            validationResponse = fromValidationMessages(
-                    facilityValidator.validate(validationContext.feedFragment()), fhirMessageFilter);
-            if (validationResponse.isNotSuccessful()) return validationResponse;
+            validationResponse.mergeErrors(fromValidationMessages(
+                    facilityValidator.validate(validationContext.feedFragment()), fhirMessageFilter));
+            //if (validationResponse.isNotSuccessful()) return validationResponse;
 
-            validationResponse = fromValidationMessages(
-                    providerValidator.validate(validationContext.feedFragment()), fhirMessageFilter);
-            if (validationResponse.isNotSuccessful()) return validationResponse;
+            validationResponse.mergeErrors(fromValidationMessages(
+                    providerValidator.validate(validationContext.feedFragment()), fhirMessageFilter));
+            //if (validationResponse.isNotSuccessful()) return validationResponse;
 
-            validationResponse = fromValidationMessages(
-                    resourceValidator.validate(validationContext.feedFragment()), fhirMessageFilter);
+            validationResponse.mergeErrors(fromValidationMessages(
+                    resourceValidator.validate(validationContext.feedFragment()), fhirMessageFilter));
 
             return validationResponse.isSuccessful()
                     ? fromValidationMessages(healthIdValidator.validate(validationContext.context()), fhirMessageFilter)

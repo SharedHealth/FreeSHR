@@ -55,4 +55,10 @@ public class EncounterValidationResponse {
                 ", encounterId='" + encounterId + '\'' +
                 '}';
     }
+
+    public void mergeErrors(EncounterValidationResponse aResponse) {
+        for (Error error : aResponse.getErrors()) {
+            addError(error);
+        }
+    }
 }
