@@ -101,7 +101,7 @@ task exportProperties(dependsOn: 'copyZip') << {
     }
 }
 
-task dist(dependsOn: 'exportProperties', type: Rpm) {
+task dist(dependsOn: [project(":schema").tasks.build,'exportProperties'], type: Rpm) {
     packageName = 'shr'
     version = '0.1'
     release = 1

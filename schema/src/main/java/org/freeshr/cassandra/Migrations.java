@@ -15,7 +15,6 @@ import static java.lang.System.getenv;
 
 public class Migrations {
 
-    private static final String MUTAGEN_CONNECTION_POOL_NAME = "shrMigrationConnectionPool";
     public static final int ONE_MINUTE = 6000;
 
     protected final Map<String, String> env;
