@@ -189,9 +189,10 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
 
     private void mockFacility(String facilityId) {
         givenThat(get(urlEqualTo(shrProperties.getFacilityRegistryUrl() + "/" + facilityId + ".json"))
+                .withHeader("X-Auth-Token", matching(shrProperties.getIdPAuthToken()))
+                .withHeader("client_id", matching(shrProperties.getIdPClientId()))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withHeader("X-Auth-Token", shrProperties.getFacilityRegistryAuthToken())
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/F" + facilityId + ".json"))));
     }

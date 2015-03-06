@@ -48,10 +48,6 @@ public class SHRProperties {
     @Value("${FACILITY_REGISTRY_URL}")
     private String facilityRegistryUrl;
 
-    //TODO: remove
-    @Value("${FACILITY_REGISTRY_AUTH_TOKEN}")
-    private String facilityRegistryAuthToken;
-
     @Value("${PROVIDER_REGISTRY_URL}")
     private String providerRegistryUrl;
 
@@ -121,10 +117,6 @@ public class SHRProperties {
 
     public String getFacilityRegistryUrl() {
         return facilityRegistryUrl;
-    }
-
-    public String getFacilityRegistryAuthToken() {
-        return facilityRegistryAuthToken;
     }
 
     public String getProviderRegistryUrl() {

@@ -80,10 +80,11 @@ public class EncounterServiceIntegrationTest {
                         .withBody(asString("jsons/patientNew.json"))));
 
         givenThat(get(urlEqualTo(shrProperties.getFacilityRegistryUrl() + "/" + VALID_FACILITY_ID + ".json"))
+                .withHeader("X-Auth-Token", matching(shrProperties.getIdPAuthToken()))
+                .withHeader("client_id", matching(shrProperties.getIdPClientId()))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withHeader("X-Auth-Token", shrProperties.getFacilityRegistryAuthToken())
                         .withBody(asString("jsons/Facility.json"))));
 
         givenThat(get(urlEqualTo("/api/v1/patients/" + INVALID_HEALTH_ID))
