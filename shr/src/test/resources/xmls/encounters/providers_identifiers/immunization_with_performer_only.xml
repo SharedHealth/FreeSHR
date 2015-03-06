@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Encounter</title>
+    <id>urn:050a8d39-ac21-4e09-94b9-ed83a6f3b484</id>
+    <updated>2014-12-17T18:26:46+05:30</updated>
+    <entry>
+        <title>Immunization</title>
+        <id>urn:5fc6d0d9-9520-4015-87cb-ab0cfa7e4b50</id>
+        <updated>2014-12-17T18:28:48.892+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <Immunization
+                    xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:5fc6d0d9-9520-4015-87cb-ab0cfa7e4b50"/>
+                </identifier>
+                <date value="2014-12-03T00:00:00+05:30"/>
+                <vaccineType>
+                    <coding>
+                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/drugs/c7a6e6e8-dde5-4194-8f60-4e090d34c00f"/>
+                        <code value="c7a6e6e8-dde5-4194-8f60-4e090d34c00f"/>
+                        <display value="Abarelix"/>
+                    </coding>
+                </vaccineType>
+                <site>
+                    <coding>
+                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/Site"/>
+                        <code value="LA"/>
+                        <display value="left arm"/>
+                    </coding>
+                </site>
+                <subject>
+                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <display value="5893922485019082753"/>
+                </subject>
+                <refusedIndicator value="true"/>
+                <reported value="true"/>
+                <performer>
+                    <reference value="http://127.0.0.1:9997/providers/48.json"/>
+                </performer>
+                <route>
+                    <coding>
+                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/Route-of-Administration"/>
+                        <code value="implant"/>
+                        <display value="implant"/>
+                    </coding>
+                </route>
+                <vaccinationProtocol>
+                    <doseTarget>
+                        <coding>
+                            <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/Dose-Target"/>
+                            <code value="mea"/>
+                            <display value="Measles"/>
+                        </coding>
+                    </doseTarget>
+                    <doseStatus>
+                        <coding>
+                            <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/Dose-Status"/>
+                            <code value="count"/>
+                            <display value="counts"/>
+                        </coding>
+                    </doseStatus>
+                    <doseStatusReason>
+                        <coding>
+                            <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/Dose-Status-Reason"/>
+                            <code value="coldchbrk"/>
+                            <display value="Cold chain break"/>
+                        </coding>
+                    </doseStatusReason>
+                </vaccinationProtocol>
+                <explanation>
+                    <reason>
+                        <coding>
+                            <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/Immunization-Reason"/>
+                            <code value="281657000"/>
+                            <display value="Travel vaccinations"/>
+                        </coding>
+                    </reason>
+                    <refusalReason>
+                        <coding>
+                            <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/No-Immunization-Reason"/>
+                            <code value="PATOBJ"/>
+                            <display value="patient objection"/>
+                        </coding>
+                    </refusalReason>
+                </explanation>
+            </Immunization>
+        </content>
+    </entry>
+</feed>

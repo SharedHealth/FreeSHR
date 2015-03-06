@@ -183,24 +183,37 @@ public class EncounterValidatorIntegrationTest {
     public void shouldRejectEncountersWithDiagnosisHavingAllInvalidSystems() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/diagnosis_system_invalid.xml"));
-        EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
-        assertFalse(encounterValidationResponse.isSuccessful());
+        EncounterValidationResponse response = validator.validate(encounterBundle);
+        assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:category/f:coding",
+                "Unknown Code System http://hl7.org/fhir/condition-category-invalid", response.getErrors());
     }
 
     @Test
     public void shouldTreatFHIRWarningAsError() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/diagnosis_system_invalid.xml"));
-        EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
-        assertFalse(encounterValidationResponse.isSuccessful());
+        EncounterValidationResponse response = validator.validate(encounterBundle);
+        assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:category",
+                "None of the codes are in the expected value set http://hl7.org/fhir/vs/condition-category (http://hl7.org/fhir/vs/condition-category)",
+                response.getErrors());
+        assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:category/f:coding",
+                "Unknown Code System http://hl7.org/fhir/condition-category-invalid",
+                response.getErrors());
     }
 
     @Test
     public void shouldRejectInvalidDiagnosisCategory() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/diagnosis_category_invalid.xml"));
-        EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
-        assertFalse(encounterValidationResponse.isSuccessful());
+        EncounterValidationResponse response = validator.validate(encounterBundle);
+        assertFalse(response.isSuccessful());
+        assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:category",
+                "None of the codes are in the expected value set http://hl7.org/fhir/vs/condition-category (http://hl7.org/fhir/vs/condition-category)",
+                response.getErrors());
+        assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:category/f:coding",
+                "Unknown Code (http://hl7.org/fhir/condition-category#invalid)",
+                response.getErrors());
+
     }
 
     @Test
@@ -239,10 +252,12 @@ public class EncounterValidatorIntegrationTest {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/coded_and_noncoded_diagnosis.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
-        verify(trConceptLocator, times(6)).verifiesSystem(anyString());
-        assertFalse(encounterValidationResponse.isSuccessful());
-        assertThat(encounterValidationResponse.getErrors().size(), is(3));
+        EncounterValidationResponse response = validator.validate(encounterBundle);
+        List<Error> errors = response.getErrors();
+        assertThat(errors.size(), is(3));
+        assertFailureFromResponseErrors("urn:5f982a33-4454-4b74-9236-b8157aa8effd", "Viral pneumonia 785857", errors);
+        assertFailureFromResponseErrors("urn:5f982a33-4454-4b74-9236-b8157aa8e678", "Viral pneumonia 785857", errors);
+        assertFailureFromResponseErrors("urn:9826cf0c-66d6-4e33-bed1-91381ab200b5", "Moderate", errors);
     }
 
 
@@ -261,13 +276,12 @@ public class EncounterValidatorIntegrationTest {
                 FileUtil.asString("xmls/encounters/encounter_with_obs_invalid.xml"));
         when(trConceptLocator.validate(anyString(), eq("77405a73-b915-4a93-87a7-f29fe6697fb4-INVALID"),
                 anyString())).thenReturn(new ConceptLocator.ValidationResult(OperationOutcome.IssueSeverity.error,
-                "Invalid code"));
+                "Invalid code 77405a73-b915-4a93-87a7-f29fe6697fb4-INVALID"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
-        List<Error> errors = encounterValidationResponse.getErrors();
-        assertEquals(2, errors.size());
-        assertEquals("Invalid code", errors.get(0).getReason());
-        assertFalse(encounterValidationResponse.isSuccessful());
+        EncounterValidationResponse response = validator.validate(encounterBundle);
+        assertFailureFromResponseErrors("/f:entry[3]/f:content/f:Observation/f:Observation/f:name/f:coding",
+                "Invalid code 77405a73-b915-4a93-87a7-f29fe6697fb4-INVALID", response.getErrors());
+
 
     }
 
@@ -275,7 +289,7 @@ public class EncounterValidatorIntegrationTest {
     public void shouldValidateIfTheHealthIdInTheEncounterContentIsNotSameAsTheOneExpected() {
         encounterBundle.setHealthId("1111222233334444555");
         EncounterValidationResponse response = validator.validate(encounterBundle);
-        assertFalse(response.isSuccessful());
+        assertFailureFromResponseErrors("healthId", "Patient's Health Id does not match.", response.getErrors());
         assertThat(response.getErrors().size(), is(3));
         assertTrue(response.getErrors().get(0).getReason().contains("Health Id does not match"));
         assertTrue(response.getErrors().get(1).getReason().contains("Health Id does not match"));
@@ -302,37 +316,17 @@ public class EncounterValidatorIntegrationTest {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/medication_prescription.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
-        assertTrue(validationResponse.isSuccessful());
+        EncounterValidationResponse response = validator.validate(encounterBundle);
+        assertTrue(response.isSuccessful());
     }
 
     @Test
-    public void shouldValidatePrescriptionWithInvalidMedicationReference() {
+    public void shouldValidateMedicationPrescriptionWithInvalidMedicationReference() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/medication_prescription_invalid.xml"));
-        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-
-
-        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
-        assertFalse("Invalid medication prescription should have failed validation", validationResponse.isSuccessful());
-        List<Error> invalidUrlError = CollectionUtils.filter(validationResponse.getErrors(), new CollectionUtils.Fn<Error, Boolean>() {
-            @Override
-            public Boolean call(Error e) {
-                return e.getReason().equals(INVALID_MEDICATION_REFERENCE_URL);
-            }
-        });
-        assertEquals("Should have found one invalid medication url", 2, invalidUrlError.size());
-
-    }
-
-    @Test
-    public void shouldValidatePrescriptionWithValidMedicationReference() {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/medication_prescription_valid.xml"));
-        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
-        verify(trConceptLocator, times(1)).validate("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration", "implant", "implant");
-        assertTrue("Medication prescription pass through validation", validationResponse.isSuccessful());
+        EncounterValidationResponse response = validator.validate(encounterBundle);
+        assertFailureFromResponseErrors("urn:5fc6d0d9-9520-4015-87cb-ab0cfa7e4b50", INVALID_MEDICATION_REFERENCE_URL,
+                response.getErrors());
     }
 
     @Test
@@ -340,11 +334,10 @@ public class EncounterValidatorIntegrationTest {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/medication_prescription_valid.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-
-        EncounterValidationResponse encounterValidationResponse = validator.validate(encounterBundle);
+        EncounterValidationResponse response = validator.validate(encounterBundle);
         verify(trConceptLocator, times(1)).verifiesSystem("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration");
         verify(trConceptLocator, times(1)).validate("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration", "implant", "implant");
-        assertTrue(encounterValidationResponse.isSuccessful());
+        assertTrue(response.isSuccessful());
     }
 
     @Test
@@ -352,21 +345,10 @@ public class EncounterValidatorIntegrationTest {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/medication_prescription_route_valid.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
+        EncounterValidationResponse response = validator.validate(encounterBundle);
         verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/dosageInstruction-site", "181220002", "Entire oral cavity");
         verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/prescription-reason", "38341003", "High blood pressure");
-        assertTrue(validationResponse.isSuccessful());
-
-    }
-
-
-    @Test
-    public void shouldValidatePrescriberMedicationInMedicationPrescription() {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/medication_prescription_substitution_type_reason.xml"));
-        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
-        assertTrue("Medication-prescription,Prescriber pass through validation", validationResponse.isSuccessful());
+        assertTrue(response.isSuccessful());
 
     }
 
@@ -375,10 +357,10 @@ public class EncounterValidatorIntegrationTest {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/medication_prescription_dispense_addinformation_valid.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
+        EncounterValidationResponse response = validator.validate(encounterBundle);
         verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/additional-instructions",
                 "79647ed4-a60e-4cf5-ba68-cf4d55956xyz", "Take With Water");
-        assertTrue("Should Validate Valid Encounter In MedicationPrescription", validationResponse.isSuccessful());
+        assertTrue("Should Validate Valid Encounter In MedicationPrescription", response.isSuccessful());
     }
 
     @Test
@@ -386,16 +368,9 @@ public class EncounterValidatorIntegrationTest {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/medication_prescription_dispense_addinformation_invalid.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
-        assertFalse("Invalid Dispense Should Fail", validationResponse.isSuccessful());
-        List<Error> errorList = CollectionUtils.filter(validationResponse.getErrors(), new CollectionUtils.Fn<Error, Boolean>() {
-            @Override
-            public Boolean call(Error e) {
-                return e.getReason().equals(INVALID_DISPENSE_MEDICATION_REFERENCE_URL);
-            }
-        });
-
-        assertEquals("Should Have Found One Invalid Dispense-Mediaction Url", 1, errorList.size());
+        EncounterValidationResponse response = validator.validate(encounterBundle);
+        assertFailureFromResponseErrors("urn:6dc6d0d9-9520-4015-87cb-ab0cfa7e4b50", INVALID_DISPENSE_MEDICATION_REFERENCE_URL,
+                response.getErrors());
     }
 
     @Test
@@ -403,11 +378,11 @@ public class EncounterValidatorIntegrationTest {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/medication_prescription_substitution_type_reason.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
+        EncounterValidationResponse response = validator.validate(encounterBundle);
         verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/substitution-type", "291220002", "Paracetamol");
         verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/substitution-reason", "301220005"
                 , "Paracetamol can be taken in place of this drug");
-        assertTrue(validationResponse.isSuccessful());
+        assertTrue(response.isSuccessful());
 
 
     }
@@ -424,12 +399,12 @@ public class EncounterValidatorIntegrationTest {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/medication_prescription_route_valid.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
+        EncounterValidationResponse response = validator.validate(encounterBundle);
         verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba",
                 "79647ed4-a60e-4cf5-ba68-cf4d55956cba", "Hemoglobin");
         verify(trConceptLocator, times(1)).validate("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/administration-method-codes",
                 "320276009", "Salmeterol+fluticasone 25/250ug inhaler");
-        assertTrue(validationResponse.isSuccessful());
+        assertTrue(response.isSuccessful());
 
     }
 
@@ -438,21 +413,18 @@ public class EncounterValidatorIntegrationTest {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/medication_prescription_invalid_dosage_quantity.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
-        List<Error> errors = validationResponse.getErrors();
-        assertFailureFromResponseErrors("urn:5fc6d0d9-9520-4015-87cb-ab0cfa7e4b50", "Invalid Dosage Quantity", errors);
-
+        EncounterValidationResponse response = validator.validate(encounterBundle);
+        assertFailureFromResponseErrors("urn:5fc6d0d9-9520-4015-87cb-ab0cfa7e4b50", "Invalid Dosage Quantity",
+                response.getErrors());
     }
 
     @Test
-    @Ignore
     public void shouldValidateDischargeSummaryEncounterWithAllResources() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/discharge_summary_encounter.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
-        verify(trConceptLocator, times(31)).validate(contains("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr"), anyString(), anyString());
-        assertTrue(validationResponse.isSuccessful());
+        EncounterValidationResponse response = validator.validate(encounterBundle);
+        assertTrue(response.isSuccessful());
     }
 
     @Test
@@ -460,10 +432,11 @@ public class EncounterValidatorIntegrationTest {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/discharge_summary_encounter_invalid.xml"));
 
-        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
-        List<Error> errors = validationResponse.getErrors();
+        EncounterValidationResponse response = validator.validate(encounterBundle);
+        List<Error> errors = response.getErrors();
+        assertEquals(1, errors.size());
         assertEquals("Unknown", errors.get(0).getField());
-        assertFalse(validationResponse.isSuccessful());
+        assertTrue("Should have failed for unknown ConditionStatus code", errors.get(0).getReason().contains("Unknown ConditionStatus code 'foo-bar'"));
     }
 
     @Test
@@ -472,10 +445,8 @@ public class EncounterValidatorIntegrationTest {
                 FileUtil.asString("xmls/encounters/discharge_summary_encounter_medication_invalid.xml"));
 
         EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
-        assertFalse(validationResponse.isSuccessful());
-        List<Error> errors = validationResponse.getErrors();
-        assertEquals(1, errors.size());
-        assertEquals("Invalid Medication Reference URL", errors.get(0).getReason());
+        assertFailureFromResponseErrors("urn:5fc6d0d9-9520-4015-87cb-ab0cfa7e4b50", "Invalid Medication Reference URL",
+                validationResponse.getErrors());
     }
 
     @Test
@@ -483,9 +454,9 @@ public class EncounterValidatorIntegrationTest {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/discharge_summary_dosage_quantity_invalid.xml"));
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
-        List<Error> errors = validationResponse.getErrors();
-        assertEquals("Invalid Dosage Quantity", 1, errors.size());
+        EncounterValidationResponse response = validator.validate(encounterBundle);
+        assertFailureFromResponseErrors("urn:5fc6d0d9-9520-4015-87cb-ab0cfa7e4b50", "Invalid Dosage Quantity",
+                response.getErrors());
     }
 
     @Test
@@ -493,22 +464,22 @@ public class EncounterValidatorIntegrationTest {
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         when(trConceptLocator.validate(anyString(), eq("a6e20fe1-4044-4ce7-8440-577f7f814765-invalid"),
                 anyString())).thenReturn(new ConceptLocator.ValidationResult(OperationOutcome.IssueSeverity.error,
-                "Invalid code"));
+                "Invalid code a6e20fe1-4044-4ce7-8440-577f7f814765-invalid"));
 
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/discharge_summary_encounter_code_invalid.xml"));
-        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
-        assertFalse(validationResponse.isSuccessful());
-        assertEquals(5, validationResponse.getErrors().size());
+        EncounterValidationResponse response = validator.validate(encounterBundle);
+        assertFailureFromResponseErrors("/f:entry[2]/f:content/f:Observation/f:Observation/f:name/f:coding",
+                "Invalid code a6e20fe1-4044-4ce7-8440-577f7f814765-invalid", response.getErrors());
     }
 
     @Test
     public void shouldValidateMissingSystemCodeInDischargeSummaryEncounter() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/discharge_summary_encounter_system_missing.xml"));
-        EncounterValidationResponse validationResponse = validator.validate(encounterBundle);
-        assertFalse(validationResponse.isSuccessful());
-        assertEquals("Should Fail For Missing System Url", 1, validationResponse.getErrors().size());
+        EncounterValidationResponse response = validator.validate(encounterBundle);
+        assertFailureFromResponseErrors("/f:entry[24]/f:content/f:Observation/f:Observation/f:name/f:coding/f:system",
+                "@value cannot be empty", response.getErrors());
     }
 
     @Test

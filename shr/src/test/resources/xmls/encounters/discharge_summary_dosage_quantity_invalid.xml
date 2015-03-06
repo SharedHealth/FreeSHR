@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feed
-        xmlns="http://www.w3.org/2005/Atom">
+<feed xmlns="http://www.w3.org/2005/Atom">
     <title>Encounter</title>
     <id>urn:73b7eb36-a1e2-4754-8518-19360c87ea62</id>
     <updated>2015-01-07T12:00:15+05:30</updated>
@@ -753,7 +752,7 @@
                     <display value="Encounter"/>
                 </encounter>
                 <asserter>
-                    <reference value="3accd17c-7561-11e4-a8f7-005056826e54"/>
+                    <reference value="http://127.0.0.1:9997/providers/18.json"/>
                 </asserter>
                 <dateAsserted value="2015-01-07T12:00:15+05:30"/>
                 <code>
@@ -1215,7 +1214,7 @@
                     <reference value="5893922485019082753"/>
                 </subject>
                 <performer>
-                    <reference value="456e6c79-35be-11e4-9d09-08002773bf1c"/>
+                    <reference value="http://127.0.0.1:9997/providers/18.json"/>
                 </performer>
                 <identifier>
                     <value value="24030c01-f6dd-42a1-a7d9-acb5dc5d04d1"/>

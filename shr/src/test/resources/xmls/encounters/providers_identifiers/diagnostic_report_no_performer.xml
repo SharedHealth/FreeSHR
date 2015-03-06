@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Encounter</title>
+    <id>urn:41cf285f-6175-4959-b657-407fef53129d</id>
+    <updated>2014-10-13T14:38:22+05:30</updated>
+    <entry>
+        <title>Diagnostic Report</title>
+        <id>urn:24030c01-f6dd-42a1-a7d9-acb5dc5d04d1</id>
+        <updated>2014-10-14T12:29:14.421+05:30</updated>
+        <author>
+            <name>bahmni</name>
+        </author>
+        <content type="text/xml">
+            <DiagnosticReport xmlns="http://hl7.org/fhir">
+                <serviceCategory>
+                    <coding>
+                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/referenceterms/94f5e936-1b2d-421d-8f83-21048270bf32"/>
+                        <code value="94f5e936-1b2d-421d-8f83-21048270bf32"/>
+                        <display value="hematology"/>
+                    </coding>
+                </serviceCategory>
+                <name>
+                    <coding>
+                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/referenceterms/94f5e936-1b2d-421d-8f83-21048270bf32"/>
+                        <code value="20563-3"/>
+                        <display value="Hemoglobin"/>
+                    </coding>
+                    <coding>
+                        <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba"/>
+                        <code value="79647ed4-a60e-4cf5-ba68-cf4d55956cba"/>
+                        <display value="Hemoglobin"/>
+                    </coding>
+                </name>
+                <status value="final"/>
+                <issued value="2014-10-13T15:04:30+05:30"/>
+                <subject>
+                    <reference value="5893922485019082753"/>
+                </subject>
+                <identifier>
+                    <value value="24030c01-f6dd-42a1-a7d9-acb5dc5d04d1"/>
+                </identifier>
+                <requestDetail>
+                    <reference value="urn:encounter/781e2b52-ad92-411c-a7c6-eb3fea53e566orders"/>
+                </requestDetail>
+                <diagnosticDateTime value="2014-10-13T14:38:22+05:30"/>
+                <result>
+                    <reference value="ce6c6ac9-ca55-44a2-9c41-c1227d55c730"/>
+                </result>
+            </DiagnosticReport>
+        </content>
+    </entry>
+</feed>

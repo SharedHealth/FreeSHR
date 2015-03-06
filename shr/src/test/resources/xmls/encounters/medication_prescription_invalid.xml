@@ -38,12 +38,6 @@
                         <display value="Medication Prescription"/>
                     </content>
                 </section>
-                <section>
-                    <content>
-                        <reference value="urn:6dc6d0d9-9520-4015-87cb-ab0cfa7e4b50"/>
-                        <display value="Medication Prescription"/>
-                    </content>
-                </section>
             </Composition>
         </content>
     </entry>
@@ -103,55 +97,6 @@
                 </prescriber>
                <medication>
                     <reference value="/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>
-                    <display value="Paracetamol1"/>
-                </medication>
-                <dosageInstruction>
-                    <timingSchedule>
-                        <repeat>
-                            <frequency value="2"/>
-                            <duration value="1"/>
-                            <units value="d"/>
-                            <count value="4"/>
-                        </repeat>
-                    </timingSchedule>
-                    <route>
-                        <coding>
-                            <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/Route-of-Administration"/>
-                            <code value="implant"/>
-                            <display value="implant"/>
-                        </coding>
-                    </route>
-                    <doseQuantity>
-                        <value value="3"/>
-                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Quantity-Units"/>
-                        <code value="TU"/>
-                    </doseQuantity>
-                </dosageInstruction>
-            </MedicationPrescription>
-        </content>
-    </entry>
-    <entry>
-        <title>Medication Prescription</title>
-        <id>urn:6dc6d0d9-9520-4015-87cb-ab0cfa7e4b50</id>
-        <updated>2014-12-17T18:28:48.892+05:30</updated>
-        <author>
-            <name>bahmni</name>
-        </author>
-        <content type="text/xml">
-            <MedicationPrescription xmlns="http://hl7.org/fhir">
-                <identifier>
-                    <value value="urn:6dc6d0d9-9520-4015-87cb-ab0cfa7e4b50"/>
-                </identifier>
-                <dateWritten value="2014-12-17T18:26:46+05:30"/>
-                <patient>
-                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
-                    <display value="5893922485019082753"/>
-                </patient>
-                <prescriber>
-                    <reference value="http://127.0.0.1:9997/providers/18.json"/>
-                </prescriber>
-                <medication>
-                    <reference value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f518"/>
                     <display value="Paracetamol1"/>
                 </medication>
                 <dosageInstruction>
