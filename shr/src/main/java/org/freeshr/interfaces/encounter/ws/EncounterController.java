@@ -4,15 +4,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.domain.service.EncounterService;
-import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.utils.DateUtil;
 import org.freeshr.utils.HttpUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -47,8 +44,7 @@ public class EncounterController {
     public DeferredResult<EncounterResponse> create(
             @PathVariable String healthId,
             @RequestBody EncounterBundle encounterBundle,
-            HttpServletRequest request,
-            @AuthenticationPrincipal UserInfo userInfo) throws ExecutionException, InterruptedException {
+            HttpServletRequest request) throws ExecutionException, InterruptedException {
         
         logger.debug("Create encounter. " + encounterBundle.getContent());
         encounterBundle.setHealthId(healthId);
@@ -94,8 +90,7 @@ public class EncounterController {
     public DeferredResult<EncounterSearchResponse> findEncountersForPatient(
             final HttpServletRequest request,
             @PathVariable String healthId,
-            @RequestParam(value = "updatedSince", required = false) String updatedSince,
-            @AuthenticationPrincipal UserInfo userInfo) {
+            @RequestParam(value = "updatedSince", required = false) String updatedSince) {
         logger.debug("Find all encounters by health id: " + healthId);
         final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<EncounterSearchResponse>();
         try {
