@@ -23,7 +23,7 @@ public class Main {
 
     @Bean
     public EmbeddedServletContainerFactory getFactory() {
-        Map<String, String> env = getenv();
+        final Map<String, String> env = getenv();
         TomcatEmbeddedServletContainerFactory factory = new TomcatEmbeddedServletContainerFactory();
         factory.addConnectorCustomizers(new TomcatCustomization());
         factory.addInitializers(new ServletContextInitializer() {
@@ -31,7 +31,7 @@ public class Main {
             public void onStartup(ServletContext servletContext) throws ServletException {
 
                 ServletRegistration.Dynamic shr = servletContext.addServlet("shr", DispatcherServlet.class);
-                shr.addMapping("/");
+                shr.addMapping(String.format("/%s/*", env.get("SHR_VERSION")));
                 shr.setInitParameter("contextClass", "org.springframework.web.context.support" +
                         ".AnnotationConfigWebApplicationContext");
                 shr.setInitParameter("contextConfigLocation", "org.freeshr.launch.WebMvcConfig");
