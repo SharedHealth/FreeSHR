@@ -2,7 +2,7 @@ package org.freeshr.domain.service;
 
 import org.apache.log4j.Logger;
 import org.freeshr.domain.model.patient.Patient;
-import org.freeshr.infrastructure.mci.MasterClientIndexClient;
+import org.freeshr.infrastructure.mci.MCIClient;
 import org.freeshr.infrastructure.persistence.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,27 +19,27 @@ public class PatientService {
     private Logger logger = Logger.getLogger(PatientService.class);
 
     private final PatientRepository patientRepository;
-    private final MasterClientIndexClient masterClientIndexClient;
+    private final MCIClient mciClient;
 
     @Autowired
-    public PatientService(PatientRepository patientRepository, MasterClientIndexClient masterClientIndexClient) {
+    public PatientService(PatientRepository patientRepository, MCIClient mciClient) {
         this.patientRepository = patientRepository;
-        this.masterClientIndexClient = masterClientIndexClient;
+        this.mciClient = mciClient;
     }
 
-    public Observable<Patient> ensurePresent(final String healthId, final String securityToken) throws ExecutionException, InterruptedException {
+    public Observable<Patient> ensurePresent(final String healthId, final String clientId, final String userEmail, final String accessToken) throws ExecutionException, InterruptedException {
         Observable<Patient> patient = patientRepository.find(healthId);
         return patient.flatMap(new Func1<Patient, Observable<Patient>>() {
             @Override
             public Observable<Patient> call(Patient patient) {
                 if (null != patient) return Observable.just(patient);
-                return findRemote(healthId, securityToken);
+                return findRemote(healthId, clientId, userEmail, accessToken);
             }
         });
     }
 
-    private Observable<Patient> findRemote(String healthId, String securityToken) {
-        Observable<Patient> remotePatient = masterClientIndexClient.getPatient(healthId, securityToken);
+    private Observable<Patient> findRemote(String healthId, String clientId, String userEmail, String accessToken) {
+        Observable<Patient> remotePatient = mciClient.getPatient(healthId, clientId, userEmail, accessToken);
         savePatient(remotePatient);
         return remotePatient.onErrorReturn(new Func1<Throwable, Patient>() {
             @Override

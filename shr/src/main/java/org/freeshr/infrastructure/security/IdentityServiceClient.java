@@ -15,7 +15,7 @@ import org.springframework.web.client.AsyncRestTemplate;
 import javax.naming.AuthenticationException;
 import java.util.concurrent.ExecutionException;
 
-import static org.freeshr.utils.HttpUtil.getIdentityHeaders;
+import static org.freeshr.utils.HttpUtil.getSHRIdentityHeaders;
 
 @Component
 public class IdentityServiceClient {
@@ -34,7 +34,7 @@ public class IdentityServiceClient {
     public TokenAuthentication authenticate(UserAuthInfo userAuthInfo, String token) throws AuthenticationException, ExecutionException,
             InterruptedException {
         String userInfoUrl = shrProperties.getIdentityServerBaseUrl() + token;
-        HttpHeaders httpHeaders = getIdentityHeaders(shrProperties);
+        HttpHeaders httpHeaders = getSHRIdentityHeaders(shrProperties);
         ListenableFuture<ResponseEntity<UserInfo>> listenableFuture = shrRestTemplate.exchange(userInfoUrl,
                 HttpMethod.GET,
                 new HttpEntity(httpHeaders), UserInfo.class);

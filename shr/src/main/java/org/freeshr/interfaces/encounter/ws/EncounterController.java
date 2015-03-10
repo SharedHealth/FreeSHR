@@ -9,6 +9,7 @@ import org.freeshr.utils.HttpUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
@@ -28,6 +29,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import static org.freeshr.utils.HttpUtil.*;
 
 @RestController
 public class EncounterController {
@@ -50,9 +53,8 @@ public class EncounterController {
         encounterBundle.setHealthId(healthId);
 
         final DeferredResult<EncounterResponse> deferredResult = new DeferredResult<>();
-        String securityToken = getSecurityToken(request);
         Observable<EncounterResponse> encounterResponse = encounterService.ensureCreated(encounterBundle,
-                securityToken);
+                request.getHeader(CLIENT_ID_KEY), request.getHeader(FROM_KEY), request.getHeader(AUTH_TOKEN_KEY));
 
         encounterResponse.subscribe(new Action1<EncounterResponse>() {
             @Override
@@ -78,11 +80,6 @@ public class EncounterController {
         });
 
         return deferredResult;
-    }
-
-    private String getSecurityToken(HttpServletRequest request) {
-        //if the request has reached here, the token is guaranteed to be present
-        return request.getHeader(HttpUtil.AUTH_TOKEN_KEY);
     }
 
     @RequestMapping(value = "/patients/{healthId}/encounters", method = RequestMethod.GET,

@@ -1,13 +1,9 @@
 package org.freeshr.infrastructure;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import junit.framework.TestCase;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.domain.model.Facility;
-import org.freeshr.domain.model.patient.Address;
-import org.freeshr.domain.model.patient.Patient;
-import org.freeshr.infrastructure.mci.MasterClientIndexClient;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;

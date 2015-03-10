@@ -2,7 +2,6 @@ package org.freeshr.infrastructure.mci;
 
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.patient.Patient;
-import org.freeshr.utils.HttpUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
@@ -14,25 +13,27 @@ import org.springframework.web.client.AsyncRestTemplate;
 import rx.Observable;
 import rx.functions.Func1;
 
-import static org.freeshr.utils.HttpUtil.basicAuthHeaders;
+import static org.freeshr.utils.HttpUtil.*;
 
 @Component
-public class MasterClientIndexClient {
+public class MCIClient {
 
     private AsyncRestTemplate shrRestTemplate;
     private SHRProperties shrProperties;
 
     @Autowired
-    public MasterClientIndexClient(@Qualifier("SHRRestTemplate") AsyncRestTemplate shrRestTemplate,
-                                   SHRProperties shrProperties) {
+    public MCIClient(@Qualifier("SHRRestTemplate") AsyncRestTemplate shrRestTemplate,
+                     SHRProperties shrProperties) {
         this.shrRestTemplate = shrRestTemplate;
         this.shrProperties = shrProperties;
     }
 
-    public Observable<Patient> getPatient(String healthId, String securityToken) {
+    public Observable<Patient> getPatient(String healthId, String clientId, String userEmail, String accessToken) {
         MultiValueMap<String, String> headers = basicAuthHeaders(shrProperties.getMciUser(), shrProperties
                 .getMciPassword());
-        headers.add(HttpUtil.AUTH_TOKEN_KEY, securityToken);
+        headers.add(AUTH_TOKEN_KEY, accessToken);
+        headers.add(CLIENT_ID_KEY, clientId);
+        headers.add(FROM_KEY, userEmail);
 
         Observable<ResponseEntity<Patient>> responseEntityObservable = Observable.from(shrRestTemplate.exchange(
                 shrProperties.getMCIPatientUrl() + "/" + healthId,

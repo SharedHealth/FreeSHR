@@ -114,8 +114,11 @@ public class EncounterServiceIntegrationTest {
 
     @Test
     public void shouldRejectEncounterWithInvalidReferenceCode() throws Exception {
+        String clientId="123";
+        String email = "email@gmail.com";
         String securityToken = UUID.randomUUID().toString();
-        EncounterResponse response = encounterService.ensureCreated(withInvalidReferenceTerm(), securityToken)
+        
+        EncounterResponse response = encounterService.ensureCreated(withInvalidReferenceTerm(), clientId, email, securityToken)
                 .toBlocking().first();
         assertTrue(new ValidationFailures(response).matches(new
                 String[]{"/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "code-unknown", null}));
@@ -123,8 +126,11 @@ public class EncounterServiceIntegrationTest {
 
     @Test
     public void shouldRejectEncounterWithInvalidConceptCode() throws Exception {
+        String clientId="123";
+        String email = "email@gmail.com";
         String securityToken = UUID.randomUUID().toString();
-        EncounterResponse response = encounterService.ensureCreated(withInvalidConcept(), securityToken).toBlocking()
+        
+        EncounterResponse response = encounterService.ensureCreated(withInvalidConcept(), clientId, email, securityToken).toBlocking()
                 .first();
         assertTrue(new ValidationFailures(response).matches(new
                 String[]{"/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "code-unknown",
@@ -133,17 +139,23 @@ public class EncounterServiceIntegrationTest {
 
     @Test
     public void shouldRejectEncountersForUnknownPatients() throws ExecutionException, InterruptedException {
+        String clientId="123";
+        String email = "email@gmail.com";
         String securityToken = UUID.randomUUID().toString();
+        
         Observable<EncounterResponse> encounterResponseObservable = encounterService.ensureCreated
-                (encounterForUnknownPatient(), securityToken);
+                (encounterForUnknownPatient(), clientId, email, securityToken);
         EncounterResponse response = encounterResponseObservable.toBlocking().first();
         assertThat(true, is(response.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition)));
     }
 
     @Test
     public void shouldCaptureAnEncounterAlongWithPatientDetails() throws Exception {
+        String clientId="123";
+        String email = "email@gmail.com";
         String securityToken = UUID.randomUUID().toString();
-        Observable<EncounterResponse> response = encounterService.ensureCreated(withValidEncounter(), securityToken);
+        
+        Observable<EncounterResponse> response = encounterService.ensureCreated(withValidEncounter(), clientId, email, securityToken);
         TestSubscriber<EncounterResponse> encounterResponseSubscriber = new TestSubscriber<>();
         response.subscribe(encounterResponseSubscriber);
         encounterResponseSubscriber.awaitTerminalEvent();
@@ -171,12 +183,15 @@ public class EncounterServiceIntegrationTest {
     @Test
     public void shouldReturnUniqueListOfEncountersForGivenListOfCatchments() throws ExecutionException,
             InterruptedException, ParseException {
+        String clientId="123";
+        String email = "email@gmail.com";
         String securityToken = UUID.randomUUID().toString();
+        
         Facility facility = new Facility("4", "facility1", "Main hospital", "305610", new Address("1", "2", "3",
                 null, null));
         Date date = new Date();
         facilityRepository.save(facility).toBlocking().first();
-        encounterService.ensureCreated(withValidEncounter(), securityToken).toBlocking().first();
+        encounterService.ensureCreated(withValidEncounter(), clientId, email, securityToken).toBlocking().first();
 
         List<EncounterBundle> encounterBundles = encounterService.findEncountersForFacilityCatchment("4", "305610",
                 date, 20).toBlocking().first();
@@ -187,6 +202,8 @@ public class EncounterServiceIntegrationTest {
     @Test
     public void shouldReturnUniqueListOfEncountersForFacilityCatchment() throws ExecutionException,
             InterruptedException, ParseException {
+        String clientId="123";
+        String email = "email@gmail.com";
         String securityToken = UUID.randomUUID().toString();
         Date date = new Date();
 
@@ -195,8 +212,8 @@ public class EncounterServiceIntegrationTest {
         facilityRepository.save(facility).toBlocking().first();
 
         assertNotNull(facilityRepository.find("3").toBlocking().first());
-        assertTrue(encounterService.ensureCreated(withValidEncounter(), securityToken).toBlocking().first().isSuccessful());
-        assertTrue(encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW), securityToken).toBlocking().first()
+        assertTrue(encounterService.ensureCreated(withValidEncounter(), clientId, email, securityToken).toBlocking().first().isSuccessful());
+        assertTrue(encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW), clientId, email, securityToken).toBlocking().first()
                 .isSuccessful());
 
         assertEquals(1, encounterService.findEncountersForPatient(VALID_HEALTH_ID, null,
@@ -213,12 +230,15 @@ public class EncounterServiceIntegrationTest {
 
     @Test
     public void shouldReturnEncounterIfPresentForHealthId() throws ExecutionException, InterruptedException {
+        String clientId="123";
+        String email = "email@gmail.com";
         String securityToken = UUID.randomUUID().toString();
+        
         Facility facility = new Facility("3", "facility", "Main hospital", "305610,3056", new Address("1", "2", "3",
                 null, null));
         facilityRepository.save(facility).toBlocking().first();
 
-        EncounterResponse first = encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW), securityToken)
+        EncounterResponse first = encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW), clientId, email, securityToken)
                 .toBlocking().first();
         String encounterId = first.getEncounterId();
         EncounterBundle encounterBundle = encounterService.findEncounter(VALID_HEALTH_ID_NEW,
@@ -228,12 +248,15 @@ public class EncounterServiceIntegrationTest {
 
     @Test
     public void shouldReturnEmptyIfNotPresentForHealthId() throws ExecutionException, InterruptedException {
+        String clientId="123";
+        String email = "email@gmail.com";
         String securityToken = UUID.randomUUID().toString();
         Facility facility = new Facility("3", "facility", "Main hospital", "305610,3056", new Address("1", "2", "3",
                 null, null));
+        
         facilityRepository.save(facility).toBlocking().first();
 
-        EncounterResponse first = encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW), securityToken)
+        EncounterResponse first = encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW), clientId, email, securityToken)
                 .toBlocking().first();
         String encounterId = first.getEncounterId();
 

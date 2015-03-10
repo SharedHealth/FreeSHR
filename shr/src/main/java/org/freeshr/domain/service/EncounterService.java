@@ -42,13 +42,13 @@ public class EncounterService {
         this.facilityService = facilityService;
     }
 
-    public Observable<EncounterResponse> ensureCreated(final EncounterBundle encounterBundle, String securityToken)
+    public Observable<EncounterResponse> ensureCreated(final EncounterBundle encounterBundle, String clientId, String userEmail, String accessToken)
             throws
             ExecutionException, InterruptedException {
         EncounterValidationResponse validationResult = validate(encounterBundle);
         if (null == validationResult) {
             Observable<Patient> patientObservable = patientService.ensurePresent(encounterBundle.getHealthId(),
-                    securityToken);
+                    clientId, userEmail, accessToken);
             return patientObservable.flatMap(success(encounterBundle), error(), complete());
 
         } else {
