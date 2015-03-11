@@ -2,6 +2,7 @@ package org.freeshr.config;
 
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.PersistenceConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.annotation.EnableCaching;
@@ -18,6 +19,9 @@ public class SHRCacheConfiguration implements CachingConfigurer {
 
     public static final int A_DAY_IN_SECONDS = 86400;
 
+    @Autowired
+    private SHRProperties shrProperties;
+
     @Bean(destroyMethod = "shutdown", name = "ehCacheManager")
     public net.sf.ehcache.CacheManager ehCacheManager() {
         CacheConfiguration cacheConfig = getCacheConfiguration();
@@ -32,7 +36,7 @@ public class SHRCacheConfiguration implements CachingConfigurer {
         cacheConfig.setName("shrCache");
         cacheConfig.setMemoryStoreEvictionPolicy("LRU");
         cacheConfig.setMaxEntriesLocalHeap(1000);
-        cacheConfig.setTimeToLiveSeconds(A_DAY_IN_SECONDS);
+        cacheConfig.setTimeToLiveSeconds(shrProperties.getLocalCacheTTL());
         return cacheConfig;
     }
 

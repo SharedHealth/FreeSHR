@@ -70,6 +70,9 @@ public class SHRProperties {
     @Value("${IDP_AUTH_TOKEN}")
     private String idPAuthToken;
 
+    @Value("${LOCAL_CACHE_TTL}")
+    private int localCacheTTL;
+
     public String getMCIPatientUrl() {
         return String.format("%s://%s:%s/%s",mciSchema,mciHost,mciPort,mciPatientPath);
     }
@@ -152,5 +155,9 @@ public class SHRProperties {
 
     public String getIdPAuthToken() {
         return idPAuthToken;
+    }
+
+    public int getLocalCacheTTL() {
+        return localCacheTTL;
     }
 }

@@ -26,6 +26,10 @@
                     <reference value="c41cabed-3c47-4260-bd70-ac4893b97ee8"/>
                     <display value="encounter"/>
                 </encounter>
+                <confidentiality>
+                    <system value="http://hl7.org/fhir/v3/Confidentiality"/>
+                    <code value="N"/>
+                </confidentiality>
                 <section>
                     <content>
                         <reference value="c41cabed-3c47-4260-bd70-ac4893b97ee8"/>
