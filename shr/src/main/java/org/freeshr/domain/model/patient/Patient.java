@@ -3,6 +3,7 @@ package org.freeshr.domain.model.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.freeshr.utils.Confidentiality;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Patient {
@@ -16,7 +17,7 @@ public class Patient {
     @JsonProperty("gender")
     private String gender;
 
-    private boolean isConfidential;
+    private Confidentiality confidentiality;
 
     public String getHealthId() {
         return healthId;
@@ -43,18 +44,19 @@ public class Patient {
     }
 
 
-    public boolean isConfidential() {
-        return isConfidential;
+    public Confidentiality getConfidentiality() {
+        return confidentiality;
     }
 
     //this is bad. done this way because MCI chooses to send booleans as yes/no
-    public void setConfidential(boolean isConfidential) {
-        this.isConfidential = isConfidential ;
+    public void setConfidentiality(boolean isConfidential) {
+        this.confidentiality = isConfidential ? Confidentiality.VeryRestricted : Confidentiality.Normal;
     }
 
     @JsonProperty("confidential")
-    public void setConfidential(String confidential) {
-        this.isConfidential = "YES".equalsIgnoreCase(confidential);
+    public void setConfidentiality(String confidentiality) {
+        this.confidentiality = "YES".equalsIgnoreCase(confidentiality) ?
+                Confidentiality.VeryRestricted : Confidentiality.Normal;
     }
 
     @Override

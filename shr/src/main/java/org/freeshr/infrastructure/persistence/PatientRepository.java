@@ -6,6 +6,7 @@ import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
+import org.freeshr.utils.Confidentiality;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ public class PatientRepository {
         Observable<ResultSet> observable = Observable.from(
                 cqlOperations.queryAsynchronously("SELECT " +
                         " health_id, gender, division_id, district_id, upazila_id, city_corporation_id, " +
-                        "union_urban_ward_id, address_line, confidential" +
+                        "union_urban_ward_id, address_line, confidentiality" +
                         " FROM patient WHERE health_id='" + healthId + "';"));
         return observable.map(new Func1<ResultSet, Patient>() {
             @Override
@@ -50,7 +51,7 @@ public class PatientRepository {
             Address address = new Address();
             patient.setHealthId(result.getString("health_id"));
             patient.setGender(result.getString("gender"));
-            patient.setConfidential(result.getBool("confidential"));
+            patient.setConfidentiality(isConfidential(result.getString("Confidentiality")));
             address.setDivision(result.getString("division_id"));
             address.setDistrict(result.getString("district_id"));
             address.setUpazila(result.getString("upazila_id"));
@@ -62,6 +63,10 @@ public class PatientRepository {
         } else {
             return null;
         }
+    }
+
+    private boolean isConfidential(String confidentiality) {
+        return confidentiality.equals("V");
     }
 
     public Observable<Boolean> save(Patient patient) {
@@ -82,7 +87,6 @@ public class PatientRepository {
                 .value("upazila_id", address.getUpazila())
                 .value("city_corporation_id", address.getCityCorporation())
                 .value("union_urban_ward_id", address.getUnionOrUrbanWardId())
-                .value("confidential", patient.isConfidential());
-
+                .value("confidentiality", patient.getConfidentiality().getLevel());
     }
 }

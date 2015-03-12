@@ -4,6 +4,7 @@ import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
+import org.freeshr.utils.Confidentiality;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,7 +39,7 @@ public class PatientRepositoryIntegrationTest {
         assertNotNull(patient);
         assertThat(patient, is(patient(healthId, false)));
         assertThat(patient.getAddress(), is(address()));
-        assertTrue(patient.isConfidential());
+        assertTrue(patient.getConfidentiality().equals(Confidentiality.VeryRestricted));
 
     }
 
@@ -47,7 +48,7 @@ public class PatientRepositoryIntegrationTest {
         patient.setHealthId(healthId);
         patient.setGender("1");
         patient.setAddress(address());
-        patient.setConfidential(confidential);
+        patient.setConfidentiality(confidential);
         return patient;
     }
 

@@ -7,6 +7,7 @@ import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
 import org.junit.Before;
+import org.freeshr.utils.Confidentiality;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,7 +74,7 @@ public class MCIClientIntegrationTest {
         assertThat(patient, is(notNullValue()));
         assertThat(patient.getHealthId(), is(heathId));
         assertThat(patient.getGender(), is("1"));
-        assertTrue(patient.isConfidential());
+        assertTrue(patient.getConfidentiality().equals(Confidentiality.VeryRestricted));
         Address address = patient.getAddress();
         assertThat(address.getLine(), is("house30"));
         assertThat(address.getDistrict(), is("56"));
