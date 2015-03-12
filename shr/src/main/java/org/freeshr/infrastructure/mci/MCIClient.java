@@ -5,6 +5,7 @@ import org.freeshr.domain.model.patient.Patient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -29,8 +30,7 @@ public class MCIClient {
     }
 
     public Observable<Patient> getPatient(String healthId, String clientId, String userEmail, String accessToken) {
-        MultiValueMap<String, String> headers = basicAuthHeaders(shrProperties.getMciUser(), shrProperties
-                .getMciPassword());
+        MultiValueMap<String, String> headers = new HttpHeaders();
         headers.add(AUTH_TOKEN_KEY, accessToken);
         headers.add(CLIENT_ID_KEY, clientId);
         headers.add(FROM_KEY, userEmail);
