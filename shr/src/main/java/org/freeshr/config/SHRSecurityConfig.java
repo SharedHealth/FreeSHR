@@ -45,7 +45,7 @@ public class SHRSecurityConfig extends WebSecurityConfigurerAdapter {
                     }
                 }))
                 .authorizeRequests()
-                .anyRequest().hasRole("Facility Admin")
+                .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(new TokenAuthenticationFilter(authenticationManager()), BasicAuthenticationFilter
                         .class)
