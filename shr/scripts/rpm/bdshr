@@ -86,10 +86,10 @@ case $1 in
 		status
 	;;
 	kill)
-		terminate
+		stop
 	;;
 	*)
-		echo -e $TOMCAT_USAGE
+
 	;;
 esac
 exit 0
