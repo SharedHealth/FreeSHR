@@ -1,7 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 #
-# bdshr        This shell script takes care of starting and stopping
-#              the bdshr system
+# bdshr        start/stop/status script
 #
 # chkconfig: - 64 36
 # description: The bdshr shared health record system
@@ -16,22 +15,81 @@
 # Description: BDSHR system
 ### END INIT INFO
 
+export BDSHR_USER=sharedhealth
+export BDSHR_RUN=/opt/bdshr/bin/start.sh
+
+# load configuration
 . /etc/default/bdshr
 
-if [[ ! -e /var/run/bdshr ]]; then
-    ln -s /opt/bdshr/var /var/run/bdshr
-fi
+create_dirs() {
+    if [[ ! -e /var/run/bdshr ]]; then
+        ln -s /opt/bdshr/var /var/run/bdshr
+    fi
 
-if [[ ! -e /var/log/bdshr ]]; then
-    mkdir /var/log/bdshr
-fi
+    if [[ ! -e /var/log/bdshr ]]; then
+        mkdir /var/log/bdshr
+    fi
+}
+bdshr_pid() {
+        echo `ps -fe | grep $BDSHR_RUN | grep -v grep | tr -s " "|cut -d" " -f2`
+}
 
-case "$1" in
-  start)
-    nohup java -Dserver.port=$BDSHR_PORT -DSHR_LOG_LEVEL=$SHR_LOG_LEVEL -jar /opt/bdshr/lib/shr.war > /var/log/bdshr/bdshr.log &
-    echo $! > /var/run/bdshr/bdshr.pid
-    ;;
-  stop)
-    (cat /var/run/bdshr/bdshr.pid |  xargs -n 1 kill) || (true)
-    ;;
+start(){
+    pid=$(bdshr_pid)
+    if [ -n "$pid" ]
+    then
+        echo -e "\e[00;31mService bdshr is already running (pid: $pid)\e[00m"
+    else
+        # Start bdshr
+        create_dirs
+        echo -e "\e[00;32mStarting bdshr\e[00m"
+        if [ `user_exists $BDSHR_USER` = "1" ]
+        then
+                /bin/su $BDSHR_USER -c $BDSHR_RUN
+        else
+                sh $BDSHR_RUN
+        fi
+  fi
+  return 0
+}
+status(){
+          pid=$(bdshr_pid)
+          if [ -n "$pid" ]; then echo -e "\e[00;32mService bdshr is running with pid: $pid\e[00m"
+          else echo -e "\e[00;31mService bdshr is not running\e[00m"
+          fi
+}
+
+stop() {
+	echo -e "\e[00;31mTerminating bdshr\e[00m"
+	kill -9 $(bdshr_pid)
+}
+user_exists(){
+        if id -u $1 >/dev/null 2>&1; then
+        echo "1"
+        else
+                echo "0"
+        fi
+}
+
+case $1 in
+	start)
+	  start
+	;;
+	stop)
+	  stop
+	;;
+	restart)
+	  stop
+	  start
+	;;
+	status)
+		status
+	;;
+	kill)
+		terminate
+	;;
+	*)
+		echo -e $TOMCAT_USAGE
+	;;
 esac
+exit 0

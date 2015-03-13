@@ -143,6 +143,7 @@ task dist(dependsOn: [project(":schema").tasks.build,'exportProperties'], type: 
     from("scripts/rpm") {
         fileMode = 0755
         exclude 'bdshr'
+        exclude 'start.sh'
         into 'var'
     }
 }
