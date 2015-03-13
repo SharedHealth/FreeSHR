@@ -14,7 +14,6 @@ import static org.freeshr.application.fhir.EncounterValidationResponse.fromValid
 @Component
 public class EncounterValidator {
 
-    private final ResourceOrFeedDeserializer resourceOrFeedDeserializer;
     private FhirMessageFilter fhirMessageFilter;
     private FhirSchemaValidator fhirSchemaValidator;
     private ResourceValidator resourceValidator;
@@ -37,16 +36,11 @@ public class EncounterValidator {
         this.healthIdValidator = healthIdValidator;
         this.structureValidator = structureValidator;
         this.facilityValidator = facilityValidator;
-        this.resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
         this.providerValidator = providerValidator;
     }
 
-    public EncounterValidationResponse validate(EncounterBundle encounterBundle) {
+    public EncounterValidationResponse validate(EncounterValidationContext validationContext) {
         try {
-            final EncounterValidationContext validationContext = new EncounterValidationContext(encounterBundle,
-                    resourceOrFeedDeserializer);
-
-
             EncounterValidationResponse validationResponse = fromValidationMessages(
                     fhirSchemaValidator.validate(validationContext.sourceFragment()), fhirMessageFilter);
             if (validationResponse.isNotSuccessful()) return validationResponse;
@@ -65,6 +59,7 @@ public class EncounterValidator {
 
             validationResponse.mergeErrors(fromValidationMessages(
                     resourceValidator.validate(validationContext.feedFragment()), fhirMessageFilter));
+
 
             return validationResponse.isSuccessful()
                     ? fromValidationMessages(healthIdValidator.validate(validationContext.context()), fhirMessageFilter)

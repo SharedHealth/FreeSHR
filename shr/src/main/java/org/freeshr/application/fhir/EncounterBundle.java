@@ -4,6 +4,7 @@ package org.freeshr.application.fhir;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.eclipse.persistence.oxm.annotations.XmlCDATA;
+import org.freeshr.utils.Confidentiality;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -29,6 +30,18 @@ public class EncounterBundle {
     private String[] categories = new String[]{"encounter"};
 
     private String title = "Encounter";
+
+    @JsonIgnore
+    @XmlTransient
+    private Confidentiality encounterConfidentiality;
+
+    @JsonIgnore
+    @XmlTransient
+    private Confidentiality patientConfidentiality;
+
+    public void setEncounterContent(EncounterContent encounterContent) {
+        this.encounterContent = encounterContent;
+    }
 
     @XmlElement(name = "id")
     public String getEncounterId() {
@@ -100,10 +113,10 @@ public class EncounterBundle {
         return String.format("/patients/%s/encounters/%s", getHealthId(), getEncounterId());
     }
 
-
     public void setCategories(String[] categories) {
         this.categories = categories;
     }
+
 
     public String[] getCategories() {
         return categories != null ? categories : new String[]{};
@@ -128,5 +141,21 @@ public class EncounterBundle {
                 ", categories=" + Arrays.toString(categories) +
                 ", title='" + title + '\'' +
                 '}';
+    }
+
+    public Confidentiality getEncounterConfidentiality() {
+        return encounterConfidentiality;
+    }
+
+    public void setEncounterConfidentiality(Confidentiality encounterConfidentiality) {
+        this.encounterConfidentiality = encounterConfidentiality;
+    }
+
+    public void setPatientConfidentiality(Confidentiality patientConfidentiality) {
+        this.patientConfidentiality = patientConfidentiality;
+    }
+
+    public Confidentiality getPatientConfidentiality() {
+        return patientConfidentiality;
     }
 }

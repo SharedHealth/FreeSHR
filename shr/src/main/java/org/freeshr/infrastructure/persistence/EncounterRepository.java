@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutionException;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static org.freeshr.infrastructure.persistence.RxMaps.completeResponds;
 import static org.freeshr.infrastructure.persistence.RxMaps.respondOnNext;
+import static org.freeshr.utils.Confidentiality.getConfidentiality;
 
 @Component
 public class EncounterRepository {
@@ -54,6 +55,8 @@ public class EncounterRepository {
         insertEncounterStmt.value("received_date", DateUtil.getCurrentTimeInISOString()); //TODO check timefunction
         insertEncounterStmt.value("content", encounterBundle.getEncounterContent().toString());
         insertEncounterStmt.value("patient_location_code", address.getLocationCode());
+        insertEncounterStmt.value("encounter_confidentiality", encounterBundle.getEncounterConfidentiality().getLevel());
+        insertEncounterStmt.value("patient_confidentiality", encounterBundle.getPatientConfidentiality().getLevel());
 
         String encCatchmentInsertQuery =
                 String.format("INSERT INTO enc_by_catchment (division_id, district_id, year, " +
@@ -101,7 +104,7 @@ public class EncounterRepository {
 
     public Observable<EncounterBundle> findEncounterById(String encounterId) {
         Select findEncounter = QueryBuilder
-                .select("encounter_id", "health_id", "received_date", "content")
+                .select("encounter_id", "health_id", "received_date", "content", "encounter_confidentiality", "patient_confidentiality")
                 .from("encounter")
                 .where(eq("encounter_id", encounterId))
                 .limit(1);
@@ -140,7 +143,7 @@ public class EncounterRepository {
 
     private String buildEncounterSelectionQuery(LinkedHashSet<String> encounterIds) {
         StringBuilder encounterQuery = new StringBuilder("SELECT encounter_id, health_id, received_date, " +
-                "content FROM encounter where encounter_id in (");
+                "content, patient_confidentiality, encounter_confidentiality FROM encounter where encounter_id in (");
         int noOfEncounters = encounterIds.size();
         int idx = 0;
         for (String encounterId : encounterIds) {
@@ -180,7 +183,6 @@ public class EncounterRepository {
     }
 
     private List<EncounterBundle> read(ResultSet resultSet) {
-        //TODO return LinkedHashSet
         List<EncounterBundle> bundles = new ArrayList<>();
         List<Row> rows = resultSet.all();
         for (Row result : rows) {
@@ -189,6 +191,8 @@ public class EncounterRepository {
             bundle.setHealthId(result.getString("health_id"));
             bundle.setReceivedDate(DateUtil.toISOString(result.getDate("received_date")));
             bundle.setEncounterContent(result.getString("content"));
+            bundle.setEncounterConfidentiality(getConfidentiality(result.getString("encounter_confidentiality")));
+            bundle.setPatientConfidentiality(getConfidentiality(result.getString("patient_confidentiality")));
             bundles.add(bundle);
         }
         return bundles;

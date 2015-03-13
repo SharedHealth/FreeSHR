@@ -8,8 +8,12 @@ import org.freeshr.domain.model.Catchment;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
+import org.freeshr.utils.Confidentiality;
 import org.freeshr.utils.DateUtil;
+import org.freeshr.utils.ResourceOrFeedDeserializer;
+import org.freeshr.validations.EncounterValidationContext;
 import org.freeshr.validations.EncounterValidator;
+import org.hl7.fhir.instance.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +23,13 @@ import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.functions.FuncN;
 
+import java.lang.Boolean;
+import java.lang.Integer;
 import java.util.*;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
+
+import static org.freeshr.utils.Confidentiality.getConfidentiality;
 
 @Service
 public class EncounterService {
@@ -82,6 +91,7 @@ public class EncounterService {
                 final EncounterResponse response = new EncounterResponse();
                 if (patient != null) {
                     encounterBundle.setEncounterId(UUID.randomUUID().toString());
+                    encounterBundle.setPatientConfidentiality(patient.getConfidentiality());
                     Observable<Boolean> save = encounterRepository.save(encounterBundle, patient);
 
                     return save.flatMap(new Func1<Boolean, Observable<EncounterResponse>>() {
@@ -117,8 +127,31 @@ public class EncounterService {
     }
 
     private EncounterValidationResponse validate(EncounterBundle encounterBundle) {
-        final EncounterValidationResponse encounterValidationResponse = encounterValidator.validate(encounterBundle);
-        return encounterValidationResponse.isSuccessful() ? null : encounterValidationResponse;
+        EncounterValidationContext validationContext = new EncounterValidationContext(encounterBundle, new ResourceOrFeedDeserializer());
+        final EncounterValidationResponse encounterValidationResponse = encounterValidator.validate(validationContext);
+        if (encounterValidationResponse.isNotSuccessful())
+            return encounterValidationResponse;
+        Confidentiality encounterConfidentiality = getEncounterConfidentiality(validationContext);
+        encounterBundle.setEncounterConfidentiality(encounterConfidentiality);
+        return null;
+    }
+
+    private Confidentiality getEncounterConfidentiality(EncounterValidationContext validationContext) {
+        Confidentiality encounterConfidentiality = Confidentiality.Normal;
+        AtomFeed feed = validationContext.feedFragment().extract();
+        for (AtomEntry<? extends Resource> entry : feed.getEntryList()) {
+            if (entry.getResource().getResourceType().equals(ResourceType.Composition)) {
+                Composition composition = (Composition) entry.getResource();
+                Coding confidentiality = composition.getConfidentiality();
+                if (null == confidentiality) {
+                    break;
+                }
+                String code = confidentiality.getCodeSimple();
+                encounterConfidentiality = getConfidentiality(code);
+                break;
+            }
+        }
+        return encounterConfidentiality;
     }
 
     /**

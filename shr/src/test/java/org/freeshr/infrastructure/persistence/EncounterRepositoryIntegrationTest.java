@@ -6,6 +6,7 @@ import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.domain.model.Catchment;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
+import org.freeshr.utils.Confidentiality;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -117,6 +118,8 @@ public class EncounterRepositoryIntegrationTest {
         EncounterBundle bundle = new EncounterBundle();
         bundle.setEncounterId(encounterId);
         bundle.setHealthId(healthId);
+        bundle.setEncounterConfidentiality(Confidentiality.Normal);
+        bundle.setPatientConfidentiality(Confidentiality.Normal);
         bundle.setEncounterContent(asString("jsons/encounters/valid.json"));
         return bundle;
     }

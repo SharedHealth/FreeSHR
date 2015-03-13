@@ -7,6 +7,9 @@ import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
+import org.freeshr.utils.Confidentiality;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.internal.matchers.InstanceOf;
@@ -196,6 +199,66 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
                 .andExpect(request().asyncResult(hasEncountersOfSize(3)));
     }
 
+    @Test
+    public void shouldSaveEncounterConfidentialityAsNormal() throws Exception {
+        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID + "/encounters")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_XML)
+                .characterEncoding(Charsets.UTF_8.name())
+                .content(asString("xmls/encounters/encounter_with_normal_confidentiality.xml")))
+                .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
+
+        mockMvc.perform(MockMvcRequestBuilders.get(
+                String.format("/patients/%s/encounters", VALID_HEALTH_ID))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(request().asyncResult(assertConfidentiality(Confidentiality.Normal,Confidentiality.VeryRestricted)));
+    }
+
+    @Test
+    public void shouldSaveEncounterConfidentialityAsVeryRestricted() throws Exception {
+        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID + "/encounters")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_XML)
+                .characterEncoding(Charsets.UTF_8.name())
+                .content(asString("xmls/encounters/encounter_with_very_restricted_confidentiality.xml")))
+                .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
+
+        mockMvc.perform(MockMvcRequestBuilders.get(
+                String.format("/patients/%s/encounters", VALID_HEALTH_ID))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(request().asyncResult(assertConfidentiality(Confidentiality.VeryRestricted, Confidentiality.VeryRestricted)));
+    }
+
+    @Test
+    public void shouldSaveEncounterConfidentialityAsNormalWhenNotSpecified() throws Exception {
+        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID + "/encounters")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_XML)
+                .characterEncoding(Charsets.UTF_8.name())
+                .content(asString("xmls/encounters/encounter.xml")))
+                .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
+
+        mockMvc.perform(MockMvcRequestBuilders.get(
+                String.format("/patients/%s/encounters", VALID_HEALTH_ID))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(request().asyncResult(assertConfidentiality(Confidentiality.Normal, Confidentiality.VeryRestricted)));
+    }
+
+    private BaseMatcher<EncounterSearchResponse> assertConfidentiality(final Confidentiality encounterConfidentiality, final Confidentiality patientConfidentiality) {
+        return new BaseMatcher<EncounterSearchResponse>() {
+            @Override
+            public void describeTo(Description description) {
+            }
+
+            @Override
+            public boolean matches(Object item) {
+                EncounterBundle encounterBundle = ((EncounterSearchResponse) item).getEntries().get(0);
+                return encounterBundle.getEncounterConfidentiality().equals(encounterConfidentiality) &&
+                        encounterBundle.getPatientConfidentiality().equals(patientConfidentiality);
+            }
+        };
+    }
+
     private void mockFacility(String facilityId) {
         givenThat(get(urlEqualTo(shrProperties.getFRLocationPath() + "/" + facilityId + ".json"))
                 .withHeader("X-Auth-Token", matching(shrProperties.getIdPAuthToken()))
@@ -211,6 +274,8 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
         EncounterBundle bundle = new EncounterBundle();
         bundle.setEncounterId(encounterId);
         bundle.setHealthId(healthId);
+        bundle.setEncounterConfidentiality(Confidentiality.Normal);
+        bundle.setPatientConfidentiality(Confidentiality.Normal);
         bundle.setEncounterContent(asString("jsons/encounters/valid.json"));
         return bundle;
     }
