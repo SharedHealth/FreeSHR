@@ -31,7 +31,7 @@ create_dirs() {
     fi
 }
 bdshr_pid() {
-        echo `ps -fe | grep $BDSHR_RUN | grep -v grep | tr -s " "|cut -d" " -f2`
+        echo `ps -fe | grep 'shr.war' | grep -v grep | tr -s " "|cut -d" " -f2`
 }
 
 start(){
