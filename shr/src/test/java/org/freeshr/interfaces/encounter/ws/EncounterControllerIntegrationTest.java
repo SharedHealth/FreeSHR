@@ -290,7 +290,6 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
         UserInfo patientUser = new UserInfo("123", "name", "google@rajanikant.com", 1, true, "xyz", asList("MCI_ADMIN"), asList(patientProfile));
         SecurityContextHolder.getContext().setAuthentication(new TokenAuthentication(patientUser, true));
 
-
         mockMvc.perform(post("/patients/" + VALID_HEALTH_ID_CONFIDENTIAL + "/encounters")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_XML)
