@@ -6,12 +6,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.freeshr.application.fhir.EncounterBundle;
+import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.service.EncounterService;
+import org.freeshr.domain.service.UserService;
+import org.freeshr.infrastructure.security.UserInfo;
+import org.freeshr.infrastructure.security.UserProfile;
 import org.freeshr.utils.DateUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -30,8 +33,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 
@@ -40,19 +45,30 @@ public class EncounterControllerTest {
     @Mock
     EncounterService mockedEncounterService;
 
+    @Mock
+    private SHRProperties shrProperties;
+
+    @Mock
+    private UserService userService;
+
     EncounterController controller;
 
     @Before
     public void setUp() {
         initMocks(this);
-        controller = new EncounterController(mockedEncounterService);
+        controller = new EncounterController(mockedEncounterService, shrProperties, userService);
     }
 
     @Test
     public void shouldGetPagedEncountersForCatchment() throws Exception {
         int encounterFetchLimit = EncounterService.getEncounterFetchLimit();
         List<EncounterBundle> dummyEncounters = createEncounterBundles("hid01", 50, DateUtil.parseDate("2014-10-10"));
-        Mockito.when(mockedEncounterService.findEncountersForFacilityCatchment(anyString(), anyString(),
+        UserProfile datasenseProfile = new UserProfile("facility", "123", asList("3026"));
+        UserInfo datasenseUser = new UserInfo("12345", "name", "google@rajanikant.com", 1, true, "xyz", asList("MCI_ADMIN"), asList(datasenseProfile));
+
+        when(shrProperties.getDatasenseFacilityCodes()).thenReturn(new String[]{"123"});
+        when(userService.getUserInfo()).thenReturn(datasenseUser);
+        when(mockedEncounterService.findEncountersForFacilityCatchment(anyString(), anyString(),
                 any(Date.class),
                 eq(encounterFetchLimit * 2))).thenReturn(Observable.just(slice(encounterFetchLimit * 2,
                 dummyEncounters)));
@@ -80,17 +96,21 @@ public class EncounterControllerTest {
     public void shouldGetAtomFeed() throws Exception {
         int encounterFetchLimit = EncounterService.getEncounterFetchLimit();
         List<EncounterBundle> dummyEncounters = createEncounterBundles("hid01", 50, DateUtil.parseDate("2014-10-10"));
-        Mockito.when(mockedEncounterService.findEncountersForFacilityCatchment(anyString(), anyString(),
+        UserProfile patientProfile = new UserProfile("patient", "12", null);
+        UserInfo patientUser = new UserInfo("123", "name", "google@rajanikant.com", 1, true, "xyz", asList("MCI_ADMIN"), asList(patientProfile));
+
+        when(userService.getUserInfo()).thenReturn(patientUser);
+        when(mockedEncounterService.findEncountersForFacilityCatchment(anyString(), anyString(),
                 any(Date.class),
                 eq(encounterFetchLimit * 2))).thenReturn(Observable.just(slice(encounterFetchLimit * 2,
                 dummyEncounters)));
+
 
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null,
                 "/catchments/3026/encounters");
         DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncountersForCatchment
                 (mockHttpServletRequest, "F1", "3026", "2014-10-10", null);
         EncounterSearchResponse response = (EncounterSearchResponse) encountersForCatchment.getResult();
-        System.out.println(response.toString());
         List<EncounterBundle> results = response.getEntries();
 
         EncounterFeedHelper encounterFeedBuilder = new EncounterFeedHelper();

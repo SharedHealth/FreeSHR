@@ -3,7 +3,11 @@ package org.freeshr.interfaces.encounter.ws;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
+import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.service.EncounterService;
+import org.freeshr.domain.service.UserService;
+import org.freeshr.infrastructure.security.UserInfo;
+import org.freeshr.infrastructure.security.UserProfile;
 import org.freeshr.utils.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,17 +32,22 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import static org.freeshr.utils.EncounterUtil.filter;
 import static org.freeshr.utils.HttpUtil.*;
 
 @RestController
 public class EncounterController {
     private static final Logger logger = LoggerFactory.getLogger(EncounterController.class);
 
+    private final UserService userService;
     private EncounterService encounterService;
+    private SHRProperties shrProperties;
 
     @Autowired
-    public EncounterController(EncounterService encounterService) {
+    public EncounterController(EncounterService encounterService, SHRProperties shrProperties, UserService userService) {
         this.encounterService = encounterService;
+        this.shrProperties = shrProperties;
+        this.userService = userService;
     }
 
     @RequestMapping(value = "/patients/{healthId}/encounters", method = RequestMethod.POST)
@@ -90,6 +99,7 @@ public class EncounterController {
             @RequestParam(value = "updatedSince", required = false) String updatedSince) {
         logger.debug("Find all encounters by health id: " + healthId);
         final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<>();
+        final UserInfo userInfo = userService.getUserInfo();
         try {
             final Date requestedDate = getRequestedDate(updatedSince);
             Observable<List<EncounterBundle>> encountersForPatient =
@@ -98,6 +108,11 @@ public class EncounterController {
                 @Override
                 public void call(List<EncounterBundle> encounterBundles) {
                     try {
+                        encounterBundles = filter(encounterBundles, userInfo, shrProperties);
+                        if (encounterBundles.isEmpty()) {
+                            deferredResult.setErrorResult("This patient's encounters cannot be downloaded");
+                            return;
+                        }
                         EncounterSearchResponse searchResponse = new EncounterSearchResponse(
                                 getRequestUri(request, requestedDate, null), encounterBundles);
                         logger.debug(searchResponse.toString());
@@ -107,6 +122,8 @@ public class EncounterController {
                     }
 
                 }
+
+
             }, new Action1<Throwable>() {
                 @Override
                 public void call(Throwable throwable) {
@@ -135,11 +152,12 @@ public class EncounterController {
         final Date requestedDate = getRequestedDateForCatchment(updatedSince);
         final Observable<List<EncounterBundle>> catchmentEncounters =
                 findFacilityCatchmentEncounters(facilityId, catchment, lastMarker, requestedDate);
-
+        final UserInfo userInfo = userService.getUserInfo();
         catchmentEncounters.subscribe(new Action1<List<EncounterBundle>>() {
             @Override
             public void call(List<EncounterBundle> encounterBundles) {
                 try {
+                    encounterBundles = filter(encounterBundles, userInfo, shrProperties);
                     EncounterSearchResponse searchResponse = new EncounterSearchResponse(
                             getRequestUri(request, requestedDate, lastMarker), encounterBundles);
                     searchResponse.setNavLinks(null, getNextResultURL(request, encounterBundles, requestedDate));
@@ -167,6 +185,13 @@ public class EncounterController {
             @PathVariable String healthId, @PathVariable final String encounterId) {
         logger.debug(String.format("Find encounter %s for patient %s", encounterId, healthId));
         final DeferredResult<EncounterBundle> deferredResult = new DeferredResult<>();
+        final UserInfo userInfo = userService.getUserInfo();
+        for (UserProfile userProfile : userInfo.getUserProfiles()) {
+            if (!userProfile.isPatientType()) {
+                deferredResult.setErrorResult("This encounter cannot be downloaded");
+                return deferredResult;
+            }
+        }
         Observable<EncounterBundle> observable = encounterService.findEncounter(healthId,
                 encounterId).firstOrDefault(null);
         observable.subscribe(new Action1<EncounterBundle>() {

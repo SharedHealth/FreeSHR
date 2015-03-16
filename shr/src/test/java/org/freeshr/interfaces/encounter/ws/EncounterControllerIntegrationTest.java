@@ -34,7 +34,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource(properties = "MCI_SERVER_URL=http://localhost:9997")
 public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
 
-    private static final String VALID_HEALTH_ID = "5893922485019082753";
+    private static final String VALID_HEALTH_ID_CONFIDENTIAL = "5893922485019082753";
+    private static final String VALID_HEALTH_ID_NOT_CONFIDENTIAL = "5893922485019081234";
 
     private static final String INVALID_HEALTH_ID = "1234";
 
@@ -43,7 +44,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
 
     @Before
     public void setUp() throws Exception {
-        givenThat(get(urlEqualTo("/api/v1/patients/" + VALID_HEALTH_ID))
+        givenThat(get(urlEqualTo("/api/v1/patients/" + VALID_HEALTH_ID_CONFIDENTIAL))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
@@ -90,7 +91,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
 
     @Test
     public void shouldSaveEncounter() throws Exception {
-        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID + "/encounters")
+        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID_CONFIDENTIAL + "/encounters")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
@@ -113,7 +114,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
 
     @Test
     public void shouldRejectAnEncounterWithCorrectHttpResponseCodeWhenThereAreValidationFailures() throws Exception {
-        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID + "/encounters")
+        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID_CONFIDENTIAL + "/encounters")
                 .accept(MediaType.APPLICATION_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
@@ -123,7 +124,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
 
     @Test
     public void shouldRejectAnEncounterWithInvalidDiagnosticCode() throws Exception {
-        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID + "/encounters")
+        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID_CONFIDENTIAL + "/encounters")
                 .accept(MediaType.APPLICATION_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
@@ -133,7 +134,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
 
     @Test
     public void shouldSaveTheEncounterWhenValidType() throws Exception {
-        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID + "/encounters")
+        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID_CONFIDENTIAL + "/encounters")
                 .accept(MediaType.APPLICATION_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
@@ -143,7 +144,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
 
     @Test
     public void shouldRejectAnEncounterWithInvalidEncounterType() throws Exception {
-        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID + "/encounters")
+        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID_CONFIDENTIAL + "/encounters")
                 .accept(MediaType.APPLICATION_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
@@ -218,7 +219,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
         UserInfo patientUser = new UserInfo("123", "name", "google@rajanikant.com", 1, true, "xyz", asList("MCI_ADMIN"), asList(patientProfile));
         SecurityContextHolder.getContext().setAuthentication(new TokenAuthentication(patientUser, true));
 
-        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID + "/encounters")
+        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID_CONFIDENTIAL + "/encounters")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
@@ -226,7 +227,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
                 .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
 
         mockMvc.perform(MockMvcRequestBuilders.get(
-                String.format("/patients/%s/encounters", VALID_HEALTH_ID))
+                String.format("/patients/%s/encounters", VALID_HEALTH_ID_CONFIDENTIAL))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(request().asyncResult(assertConfidentiality(Confidentiality.Normal, Confidentiality.VeryRestricted)));
     }
@@ -237,7 +238,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
         UserInfo patientUser = new UserInfo("123", "name", "google@rajanikant.com", 1, true, "xyz", asList("MCI_ADMIN"), asList(patientProfile));
         SecurityContextHolder.getContext().setAuthentication(new TokenAuthentication(patientUser, true));
 
-        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID + "/encounters")
+        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID_CONFIDENTIAL + "/encounters")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
@@ -245,9 +246,42 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
                 .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
 
         mockMvc.perform(MockMvcRequestBuilders.get(
-                String.format("/patients/%s/encounters", VALID_HEALTH_ID))
+                String.format("/patients/%s/encounters", VALID_HEALTH_ID_CONFIDENTIAL))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(request().asyncResult(assertConfidentiality(Confidentiality.VeryRestricted, Confidentiality.VeryRestricted)));
+    }
+
+    @Test
+    public void shouldGetOnlyEncountersWithNormalConfidentiality() throws Exception {
+        UserProfile facility = new UserProfile("facility", "123", asList("3026"));
+        UserInfo facilityUser = new UserInfo("12345", "name", "google@rajanikant.com", 1, true, "xyz", asList("MCI_ADMIN"), asList(facility));
+        SecurityContextHolder.getContext().setAuthentication(new TokenAuthentication(facilityUser, true));
+
+        givenThat(get(urlEqualTo("/api/v1/patients/" + VALID_HEALTH_ID_NOT_CONFIDENTIAL))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/patient_not_confidential.json"))));
+
+
+        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID_NOT_CONFIDENTIAL + "/encounters")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_XML)
+                .characterEncoding(Charsets.UTF_8.name())
+                .content(asString("xmls/encounters/encounter_normal_with_normal_patient.xml")))
+                .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
+
+        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID_NOT_CONFIDENTIAL + "/encounters")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_XML)
+                .characterEncoding(Charsets.UTF_8.name())
+                .content(asString("xmls/encounters/encounter_restricted_with_normal_patient.xml")))
+                .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
+
+        mockMvc.perform(MockMvcRequestBuilders.get(
+                String.format("/patients/%s/encounters", VALID_HEALTH_ID_NOT_CONFIDENTIAL))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(request().asyncResult(hasEncountersOfSize(1)));
     }
 
     @Test
@@ -256,7 +290,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
         UserInfo patientUser = new UserInfo("123", "name", "google@rajanikant.com", 1, true, "xyz", asList("MCI_ADMIN"), asList(patientProfile));
         SecurityContextHolder.getContext().setAuthentication(new TokenAuthentication(patientUser, true));
 
-        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID + "/encounters")
+        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID_CONFIDENTIAL + "/encounters")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
@@ -264,7 +298,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
                 .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
 
         mockMvc.perform(MockMvcRequestBuilders.get(
-                String.format("/patients/%s/encounters", VALID_HEALTH_ID))
+                String.format("/patients/%s/encounters", VALID_HEALTH_ID_CONFIDENTIAL))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(request().asyncResult(assertConfidentiality(Confidentiality.Normal, Confidentiality.VeryRestricted)));
     }

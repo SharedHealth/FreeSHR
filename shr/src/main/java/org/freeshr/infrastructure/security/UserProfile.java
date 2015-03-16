@@ -37,4 +37,8 @@ public class UserProfile {
     public boolean isPatientType() {
         return name.equalsIgnoreCase(PATIENT_TYPE);
     }
+
+    public String getId() {
+        return id;
+    }
 }

@@ -66,6 +66,8 @@ public class SHRProperties {
     @Value("${MCI_SERVER_URL}")
     private String mciServerUrl;
 
+    @Value("${DATASENSE_FACILITY_CODES}")
+    private String datasenseFacilityCodes;
 
     private String[] mciServerLocationUrls = null;
     private String[] facilityServerLocationUrls = null;
@@ -244,4 +246,7 @@ public class SHRProperties {
         return this.terminologyServerLocationUrls;
     }
 
+    public String[] getDatasenseFacilityCodes() {
+        return StringUtils.split(datasenseFacilityCodes, ",");
+    }
 }

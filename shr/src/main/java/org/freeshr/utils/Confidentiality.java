@@ -23,19 +23,28 @@ public enum Confidentiality {
     }
 
     public static Confidentiality getConfidentiality(String code) {
-        Confidentiality confidentiality;
-        if (code.equals(Confidentiality.Unrestricted.getLevel())) {
-            confidentiality = Confidentiality.Unrestricted;
-        } else if (code.equals(Confidentiality.Low.getLevel())) {
-            confidentiality = Confidentiality.Low;
-        } else if (code.equals(Confidentiality.Moderate.getLevel())) {
-            confidentiality = Confidentiality.Moderate;
-        } else if (code.equals(Confidentiality.Restricted.getLevel())) {
-            confidentiality = Confidentiality.Restricted;
-        } else if (code.equals(Confidentiality.VeryRestricted.getLevel())) {
-            confidentiality = Confidentiality.VeryRestricted;
-        } else {
-            confidentiality = Confidentiality.Normal;
+        Confidentiality confidentiality = Confidentiality.Normal;
+        if (code == null) {
+            return confidentiality;
+        }
+        switch (code) {
+            case "U":
+                confidentiality = Confidentiality.Unrestricted;
+                break;
+            case "L":
+                confidentiality = Confidentiality.Low;
+                break;
+            case "M":
+                confidentiality = Confidentiality.Moderate;
+                break;
+            case "N":
+                confidentiality = Confidentiality.Normal;
+                break;
+            case "R":
+                confidentiality = Confidentiality.Restricted;
+                break;
+            case "V":
+                confidentiality = Confidentiality.VeryRestricted;
         }
         return confidentiality;
     }

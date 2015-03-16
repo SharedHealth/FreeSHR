@@ -79,7 +79,7 @@ public class EncounterServiceIntegrationTest {
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody(asString("jsons/patientNew.json"))));
+                        .withBody(asString("jsons/patient_not_confidential.json"))));
 
         givenThat(get(urlEqualTo(shrProperties.getFRLocationPath() + "/" + VALID_FACILITY_ID + ".json"))
                 .withHeader("X-Auth-Token", matching(shrProperties.getIdPAuthToken()))
