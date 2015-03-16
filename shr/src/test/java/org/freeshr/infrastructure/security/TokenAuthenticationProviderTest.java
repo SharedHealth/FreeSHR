@@ -66,6 +66,6 @@ public class TokenAuthenticationProviderTest {
 
     private UserInfo getUserInfo(UUID token) {
         return new UserInfo("123", "foo", "email@gmail.com", 1, true,
-                token.toString(), asList("MCI_ADMIN", "SHR_USER"), asList());
+                token.toString(), asList("MCI_ADMIN", "SHR_USER"), asList(new UserProfile("facility", "10000069", asList("3026"))));
     }
 }

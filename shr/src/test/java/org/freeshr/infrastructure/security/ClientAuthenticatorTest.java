@@ -85,6 +85,6 @@ public class ClientAuthenticatorTest {
 
 
     private UserInfo getUserInfo(String id, String email, boolean activated, String xyz) {
-        return new UserInfo(id, "foo", email, 1, activated, xyz, asList(""), asList());
+        return new UserInfo(id, "foo", email, 1, activated, xyz, asList(""), asList(new UserProfile("facility", "10000069", asList("3026"))));
     }
 }

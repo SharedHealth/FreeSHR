@@ -5,11 +5,9 @@ import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.domain.service.EncounterService;
 import org.freeshr.utils.DateUtil;
-import org.freeshr.utils.HttpUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
@@ -48,7 +46,7 @@ public class EncounterController {
             @PathVariable String healthId,
             @RequestBody EncounterBundle encounterBundle,
             HttpServletRequest request) throws ExecutionException, InterruptedException {
-        
+
         logger.debug("Create encounter. " + encounterBundle.getContent());
         encounterBundle.setHealthId(healthId);
 
@@ -89,7 +87,7 @@ public class EncounterController {
             @PathVariable String healthId,
             @RequestParam(value = "updatedSince", required = false) String updatedSince) {
         logger.debug("Find all encounters by health id: " + healthId);
-        final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<EncounterSearchResponse>();
+        final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<>();
         try {
             final Date requestedDate = getRequestedDate(updatedSince);
             Observable<List<EncounterBundle>> encountersForPatient =

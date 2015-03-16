@@ -22,7 +22,6 @@ import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.freeshr.utils.HttpUtil.*;
 import static org.springframework.util.StringUtils.isEmpty;
 
-
 public class TokenAuthenticationFilter extends GenericFilterBean {
     private AuthenticationManager authenticationManager;
     private final static Logger logger = LoggerFactory.getLogger(TokenAuthenticationFilter.class);

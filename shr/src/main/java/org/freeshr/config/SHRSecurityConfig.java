@@ -5,6 +5,7 @@ import org.freeshr.infrastructure.security.TokenAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,8 +30,7 @@ import java.util.ArrayList;
 @EnableWebSecurity
 public class SHRSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
-    TokenAuthenticationProvider tokenAuthenticationProvider;
-
+    private TokenAuthenticationProvider tokenAuthenticationProvider;
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -45,7 +45,9 @@ public class SHRSecurityConfig extends WebSecurityConfigurerAdapter {
                     }
                 }))
                 .authorizeRequests()
-                .anyRequest().authenticated()
+                .regexMatchers(HttpMethod.GET, "\\/v.?\\/patients\\/.*\\/encounters(\\/.*){0,1}$").hasAnyRole("SHR_FACILITY", "SHR_PROVIDER", "SHR_PATIENT")
+                .regexMatchers(HttpMethod.POST, "\\/v.?\\/patients\\/.*\\/encounters$").hasAnyRole("SHR_FACILITY", "SHR_PROVIDER")
+                .regexMatchers(HttpMethod.GET, "\\/v.?\\/catchments\\/\\d.*\\/encounters$").hasAnyRole("SHR_FACILITY", "SHR_PROVIDER")
                 .and()
                 .addFilterBefore(new TokenAuthenticationFilter(authenticationManager()), BasicAuthenticationFilter
                         .class)
@@ -73,5 +75,4 @@ public class SHRSecurityConfig extends WebSecurityConfigurerAdapter {
             }
         };
     }
-
 }

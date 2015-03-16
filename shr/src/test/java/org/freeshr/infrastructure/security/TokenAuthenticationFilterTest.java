@@ -13,7 +13,6 @@ import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import static java.util.Arrays.asList;
@@ -112,6 +111,6 @@ public class TokenAuthenticationFilterTest {
 
     private TokenAuthentication tokenAuthentication(UUID token) {
         return new TokenAuthentication(new UserInfo("1232", "foo", "email@gmail.com", 1, true,
-                token.toString(), new ArrayList<String>(), asList()), true);
+                token.toString(), new ArrayList<String>(), asList(new UserProfile("facility", "10000069", asList("3026")))), true);
     }
 }
