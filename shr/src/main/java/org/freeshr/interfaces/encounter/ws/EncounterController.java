@@ -42,6 +42,7 @@ public class EncounterController {
     }
 
     @RequestMapping(value = "/patients/{healthId}/encounters", method = RequestMethod.POST)
+//    @PreAuthorize(value = "hasAnyRole('ROLE_SHR_FACILITY','SHR_PROVIDER')")
     public DeferredResult<EncounterResponse> create(
             @PathVariable String healthId,
             @RequestBody EncounterBundle encounterBundle,
@@ -82,6 +83,7 @@ public class EncounterController {
 
     @RequestMapping(value = "/patients/{healthId}/encounters", method = RequestMethod.GET,
             produces = {"application/json", "application/atom+xml"})
+//    @PreAuthorize(value = "hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER', 'ROLE_SHR_PATIENT')")
     public DeferredResult<EncounterSearchResponse> findEncountersForPatient(
             final HttpServletRequest request,
             @PathVariable String healthId,
@@ -120,6 +122,7 @@ public class EncounterController {
 
     @RequestMapping(value = "/catchments/{catchment}/encounters", method = RequestMethod.GET,
             produces = {"application/json", "application/atom+xml"})
+//    @PreAuthorize(value = "hasAnyRole('SHR_FACILITY','SHR_PROVIDER')")
     public DeferredResult<EncounterSearchResponse> findEncountersForCatchment(
             final HttpServletRequest request,
             @RequestHeader String facilityId,
@@ -159,6 +162,7 @@ public class EncounterController {
 
     @RequestMapping(value = "/patients/{healthId}/encounters/{encounterId}", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
+//    @PreAuthorize(value = "hasAnyRole('SHR_FACILITY','SHR_PROVIDER','SHR_PATIENT')")
     public DeferredResult<EncounterBundle> findEncountersForPatient(
             @PathVariable String healthId, @PathVariable final String encounterId) {
         logger.debug(String.format("Find encounter %s for patient %s", encounterId, healthId));

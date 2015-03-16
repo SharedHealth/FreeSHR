@@ -7,6 +7,9 @@ import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
+import org.freeshr.infrastructure.security.TokenAuthentication;
+import org.freeshr.infrastructure.security.UserInfo;
+import org.freeshr.infrastructure.security.UserProfile;
 import org.freeshr.utils.Confidentiality;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -16,12 +19,14 @@ import org.mockito.internal.matchers.InstanceOf;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static java.util.Arrays.asList;
 import static org.freeshr.utils.FileUtil.asString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
@@ -127,7 +132,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
     }
 
     @Test
-    public void shouldSaveTheEncodunterWhenValidType() throws Exception {
+    public void shouldSaveTheEncounterWhenValidType() throws Exception {
         mockMvc.perform(post("/patients/" + VALID_HEALTH_ID + "/encounters")
                 .accept(MediaType.APPLICATION_XML)
                 .contentType(MediaType.APPLICATION_XML)
@@ -148,6 +153,10 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
 
     @Test
     public void shouldGetEncountersForPatient() throws Exception {
+        UserProfile patientProfile = new UserProfile("patient", "12", null);
+        UserInfo patientUser = new UserInfo("123", "name", "google@rajanikant.com", 1, true, "xyz", asList("MCI_ADMIN"), asList(patientProfile));
+        SecurityContextHolder.getContext().setAuthentication(new TokenAuthentication(patientUser, true));
+
         Patient patient = new Patient();
         String healthId = generateHealthId();
         patient.setHealthId(healthId);
@@ -164,6 +173,10 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
 
     @Test
     public void shouldGetEncountersForCatchment() throws Exception {
+        UserProfile patientProfile = new UserProfile("patient", "12", null);
+        UserInfo patientUser = new UserInfo("123", "name", "google@rajanikant.com", 1, true, "xyz", asList("MCI_ADMIN"), asList(patientProfile));
+        SecurityContextHolder.getContext().setAuthentication(new TokenAuthentication(patientUser, true));
+
         Patient patient1 = new Patient();
         String healthId1 = generateHealthId();
         patient1.setHealthId(healthId1);
@@ -201,6 +214,10 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
 
     @Test
     public void shouldSaveEncounterConfidentialityAsNormal() throws Exception {
+        UserProfile patientProfile = new UserProfile("patient", "12", null);
+        UserInfo patientUser = new UserInfo("123", "name", "google@rajanikant.com", 1, true, "xyz", asList("MCI_ADMIN"), asList(patientProfile));
+        SecurityContextHolder.getContext().setAuthentication(new TokenAuthentication(patientUser, true));
+
         mockMvc.perform(post("/patients/" + VALID_HEALTH_ID + "/encounters")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_XML)
@@ -211,11 +228,15 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
         mockMvc.perform(MockMvcRequestBuilders.get(
                 String.format("/patients/%s/encounters", VALID_HEALTH_ID))
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(request().asyncResult(assertConfidentiality(Confidentiality.Normal,Confidentiality.VeryRestricted)));
+                .andExpect(request().asyncResult(assertConfidentiality(Confidentiality.Normal, Confidentiality.VeryRestricted)));
     }
 
     @Test
     public void shouldSaveEncounterConfidentialityAsVeryRestricted() throws Exception {
+        UserProfile patientProfile = new UserProfile("patient", "12", null);
+        UserInfo patientUser = new UserInfo("123", "name", "google@rajanikant.com", 1, true, "xyz", asList("MCI_ADMIN"), asList(patientProfile));
+        SecurityContextHolder.getContext().setAuthentication(new TokenAuthentication(patientUser, true));
+
         mockMvc.perform(post("/patients/" + VALID_HEALTH_ID + "/encounters")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_XML)
@@ -231,6 +252,10 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
 
     @Test
     public void shouldSaveEncounterConfidentialityAsNormalWhenNotSpecified() throws Exception {
+        UserProfile patientProfile = new UserProfile("patient", "12", null);
+        UserInfo patientUser = new UserInfo("123", "name", "google@rajanikant.com", 1, true, "xyz", asList("MCI_ADMIN"), asList(patientProfile));
+        SecurityContextHolder.getContext().setAuthentication(new TokenAuthentication(patientUser, true));
+
         mockMvc.perform(post("/patients/" + VALID_HEALTH_ID + "/encounters")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_XML)
