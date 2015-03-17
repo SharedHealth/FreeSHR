@@ -19,7 +19,7 @@
                 <date value="2014-10-13T14:38:22+05:30"/>
                 <status value="final"/>
                 <subject>
-                    <reference value="5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
                 </subject>
                 <encounter>
                     <reference value="d3cc23c3-1f12-4b89-a415-356feeba0690"/>
@@ -64,7 +64,7 @@
                     <text value="LAB_RESULT"/>
                 </type>
                 <subject>
-                    <reference value="5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
                 </subject>
                 <participant>
                     <individual>
@@ -101,7 +101,7 @@
                     <value value="ce6c6ac9-ca55-44a2-9c41-c1227d55c730"/>
                 </identifier>
                 <subject>
-                    <reference value="5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
                 </subject>
             </Observation>
         </content>
@@ -137,7 +137,7 @@
                 <status value="final"/>
                 <issued value="2014-10-13T15:04:30+05:30"/>
                 <subject>
-                    <reference value="5893922485019082753"/>
+                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
                 </subject>
                 <performer>
                     <reference value="http://127.0.0.1:9997/providers/18.json"/>

@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cassandra.core.CqlOperations;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import rx.Observable;
 import rx.observers.TestSubscriber;
@@ -38,6 +39,7 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
+@TestPropertySource(properties = "MCI_SERVER_URL=http://localhost:9997")
 public class EncounterServiceIntegrationTest {
 
     private static final String VALID_FACILITY_ID = "10000001";
@@ -213,7 +215,7 @@ public class EncounterServiceIntegrationTest {
 
         assertNotNull(facilityRepository.find("3").toBlocking().first());
         assertTrue(encounterService.ensureCreated(withValidEncounter(), clientId, email, securityToken).toBlocking().first().isSuccessful());
-        assertTrue(encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW), clientId, email, securityToken).toBlocking().first()
+        assertTrue(encounterService.ensureCreated(withNewEncounterForPatient(VALID_HEALTH_ID_NEW), clientId, email, securityToken).toBlocking().first()
                 .isSuccessful());
 
         assertEquals(1, encounterService.findEncountersForPatient(VALID_HEALTH_ID, null,
@@ -238,10 +240,10 @@ public class EncounterServiceIntegrationTest {
                 null, null));
         facilityRepository.save(facility).toBlocking().first();
 
-        EncounterResponse first = encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW), clientId, email, securityToken)
+        EncounterResponse first = encounterService.ensureCreated(withNewEncounterForPatient(VALID_HEALTH_ID), clientId, email, securityToken)
                 .toBlocking().first();
         String encounterId = first.getEncounterId();
-        EncounterBundle encounterBundle = encounterService.findEncounter(VALID_HEALTH_ID_NEW,
+        EncounterBundle encounterBundle = encounterService.findEncounter(VALID_HEALTH_ID,
                 encounterId).toBlocking().first();
         assertEquals(encounterId, encounterBundle.getEncounterId());
     }
@@ -256,7 +258,7 @@ public class EncounterServiceIntegrationTest {
         
         facilityRepository.save(facility).toBlocking().first();
 
-        EncounterResponse first = encounterService.ensureCreated(withNewValidEncounter(VALID_HEALTH_ID_NEW), clientId, email, securityToken)
+        EncounterResponse first = encounterService.ensureCreated(withNewEncounterForPatient(VALID_HEALTH_ID_NEW), clientId, email, securityToken)
                 .toBlocking().first();
         String encounterId = first.getEncounterId();
 

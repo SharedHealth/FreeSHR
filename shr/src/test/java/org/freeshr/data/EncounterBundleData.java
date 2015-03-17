@@ -14,7 +14,7 @@ public class EncounterBundleData {
     }
 
     public static EncounterBundle withValidEncounter(String healthId) {
-        return encounter(healthId, asString("xmls/encounters/encounter.xml"));
+        return encounter(healthId, asString("xmls/encounters/valid_encounter_with_patient_mocked.xml"));
     }
 
     public static EncounterBundle withNewValidEncounter(String healthId) {
@@ -38,5 +38,9 @@ public class EncounterBundleData {
         encounter.setEncounterContent(content);
         encounter.setHealthId(healthId);
         return encounter;
+    }
+
+    public static EncounterBundle withNewEncounterForPatient(String healthId) {
+        return encounter(healthId, asString(String.format("xmls/encounters/encounter_%s.xml", healthId)));
     }
 }

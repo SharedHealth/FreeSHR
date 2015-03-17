@@ -3,13 +3,16 @@ package org.freeshr.interfaces.encounter.ws;
 import com.google.common.base.Charsets;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
+import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.internal.matchers.InstanceOf;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.text.SimpleDateFormat;
@@ -20,11 +23,15 @@ import static org.freeshr.utils.FileUtil.asString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 
+@TestPropertySource(properties = "MCI_SERVER_URL=http://localhost:9997")
 public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
 
     private static final String VALID_HEALTH_ID = "5893922485019082753";
 
     private static final String INVALID_HEALTH_ID = "1234";
+
+    @Autowired
+    SHRProperties properties;
 
     @Before
     public void setUp() throws Exception {
@@ -68,6 +75,9 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/encounter-type-case-insensitive.json"))));
 
+        //propertiesAccessor = new SHRPropertiesAccessor(properties);
+        //propertiesAccessor.updateMCIServerUrls("http://localhost:9997");
+
     }
 
     @Test
@@ -76,7 +86,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/encounter.xml")))
+                .content(asString("xmls/encounters/encounter_to_save.xml")))
                 .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
     }
 
@@ -119,7 +129,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
                 .accept(MediaType.APPLICATION_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/encounter_with_valid_type.xml")))
+                .content(asString("xmls/encounters/encounter_with_valid_type_and_local_patient.xml")))
                 .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
     }
 

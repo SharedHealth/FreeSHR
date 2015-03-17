@@ -3,17 +3,22 @@ package org.freeshr.validations;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.application.fhir.FhirMessageFilter;
+import org.freeshr.config.SHRProperties;
 import org.freeshr.utils.FileUtil;
 import org.freeshr.utils.ResourceOrFeedDeserializer;
 import org.hl7.fhir.instance.model.AtomFeed;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 public class HealthIdValidatorTest {
 
@@ -21,9 +26,14 @@ public class HealthIdValidatorTest {
     ResourceOrFeedDeserializer resourceOrFeedDeserializer;
     FhirMessageFilter fhirMessageFilter;
 
+    @Mock
+    SHRProperties shrProperties;
+
     @Before
     public void setup() {
-        healthIdValidator = new HealthIdValidator();
+        initMocks(this);
+
+        healthIdValidator = new HealthIdValidator(shrProperties);
         resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
         fhirMessageFilter = new FhirMessageFilter();
     }
@@ -32,6 +42,7 @@ public class HealthIdValidatorTest {
     public void shouldAcceptEncounterIfHealthIdInTheXmlMatchesTheGivenHealthId() {
         final String xml = FileUtil.asString("xmls/encounters/diagnostic_order_valid.xml");
         AtomFeed feed = resourceOrFeedDeserializer.deserialize(xml);
+        when(shrProperties.getPatientPublicUrl()).thenReturn("http://172.18.46.56:8081/api/v1/patients");
         List<ValidationMessage> response = healthIdValidator.validate(getEncounterContext(xml, "5893922485019082753"));
         assertThat(EncounterValidationResponse.fromValidationMessages(response, fhirMessageFilter).isSuccessful(),
                 is(true));
@@ -45,8 +56,7 @@ public class HealthIdValidatorTest {
                 healthIdValidator.validate(getEncounterContext(xml, "5893922485019082753")), fhirMessageFilter);
         assertThat(response.isSuccessful(), is(false));
         assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().get(0).getReason(), is("Composition must have patient's Health Id in subject" +
-                "."));
+        assertThat(response.getErrors().get(0).getReason(), is("Composition must have patient's Health Id in subject."));
     }
 
     @Test
@@ -83,5 +93,6 @@ public class HealthIdValidatorTest {
             }
         };
     }
+
 
 }

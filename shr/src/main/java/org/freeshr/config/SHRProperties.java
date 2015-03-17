@@ -16,12 +16,6 @@ public class SHRProperties {
 
     @Value("${MCI_PATIENT_PATH}")
     private String mciPatientPath;
-    @Value("${MCI_SCHEMA}")
-    private String mciSchema;
-    @Value("${MCI_HOST}")
-    private String mciHost;
-    @Value("${MCI_PORT}")
-    private String mciPort;
     @Value("${TR_USER}")
     private String trUser;
     @Value("${TR_PASSWORD}")
@@ -69,9 +63,11 @@ public class SHRProperties {
     @Value("${LOCAL_CACHE_TTL}")
     private int localCacheTTL;
 
-    public String getMCIPatientUrl() {
-        return String.format("%s://%s:%s/%s",mciSchema,mciHost,mciPort,mciPatientPath);
-    }
+    @Value("${MCI_SERVER_URL}")
+    private String mciServerUrl;
+
+
+    private String[] mciServerLocationUrls;
 
     public String getIdentityServerBaseUrl(){
         return identityServerBaseUrl;
@@ -148,4 +144,72 @@ public class SHRProperties {
     public int getLocalCacheTTL() {
         return localCacheTTL;
     }
+
+    public String[] getMciServerLocationUrls() {
+        if (this.mciServerLocationUrls == null) {
+            this.mciServerLocationUrls = parsePublicAndPrivateUrls(mciServerUrl);
+        }
+        return this.mciServerLocationUrls;
+    }
+
+    public String getMciPatientPath() {
+        return mciPatientPath;
+    }
+
+    /**
+     * Gets the internal server URL for MCI.
+     * If no internal is provided then its the same as the public URL
+     * @return
+     */
+    public String getMCIPatientUrl() {
+        String[] mciUrls = getMciServerLocationUrls();
+        String serverUrl = mciUrls[1];
+        return getPatientUrl(serverUrl);
+    }
+
+    public String getPatientPublicUrl() {
+        String[] mciUrls = getMciServerLocationUrls();
+        String serverUrl = mciUrls[0];
+        return getPatientUrl(serverUrl);
+    }
+
+    private String getPatientUrl(String serverUrl) {
+        if (serverUrl.endsWith("/")) {
+            serverUrl = serverUrl.substring(0, serverUrl.length() - 1);
+        }
+        String mciPatientCtxPath = getMciPatientPath();
+        if (mciPatientCtxPath.startsWith("/")) {
+            return serverUrl + mciPatientCtxPath;
+        } else {
+            return serverUrl + "/" + mciPatientCtxPath;
+        }
+    }
+
+
+    /**
+     * The server URL are provided in 2 parts comma separated.
+     * the first being the public URL and second being the internal network URL if any
+     * @param value
+     * @return
+     */
+    private String[] parsePublicAndPrivateUrls(String value) {
+        String[] parts = value.split(",");
+        String[] results = new String[2];
+        results[0] = parts[0].trim();
+        if (parts.length > 1) {
+            results[1] = parts[1].trim();
+            if (results[1].length() == 0) {
+                results[1] = results[0];
+            }
+        } else {
+            results[1] = results[0];
+        }
+        return results;
+    }
+
+    void updateMciServerUrl(String value) {
+        this.mciServerUrl = value;
+        this.mciServerLocationUrls = null;
+    }
+
 }
