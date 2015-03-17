@@ -49,7 +49,7 @@ public class MCIClientIntegrationTest {
     public void setUp() {
         initMocks(this);
         mci = new MCIClient(shrRestTemplate, shrProperties);
-        when(shrProperties.getMCIPatientUrl()).thenReturn("http://localhost:9997/api/v1/patients");
+        when(shrProperties.getMCIPatientLocationPath()).thenReturn("http://localhost:9997/api/v1/patients");
     }
 
     @Test

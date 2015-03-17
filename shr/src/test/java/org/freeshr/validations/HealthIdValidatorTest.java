@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
@@ -42,7 +41,7 @@ public class HealthIdValidatorTest {
     public void shouldAcceptEncounterIfHealthIdInTheXmlMatchesTheGivenHealthId() {
         final String xml = FileUtil.asString("xmls/encounters/diagnostic_order_valid.xml");
         AtomFeed feed = resourceOrFeedDeserializer.deserialize(xml);
-        when(shrProperties.getPatientPublicUrl()).thenReturn("http://172.18.46.56:8081/api/v1/patients");
+        when(shrProperties.getPatientReferencePath()).thenReturn("http://172.18.46.56:8081/api/v1/patients");
         List<ValidationMessage> response = healthIdValidator.validate(getEncounterContext(xml, "5893922485019082753"));
         assertThat(EncounterValidationResponse.fromValidationMessages(response, fhirMessageFilter).isSuccessful(),
                 is(true));

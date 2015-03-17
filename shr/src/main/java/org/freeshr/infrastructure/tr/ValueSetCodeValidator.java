@@ -98,7 +98,7 @@ public class ValueSetCodeValidator implements CodeValidator {
     }
 
     String formatUrl(String uri) {
-        return shrProperties.getTrServerBaseUrl() + VALUE_SET_PATTERN + uri;
+        return shrProperties.getTerminologyServerReferencePath() + VALUE_SET_PATTERN + uri;
     }
 
     boolean shouldCreateUrl(String uri) {

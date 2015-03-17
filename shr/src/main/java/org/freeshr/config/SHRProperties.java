@@ -67,7 +67,10 @@ public class SHRProperties {
     private String mciServerUrl;
 
 
-    private String[] mciServerLocationUrls;
+    private String[] mciServerLocationUrls = null;
+    private String[] facilityServerLocationUrls = null;
+    private String[] providerServerLocationUrls = null;
+    private String[] terminologyServerLocationUrls = null;
 
     public String getIdentityServerBaseUrl(){
         return identityServerBaseUrl;
@@ -101,12 +104,19 @@ public class SHRProperties {
         return trPassword;
     }
 
-    public String getFacilityRegistryUrl() {
-        return facilityRegistryUrl;
+    public String getFacilityReferencePath() {
+        String[] locations = getFacilityRegistryLocationUrls();
+        return locations[0];
     }
 
-    public String getProviderRegistryUrl() {
-        return providerRegistryUrl;
+    public String getFRLocationPath() {
+        String[] locations = getFacilityRegistryLocationUrls();
+        return locations[1];
+    }
+
+    public String getProviderReferencePath() {
+        String[] locations = getProviderRegistryLocationUrls();
+        return locations[0];
     }
 
     public String getValidationFilePath() throws URISyntaxException {
@@ -125,8 +135,9 @@ public class SHRProperties {
         return encounterFetchLimit;
     }
 
-    public String getTrServerBaseUrl() {
-        return trServerBaseUrl;
+    public String getTerminologyServerReferencePath() {
+        String[] locations = getTerminologyRegistryLocationUrls();
+        return locations[0];
     }
 
     public int getFacilityCacheTTL() {
@@ -145,15 +156,14 @@ public class SHRProperties {
         return localCacheTTL;
     }
 
-    public String[] getMciServerLocationUrls() {
-        if (this.mciServerLocationUrls == null) {
-            this.mciServerLocationUrls = parsePublicAndPrivateUrls(mciServerUrl);
-        }
-        return this.mciServerLocationUrls;
-    }
-
     public String getMciPatientPath() {
         return mciPatientPath;
+    }
+
+    public String getPatientReferencePath() {
+        String[] mciUrls = getMciServerLocationUrls();
+        String serverUrl = mciUrls[0];
+        return getPatientUrl(serverUrl);
     }
 
     /**
@@ -161,15 +171,9 @@ public class SHRProperties {
      * If no internal is provided then its the same as the public URL
      * @return
      */
-    public String getMCIPatientUrl() {
+    public String getMCIPatientLocationPath() {
         String[] mciUrls = getMciServerLocationUrls();
         String serverUrl = mciUrls[1];
-        return getPatientUrl(serverUrl);
-    }
-
-    public String getPatientPublicUrl() {
-        String[] mciUrls = getMciServerLocationUrls();
-        String serverUrl = mciUrls[0];
         return getPatientUrl(serverUrl);
     }
 
@@ -185,6 +189,12 @@ public class SHRProperties {
         }
     }
 
+    private String[] getMciServerLocationUrls() {
+        if (this.mciServerLocationUrls == null) {
+            this.mciServerLocationUrls = parsePublicAndPrivateUrls(mciServerUrl);
+        }
+        return this.mciServerLocationUrls;
+    }
 
     /**
      * The server URL are provided in 2 parts comma separated.
@@ -207,9 +217,27 @@ public class SHRProperties {
         return results;
     }
 
-    void updateMciServerUrl(String value) {
-        this.mciServerUrl = value;
-        this.mciServerLocationUrls = null;
+    private String[] getFacilityRegistryLocationUrls() {
+        if (this.facilityServerLocationUrls == null) {
+            this.facilityServerLocationUrls = parsePublicAndPrivateUrls(this.facilityRegistryUrl);
+        }
+        return this.facilityServerLocationUrls;
     }
+
+
+    private String[] getProviderRegistryLocationUrls() {
+        if (this.providerServerLocationUrls == null) {
+            this.providerServerLocationUrls = parsePublicAndPrivateUrls(this.providerRegistryUrl);
+        }
+        return this.providerServerLocationUrls;
+    }
+
+    private String[] getTerminologyRegistryLocationUrls() {
+        if (this.terminologyServerLocationUrls == null) {
+            this.terminologyServerLocationUrls = parsePublicAndPrivateUrls(this.trServerBaseUrl);
+        }
+        return this.terminologyServerLocationUrls;
+    }
+
 
 }

@@ -36,7 +36,7 @@ public class MCIClient {
         headers.add(FROM_KEY, userEmail);
 
         Observable<ResponseEntity<Patient>> responseEntityObservable = Observable.from(shrRestTemplate.exchange(
-                shrProperties.getMCIPatientUrl() + "/" + healthId,
+                shrProperties.getMCIPatientLocationPath() + "/" + healthId,
                 HttpMethod.GET,
                 new HttpEntity(headers),
                 Patient.class));

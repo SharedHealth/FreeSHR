@@ -54,6 +54,6 @@ public class FacilityRegistryClient {
     }
 
     private String getFacilityUrl(String facilityId) {
-        return shrProperties.getFacilityRegistryUrl() + facilityId + ".json";
+        return shrProperties.getFRLocationPath() + facilityId + ".json";
     }
 }

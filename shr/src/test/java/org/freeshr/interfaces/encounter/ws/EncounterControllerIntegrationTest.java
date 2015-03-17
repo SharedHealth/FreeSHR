@@ -197,7 +197,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
     }
 
     private void mockFacility(String facilityId) {
-        givenThat(get(urlEqualTo(shrProperties.getFacilityRegistryUrl() + "/" + facilityId + ".json"))
+        givenThat(get(urlEqualTo(shrProperties.getFRLocationPath() + "/" + facilityId + ".json"))
                 .withHeader("X-Auth-Token", matching(shrProperties.getIdPAuthToken()))
                 .withHeader("client_id", matching(shrProperties.getIdPClientId()))
                 .willReturn(aResponse()

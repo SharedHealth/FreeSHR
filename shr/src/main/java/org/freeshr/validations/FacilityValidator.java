@@ -105,7 +105,7 @@ public class FacilityValidator implements Validator<AtomFeed> {
     }
 
     private boolean isValidFacilityUrl(String referenceSimple) {
-        String facilityRegistryUrl = shrProperties.getFacilityRegistryUrl();
+        String facilityRegistryUrl = shrProperties.getFacilityReferencePath();
         return referenceSimple.contains(facilityRegistryUrl);
     }
 }

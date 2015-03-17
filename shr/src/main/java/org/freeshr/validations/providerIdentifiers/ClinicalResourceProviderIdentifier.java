@@ -33,8 +33,8 @@ public abstract class ClinicalResourceProviderIdentifier {
     }
 
     private boolean isUrlPatternMatched(String url, SHRProperties shrProperties) {
-        String providerRegistryUrl = shrProperties.getProviderRegistryUrl();
-        String regex = START_MARKER + providerRegistryUrl + PROVIDER_ID_MATCHER + JSON + END_MARKER;
+        String providerReferencePath = shrProperties.getProviderReferencePath();
+        String regex = START_MARKER + providerReferencePath + PROVIDER_ID_MATCHER + JSON + END_MARKER;
         Matcher matcher = Pattern.compile(regex).matcher(url);
         return matcher.matches();
     }

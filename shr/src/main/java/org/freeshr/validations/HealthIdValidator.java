@@ -57,7 +57,7 @@ public class HealthIdValidator implements Validator<EncounterValidationContext> 
     }
 
     private String validateAndIdentifyPatientId(String patientUrl, String healthId) {
-        String expectedUrl = shrProperties.getPatientPublicUrl() + "/" + healthId;
+        String expectedUrl = shrProperties.getPatientReferencePath() + "/" + healthId;
         if (expectedUrl.trim().equalsIgnoreCase(patientUrl.trim())) {
             return getHealthIdFromUrl(patientUrl);
         }
