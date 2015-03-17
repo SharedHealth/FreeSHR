@@ -31,7 +31,8 @@ public class ValueSetCodeValidatorIntegrationTest {
         ValueSetCodeValidator validator = new ValueSetCodeValidator(null, shrProperties);
 
         String url = validator.formatUrl("encounter-type");
-        String expectedURL = "http://192.168.33.10:9080/openmrs/ws/rest/v1/tr/vs/encounter-type";
+        //locahost:9997 is because test-shr.properties has TR_SERVER_BASE_URL accordingly
+        String expectedURL = "http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type";
         assertEquals(expectedURL, url);
     }
 

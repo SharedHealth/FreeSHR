@@ -18,10 +18,10 @@ public class TerminologyServer {
     }
 
     public Observable<Boolean> isValid(String uri, String code) {
-//        String trServerBaseUrl = shrProperties.getTerminologyServerReferencePath();
-//        if (!uri.startsWith(trServerBaseUrl)) {
-//            return Observable.just(false);
-//        }
+        String trServerBaseUrl = shrProperties.getTerminologyServerReferencePath();
+        if (!uri.startsWith(trServerBaseUrl)) {
+            return Observable.just(false);
+        }
 
         CodeValidator validator = factory.getValidator(uri);
         if (validator != null) {
