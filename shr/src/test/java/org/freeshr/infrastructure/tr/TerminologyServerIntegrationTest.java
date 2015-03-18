@@ -99,4 +99,9 @@ public class TerminologyServerIntegrationTest {
         assertFalse(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type",
                 "friend").toBlocking().first());
     }
+
+    @Test
+    public void shouldRejectInvalidValueSetReference() {
+        assertFalse(trServer.isValid("http://example.com/openmrs/ws/rest/v1/tr/vs/encounter-type", "REG").toBlocking().first());
+    }
 }

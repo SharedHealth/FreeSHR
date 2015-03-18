@@ -20,13 +20,15 @@ public class HttpCodeValidator implements CodeValidator {
     public static final String CONCEPT_PATTERN = "/openmrs/ws/rest/v1/tr/concepts/";
 
     private String path;
+    private String pattern;
     private final AsyncRestTemplate shrRestTemplate;
     private SHRProperties shrProperties;
 
-    public HttpCodeValidator(AsyncRestTemplate shrRestTemplate, SHRProperties shrProperties, String path) {
+    public HttpCodeValidator(AsyncRestTemplate shrRestTemplate, SHRProperties shrProperties, String path, String pattern) {
         this.shrRestTemplate = shrRestTemplate;
         this.shrProperties = shrProperties;
         this.path = path;
+        this.pattern = pattern;
     }
 
     private Observable<ResponseEntity<Map>> get(String uri) {
@@ -39,7 +41,9 @@ public class HttpCodeValidator implements CodeValidator {
 
     @Override
     public Observable<Boolean> isValid(String uri, final String code) {
-        Observable<Boolean> observable = get(uri).map(new Func1<ResponseEntity<Map>, Boolean>() {
+        String codeReferenceUrl = formTerminologyReferenceUrl(uri);
+
+        Observable<Boolean> observable = get(codeReferenceUrl).map(new Func1<ResponseEntity<Map>, Boolean>() {
             @Override
             public Boolean call(ResponseEntity<Map> mapResponseEntity) {
                 return mapResponseEntity.getStatusCode().is2xxSuccessful()
@@ -52,6 +56,12 @@ public class HttpCodeValidator implements CodeValidator {
                 return false;
             }
         });
+    }
+
+    private String formTerminologyReferenceUrl(String uri) {
+        String trLocationPath = shrProperties.getTRLocationPath();
+        String trRefPath = shrProperties.getTerminologyServerReferencePath();
+        return uri.replace(trRefPath, trLocationPath);
     }
 
 }

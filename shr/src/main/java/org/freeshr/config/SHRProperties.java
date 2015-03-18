@@ -140,6 +140,11 @@ public class SHRProperties {
         return locations[0];
     }
 
+    public String getTRLocationPath() {
+        String[] locations = getTerminologyRegistryLocationUrls();
+        return locations[1];
+    }
+
     public int getFacilityCacheTTL() {
         return facilityCacheTTL != null ? Integer.parseInt(facilityCacheTTL) : ONE_DAY;
     }
@@ -238,6 +243,5 @@ public class SHRProperties {
         }
         return this.terminologyServerLocationUrls;
     }
-
 
 }

@@ -9,18 +9,19 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import rx.Observable;
 
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
 public class ValueSetCodeValidatorIntegrationTest {
+
     @Autowired
-    private SHRProperties shrProperties;
+    ValueSetCodeValidator validator;
 
     @Test
     public void shouldCheckIfUrlShouldBeCreated() {
-        ValueSetCodeValidator validator = new ValueSetCodeValidator(null, null);
         assertFalse(validator.shouldCreateUrl("http://example.com"));
         assertFalse(validator.shouldCreateUrl("https://example.com"));
         assertTrue(validator.shouldCreateUrl("encounter-type"));
@@ -28,12 +29,17 @@ public class ValueSetCodeValidatorIntegrationTest {
 
     @Test
     public void shouldFormatURL() {
-        ValueSetCodeValidator validator = new ValueSetCodeValidator(null, shrProperties);
-
         String url = validator.formatUrl("encounter-type");
         //locahost:9997 is because test-shr.properties has TR_SERVER_BASE_URL accordingly
         String expectedURL = "http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type";
         assertEquals(expectedURL, url);
+    }
+
+
+    @Test
+    public void shouldRejectInvalidValueSetCode() {
+        Observable<Boolean> observable = validator.isValid("http://random.org" + ValueSetCodeValidator.VALUE_SET_PATTERN + "encounter-type", "REG");
+        assertFalse("Should have failed for invalid valueset reference URL", observable.toBlocking().first());
     }
 
 }

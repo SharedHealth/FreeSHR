@@ -32,9 +32,9 @@ public class MedicationCodeValidator implements CodeValidator {
 
     @Override
     public Observable<Boolean> isValid(String uri, String code) {
-
         if(isEmpty(code) || substringAfterLast(uri, "/").equalsIgnoreCase(code)){
-            Observable<Boolean> map = get(uri).map(new Func1<ResponseEntity<String>, Boolean>() {
+            String medicationReferenceUrl = formMedicationReferenceUrl(uri);
+            Observable<Boolean> map = get(medicationReferenceUrl).map(new Func1<ResponseEntity<String>, Boolean>() {
                 @Override
                 public Boolean call(ResponseEntity<String> response) {
                     return !response.getBody().isEmpty();
@@ -49,6 +49,12 @@ public class MedicationCodeValidator implements CodeValidator {
             });
         }
         return Observable.just(Boolean.FALSE);
+    }
+
+    private String formMedicationReferenceUrl(String uri) {
+        String terminologyServerReferencePath = shrProperties.getTerminologyServerReferencePath();
+        String trLocationPath = shrProperties.getTRLocationPath();
+        return uri.replace(terminologyServerReferencePath, trLocationPath);
     }
 
     private Observable<ResponseEntity<String>> get(String uri) {

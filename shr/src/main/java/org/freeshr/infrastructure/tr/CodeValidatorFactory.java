@@ -24,8 +24,8 @@ public class CodeValidatorFactory {
                                 ValueSetCodeValidator valueSetCodeValidator,
                                 MedicationCodeValidator medicationCodeValidator) {
         codeValidatorMap = new HashMap<>();
-        codeValidatorMap.put(REF_TERM_PATTERN,new HttpCodeValidator(shrRestTemplate, shrProperties, "code"));
-        codeValidatorMap.put(CONCEPT_PATTERN,new HttpCodeValidator(shrRestTemplate, shrProperties, "uuid"));
+        codeValidatorMap.put(REF_TERM_PATTERN,new HttpCodeValidator(shrRestTemplate, shrProperties, "code", REF_TERM_PATTERN));
+        codeValidatorMap.put(CONCEPT_PATTERN,new HttpCodeValidator(shrRestTemplate, shrProperties, "uuid", CONCEPT_PATTERN));
         codeValidatorMap.put(VALUE_SET_PATTERN,valueSetCodeValidator);
         codeValidatorMap.put(MEDICATION_URL_PATTERN,medicationCodeValidator);
     }

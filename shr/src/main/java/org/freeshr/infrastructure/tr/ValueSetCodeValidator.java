@@ -37,11 +37,7 @@ public class ValueSetCodeValidator implements CodeValidator {
 
     @Override
     public Observable<Boolean> isValid(final String uri, final String code) {
-        String valueSetUrl = uri;
-        if (shouldCreateUrl(uri)) {
-            valueSetUrl = formatUrl(uri);
-        }
-
+        String valueSetUrl = formValueSetReferenceUrl(uri);
         Observable<Boolean> map = get(valueSetUrl).map(new Func1<ResponseEntity<String>, Boolean>() {
             @Override
             public Boolean call(ResponseEntity<String> stringResponseEntity) {
@@ -97,8 +93,8 @@ public class ValueSetCodeValidator implements CodeValidator {
         };
     }
 
-    String formatUrl(String uri) {
-        return shrProperties.getTerminologyServerReferencePath() + VALUE_SET_PATTERN + uri;
+    String formatUrl(String code) {
+        return shrProperties.getTRLocationPath() + VALUE_SET_PATTERN + code;
     }
 
     boolean shouldCreateUrl(String uri) {
@@ -110,5 +106,11 @@ public class ValueSetCodeValidator implements CodeValidator {
                 HttpMethod.GET,
                 new HttpEntity(basicAuthHeaders(shrProperties.getTrUser(), shrProperties.getTrPassword())),
                 String.class));
+    }
+
+    private String formValueSetReferenceUrl(String uri) {
+        String terminologyServerReferencePath = shrProperties.getTerminologyServerReferencePath();
+        String trLocationPath = shrProperties.getTRLocationPath();
+        return uri.replace(terminologyServerReferencePath, trLocationPath);
     }
 }
