@@ -9,8 +9,10 @@ import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.service.EncounterService;
 import org.freeshr.domain.service.UserService;
+import org.freeshr.infrastructure.security.TokenAuthentication;
 import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.infrastructure.security.UserProfile;
+import org.freeshr.utils.Confidentiality;
 import org.freeshr.utils.DateUtil;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +22,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mock.http.MockHttpOutputMessage;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.request.async.DeferredResult;
 import rx.Observable;
 
@@ -28,10 +32,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
@@ -51,24 +52,29 @@ public class EncounterControllerTest {
     @Mock
     private UserService userService;
 
-    EncounterController controller;
+    @Mock
+    private SecurityContext securityContext;
+
+    private EncounterController controller;
 
     @Before
     public void setUp() {
         initMocks(this);
-        controller = new EncounterController(mockedEncounterService, shrProperties, userService);
+        controller = new EncounterController(mockedEncounterService);
     }
 
     @Test
     public void shouldGetPagedEncountersForCatchment() throws Exception {
         int encounterFetchLimit = EncounterService.getEncounterFetchLimit();
         List<EncounterBundle> dummyEncounters = createEncounterBundles("hid01", 50, DateUtil.parseDate("2014-10-10"));
-        UserProfile datasenseProfile = new UserProfile("facility", "123", asList("3026"));
-        UserInfo datasenseUser = new UserInfo("12345", "name", "google@rajanikant.com", 1, true, "xyz", asList("MCI_ADMIN"), asList(datasenseProfile));
 
-        when(shrProperties.getDatasenseFacilityCodes()).thenReturn(new String[]{"123"});
-        when(userService.getUserInfo()).thenReturn(datasenseUser);
-        when(mockedEncounterService.findEncountersForFacilityCatchment(anyString(), anyString(),
+        ArrayList<String> datasenseFacilityCodes = new ArrayList<>();
+        datasenseFacilityCodes.add("1232");
+        when(shrProperties.getDatasenseFacilityCodes()).thenReturn(datasenseFacilityCodes);
+        TokenAuthentication tokenAuthentication = tokenAuthentication();
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(tokenAuthentication);
+        when(mockedEncounterService.findEncountersForFacilityCatchment(anyString(),
                 any(Date.class),
                 eq(encounterFetchLimit * 2))).thenReturn(Observable.just(slice(encounterFetchLimit * 2,
                 dummyEncounters)));
@@ -76,7 +82,7 @@ public class EncounterControllerTest {
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null,
                 "/catchments/3026/encounters");
         DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncountersForCatchment
-                (mockHttpServletRequest, "F1", "3026", "2014-10-10", null);
+                (mockHttpServletRequest, "3026", "2014-10-10", null);
         EncounterSearchResponse response = (EncounterSearchResponse) encountersForCatchment.getResult();
         List<EncounterBundle> entries = response.getEntries();
         assertEquals(encounterFetchLimit, entries.size());
@@ -85,7 +91,7 @@ public class EncounterControllerTest {
         assertEquals("e-20", params.get(1).getValue());
 
 
-        encountersForCatchment = controller.findEncountersForCatchment(mockHttpServletRequest, "F1", "3026",
+        encountersForCatchment = controller.findEncountersForCatchment(mockHttpServletRequest, "3026",
                 "2014-10-10", "e-22");
         response = (EncounterSearchResponse) encountersForCatchment.getResult();
         entries = response.getEntries();
@@ -96,11 +102,13 @@ public class EncounterControllerTest {
     public void shouldGetAtomFeed() throws Exception {
         int encounterFetchLimit = EncounterService.getEncounterFetchLimit();
         List<EncounterBundle> dummyEncounters = createEncounterBundles("hid01", 50, DateUtil.parseDate("2014-10-10"));
-        UserProfile patientProfile = new UserProfile("patient", "12", null);
-        UserInfo patientUser = new UserInfo("123", "name", "google@rajanikant.com", 1, true, "xyz", asList("MCI_ADMIN"), asList(patientProfile));
+//        UserProfile patientProfile = new UserProfile("patient", "12", null);
+//        UserInfo patientUser = new UserInfo("123", "name", "google@rajanikant.com", 1, true, "xyz", asList("MCI_ADMIN"), asList(patientProfile));
 
-        when(userService.getUserInfo()).thenReturn(patientUser);
-        when(mockedEncounterService.findEncountersForFacilityCatchment(anyString(), anyString(),
+        TokenAuthentication tokenAuthentication = tokenAuthentication();
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(tokenAuthentication);
+        when(mockedEncounterService.findEncountersForFacilityCatchment(anyString(),
                 any(Date.class),
                 eq(encounterFetchLimit * 2))).thenReturn(Observable.just(slice(encounterFetchLimit * 2,
                 dummyEncounters)));
@@ -109,7 +117,7 @@ public class EncounterControllerTest {
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null,
                 "/catchments/3026/encounters");
         DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncountersForCatchment
-                (mockHttpServletRequest, "F1", "3026", "2014-10-10", null);
+                (mockHttpServletRequest, "3026", "2014-10-10", null);
         EncounterSearchResponse response = (EncounterSearchResponse) encountersForCatchment.getResult();
         List<EncounterBundle> results = response.getEntries();
 
@@ -176,6 +184,8 @@ public class EncounterControllerTest {
             calendar.set(Calendar.SECOND, i);
             encounter.setReceivedDate(DateUtil.toISOString(calendar.getTime()));
             encounter.setEncounterContent("content-" + (i + 1));
+            encounter.setPatientConfidentiality(Confidentiality.Normal);
+            encounter.setEncounterConfidentiality(Confidentiality.Normal);
             encounters.add(encounter);
         }
         return encounters;
@@ -200,5 +210,11 @@ public class EncounterControllerTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private TokenAuthentication tokenAuthentication() {
+        return new TokenAuthentication(new UserInfo("1232", "foo", "email@gmail.com", 1, true,
+                "xyz", new ArrayList<String>(), asList(new UserProfile("facility", "10000069", asList("3026"))))
+                .loadUserProperties(shrProperties), true);
     }
 }

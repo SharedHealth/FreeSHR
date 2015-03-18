@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 
 @Component
 public class SHRProperties {
@@ -74,7 +77,7 @@ public class SHRProperties {
     private String[] providerServerLocationUrls = null;
     private String[] terminologyServerLocationUrls = null;
 
-    public String getIdentityServerBaseUrl(){
+    public String getIdentityServerBaseUrl() {
         return identityServerBaseUrl;
     }
 
@@ -246,7 +249,7 @@ public class SHRProperties {
         return this.terminologyServerLocationUrls;
     }
 
-    public String[] getDatasenseFacilityCodes() {
-        return StringUtils.split(datasenseFacilityCodes, ",");
+    public List<String> getDatasenseFacilityCodes() {
+        return datasenseFacilityCodes != null ? asList(StringUtils.split(datasenseFacilityCodes, ",")) : null;
     }
 }

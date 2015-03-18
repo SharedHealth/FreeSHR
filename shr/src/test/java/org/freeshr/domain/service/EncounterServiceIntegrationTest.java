@@ -195,7 +195,7 @@ public class EncounterServiceIntegrationTest {
         facilityRepository.save(facility).toBlocking().first();
         encounterService.ensureCreated(withValidEncounter(), clientId, email, securityToken).toBlocking().first();
 
-        List<EncounterBundle> encounterBundles = encounterService.findEncountersForFacilityCatchment("4", "305610",
+        List<EncounterBundle> encounterBundles = encounterService.findEncountersForFacilityCatchment("305610",
                 date, 20).toBlocking().first();
         assertEquals(1, encounterBundles.size());
         assertEquals(VALID_HEALTH_ID, encounterBundles.iterator().next().getHealthId());
@@ -222,7 +222,7 @@ public class EncounterServiceIntegrationTest {
                 200).toBlocking().first().size());
 
         List<EncounterBundle> encounterBundles = encounterService.findEncountersForFacilityCatchment(
-                "3", "3056", date, 10).toBlocking().first();
+                "3056", date, 10).toBlocking().first();
         assertEquals(2, encounterBundles.size());
 
         ArrayList<String> healthIds = extractListOfHealthIds(encounterBundles);

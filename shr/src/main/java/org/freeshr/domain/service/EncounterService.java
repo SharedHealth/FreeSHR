@@ -191,21 +191,9 @@ public class EncounterService {
      * @param sinceDate
      * @return list of encounters. limited to 20
      */
-    public Observable<List<EncounterBundle>> findEncountersForFacilityCatchment(String facilityId,
-                                                                                final String catchment,
+    public Observable<List<EncounterBundle>> findEncountersForFacilityCatchment(final String catchment,
                                                                                 final Date sinceDate, final int limit) {
-        Observable<Facility> facility = facilityService.ensurePresent(facilityId);
-
-        return facility.flatMap(new Func1<Facility, Observable<List<EncounterBundle>>>() {
-            @Override
-            public Observable<List<EncounterBundle>> call(Facility facility) {
-                if ((null == facility)
-                        || StringUtils.isBlank(catchment)
-                        || !(facility.has(catchment)))
-                    return Observable.<List<EncounterBundle>>just(new ArrayList<EncounterBundle>());
-                return encounterRepository.findEncountersForCatchment(new Catchment(catchment), sinceDate, limit);
-            }
-        });
+        return encounterRepository.findEncountersForCatchment(new Catchment(catchment), sinceDate, limit);
     }
 
     private Observable<List<EncounterBundle>> findEncountersForCatchments(final List<String> catchments,

@@ -149,7 +149,6 @@ task dist(dependsOn: [project(":schema").tasks.build,'exportProperties'], type: 
 }
 
 war {
-    from sourceSets.main.resources
     manifest {
         attributes('Main-Class': mainClassName)
     }

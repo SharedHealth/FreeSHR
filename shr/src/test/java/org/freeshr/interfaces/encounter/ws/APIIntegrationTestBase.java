@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.annotation.Resource;
+import javax.servlet.Filter;
 import java.util.concurrent.ExecutionException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -48,6 +49,10 @@ public abstract class APIIntegrationTestBase {
     @Autowired
     private FacilityRepository facilityRepository;
 
+    @Autowired
+    private Filter springSecurityFilterChain;
+
+
     protected MockMvc mockMvc;
 
     @Autowired
@@ -56,7 +61,10 @@ public abstract class APIIntegrationTestBase {
 
     @Before
     public void setUpBase() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(webApplicationContext)
+                .addFilters(springSecurityFilterChain)
+                .build();
     }
 
     @After

@@ -2,6 +2,7 @@ package org.freeshr.infrastructure.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.freeshr.config.SHRProperties;
 import org.freeshr.utils.CollectionUtils;
 
 import java.util.ArrayList;
@@ -31,6 +32,12 @@ public class UserInfo {
     @JsonProperty("profiles")
     private List<UserProfile> userProfiles;
 
+    private boolean isDatasenseFacility;
+    private String facilityId;
+    private String providerId;
+    private String patientHid;
+    private List<String> catchments;
+
     public UserInfo() {
     }
 
@@ -50,9 +57,6 @@ public class UserInfo {
     }
 
     public List<String> getGroups() {
-        ArrayList<String> groups = new ArrayList<>();
-        groups.addAll(this.groups);
-        groups.addAll(identifyGroupsFromProfiles());
         return groups;
     }
 
@@ -80,20 +84,104 @@ public class UserInfo {
         return email;
     }
 
+    public String getFacilityId() {
+        return facilityId;
+    }
+
+    public String getProviderId() {
+        return providerId;
+    }
+
+    public String getPatientHid() {
+        return patientHid;
+    }
+
+    public boolean isDatasenseFacility() {
+        return isDatasenseFacility;
+    }
+
+    public List<String> getCatchments() {
+        return catchments;
+    }
+
+    public boolean hasCatchment(String requestedCatchment) {
+        for (String catchment : catchments) {
+            if (requestedCatchment.startsWith(catchment))
+                return true;
+        }
+        return false;
+    }
+
+    public UserInfo loadUserProperties(SHRProperties shrProperties) {
+        catchments = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(userProfiles)) {
+            for (UserProfile userProfile : userProfiles) {
+                addGroupsBasedOnProfiles(userProfile);
+                loadFacilityProperties(shrProperties, userProfile);
+                loadProviderProperties(userProfile);
+                loadPatientProperties(userProfile);
+            }
+        }
+        return this;
+    }
+
+    private void addGroupsBasedOnProfiles(UserProfile userProfile) {
+        if (userProfile.isFaciltiyType() && groups.contains(FACILITY_ADMIN_GROUP)) {
+            groups.add(SHR_FACILITY_GROUP);
+        } else if (userProfile.isProviderType()) {
+            groups.add(SHR_PROVIDER_GROUP);
+        } else if (userProfile.isPatientType()) {
+            groups.add(SHR_PATIENT_GROUP);
+        }
+    }
+
+    private void loadPatientProperties(UserProfile userProfile) {
+        if (userProfile.isPatientType()) {
+            patientHid = userProfile.getId();
+        }
+    }
+
+    private void loadProviderProperties(UserProfile userProfile) {
+        if (userProfile.isProviderType()) {
+            providerId = userProfile.getId();
+            if (CollectionUtils.isNotEmpty(userProfile.getCatchments())) {
+                catchments.addAll(userProfile.getCatchments());
+            }
+        }
+    }
+
+    private void loadFacilityProperties(SHRProperties shrProperties, UserProfile userProfile) {
+        if (userProfile.isFaciltiyType()) {
+            if (CollectionUtils.isNotEmpty(shrProperties.getDatasenseFacilityCodes())
+                    && shrProperties.getDatasenseFacilityCodes().contains(userProfile.getId())) {
+                isDatasenseFacility = true;
+            }
+            facilityId = userProfile.getId();
+            if (CollectionUtils.isNotEmpty(userProfile.getCatchments())) {
+                catchments.addAll(userProfile.getCatchments());
+            }
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof UserInfo)) return false;
 
         UserInfo userInfo = (UserInfo) o;
 
         if (activated != userInfo.activated) return false;
         if (isActive != userInfo.isActive) return false;
+        if (isDatasenseFacility != userInfo.isDatasenseFacility) return false;
         if (!accessToken.equals(userInfo.accessToken)) return false;
+        if (catchments != null ? !catchments.equals(userInfo.catchments) : userInfo.catchments != null) return false;
         if (!email.equals(userInfo.email)) return false;
+        if (facilityId != null ? !facilityId.equals(userInfo.facilityId) : userInfo.facilityId != null) return false;
         if (groups != null ? !groups.equals(userInfo.groups) : userInfo.groups != null) return false;
         if (!id.equals(userInfo.id)) return false;
         if (name != null ? !name.equals(userInfo.name) : userInfo.name != null) return false;
+        if (patientHid != null ? !patientHid.equals(userInfo.patientHid) : userInfo.patientHid != null) return false;
+        if (providerId != null ? !providerId.equals(userInfo.providerId) : userInfo.providerId != null) return false;
         if (userProfiles != null ? !userProfiles.equals(userInfo.userProfiles) : userInfo.userProfiles != null)
             return false;
 
@@ -102,29 +190,19 @@ public class UserInfo {
 
     @Override
     public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
+        int result = id.hashCode();
+        result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + email.hashCode();
         result = 31 * result + isActive;
         result = 31 * result + (activated ? 1 : 0);
         result = 31 * result + accessToken.hashCode();
         result = 31 * result + (groups != null ? groups.hashCode() : 0);
         result = 31 * result + (userProfiles != null ? userProfiles.hashCode() : 0);
+        result = 31 * result + (isDatasenseFacility ? 1 : 0);
+        result = 31 * result + (facilityId != null ? facilityId.hashCode() : 0);
+        result = 31 * result + (providerId != null ? providerId.hashCode() : 0);
+        result = 31 * result + (patientHid != null ? patientHid.hashCode() : 0);
+        result = 31 * result + (catchments != null ? catchments.hashCode() : 0);
         return result;
-    }
-
-    public ArrayList<String> identifyGroupsFromProfiles() {
-        ArrayList<String> groupsFromProfiles = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(userProfiles)) {
-            for (UserProfile userProfile : userProfiles) {
-                if (userProfile.isFaciltiyType() && groups.contains(FACILITY_ADMIN_GROUP)) {
-                    groupsFromProfiles.add(SHR_FACILITY_GROUP);
-                } else if (userProfile.isProviderType()) {
-                    groupsFromProfiles.add(SHR_PROVIDER_GROUP);
-                } else if (userProfile.isPatientType()) {
-                    groupsFromProfiles.add(SHR_PATIENT_GROUP);
-                }
-            }
-        }
-        return groupsFromProfiles;
     }
 }

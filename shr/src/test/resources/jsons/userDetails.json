@@ -1,0 +1,36 @@
+{
+  "id": "6",
+  "name": "Some",
+  "email": "some@thoughtworks.com",
+  "is_active": 1,
+  "activated": true,
+  "activated_at": "2015-03-18 06:58:49",
+  "last_login": "2015-03-18 06:58:49",
+  "access_token": "2361e0a8-f352-4155-8415-32adfb8c2472",
+  "created_at": "2015-03-18 06:58:49",
+  "updated_at": "2015-03-18 06:58:49",
+  "deleted_at": "2015-03-18 06:58:49",
+  "groups": [
+    "Facility Admin",
+    "MIS Admin",
+    "Report viewer",
+    "API Consumer",
+    "MCI Admin",
+    "MCI Approver",
+    "SHR USER"
+  ],
+  "profiles": [
+    {
+      "name": "facility",
+      "id": "10000002",
+      "catchment": [
+        "30"
+      ]
+    },
+    {
+      "name": "admin",
+      "id": "6",
+      "catchment": null
+    }
+  ]
+}

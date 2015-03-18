@@ -49,7 +49,7 @@ public class EncounterServiceTest {
                 org.mockito.Matchers.any(Date.class), eq(20))).
                 thenReturn(Observable.<List<EncounterBundle>>error(new Exception(exceptionMessage)));
         try {
-            List<EncounterBundle> encountersByCatchments = encounterService.findEncountersForFacilityCatchment("1",
+            List<EncounterBundle> encountersByCatchments = encounterService.findEncountersForFacilityCatchment(
                     "30", date, 20).toBlocking().first();
         } catch (Exception e) {
             assertEquals(RuntimeException.class, e.getClass());

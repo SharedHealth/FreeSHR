@@ -41,4 +41,8 @@ public class UserProfile {
     public String getId() {
         return id;
     }
+
+    public List<String> getCatchments() {
+        return catchments;
+    }
 }
