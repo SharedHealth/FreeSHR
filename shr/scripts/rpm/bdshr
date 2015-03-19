@@ -17,6 +17,7 @@
 
 export BDSHR_USER=sharedhealth
 export BDSHR_RUN=/opt/bdshr/bin/start.sh
+export CUR_USER=`/usr/bin/whoami`
 
 # load configuration
 . /etc/default/bdshr
@@ -43,7 +44,7 @@ start(){
         # Start bdshr
         create_dirs
         echo -e "\e[00;32mStarting bdshr\e[00m"
-        if [ `user_exists $BDSHR_USER` = "1" ]
+        if [ `user_exists $BDSHR_USER` = "1" ] && ["$CUR_USER" != "$BDSHR_USER"] ;
         then
                 /bin/su $BDSHR_USER -c $BDSHR_RUN
         else
