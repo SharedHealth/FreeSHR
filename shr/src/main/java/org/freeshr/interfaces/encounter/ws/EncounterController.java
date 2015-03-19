@@ -77,9 +77,9 @@ public class EncounterController {
             }
         }, new Action1<Throwable>() {
             @Override
-            public void call(Throwable throwable) {
-                logger.error(throwable.getMessage());
-                deferredResult.setErrorResult(throwable.getMessage());
+            public void call(Throwable error) {
+                logger.error(error.getMessage());
+                deferredResult.setErrorResult(error);
             }
         });
 
