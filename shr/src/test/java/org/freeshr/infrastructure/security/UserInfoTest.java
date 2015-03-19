@@ -1,6 +1,5 @@
 package org.freeshr.infrastructure.security;
 
-import org.freeshr.config.SHRProperties;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -17,7 +16,7 @@ public class UserInfoTest {
 
         UserInfo userInfo = new UserInfo("102", "ABC", "abc@mail", 1, true, "111100",
                 new ArrayList<>(asList(FACILITY_ADMIN_GROUP)), asList(userProfile));
-        userInfo.loadUserProperties(new SHRProperties());
+        userInfo.loadUserProperties();
         assertTrue(userInfo.getGroups().contains(UserInfo.SHR_FACILITY_GROUP));
     }
 
@@ -27,12 +26,12 @@ public class UserInfoTest {
 
         UserInfo userInfo = new UserInfo("102", "ABC", "abc@mail", 1, true, "111100",
                 new ArrayList<String>(), asList(userProfile));
-        userInfo.loadUserProperties(new SHRProperties());
+        userInfo.loadUserProperties();
         assertFalse(userInfo.getGroups().contains(UserInfo.SHR_FACILITY_GROUP));
 
         new UserInfo("102", "ABC", "abc@mail", 1, true, "111100",
                 new ArrayList<>(asList(FACILITY_ADMIN_GROUP)), null);
-        userInfo.loadUserProperties(new SHRProperties());
+        userInfo.loadUserProperties();
         assertFalse(userInfo.getGroups().contains(UserInfo.SHR_FACILITY_GROUP));
     }
 
@@ -42,12 +41,12 @@ public class UserInfoTest {
 
         UserInfo userInfo = new UserInfo("102", "ABC", "abc@mail", 1, true, "111100",
                 new ArrayList<String>(), asList(userProfile));
-        userInfo.loadUserProperties(new SHRProperties());
+        userInfo.loadUserProperties();
         assertTrue(userInfo.getGroups().contains(UserInfo.SHR_PROVIDER_GROUP));
 
         userInfo = new UserInfo("102", "ABC", "abc@mail", 1, true, "111100",
                 new ArrayList<String>(), null);
-        userInfo.loadUserProperties(new SHRProperties());
+        userInfo.loadUserProperties();
         assertFalse(userInfo.getGroups().contains(UserInfo.SHR_PROVIDER_GROUP));
     }
 
@@ -57,12 +56,12 @@ public class UserInfoTest {
 
         UserInfo userInfo = new UserInfo("102", "ABC", "abc@mail", 1, true, "111100",
                 new ArrayList<String>(), asList(userProfile));
-        userInfo.loadUserProperties(new SHRProperties());
+        userInfo.loadUserProperties();
         assertTrue(userInfo.getGroups().contains(UserInfo.SHR_PATIENT_GROUP));
 
         userInfo = new UserInfo("102", "ABC", "abc@mail", 1, true, "111100",
                 new ArrayList<String>(), null);
-        userInfo.loadUserProperties(new SHRProperties());
+        userInfo.loadUserProperties();
         assertFalse(userInfo.getGroups().contains(UserInfo.SHR_PATIENT_GROUP));
     }
 }

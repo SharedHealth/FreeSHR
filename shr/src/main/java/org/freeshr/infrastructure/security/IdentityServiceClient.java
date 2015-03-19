@@ -43,7 +43,7 @@ public class IdentityServiceClient {
             throw new AuthenticationServiceException("Identity Server responded :" + responseEntity.getStatusCode()
                     .toString());
         UserInfo userInfo = responseEntity.getBody();
-        userInfo.loadUserProperties(shrProperties);
+        userInfo.loadUserProperties();
         boolean isAuthenticated = clientAuthenticator.authenticate(userAuthInfo, token, userInfo);
         return new TokenAuthentication(userInfo, isAuthenticated);
     }

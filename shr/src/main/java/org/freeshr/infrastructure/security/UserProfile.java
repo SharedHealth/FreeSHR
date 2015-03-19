@@ -7,9 +7,9 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserProfile {
-    private static final String FACILITY_TYPE = "facility";
-    private static final String PROVIDER_TYPE = "provider";
-    private static final String PATIENT_TYPE = "patient";
+    public static final String FACILITY_TYPE = "facility";
+    public static final String PROVIDER_TYPE = "provider";
+    public static final String PATIENT_TYPE = "patient";
     @JsonProperty("name")
     private String name;
     @JsonProperty("id")

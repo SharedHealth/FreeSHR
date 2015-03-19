@@ -6,9 +6,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.util.List;
-
-import static java.util.Arrays.asList;
 
 @Component
 public class SHRProperties {
@@ -69,8 +66,6 @@ public class SHRProperties {
     @Value("${MCI_SERVER_URL}")
     private String mciServerUrl;
 
-    @Value("${DATASENSE_FACILITY_CODES}")
-    private String datasenseFacilityCodes;
 
     private String[] mciServerLocationUrls = null;
     private String[] facilityServerLocationUrls = null;
@@ -179,6 +174,7 @@ public class SHRProperties {
     /**
      * Gets the internal server URL for MCI.
      * If no internal is provided then its the same as the public URL
+     *
      * @return
      */
     public String getMCIPatientLocationPath() {
@@ -209,6 +205,7 @@ public class SHRProperties {
     /**
      * The server URL are provided in 2 parts comma separated.
      * the first being the public URL and second being the internal network URL if any
+     *
      * @param value
      * @return
      */
@@ -247,9 +244,5 @@ public class SHRProperties {
             this.terminologyServerLocationUrls = parsePublicAndPrivateUrls(this.trServerBaseUrl);
         }
         return this.terminologyServerLocationUrls;
-    }
-
-    public List<String> getDatasenseFacilityCodes() {
-        return datasenseFacilityCodes != null ? asList(StringUtils.split(datasenseFacilityCodes, ",")) : null;
     }
 }

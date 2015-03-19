@@ -11,9 +11,11 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserInfo {
     public static final String SHR_FACILITY_GROUP = "SHR_FACILITY";
+    public static final String SHR_USER_GROUP = "SHR USER";
     public static final String SHR_PROVIDER_GROUP = "SHR_PROVIDER";
     public static final String SHR_PATIENT_GROUP = "SHR_PATIENT";
     public static final String FACILITY_ADMIN_GROUP = "Facility Admin";
+    public static final String DATASENSE_FACILITY_GROUP = "Datasense Facility";
 
     @JsonProperty("id")
     private String id;
@@ -112,15 +114,18 @@ public class UserInfo {
         return false;
     }
 
-    public UserInfo loadUserProperties(SHRProperties shrProperties) {
+    public UserInfo loadUserProperties() {
         catchments = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(userProfiles)) {
             for (UserProfile userProfile : userProfiles) {
                 addGroupsBasedOnProfiles(userProfile);
-                loadFacilityProperties(shrProperties, userProfile);
+                loadFacilityProperties(userProfile);
                 loadProviderProperties(userProfile);
                 loadPatientProperties(userProfile);
             }
+        }
+        if(groups.contains(DATASENSE_FACILITY_GROUP)) {
+            isDatasenseFacility = true;
         }
         return this;
     }
@@ -150,12 +155,8 @@ public class UserInfo {
         }
     }
 
-    private void loadFacilityProperties(SHRProperties shrProperties, UserProfile userProfile) {
+    private void loadFacilityProperties(UserProfile userProfile) {
         if (userProfile.isFaciltiyType()) {
-            if (CollectionUtils.isNotEmpty(shrProperties.getDatasenseFacilityCodes())
-                    && shrProperties.getDatasenseFacilityCodes().contains(userProfile.getId())) {
-                isDatasenseFacility = true;
-            }
             facilityId = userProfile.getId();
             if (CollectionUtils.isNotEmpty(userProfile.getCatchments())) {
                 catchments.addAll(userProfile.getCatchments());

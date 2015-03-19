@@ -28,11 +28,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static org.freeshr.infrastructure.security.UserInfo.*;
+
 @Configuration
 @EnableWebSecurity
 public class SHRSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private TokenAuthenticationProvider tokenAuthenticationProvider;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -47,9 +50,12 @@ public class SHRSecurityConfig extends WebSecurityConfigurerAdapter {
                     }
                 }))
                 .authorizeRequests()
-                .regexMatchers(HttpMethod.GET, "\\/v.?\\/patients\\/.*\\/encounters(\\/.*){0,1}$").hasAnyRole("SHR_FACILITY", "SHR_PROVIDER", "SHR_PATIENT")
-                .regexMatchers(HttpMethod.POST, "\\/v.?\\/patients\\/.*\\/encounters$").hasAnyRole("SHR_FACILITY", "SHR_PROVIDER")
-                .regexMatchers(HttpMethod.GET, "\\/v.?\\/catchments\\/\\d.*\\/encounters$").hasAnyRole("SHR_FACILITY", "SHR_PROVIDER")
+                .regexMatchers(HttpMethod.GET, "\\/v.?\\/patients\\/.*\\/encounters(\\/.*){0,1}")
+                    .hasAnyRole(SHR_FACILITY_GROUP, SHR_PROVIDER_GROUP, SHR_PATIENT_GROUP)
+                .regexMatchers(HttpMethod.POST, "\\/v.?\\/patients\\/.*\\/encounters.*")
+                    .hasAnyRole(SHR_FACILITY_GROUP, SHR_PROVIDER_GROUP)
+                .regexMatchers(HttpMethod.GET, "\\/v.?\\/catchments\\/\\d.*\\/encounters.*")
+                    .hasAnyRole(SHR_FACILITY_GROUP, SHR_PROVIDER_GROUP)
                 .and()
                 .addFilterBefore(new TokenAuthenticationFilter(authenticationManager()), BasicAuthenticationFilter
                         .class)

@@ -8,7 +8,6 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.service.EncounterService;
-import org.freeshr.domain.service.UserService;
 import org.freeshr.infrastructure.security.TokenAuthentication;
 import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.infrastructure.security.UserProfile;
@@ -50,9 +49,6 @@ public class EncounterControllerTest {
     private SHRProperties shrProperties;
 
     @Mock
-    private UserService userService;
-
-    @Mock
     private SecurityContext securityContext;
 
     private EncounterController controller;
@@ -70,7 +66,6 @@ public class EncounterControllerTest {
 
         ArrayList<String> datasenseFacilityCodes = new ArrayList<>();
         datasenseFacilityCodes.add("1232");
-        when(shrProperties.getDatasenseFacilityCodes()).thenReturn(datasenseFacilityCodes);
         TokenAuthentication tokenAuthentication = tokenAuthentication();
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication()).thenReturn(tokenAuthentication);
@@ -215,6 +210,6 @@ public class EncounterControllerTest {
     private TokenAuthentication tokenAuthentication() {
         return new TokenAuthentication(new UserInfo("1232", "foo", "email@gmail.com", 1, true,
                 "xyz", new ArrayList<String>(), asList(new UserProfile("facility", "10000069", asList("3026"))))
-                .loadUserProperties(shrProperties), true);
+                .loadUserProperties(), true);
     }
 }
