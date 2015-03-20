@@ -1,0 +1,25 @@
+{
+  "id": "18556",
+  "name": "Provider",
+  "email": "provider@gmail.com",
+  "is_active": 1,
+  "activated": true,
+  "activated_at": "2015-03-20 06:50:30",
+  "last_login": "2015-03-20 06:50:30",
+  "access_token": "40214a6c-e27c-4223-981c-1f837be90f97",
+  "created_at": "2015-03-20 06:50:30",
+  "updated_at": "2015-03-20 06:50:30",
+  "deleted_at": "2015-03-20 06:50:30",
+  "groups": [
+    "SHR USER"
+  ],
+  "profiles": [
+    {
+      "name": "provider",
+      "id": "113068",
+      "catchment": [
+        "302607"
+      ]
+    }
+  ]
+}

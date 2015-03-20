@@ -55,36 +55,40 @@ public class EncounterController {
             HttpServletRequest request) throws ExecutionException, InterruptedException {
         logger.info(String.format("ACCESS: create encounter request for patient: %s", healthId));
         logger.debug("Create encounter. " + encounterBundle.getContent());
-        checkAccessForEncounterPush((UserInfo) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        encounterBundle.setHealthId(healthId);
-
         final DeferredResult<EncounterResponse> deferredResult = new DeferredResult<>();
-        Observable<EncounterResponse> encounterResponse = encounterService.ensureCreated(encounterBundle,
-                request.getHeader(CLIENT_ID_KEY), request.getHeader(FROM_KEY), request.getHeader(AUTH_TOKEN_KEY));
+        try {
+            checkAccessForEncounterPush((UserInfo) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+            encounterBundle.setHealthId(healthId);
 
-        encounterResponse.subscribe(new Action1<EncounterResponse>() {
-            @Override
-            public void call(EncounterResponse encounterResponse) {
-                if (encounterResponse.isSuccessful()) {
-                    logger.debug(encounterResponse.toString());
-                    deferredResult.setResult(encounterResponse);
-                } else {
-                    //TODO: move code to encounter response class
-                    deferredResult.setErrorResult(
-                            encounterResponse.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition)
-                                    ?
-                                    new PreconditionFailed(encounterResponse)
-                                    : new UnProcessableEntity(encounterResponse));
+            Observable<EncounterResponse> encounterResponse = encounterService.ensureCreated(encounterBundle,
+                    request.getHeader(CLIENT_ID_KEY), request.getHeader(FROM_KEY), request.getHeader(AUTH_TOKEN_KEY));
+
+            encounterResponse.subscribe(new Action1<EncounterResponse>() {
+                @Override
+                public void call(EncounterResponse encounterResponse) {
+                    if (encounterResponse.isSuccessful()) {
+                        logger.debug(encounterResponse.toString());
+                        deferredResult.setResult(encounterResponse);
+                    } else {
+                        //TODO: move code to encounter response class
+                        RuntimeException errorResult = encounterResponse.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition) ?
+                                new PreconditionFailed(encounterResponse)
+                                : new UnProcessableEntity(encounterResponse);
+                        logger.error(errorResult.getMessage());
+                        deferredResult.setErrorResult(errorResult);
+                    }
                 }
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable error) {
-                logger.error(error.getMessage());
-                deferredResult.setErrorResult(error);
-            }
-        });
-
+            }, new Action1<Throwable>() {
+                @Override
+                public void call(Throwable error) {
+                    logger.error(error.getMessage());
+                    deferredResult.setErrorResult(error);
+                }
+            });
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            deferredResult.setErrorResult(e);
+        }
         return deferredResult;
     }
 
@@ -95,8 +99,8 @@ public class EncounterController {
             @PathVariable String healthId,
             @RequestParam(value = "updatedSince", required = false) String updatedSince) {
         logger.debug("Find all encounters by health id: " + healthId);
-        final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<>();
         final UserInfo userInfo = (UserInfo) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<>();
         try {
             final boolean isRestrictedAccess = isRestrictedAccessForEncounterFetchForPatient(healthId, userInfo);
             final Date requestedDate = getRequestedDate(updatedSince);
@@ -112,6 +116,7 @@ public class EncounterController {
                         logger.debug(searchResponse.toString());
                         deferredResult.setResult(searchResponse);
                     } catch (UnsupportedEncodingException e) {
+                        logger.error(e.getMessage());
                         deferredResult.setErrorResult(e);
                     }
 
@@ -126,6 +131,7 @@ public class EncounterController {
                 }
             });
         } catch (Exception e) {
+            logger.error(e.getMessage());
             deferredResult.setErrorResult(e);
         }
         return deferredResult;
@@ -139,38 +145,44 @@ public class EncounterController {
             @RequestParam(value = "updatedSince", required = false) String updatedSince,
             @RequestParam(value = "lastMarker", required = false) final String lastMarker)
             throws ExecutionException, InterruptedException, ParseException, UnsupportedEncodingException {
-        if (catchment.length() < 4) {
-            logger.error("Catchment should have division and district.");
-            throw new BadRequest("Catchment should have division and district");
-        }
+        final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<>();
         final UserInfo userInfo = (UserInfo) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         logger.info(format("Find all encounters for facility %s in catchment %s", userInfo.getFacilityId(), catchment));
-        final Date requestedDate = getRequestedDateForCatchment(updatedSince);
-        final boolean isRestrictedAccess = isRestrictedAccessForEncounterFetchForCatchment(catchment, userInfo);
-        final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<>();
-        final Observable<List<EncounterBundle>> catchmentEncounters =
-                findFacilityCatchmentEncounters(catchment, lastMarker, requestedDate);
-        catchmentEncounters.subscribe(new Action1<List<EncounterBundle>>() {
-            @Override
-            public void call(List<EncounterBundle> encounterBundles) {
-                try {
-                    encounterBundles = filterEncounters(isRestrictedAccess, encounterBundles);
-                    EncounterSearchResponse searchResponse = new EncounterSearchResponse(
-                            getRequestUri(request, requestedDate, lastMarker), encounterBundles);
-                    searchResponse.setNavLinks(null, getNextResultURL(request, encounterBundles, requestedDate));
-                    logger.debug(searchResponse.toString());
-                    deferredResult.setResult(searchResponse);
-                } catch (Throwable t) {
-                    deferredResult.setErrorResult(t);
-                    logger.error(t.getMessage());
+        try {
+            if (catchment.length() < 4) {
+                logger.error("Catchment should have division and district.");
+                throw new BadRequest("Catchment should have division and district");
+            }
+            final Date requestedDate = getRequestedDateForCatchment(updatedSince);
+            final boolean isRestrictedAccess = isRestrictedAccessForEncounterFetchForCatchment(catchment, userInfo);
+            final Observable<List<EncounterBundle>> catchmentEncounters =
+                    findFacilityCatchmentEncounters(catchment, lastMarker, requestedDate);
+            catchmentEncounters.subscribe(new Action1<List<EncounterBundle>>() {
+                @Override
+                public void call(List<EncounterBundle> encounterBundles) {
+                    try {
+                        encounterBundles = filterEncounters(isRestrictedAccess, encounterBundles);
+                        EncounterSearchResponse searchResponse = new EncounterSearchResponse(
+                                getRequestUri(request, requestedDate, lastMarker), encounterBundles);
+                        searchResponse.setNavLinks(null, getNextResultURL(request, encounterBundles, requestedDate));
+                        logger.debug(searchResponse.toString());
+                        deferredResult.setResult(searchResponse);
+                    } catch (Throwable t) {
+                        logger.error(t.getMessage());
+                        deferredResult.setErrorResult(t);
+                    }
                 }
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                deferredResult.setErrorResult(throwable);
-            }
-        });
+            }, new Action1<Throwable>() {
+                @Override
+                public void call(Throwable throwable) {
+                    logger.error(throwable.getMessage());
+                    deferredResult.setErrorResult(throwable);
+                }
+            });
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            deferredResult.setErrorResult(e);
+        }
         return deferredResult;
     }
 
@@ -179,36 +191,42 @@ public class EncounterController {
     public DeferredResult<EncounterBundle> findEncountersForPatient(
             @PathVariable String healthId, @PathVariable final String encounterId) {
         logger.debug(format("Find encounter %s for patient %s", encounterId, healthId));
-        UserInfo userInfo = (UserInfo) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        final boolean isRestrictedAccess = isRestrictedAccessForEncounterFetchForPatient(healthId, userInfo);
         final DeferredResult<EncounterBundle> deferredResult = new DeferredResult<>();
-        Observable<EncounterBundle> observable = encounterService.findEncounter(healthId,
-                encounterId).firstOrDefault(null);
-        observable.subscribe(new Action1<EncounterBundle>() {
-                                 @Override
-                                 public void call(EncounterBundle encounterBundle) {
-                                     if (encounterBundle != null) {
-                                         logger.debug(encounterBundle.toString());
-                                         if (CollectionUtils.isEmpty(filterEncounters(isRestrictedAccess, asList(encounterBundle)))) {
-                                             deferredResult.setErrorResult(new Forbidden(format("Access for encounter [%s] for is denied", encounterId)));
+        try {
+            UserInfo userInfo = (UserInfo) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            final boolean isRestrictedAccess = isRestrictedAccessForEncounterFetchForPatient(healthId, userInfo);
+            Observable<EncounterBundle> observable = encounterService.findEncounter(healthId,
+                    encounterId).firstOrDefault(null);
+            observable.subscribe(new Action1<EncounterBundle>() {
+                                     @Override
+                                     public void call(EncounterBundle encounterBundle) {
+                                         if (encounterBundle != null) {
+                                             logger.debug(encounterBundle.toString());
+                                             if (CollectionUtils.isEmpty(filterEncounters(isRestrictedAccess, asList(encounterBundle)))) {
+                                                 Forbidden errorResult = new Forbidden(format("Access for encounter %s for is denied", encounterId));
+                                                 logger.error(errorResult.getMessage());
+                                                 deferredResult.setErrorResult(errorResult);
+                                             } else {
+                                                 deferredResult.setResult(encounterBundle);
+                                             }
                                          } else {
-                                             deferredResult.setResult(encounterBundle);
+                                             String errorMessage = format("Encounter %s not found", encounterId);
+                                             logger.error(errorMessage);
+                                             deferredResult.setErrorResult(new ResourceNotFound(errorMessage));
                                          }
-                                     } else {
-                                         String errorMessage = format("Encounter %s not found", encounterId);
-                                         logger.error(errorMessage);
-                                         deferredResult.setErrorResult(new ResourceNotFound(errorMessage));
                                      }
-                                 }
-                             },
-                new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        logger.error(throwable.getMessage());
-                        deferredResult.setErrorResult(throwable);
-                    }
-                });
-
+                                 },
+                    new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            logger.error(throwable.getMessage());
+                            deferredResult.setErrorResult(throwable);
+                        }
+                    });
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            deferredResult.setErrorResult(e);
+        }
         return deferredResult;
     }
 
@@ -360,7 +378,7 @@ public class EncounterController {
     @ResponseBody
     @ExceptionHandler(BadRequest.class)
     public ErrorInfo badRequest(BadRequest badRequest) {
-        return new ErrorInfo(HttpStatus.BAD_REQUEST, badRequest.getErrorMessage());
+        return new ErrorInfo(HttpStatus.BAD_REQUEST, badRequest.getMessage());
     }
 
 
@@ -375,21 +393,21 @@ public class EncounterController {
     @ResponseBody
     @ExceptionHandler(ResourceNotFound.class)
     public ErrorInfo resourceNotFound(ResourceNotFound resourceNotFound) {
-        return new ErrorInfo(HttpStatus.NOT_FOUND, resourceNotFound.getErrorMessage());
+        return new ErrorInfo(HttpStatus.NOT_FOUND, resourceNotFound.getMessage());
     }
 
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     @ResponseBody
     @ExceptionHandler(Unauthorized.class)
     public ErrorInfo unauthorized(Unauthorized unauthorized) {
-        return new ErrorInfo(HttpStatus.UNAUTHORIZED, unauthorized.getErrorMessage());
+        return new ErrorInfo(HttpStatus.UNAUTHORIZED, unauthorized.getMessage());
     }
 
     @ResponseStatus(value = HttpStatus.FORBIDDEN)
     @ResponseBody
     @ExceptionHandler(Forbidden.class)
     public ErrorInfo forbidden(Forbidden forbidden) {
-        return new ErrorInfo(HttpStatus.FORBIDDEN, forbidden.getErrorMessage());
+        return new ErrorInfo(HttpStatus.FORBIDDEN, forbidden.getMessage());
     }
 
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)

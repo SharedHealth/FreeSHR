@@ -17,7 +17,7 @@ public class AccessFilter {
             }
             return true;
         }
-        throw new Forbidden(String.format("Access for patient [%s] is denied for user [%s]", healthId, userInfo.getId()));
+        throw new Forbidden(String.format("Access for patient %s is denied for user %s", healthId, userInfo.getId()));
     }
 
     public static boolean isRestrictedAccessForEncounterFetchForCatchment(String catchment, UserInfo userInfo) {

@@ -14,4 +14,9 @@ public class UnProcessableEntity extends RuntimeException {
     public EncounterResponse getResult() {
         return result;
     }
+
+    @Override
+    public String getMessage() {
+        return String.format("Unprocessable entity : %s", result.getErrors().toString());
+    }
 }

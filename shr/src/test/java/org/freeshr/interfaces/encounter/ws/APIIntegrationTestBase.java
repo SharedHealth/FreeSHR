@@ -9,7 +9,9 @@ import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
 import org.freeshr.infrastructure.persistence.FacilityRepository;
+import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
 import org.freeshr.launch.WebMvcConfig;
+import org.freeshr.utils.Confidentiality;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.After;
@@ -29,6 +31,8 @@ import org.springframework.web.context.WebApplicationContext;
 import javax.annotation.Resource;
 import javax.servlet.Filter;
 import java.util.concurrent.ExecutionException;
+
+import static org.freeshr.utils.FileUtil.asString;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = {WebMvcConfig.class, SHRConfig.class})
@@ -76,16 +80,16 @@ public abstract class APIIntegrationTestBase {
         cqlTemplate.execute("truncate enc_by_catchment");
     }
 
-    public void createEncounter(EncounterBundle encounter, Patient patient) throws ExecutionException,
+    protected void createEncounter(EncounterBundle encounter, Patient patient) throws ExecutionException,
             InterruptedException {
         encounterRepository.save(encounter, patient).toBlocking().first();
     }
 
-    public void createFacility(Facility facility) {
+    protected void createFacility(Facility facility) {
         facilityRepository.save(facility).toBlocking().first();
     }
 
-    public BaseMatcher<EncounterSearchResponse> hasEncountersOfSize(final int expectedSize) {
+    protected BaseMatcher<EncounterSearchResponse> hasEncountersOfSize(final int expectedSize) {
         return new BaseMatcher<EncounterSearchResponse>() {
 
             @Override
@@ -101,8 +105,32 @@ public abstract class APIIntegrationTestBase {
         };
     }
 
-    public String generateHealthId() {
+    protected BaseMatcher<EncounterSearchResponse> isForbidden() {
+        return new BaseMatcher<EncounterSearchResponse>() {
+
+            @Override
+            public boolean matches(Object item) {
+                return item instanceof Forbidden;
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendValue("Forbidden");
+            }
+        };
+    }
+
+    protected String generateHealthId() {
         return java.util.UUID.randomUUID().toString();
     }
 
+    protected EncounterBundle createEncounterBundle(String encounterId, String healthId, Confidentiality encounterConfidentiality, Confidentiality patientConfidentiality) {
+        EncounterBundle bundle = new EncounterBundle();
+        bundle.setEncounterId(encounterId);
+        bundle.setHealthId(healthId);
+        bundle.setEncounterConfidentiality(encounterConfidentiality);
+        bundle.setPatientConfidentiality(patientConfidentiality);
+        bundle.setEncounterContent(asString("jsons/encounters/valid.json"));
+        return bundle;
+    }
 }

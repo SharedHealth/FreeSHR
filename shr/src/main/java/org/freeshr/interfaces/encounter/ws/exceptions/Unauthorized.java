@@ -9,7 +9,8 @@ public class Unauthorized extends RuntimeException {
         this.errorMessage = errorMessage;
     }
 
-    public String getErrorMessage() {
+    @Override
+    public String getMessage() {
         return errorMessage;
     }
 }

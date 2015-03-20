@@ -1,0 +1,26 @@
+{
+  "id": "18548",
+  "name": "Facility",
+  "email": "facility@gmail.com",
+  "is_active": 1,
+  "activated": true,
+  "activated_at": "2015-03-20 06:37:40",
+  "last_login": "2015-03-20 06:37:40",
+  "access_token": "40214a6c-e27c-4223-981c-1f837be90f97",
+  "created_at": "2015-03-20 06:37:40",
+  "updated_at": "2015-03-20 06:37:40",
+  "deleted_at": "2015-03-20 06:37:40",
+  "groups": [
+    "Facility Admin",
+    "SHR USER"
+  ],
+  "profiles": [
+    {
+      "name": "facility",
+      "id": "10019842",
+      "catchment": [
+        "3026"
+      ]
+    }
+  ]
+}

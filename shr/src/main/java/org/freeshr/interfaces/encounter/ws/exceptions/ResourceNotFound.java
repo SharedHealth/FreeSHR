@@ -9,7 +9,8 @@ public class ResourceNotFound extends RuntimeException {
         this.errorMessage = errorMessage;
     }
 
-    public String getErrorMessage() {
+    @Override
+    public String getMessage() {
         return errorMessage;
     }
 }

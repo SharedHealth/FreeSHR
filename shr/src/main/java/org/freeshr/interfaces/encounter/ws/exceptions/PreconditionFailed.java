@@ -14,4 +14,9 @@ public class PreconditionFailed extends RuntimeException {
     public EncounterResponse getResult() {
         return result;
     }
+
+    @Override
+    public String getMessage() {
+        return String.format("Precondition failed: %s", result.getErrors().toString());
+    }
 }

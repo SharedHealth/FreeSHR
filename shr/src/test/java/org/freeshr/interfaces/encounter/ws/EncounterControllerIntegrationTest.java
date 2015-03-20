@@ -42,7 +42,6 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
     private final String validEmail = "some@thoughtworks.com";
     private final String validAccessToken = "2361e0a8-f352-4155-8415-32adfb8c2472";
 
-
     @Autowired
     SHRProperties properties;
 
@@ -99,7 +98,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody(asString("jsons/userDetails.json"))));
+                        .withBody(asString("jsons/userDetailsWithAllRoles.json"))));
 
         //propertiesAccessor = new SHRPropertiesAccessor(properties);
         //propertiesAccessor.updateMCIServerUrls("http://localhost:9997");
@@ -116,6 +115,7 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
                 .content(asString("xmls/encounters/encounter_to_save.xml")))
+                .andExpect(status().isOk())
                 .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
     }
 
@@ -194,9 +194,9 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
         patient.setHealthId(healthId);
         patient.setAddress(new Address("01", "02", "03", "04", "05"));
 
-        createEncounter(createEncounterBundle("e-0-" + healthId, healthId), patient);
-        createEncounter(createEncounterBundle("e-1-" + healthId, healthId), patient);
-        createEncounter(createEncounterBundle("e-2-" + healthId, healthId), patient);
+        createEncounter(createEncounterBundle("e-0-" + healthId, healthId, Normal, Normal), patient);
+        createEncounter(createEncounterBundle("e-1-" + healthId, healthId, Normal, Normal), patient);
+        createEncounter(createEncounterBundle("e-2-" + healthId, healthId, Normal, Normal), patient);
         mockMvc.perform(MockMvcRequestBuilders.get(
                 String.format("/patients/%s/encounters", healthId))
                 .header(AUTH_TOKEN_KEY, validAccessToken)
@@ -213,17 +213,17 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
         String healthId1 = generateHealthId();
         patient1.setHealthId(healthId1);
         patient1.setAddress(new Address("30", "26", "18", "01", "02"));
-        createEncounter(createEncounterBundle("e-0100-" + healthId1, healthId1), patient1);
-        createEncounter(createEncounterBundle("e-1100-" + healthId1, healthId1), patient1);
-        createEncounter(createEncounterBundle("e-2100-" + healthId1, healthId1), patient1);
+        createEncounter(createEncounterBundle("e-0100-" + healthId1, healthId1, Normal, Normal), patient1);
+        createEncounter(createEncounterBundle("e-1100-" + healthId1, healthId1, Normal, Normal), patient1);
+        createEncounter(createEncounterBundle("e-2100-" + healthId1, healthId1, Normal, Normal), patient1);
 
         Patient patient2 = new Patient();
         String healthId2 = generateHealthId();
         patient2.setHealthId(healthId2);
         patient2.setAddress(new Address("30", "26", "18", "02", "02"));
-        createEncounter(createEncounterBundle("e-0200-" + healthId2, healthId2), patient2);
-        createEncounter(createEncounterBundle("e-1200-" + healthId2, healthId2), patient2);
-        createEncounter(createEncounterBundle("e-2200-" + healthId2, healthId2), patient2);
+        createEncounter(createEncounterBundle("e-0200-" + healthId2, healthId2, Normal, Normal), patient2);
+        createEncounter(createEncounterBundle("e-1200-" + healthId2, healthId2, Normal, Normal), patient2);
+        createEncounter(createEncounterBundle("e-2200-" + healthId2, healthId2, Normal, Normal), patient2);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String today = dateFormat.format(new Date());
@@ -330,15 +330,5 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
                         encounterBundle.getPatientConfidentiality().equals(patientConfidentiality);
             }
         };
-    }
-
-    private EncounterBundle createEncounterBundle(String encounterId, String healthId) {
-        EncounterBundle bundle = new EncounterBundle();
-        bundle.setEncounterId(encounterId);
-        bundle.setHealthId(healthId);
-        bundle.setEncounterConfidentiality(Normal);
-        bundle.setPatientConfidentiality(Normal);
-        bundle.setEncounterContent(asString("jsons/encounters/valid.json"));
-        return bundle;
     }
 }

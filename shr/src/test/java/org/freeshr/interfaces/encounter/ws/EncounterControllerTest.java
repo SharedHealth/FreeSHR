@@ -157,13 +157,17 @@ public class EncounterControllerTest {
         assertEquals(1, calendar.get(Calendar.DAY_OF_MONTH));
     }
 
-    @Test(expected = BadRequest.class)
+    @Test
     public void shouldThrowErrorIfCatchmentDoesNotHaveDivisionAndDistrict() throws Exception {
+        TokenAuthentication tokenAuthentication = tokenAuthentication();
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(tokenAuthentication);
+
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null,
                 "/catchments/30/encounters");
-        controller.findEncountersForCatchment
+        DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncountersForCatchment
                 (mockHttpServletRequest, "30", "2014-10-10", null);
-
+        assertTrue(encountersForCatchment.getResult() instanceof BadRequest);
     }
 
     private String generateFeedId(String updatedSince, String requestedMarker) {

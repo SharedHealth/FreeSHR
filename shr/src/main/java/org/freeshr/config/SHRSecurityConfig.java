@@ -2,6 +2,8 @@ package org.freeshr.config;
 
 import org.freeshr.infrastructure.security.TokenAuthenticationFilter;
 import org.freeshr.infrastructure.security.TokenAuthenticationProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,6 +38,8 @@ public class SHRSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private TokenAuthenticationProvider tokenAuthenticationProvider;
 
+    private static final Logger logger = LoggerFactory.getLogger(SHRSecurityConfig.class);
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -50,11 +54,11 @@ public class SHRSecurityConfig extends WebSecurityConfigurerAdapter {
                     }
                 }))
                 .authorizeRequests()
-                .regexMatchers(HttpMethod.GET, "\\/v.?\\/patients\\/.*\\/encounters(\\/.*){0,1}")
+                .regexMatchers(HttpMethod.GET, "\\/patients\\/.*\\/encounters(\\/.*){0,1}")
                     .hasAnyRole(SHR_FACILITY_GROUP, SHR_PROVIDER_GROUP, SHR_PATIENT_GROUP)
-                .regexMatchers(HttpMethod.POST, "\\/v.?\\/patients\\/.*\\/encounters.*")
+                .regexMatchers(HttpMethod.POST, "\\/patients\\/.*\\/encounters.*")
                     .hasAnyRole(SHR_FACILITY_GROUP, SHR_PROVIDER_GROUP)
-                .regexMatchers(HttpMethod.GET, "\\/v.?\\/catchments\\/\\d.*\\/encounters.*")
+                .regexMatchers(HttpMethod.GET, "\\/catchments\\/\\d.*\\/encounters.*")
                     .hasAnyRole(SHR_FACILITY_GROUP, SHR_PROVIDER_GROUP)
                 .and()
                 .addFilterBefore(new TokenAuthenticationFilter(authenticationManager()), BasicAuthenticationFilter
@@ -79,6 +83,7 @@ public class SHRSecurityConfig extends WebSecurityConfigurerAdapter {
             @Override
             public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException
                     authException) throws IOException, ServletException {
+                logger.error(authException.getMessage());
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
             }
         };
@@ -88,6 +93,7 @@ public class SHRSecurityConfig extends WebSecurityConfigurerAdapter {
         return new AccessDeniedHandler() {
             @Override
             public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+                logger.error(accessDeniedException.getMessage());
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, accessDeniedException.getMessage());
             }
         };
