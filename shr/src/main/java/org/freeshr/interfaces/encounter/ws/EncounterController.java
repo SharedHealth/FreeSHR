@@ -155,7 +155,6 @@ public class EncounterController {
         logAccessDetails(userInfo, format("Find all encounters for facility %s in catchment %s", userInfo.getFacilityId(), catchment));
         try {
             if (catchment.length() < 4) {
-                logger.error("Catchment should have division and district.");
                 throw new BadRequest("Catchment should have division and district");
             }
             final Date requestedDate = getRequestedDateForCatchment(updatedSince);
@@ -195,11 +194,12 @@ public class EncounterController {
             produces = {"application/json", "application/xml"})
     public DeferredResult<EncounterBundle> findEncountersForPatient(
             @PathVariable String healthId, @PathVariable final String encounterId) {
-        logger.debug(format("Find encounter %s for patient %s", encounterId, healthId));
         final DeferredResult<EncounterBundle> deferredResult = new DeferredResult<>();
+        logger.debug(format("Find encounter %s for patient %s", encounterId, healthId));
+        UserInfo userInfo = getUserInfo();
+        logAccessDetails(userInfo, format("Find encounter %s for patient %s", encounterId, healthId));
+
         try {
-            UserInfo userInfo = getUserInfo();
-            logAccessDetails(userInfo, format("Find encounter %s for patient %s", encounterId, healthId));
             final boolean isRestrictedAccess = isAccessRestrictedToEncounterFetchForPatient(healthId, userInfo);
             Observable<EncounterBundle> observable = encounterService.findEncounter(healthId,
                     encounterId).firstOrDefault(null);
@@ -380,15 +380,15 @@ public class EncounterController {
     }
 
     private void logAccessDetails(UserInfo userInfo, String action) {
-        logger.info(String.format("ACCESS: USER:%s ACTION: %s", userInfo.getName(), action));
+        logger.info(String.format("ACCESS: USER=%s TYPE=%s ACTION=%s", userInfo.getId(), userInfo.getName(), action));
     }
 
     @ResponseStatus(value = HttpStatus.PRECONDITION_FAILED)
     @ResponseBody
     @ExceptionHandler(PreconditionFailed.class)
-    public EncounterResponse preConditionFailed(PreconditionFailed preconditionFailed) {
+    public EncounterResponse preConditionFailed(PreconditionFaUiled preconditionFailed) {
         return preconditionFailed.getResult();
-    }
+    }U
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @ResponseBody

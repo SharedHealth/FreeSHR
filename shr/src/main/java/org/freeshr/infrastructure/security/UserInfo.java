@@ -113,6 +113,8 @@ public class UserInfo {
         return false;
     }
 
+    //TODO: This pattern of having clients of this class to loadUserProperties explicitly
+    // is highly error prone, we should take utmost care to make sure objects are valid on construction.
     public UserInfo loadUserProperties() {
         catchments = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(userProfiles)) {
