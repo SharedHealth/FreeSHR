@@ -26,16 +26,6 @@
         <filter class="org.freeshr.utils.log4j.AccessLogFilter"/>
     </appender>
 
-    <logger name="org.freeshr" additivity="false">
-        <level value="${SHR_LOG_LEVEL}"/>
-        <appender-ref ref="VAR_LOG"/>
-    </logger>
-
-    <logger name="org.freeshr" additivity="false">
-        <level value="INFO"/>
-        <appender-ref ref="ACCESS_LOG"/>
-    </logger>
-
     <root>
         <priority value="${SHR_LOG_LEVEL}"/>
         <appender-ref ref="VAR_LOG"/>
