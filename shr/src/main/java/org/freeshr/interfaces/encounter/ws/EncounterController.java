@@ -52,6 +52,7 @@ public class EncounterController {
             @PathVariable String healthId,
             @RequestBody EncounterBundle encounterBundle,
             HttpServletRequest request) throws ExecutionException, InterruptedException {
+        logger.info(String.format("ACCESS: create encounter request for patient: %s", healthId));
         logger.debug("Create encounter. " + encounterBundle.getContent());
         checkAccessForEncounterPush((UserInfo) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         encounterBundle.setHealthId(healthId);
