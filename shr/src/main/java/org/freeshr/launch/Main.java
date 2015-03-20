@@ -36,7 +36,6 @@ public class Main {
                         ".AnnotationConfigWebApplicationContext");
                 shr.setInitParameter("contextConfigLocation", "org.freeshr.launch.WebMvcConfig");
                 shr.setAsyncSupported(true);
-
             }
         });
 

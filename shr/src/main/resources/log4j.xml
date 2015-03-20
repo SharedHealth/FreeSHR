@@ -5,26 +5,26 @@
 
     <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
         <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%-5p %c{1} - %m%n"/>
+            <param name="ConversionPattern" value="%d{dd-MM-yyyy HH:mm:ss} [%-5p] %c{1} - %m%n"/>
         </layout>
     </appender>
 
-    <!--<appender name="VAR_LOG" class="org.apache.log4j.DailyRollingFileAppender">-->
-        <!--<param name="file" value="/var/log/bdshr/bdshr.log"/>-->
-        <!--<param name="DatePattern" value="'.'dd-MM-yyyy"/>-->
-        <!--<layout class="org.apache.log4j.PatternLayout">-->
-            <!--<param name="ConversionPattern" value="%-5p %c{1} - %m%n"/>-->
-        <!--</layout>-->
-    <!--</appender>-->
+    <appender name="VAR_LOG" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="file" value="/var/log/bdshr/bdshr.log"/>
+        <param name="DatePattern" value="'.'dd-MM-yyyy"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{dd-MM-yyyy HH:mm:ss} [%-5p] %c{1} - %m%n"/>
+        </layout>
+    </appender>
 
     <logger name="org.freeshr" additivity="false">
         <level value="${SHR_LOG_LEVEL}"/>
-        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="VAR_LOG"/>
     </logger>
 
     <root>
         <priority value="${SHR_LOG_LEVEL}"/>
-        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="VAR_LOG"/>
     </root>
 
 </log4j:configuration>
