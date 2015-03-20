@@ -18,7 +18,7 @@ import static org.freeshr.infrastructure.security.UserInfo.SHR_USER_GROUP;
 import static org.freeshr.infrastructure.security.UserProfile.FACILITY_TYPE;
 import static org.freeshr.infrastructure.security.UserProfile.PATIENT_TYPE;
 import static org.freeshr.infrastructure.security.UserProfile.PROVIDER_TYPE;
-import static org.freeshr.utils.AccessFilter.*;
+import static org.freeshr.infrastructure.security.AccessFilter.*;
 import static org.junit.Assert.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -73,127 +73,127 @@ public class AccessFilterTest {
 
     @Test
     public void shouldAllowAccessForEncounterPushForFacility() throws Exception {
-        assertTrue(checkAccessForEncounterPush(facility));
+        assertTrue(validateAccessToSaveEncounter(facility));
     }
 
     @Test(expected = Forbidden.class)
     public void shouldNotAllowAccessForEncounterPushForDatasense() throws Exception {
-        checkAccessForEncounterPush(datasenseFacility);
+        validateAccessToSaveEncounter(datasenseFacility);
     }
 
     @Test
     public void shouldAllowAccessForEncounterPushForFacilityAndProvider() throws Exception {
-        assertTrue(checkAccessForEncounterPush(facilityAndProvider));
+        assertTrue(validateAccessToSaveEncounter(facilityAndProvider));
     }
 
     @Test
     public void shouldAllowAccessForEncounterPushForProviderWithPatient() throws Exception {
-        assertTrue(checkAccessForEncounterPush(providerAndPatient));
+        assertTrue(validateAccessToSaveEncounter(providerAndPatient));
     }
 
     @Test
     public void shouldAllowAccessForEncounterPushForProvider() throws Exception {
-        assertTrue(checkAccessForEncounterPush(provider));
+        assertTrue(validateAccessToSaveEncounter(provider));
     }
 
     @Test
     public void shouldAllowRestrictedAccessForEncounterFetchToFacility() throws Exception {
-        assertTrue(isRestrictedAccessForEncounterFetchForPatient("some health id", facility));
+        assertTrue(isAccessRestrictedToEncounterFetchForPatient("some health id", facility));
     }
 
     @Test
     public void shouldAllowUnRestrictedAccessForEncounterFetchToDatasense() throws Exception {
-        assertFalse(isRestrictedAccessForEncounterFetchForPatient("some health id", datasenseFacility));
+        assertFalse(isAccessRestrictedToEncounterFetchForPatient("some health id", datasenseFacility));
     }
 
     @Test
     public void shouldAllowRestrictedAccessForEncounterFetchToFacilityWithProvider() throws Exception {
-        assertTrue(isRestrictedAccessForEncounterFetchForPatient("some health id", facilityAndProvider));
+        assertTrue(isAccessRestrictedToEncounterFetchForPatient("some health id", facilityAndProvider));
     }
 
     @Test
     public void shouldAllowUnRestrictedAccessForEncounterFetchToPatientForAssociatedHid() throws Exception {
-        assertFalse(isRestrictedAccessForEncounterFetchForPatient(HEALTH_ID, patient));
+        assertFalse(isAccessRestrictedToEncounterFetchForPatient(HEALTH_ID, patient));
     }
 
     @Test(expected = Forbidden.class)
     public void shouldNotAllowAccessForEncounterFetchToPatientForOtherHid() throws Exception {
-        isRestrictedAccessForEncounterFetchForPatient("some hid", patient);
+        isAccessRestrictedToEncounterFetchForPatient("some hid", patient);
     }
 
     @Test
     public void shouldAllowUnRestrictedAccessForEncounterFetchToProviderWithPatientForAssociatedHid() throws Exception {
-        assertFalse(isRestrictedAccessForEncounterFetchForPatient(HEALTH_ID_FOR_PROVIDER, providerAndPatient));
+        assertFalse(isAccessRestrictedToEncounterFetchForPatient(HEALTH_ID_FOR_PROVIDER, providerAndPatient));
     }
 
     @Test
     public void shouldAllowRestrictedAccessForEncounterFetchToProviderWithPatientForOtherHid() throws Exception {
-        assertTrue(isRestrictedAccessForEncounterFetchForPatient(HEALTH_ID, providerAndPatient));
+        assertTrue(isAccessRestrictedToEncounterFetchForPatient(HEALTH_ID, providerAndPatient));
     }
 
     @Test
     public void shouldAllowRestrictedAccessForEncounterFetchToProvider() throws Exception {
-        assertTrue(isRestrictedAccessForEncounterFetchForPatient(HEALTH_ID, provider));
+        assertTrue(isAccessRestrictedToEncounterFetchForPatient(HEALTH_ID, provider));
     }
 
     @Test
     public void shouldAllowRestrictedAccessForCatchmentFetchToFacilityWithAssociatedCatchment() throws Exception {
-        assertTrue(isRestrictedAccessForEncounterFetchForCatchment(FACILITY_CATCHMENT, facility));
+        assertTrue(isAccessRestrictedToEncounterFetchForCatchment(FACILITY_CATCHMENT, facility));
     }
 
     @Test(expected = Forbidden.class)
     public void shouldNotAllowAccessForCatchmentFetchToFacilityWithOtherCatchment() throws Exception {
-        assertTrue(isRestrictedAccessForEncounterFetchForCatchment(PROVIDER_CATCHMENT, facility));
+        assertTrue(isAccessRestrictedToEncounterFetchForCatchment(PROVIDER_CATCHMENT, facility));
     }
 
     @Test
     public void shouldAllowUnRestrictedAccessForCatchmentFetchToDatasenseWithAssociatedCatchment() throws Exception {
-        assertFalse(isRestrictedAccessForEncounterFetchForCatchment(FACILITY_CATCHMENT, datasenseFacility));
+        assertFalse(isAccessRestrictedToEncounterFetchForCatchment(FACILITY_CATCHMENT, datasenseFacility));
     }
 
     @Test(expected = Forbidden.class)
     public void shouldNotAllowAccessForCatchmentFetchToDatasenseForOtherCatchment() throws Exception {
-        assertFalse(isRestrictedAccessForEncounterFetchForCatchment(PROVIDER_CATCHMENT, datasenseFacility));
+        assertFalse(isAccessRestrictedToEncounterFetchForCatchment(PROVIDER_CATCHMENT, datasenseFacility));
     }
 
     @Test
     public void shouldAllowRestrictedAccessForCatchmentFetchToFacilityAndProviderWithFacilityCatchment() throws Exception {
-        assertTrue(isRestrictedAccessForEncounterFetchForCatchment(FACILITY_CATCHMENT, facilityAndProvider));
+        assertTrue(isAccessRestrictedToEncounterFetchForCatchment(FACILITY_CATCHMENT, facilityAndProvider));
     }
 
     @Test
     public void shouldAllowRestrictedAccessForCatchmentFetchToFacilityAndProviderWithProviderCatchment() throws Exception {
-        assertTrue(isRestrictedAccessForEncounterFetchForCatchment(PROVIDER_CATCHMENT, facilityAndProvider));
+        assertTrue(isAccessRestrictedToEncounterFetchForCatchment(PROVIDER_CATCHMENT, facilityAndProvider));
     }
 
     @Test(expected = Forbidden.class)
     public void shouldNotAllowAccessForCatchmentFetchToFacilityAndProviderWithOtherCatchment() throws Exception {
-        assertTrue(isRestrictedAccessForEncounterFetchForCatchment("1029", facilityAndProvider));
+        assertTrue(isAccessRestrictedToEncounterFetchForCatchment("1029", facilityAndProvider));
     }
 
     @Test(expected = Forbidden.class)
     public void shouldNotAllowAccessForCatchmentFetchToPatient() throws Exception {
-        assertTrue(isRestrictedAccessForEncounterFetchForCatchment("1029", patient));
+        assertTrue(isAccessRestrictedToEncounterFetchForCatchment("1029", patient));
     }
 
     @Test
     public void shouldAllowRestrictedAccessForCatchmentFetchToProviderAndPatientWithAssociatedCatchment() throws Exception {
-        assertTrue(isRestrictedAccessForEncounterFetchForCatchment(PROVIDER_CATCHMENT, providerAndPatient));
+        assertTrue(isAccessRestrictedToEncounterFetchForCatchment(PROVIDER_CATCHMENT, providerAndPatient));
     }
 
     @Test(expected = Forbidden.class)
     public void shouldNotAllowAccessForCatchmentFetchToProviderAndPatientWithOtherCatchment() throws Exception {
-        assertTrue(isRestrictedAccessForEncounterFetchForCatchment("1029", providerAndPatient));
+        assertTrue(isAccessRestrictedToEncounterFetchForCatchment("1029", providerAndPatient));
     }
 
     @Test
     public void shouldAllowRestrictedAccessForCatchmentFetchToProviderWithAssociatedCatchment() throws Exception {
-        assertTrue(isRestrictedAccessForEncounterFetchForCatchment(PROVIDER_CATCHMENT, provider));
+        assertTrue(isAccessRestrictedToEncounterFetchForCatchment(PROVIDER_CATCHMENT, provider));
     }
 
     @Test(expected = Forbidden.class)
     public void shouldNotAllowAccessForCatchmentFetchToProviderWithOtherCatchment() throws Exception {
-        assertTrue(isRestrictedAccessForEncounterFetchForCatchment("1029", provider));
+        assertTrue(isAccessRestrictedToEncounterFetchForCatchment("1029", provider));
     }
 
     @Test

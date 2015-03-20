@@ -9,7 +9,7 @@ import javax.naming.AuthenticationException;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertTrue;
 
-public class ClientAuthenticatorTest {
+public class ClientAuthenticationTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -23,7 +23,7 @@ public class ClientAuthenticatorTest {
         UserAuthInfo userAuthInfo = new UserAuthInfo(client_id, email);
         UserInfo userInfo = getUserInfo(client_id, email, true, token);
 
-        assertTrue(new ClientAuthenticator().authenticate(userAuthInfo, token, userInfo));
+        assertTrue(new ClientAuthentication().verify(userInfo, userAuthInfo, token));
     }
 
     @Test
@@ -35,9 +35,9 @@ public class ClientAuthenticatorTest {
         UserInfo userInfo = getUserInfo(client_id, email, false, token);
 
         thrown.expect(AuthenticationException.class);
-        thrown.expectMessage("Client is not activated.");
+        thrown.expectMessage(ClientAuthentication.CLIENT_IS_NOT_ACTIVATED);
 
-        new ClientAuthenticator().authenticate(userAuthInfo, token, userInfo);
+        new ClientAuthentication().verify(userInfo, userAuthInfo, token);
     }
     
     @Test
@@ -48,9 +48,9 @@ public class ClientAuthenticatorTest {
         UserInfo userInfo = getUserInfo("432", email, true, token);
 
         thrown.expect(AuthenticationException.class);
-        thrown.expectMessage("Client ID is invalid.");
+        thrown.expectMessage(ClientAuthentication.CLIENT_ID_IS_INVALID);
 
-        new ClientAuthenticator().authenticate(userAuthInfo, token, userInfo);
+        new ClientAuthentication().verify(userInfo, userAuthInfo, token);
     }
 
     @Test
@@ -63,9 +63,9 @@ public class ClientAuthenticatorTest {
         UserInfo userInfo = getUserInfo(clientId, email, true, "abc");
 
         thrown.expect(AuthenticationException.class);
-        thrown.expectMessage("Token is invalid or expired.");
+        thrown.expectMessage(ClientAuthentication.TOKEN_IS_INVALID_OR_EXPIRED);
 
-        new ClientAuthenticator().authenticate(userAuthInfo, token, userInfo);
+        new ClientAuthentication().verify(userInfo, userAuthInfo, token);
     }
 
     @Test
@@ -78,13 +78,14 @@ public class ClientAuthenticatorTest {
         UserInfo userInfo = getUserInfo(clientId, "abc@gmail.com", true, token);
 
         thrown.expect(AuthenticationException.class);
-        thrown.expectMessage("Email is invalid.");
+        thrown.expectMessage(ClientAuthentication.EMAIL_IS_INVALID);
 
-        new ClientAuthenticator().authenticate(userAuthInfo, token, userInfo);
+        new ClientAuthentication().verify(userInfo, userAuthInfo, token);
     }
 
 
     private UserInfo getUserInfo(String id, String email, boolean activated, String xyz) {
-        return new UserInfo(id, "foo", email, 1, activated, xyz, asList(""), asList(new UserProfile("facility", "10000069", asList("3026"))));
+        return new UserInfo(id, "foo", email, 1, activated, xyz, asList(""),
+                asList(new UserProfile("facility", "10000069", asList("3026"))));
     }
 }

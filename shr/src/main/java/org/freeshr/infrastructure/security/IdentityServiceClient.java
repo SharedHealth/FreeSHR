@@ -21,14 +21,14 @@ import static org.freeshr.utils.HttpUtil.getSHRIdentityHeaders;
 public class IdentityServiceClient {
     private AsyncRestTemplate shrRestTemplate;
     private SHRProperties shrProperties;
-    private ClientAuthenticator clientAuthenticator;
+    private ClientAuthentication clientAuthentication;
 
     @Autowired
     public IdentityServiceClient(@Qualifier("SHRRestTemplate") AsyncRestTemplate shrRestTemplate,
-                                 SHRProperties shrProperties, ClientAuthenticator clientAuthenticator) {
+                                 SHRProperties shrProperties, ClientAuthentication clientAuthentication) {
         this.shrRestTemplate = shrRestTemplate;
         this.shrProperties = shrProperties;
-        this.clientAuthenticator = clientAuthenticator;
+        this.clientAuthentication = clientAuthentication;
     }
 
     public TokenAuthentication authenticate(UserAuthInfo userAuthInfo, String token) throws AuthenticationException, ExecutionException,
@@ -44,7 +44,6 @@ public class IdentityServiceClient {
                     .toString());
         UserInfo userInfo = responseEntity.getBody();
         userInfo.loadUserProperties();
-        boolean isAuthenticated = clientAuthenticator.authenticate(userAuthInfo, token, userInfo);
-        return new TokenAuthentication(userInfo, isAuthenticated);
+        return new TokenAuthentication(userInfo, clientAuthentication.verify(userInfo, userAuthInfo, token));
     }
 }

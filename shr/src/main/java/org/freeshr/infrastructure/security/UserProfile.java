@@ -26,15 +26,15 @@ public class UserProfile {
         this.catchments = catchments;
     }
 
-    public boolean isFaciltiyType() {
+    public boolean isFacility() {
         return name.equalsIgnoreCase(FACILITY_TYPE);
     }
 
-    public boolean isProviderType() {
+    public boolean isProvider() {
         return name.equalsIgnoreCase(PROVIDER_TYPE);
     }
 
-    public boolean isPatientType() {
+    public boolean isPatient() {
         return name.equalsIgnoreCase(PATIENT_TYPE);
     }
 

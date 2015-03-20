@@ -2,7 +2,6 @@ package org.freeshr.infrastructure.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.freeshr.config.SHRProperties;
 import org.freeshr.utils.CollectionUtils;
 
 import java.util.ArrayList;
@@ -98,8 +97,8 @@ public class UserInfo {
         return patientHid;
     }
 
-    public boolean isDatasenseFacility() {
-        return isDatasenseFacility;
+    public boolean isNotDatasenseFacility() {
+        return !isDatasenseFacility;
     }
 
     public List<String> getCatchments() {
@@ -131,23 +130,23 @@ public class UserInfo {
     }
 
     private void addGroupsBasedOnProfiles(UserProfile userProfile) {
-        if (userProfile.isFaciltiyType() && groups.contains(FACILITY_ADMIN_GROUP)) {
+        if (userProfile.isFacility() && groups.contains(FACILITY_ADMIN_GROUP)) {
             groups.add(SHR_FACILITY_GROUP);
-        } else if (userProfile.isProviderType()) {
+        } else if (userProfile.isProvider()) {
             groups.add(SHR_PROVIDER_GROUP);
-        } else if (userProfile.isPatientType()) {
+        } else if (userProfile.isPatient()) {
             groups.add(SHR_PATIENT_GROUP);
         }
     }
 
     private void loadPatientProperties(UserProfile userProfile) {
-        if (userProfile.isPatientType()) {
+        if (userProfile.isPatient()) {
             patientHid = userProfile.getId();
         }
     }
 
     private void loadProviderProperties(UserProfile userProfile) {
-        if (userProfile.isProviderType()) {
+        if (userProfile.isProvider()) {
             providerId = userProfile.getId();
             if (CollectionUtils.isNotEmpty(userProfile.getCatchments())) {
                 catchments.addAll(userProfile.getCatchments());
@@ -156,7 +155,7 @@ public class UserInfo {
     }
 
     private void loadFacilityProperties(UserProfile userProfile) {
-        if (userProfile.isFaciltiyType()) {
+        if (userProfile.isFacility()) {
             facilityId = userProfile.getId();
             if (CollectionUtils.isNotEmpty(userProfile.getCatchments())) {
                 catchments.addAll(userProfile.getCatchments());

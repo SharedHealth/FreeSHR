@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class TokenAuthentication implements Authentication {
+    public static final String ROLE_PREFIX = "ROLE_";
     private UserInfo userInfo;
     private List<? extends GrantedAuthority> groups;
     private boolean isAuthenticated;
@@ -20,16 +21,16 @@ public class TokenAuthentication implements Authentication {
     }
 
     private List<GrantedAuthority> getUserGroups(UserInfo userInfo) {
-        List<String> userGroups = userInfo.getGroups();
-        for (int index = 0; index < userGroups.size(); index++) {
-            String group = userGroups.get(index);
-            group = "ROLE_" + group;
-            userGroups.set(index, group);
-        }
+        List<String> userRoles = prefixGroupNames(userInfo.getGroups());
+        String commaSeparatedRoles = StringUtils.join(userRoles, ",");
+        return AuthorityUtils.commaSeparatedStringToAuthorityList(commaSeparatedRoles);
+    }
 
-        String commaSeparateRoles = StringUtils.join(userGroups, ",");
-        return AuthorityUtils.commaSeparatedStringToAuthorityList
-                (commaSeparateRoles);
+    private List<String> prefixGroupNames(List<String> userGroups) {
+        for (int index = 0; index < userGroups.size(); index++) {
+            userGroups.set(index, String.format("%s%s", ROLE_PREFIX, userGroups.get(index)));
+        }
+        return userGroups;
     }
 
     @Override
