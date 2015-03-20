@@ -2,7 +2,7 @@ package org.freeshr.utils;
 
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.infrastructure.security.UserInfo;
-import org.freeshr.interfaces.encounter.ws.Forbidden;
+import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
 
 import java.util.ArrayList;
 import java.util.List;

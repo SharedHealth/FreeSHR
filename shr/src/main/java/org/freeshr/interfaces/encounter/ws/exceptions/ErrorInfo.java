@@ -1,4 +1,4 @@
-package org.freeshr.interfaces.encounter.ws;
+package org.freeshr.interfaces.encounter.ws.exceptions;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;

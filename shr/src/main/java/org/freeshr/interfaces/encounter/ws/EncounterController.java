@@ -5,6 +5,7 @@ import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.domain.service.EncounterService;
 import org.freeshr.infrastructure.security.UserInfo;
+import org.freeshr.interfaces.encounter.ws.exceptions.*;
 import org.freeshr.utils.CollectionUtils;
 import org.freeshr.utils.DateUtil;
 import org.slf4j.Logger;
@@ -138,11 +139,15 @@ public class EncounterController {
             @RequestParam(value = "updatedSince", required = false) String updatedSince,
             @RequestParam(value = "lastMarker", required = false) final String lastMarker)
             throws ExecutionException, InterruptedException, ParseException, UnsupportedEncodingException {
+        if (catchment.length() < 4) {
+            logger.error("Catchment should have division and district.");
+            throw new BadRequest("Catchment should have division and district");
+        }
         final UserInfo userInfo = (UserInfo) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        logger.debug(format("Find all encounters for facility %s in catchment %s", userInfo.getFacilityId(), catchment));
-        final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<>();
+        logger.info(format("Find all encounters for facility %s in catchment %s", userInfo.getFacilityId(), catchment));
         final Date requestedDate = getRequestedDateForCatchment(updatedSince);
         final boolean isRestrictedAccess = isRestrictedAccessForEncounterFetchForCatchment(catchment, userInfo);
+        final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<>();
         final Observable<List<EncounterBundle>> catchmentEncounters =
                 findFacilityCatchmentEncounters(catchment, lastMarker, requestedDate);
         catchmentEncounters.subscribe(new Action1<List<EncounterBundle>>() {
@@ -350,6 +355,14 @@ public class EncounterController {
     public EncounterResponse preConditionFailed(PreconditionFailed preconditionFailed) {
         return preconditionFailed.getResult();
     }
+
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    @ExceptionHandler(BadRequest.class)
+    public ErrorInfo badRequest(BadRequest badRequest) {
+        return new ErrorInfo(HttpStatus.BAD_REQUEST, badRequest.getErrorMessage());
+    }
+
 
     @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)
     @ResponseBody

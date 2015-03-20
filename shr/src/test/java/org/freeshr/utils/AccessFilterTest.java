@@ -4,7 +4,7 @@ import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.infrastructure.security.UserProfile;
-import org.freeshr.interfaces.encounter.ws.Forbidden;
+import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

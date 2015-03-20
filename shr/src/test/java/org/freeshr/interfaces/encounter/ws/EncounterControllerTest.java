@@ -11,6 +11,8 @@ import org.freeshr.domain.service.EncounterService;
 import org.freeshr.infrastructure.security.TokenAuthentication;
 import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.infrastructure.security.UserProfile;
+import org.freeshr.interfaces.encounter.ws.exceptions.BadRequest;
+import org.freeshr.interfaces.encounter.ws.exceptions.ErrorInfo;
 import org.freeshr.utils.Confidentiality;
 import org.freeshr.utils.DateUtil;
 import org.junit.Before;
@@ -153,6 +155,15 @@ public class EncounterControllerTest {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(controller.getRequestedDateForCatchment(""));
         assertEquals(1, calendar.get(Calendar.DAY_OF_MONTH));
+    }
+
+    @Test(expected = BadRequest.class)
+    public void shouldThrowErrorIfCatchmentDoesNotHaveDivisionAndDistrict() throws Exception {
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null,
+                "/catchments/30/encounters");
+        controller.findEncountersForCatchment
+                (mockHttpServletRequest, "30", "2014-10-10", null);
+
     }
 
     private String generateFeedId(String updatedSince, String requestedMarker) {

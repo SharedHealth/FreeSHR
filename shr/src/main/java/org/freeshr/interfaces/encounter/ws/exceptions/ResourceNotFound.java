@@ -1,10 +1,10 @@
-package org.freeshr.interfaces.encounter.ws;
+package org.freeshr.interfaces.encounter.ws.exceptions;
 
-public class Unauthorized extends RuntimeException {
+public class ResourceNotFound extends RuntimeException {
 
     private String errorMessage;
 
-    public Unauthorized(String errorMessage) {
+    public ResourceNotFound(String errorMessage) {
         super();
         this.errorMessage = errorMessage;
     }

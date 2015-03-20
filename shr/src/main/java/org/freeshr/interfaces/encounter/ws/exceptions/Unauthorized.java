@@ -1,9 +1,10 @@
-package org.freeshr.interfaces.encounter.ws;
+package org.freeshr.interfaces.encounter.ws.exceptions;
 
-public class Forbidden extends RuntimeException {
+public class Unauthorized extends RuntimeException {
+
     private String errorMessage;
 
-    public Forbidden(String errorMessage) {
+    public Unauthorized(String errorMessage) {
         super();
         this.errorMessage = errorMessage;
     }

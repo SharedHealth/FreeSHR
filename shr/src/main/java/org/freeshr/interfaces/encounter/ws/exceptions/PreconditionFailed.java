@@ -1,13 +1,13 @@
-package org.freeshr.interfaces.encounter.ws;
+package org.freeshr.interfaces.encounter.ws.exceptions;
 
 
 import org.freeshr.application.fhir.EncounterResponse;
 
-public class UnProcessableEntity extends RuntimeException {
+public class PreconditionFailed extends RuntimeException {
 
     private EncounterResponse result;
 
-    public UnProcessableEntity(EncounterResponse result) {
+    public PreconditionFailed(EncounterResponse result) {
         this.result = result;
     }
 
