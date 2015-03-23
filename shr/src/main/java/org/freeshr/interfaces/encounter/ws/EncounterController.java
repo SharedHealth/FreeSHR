@@ -386,9 +386,9 @@ public class EncounterController {
     @ResponseStatus(value = HttpStatus.PRECONDITION_FAILED)
     @ResponseBody
     @ExceptionHandler(PreconditionFailed.class)
-    public EncounterResponse preConditionFailed(PreconditionFaUiled preconditionFailed) {
+    public EncounterResponse preConditionFailed(PreconditionFailed preconditionFailed) {
         return preconditionFailed.getResult();
-    }U
+    }
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @ResponseBody
