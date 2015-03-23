@@ -67,11 +67,12 @@ dependencies {
     compile(libraries.spring_boot_actuator){
         exclude group: 'ch.qos.logback', module: "logback-classic"
     }
-    compile('io.netty:netty:3.9.0.Final') {
-        force = 'true'
-    }
 
     compile project(":fhir")
+
+    testCompile(testLibraries.netty) {
+        force = 'true'
+    }
     testCompile project(":schema")
     testCompile testLibraries.mockito, testLibraries.junit, testLibraries.spring_test, testLibraries.cassandra_unit_spring,
             testLibraries.wiremock, testLibraries.hamcrest_core
