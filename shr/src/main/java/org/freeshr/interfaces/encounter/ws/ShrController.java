@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 // Base controller for SHR - get user info, log access and get Error responses for free
 public class ShrController {
-    private static final Logger logger = LoggerFactory.getLogger(EncounterController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ShrController.class);
 
     protected UserInfo getUserInfo() {
         return (UserInfo) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

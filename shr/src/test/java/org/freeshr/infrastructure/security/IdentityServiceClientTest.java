@@ -116,6 +116,6 @@ public class IdentityServiceClientTest {
 
     private UserInfo userInfo(String token) {
         return new UserInfo("123", "bar", "email@gmail.com", 1, true,
-                token.toString(), asList("MCI_ADMIN", "SHR_USER"), asList(new UserProfile("facility", "10000069", asList("3026"))));
+                token, asList("MCI_ADMIN", "SHR_USER"), asList(new UserProfile("facility", "10000069", asList("3026"))));
     }
 }

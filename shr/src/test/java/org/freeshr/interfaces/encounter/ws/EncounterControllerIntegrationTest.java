@@ -100,9 +100,6 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/userDetailsWithAllRoles.json"))));
 
-        //propertiesAccessor = new SHRPropertiesAccessor(properties);
-        //propertiesAccessor.updateMCIServerUrls("http://localhost:9997");
-
     }
 
     @Test
@@ -118,9 +115,6 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
                 .andExpect(status().isOk())
                 .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
     }
-
-    /*Note: Verifying status code on async result is not supported in spring test. The actual response codes are
-    being set as expected.*/
 
     @Test
     public void shouldRejectAnEncounterWithCorrectHttpResponseCodeWhenHealthIdIsInvalid() throws Exception {

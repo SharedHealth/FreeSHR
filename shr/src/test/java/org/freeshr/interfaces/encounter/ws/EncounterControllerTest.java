@@ -99,8 +99,6 @@ public class EncounterControllerTest {
     public void shouldGetAtomFeed() throws Exception {
         int encounterFetchLimit = EncounterService.getEncounterFetchLimit();
         List<EncounterBundle> dummyEncounters = createEncounterBundles("hid01", 50, DateUtil.parseDate("2014-10-10"));
-//        UserProfile patientProfile = new UserProfile("patient", "12", null);
-//        UserInfo patientUser = new UserInfo("123", "name", "google@rajanikant.com", 1, true, "xyz", asList("MCI_ADMIN"), asList(patientProfile));
 
         TokenAuthentication tokenAuthentication = tokenAuthentication();
         SecurityContextHolder.setContext(securityContext);
@@ -209,13 +207,6 @@ public class EncounterControllerTest {
         try {
             converter.write(errorInfo, MediaType.APPLICATION_JSON, outputMessage);
             assertEquals("{\"httpStatus\":\"404\",\"message\":\"Not found\"}", outputMessage.getBodyAsString());
-
-//            EncounterResponse encounterResponse = new EncounterResponse();
-//            EncounterValidationResponse encounterValidationResponse = new EncounterValidationResponse();
-//            encounterValidationResponse.addError(new Error("encounterDate", "invalid", "invalid date" ));
-//            encounterResponse.setValidationFailure(encounterValidationResponse);
-//            converter.write(encounterResponse, MediaType.APPLICATION_JSON, outputMessage);
-//            System.out.println(outputMessage.getBodyAsString());
 
         } catch (IOException e) {
             e.printStackTrace();

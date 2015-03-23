@@ -69,15 +69,6 @@ public class EncounterRepositoryIntegrationTest {
         return java.util.UUID.randomUUID().toString();
     }
 
-    private void saveEncounterWithDate(String encounterId, String healthId, String date) {
-        //TODO why can't we call encounterRepository.save()??????
-        cqlOperations.execute("INSERT INTO encounter (encounter_id, health_id, date, content,division_id, " +
-                "district_id, upazilla_id, city_corporation_id,ward_id) VALUES ( '"
-                + encounterId + "','" + healthId + "','" + date + "',"
-                + "'some-content','10','1020','102030','10203040','1020304050');");
-
-    }
-
     @Test
     public void shouldFetchEncounterByAddressOnly() throws InterruptedException, ExecutionException, ParseException {
         Patient patient = new Patient();
