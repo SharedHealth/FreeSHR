@@ -5,29 +5,13 @@ import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.domain.service.EncounterService;
 import org.freeshr.infrastructure.security.UserInfo;
-import org.freeshr.interfaces.encounter.ws.exceptions.BadRequest;
-import org.freeshr.interfaces.encounter.ws.exceptions.ErrorInfo;
-import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
-import org.freeshr.interfaces.encounter.ws.exceptions.PreconditionFailed;
-import org.freeshr.interfaces.encounter.ws.exceptions.ResourceNotFound;
-import org.freeshr.interfaces.encounter.ws.exceptions.UnProcessableEntity;
-import org.freeshr.interfaces.encounter.ws.exceptions.Unauthorized;
+import org.freeshr.interfaces.encounter.ws.exceptions.*;
 import org.freeshr.utils.CollectionUtils;
 import org.freeshr.utils.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.util.UriComponentsBuilder;
 import rx.Observable;
@@ -52,7 +36,7 @@ import static org.freeshr.infrastructure.security.AccessFilter.*;
 import static org.freeshr.utils.HttpUtil.*;
 
 @RestController
-public class EncounterController {
+public class EncounterController extends ShrController {
     private static final Logger logger = LoggerFactory.getLogger(EncounterController.class);
 
     private EncounterService encounterService;
@@ -306,7 +290,7 @@ public class EncounterController {
                 .build().toString();
     }
 
-    String rollingFeedUrl(HttpServletRequest request, Date forDate) throws UnsupportedEncodingException {
+    private String rollingFeedUrl(HttpServletRequest request, Date forDate) throws UnsupportedEncodingException {
         Calendar requestedTime = Calendar.getInstance();
         requestedTime.setTime(forDate);
         int requestedYear = requestedTime.get(Calendar.YEAR);
@@ -325,7 +309,7 @@ public class EncounterController {
         return null;
     }
 
-    String getRequestUri(HttpServletRequest request, Date lastUpdateDate, String lastMarker)
+    private String getRequestUri(HttpServletRequest request, Date lastUpdateDate, String lastMarker)
             throws UnsupportedEncodingException {
         UriComponentsBuilder uriBuilder =
                 UriComponentsBuilder.fromUriString(request.getRequestURL().toString());
@@ -341,7 +325,6 @@ public class EncounterController {
 
     private Observable<List<EncounterBundle>> filterAfterMarker(final Observable<List<EncounterBundle>> encounters,
                                                                 final String lastMarker, final int limit) {
-
 
         return encounters.flatMap(new Func1<List<EncounterBundle>, Observable<? extends List<EncounterBundle>>>() {
             @Override
@@ -388,62 +371,4 @@ public class EncounterController {
         return -1;
     }
 
-
-    private UserInfo getUserInfo() {
-        return (UserInfo) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    }
-
-    private void logAccessDetails(UserInfo userInfo, String action) {
-        logger.info(String.format("ACCESS: USER=%s TYPE=%s ACTION=%s", userInfo.getId(), userInfo.getName(), action));
-    }
-
-    @ResponseStatus(value = HttpStatus.PRECONDITION_FAILED)
-    @ResponseBody
-    @ExceptionHandler(PreconditionFailed.class)
-    public EncounterResponse preConditionFailed(PreconditionFailed preconditionFailed) {
-        return preconditionFailed.getResult();
-    }
-
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    @ExceptionHandler(BadRequest.class)
-    public ErrorInfo badRequest(BadRequest badRequest) {
-        return new ErrorInfo(HttpStatus.BAD_REQUEST, badRequest.getMessage());
-    }
-
-
-    @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)
-    @ResponseBody
-    @ExceptionHandler(UnProcessableEntity.class)
-    public EncounterResponse unProcessableEntity(UnProcessableEntity unProcessableEntity) {
-        return unProcessableEntity.getResult();
-    }
-
-    @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    @ResponseBody
-    @ExceptionHandler(ResourceNotFound.class)
-    public ErrorInfo resourceNotFound(ResourceNotFound resourceNotFound) {
-        return new ErrorInfo(HttpStatus.NOT_FOUND, resourceNotFound.getMessage());
-    }
-
-    @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
-    @ResponseBody
-    @ExceptionHandler(Unauthorized.class)
-    public ErrorInfo unauthorized(Unauthorized unauthorized) {
-        return new ErrorInfo(HttpStatus.UNAUTHORIZED, unauthorized.getMessage());
-    }
-
-    @ResponseStatus(value = HttpStatus.FORBIDDEN)
-    @ResponseBody
-    @ExceptionHandler(Forbidden.class)
-    public ErrorInfo forbidden(Forbidden forbidden) {
-        return new ErrorInfo(HttpStatus.FORBIDDEN, forbidden.getMessage());
-    }
-
-    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
-    @ResponseBody
-    @ExceptionHandler(Exception.class)
-    public ErrorInfo catchAll(Exception exception) {
-        return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, exception.getLocalizedMessage());
-    }
 }
