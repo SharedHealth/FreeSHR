@@ -5,7 +5,13 @@ import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.domain.service.EncounterService;
 import org.freeshr.infrastructure.security.UserInfo;
-import org.freeshr.interfaces.encounter.ws.exceptions.*;
+import org.freeshr.interfaces.encounter.ws.exceptions.BadRequest;
+import org.freeshr.interfaces.encounter.ws.exceptions.ErrorInfo;
+import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
+import org.freeshr.interfaces.encounter.ws.exceptions.PreconditionFailed;
+import org.freeshr.interfaces.encounter.ws.exceptions.ResourceNotFound;
+import org.freeshr.interfaces.encounter.ws.exceptions.UnProcessableEntity;
+import org.freeshr.interfaces.encounter.ws.exceptions.Unauthorized;
 import org.freeshr.utils.CollectionUtils;
 import org.freeshr.utils.DateUtil;
 import org.slf4j.Logger;
@@ -13,7 +19,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.util.UriComponentsBuilder;
 import rx.Observable;
@@ -75,19 +89,19 @@ public class EncounterController {
                         RuntimeException errorResult = encounterResponse.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition) ?
                                 new PreconditionFailed(encounterResponse)
                                 : new UnProcessableEntity(encounterResponse);
-                        logger.error(errorResult.getMessage());
+                        logger.debug(errorResult.getMessage());
                         deferredResult.setErrorResult(errorResult);
                     }
                 }
             }, new Action1<Throwable>() {
                 @Override
                 public void call(Throwable error) {
-                    logger.error(error.getMessage());
+                    logger.debug(error.getMessage());
                     deferredResult.setErrorResult(error);
                 }
             });
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.debug(e.getMessage());
             deferredResult.setErrorResult(e);
         }
         return deferredResult;
@@ -120,7 +134,7 @@ public class EncounterController {
                         logger.debug(searchResponse.toString());
                         deferredResult.setResult(searchResponse);
                     } catch (UnsupportedEncodingException e) {
-                        logger.error(e.getMessage());
+                        logger.debug(e.getMessage());
                         deferredResult.setErrorResult(e);
                     }
 
@@ -130,12 +144,12 @@ public class EncounterController {
             }, new Action1<Throwable>() {
                 @Override
                 public void call(Throwable throwable) {
-                    logger.error(throwable.getMessage());
+                    logger.debug(throwable.getMessage());
                     deferredResult.setErrorResult(throwable);
                 }
             });
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.debug(e.getMessage());
             deferredResult.setErrorResult(e);
         }
         return deferredResult;
@@ -172,19 +186,19 @@ public class EncounterController {
                         logger.debug(searchResponse.toString());
                         deferredResult.setResult(searchResponse);
                     } catch (Throwable t) {
-                        logger.error(t.getMessage());
+                        logger.debug(t.getMessage());
                         deferredResult.setErrorResult(t);
                     }
                 }
             }, new Action1<Throwable>() {
                 @Override
                 public void call(Throwable throwable) {
-                    logger.error(throwable.getMessage());
+                    logger.debug(throwable.getMessage());
                     deferredResult.setErrorResult(throwable);
                 }
             });
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.debug(e.getMessage());
             deferredResult.setErrorResult(e);
         }
         return deferredResult;
@@ -211,14 +225,14 @@ public class EncounterController {
                                              if (CollectionUtils.isEmpty(filterEncounters(isRestrictedAccess, asList(encounterBundle)))) {
                                                  Forbidden errorResult = new Forbidden(format("Access for encounter %s for is denied",
                                                          encounterId));
-                                                 logger.error(errorResult.getMessage());
+                                                 logger.debug(errorResult.getMessage());
                                                  deferredResult.setErrorResult(errorResult);
                                              } else {
                                                  deferredResult.setResult(encounterBundle);
                                              }
                                          } else {
                                              String errorMessage = format("Encounter %s not found", encounterId);
-                                             logger.error(errorMessage);
+                                             logger.debug(errorMessage);
                                              deferredResult.setErrorResult(new ResourceNotFound(errorMessage));
                                          }
                                      }
@@ -226,12 +240,12 @@ public class EncounterController {
                     new Action1<Throwable>() {
                         @Override
                         public void call(Throwable throwable) {
-                            logger.error(throwable.getMessage());
+                            logger.debug(throwable.getMessage());
                             deferredResult.setErrorResult(throwable);
                         }
                     });
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.debug(e.getMessage());
             deferredResult.setErrorResult(e);
         }
         return deferredResult;

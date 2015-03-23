@@ -125,7 +125,7 @@ public class UserInfo {
                 loadPatientProperties(userProfile);
             }
         }
-        if(groups.contains(DATASENSE_FACILITY_GROUP)) {
+        if (groups.contains(DATASENSE_FACILITY_GROUP)) {
             isDatasenseFacility = true;
         }
         return this;
