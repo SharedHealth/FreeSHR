@@ -8,7 +8,7 @@ deploy:
   skip_cleanup: true
   api_key:
     secure: D9LX+bDj7QyFRSzfUGpYf55cGEHn6zIWVi6N0hjDZQeCZGreE8XY6uewVy4lI+RdE1VOkBMdj/J/mJInF6yDBQm+uwn9BMsk/O2YoCalIb9rcTptkrw+OMZiuI82FXqp8fbMjdazKitB4TZzvBsnd58KmVxhBen9ldNcszRNa1Y=
-  file: "shr/build/libs/shr.war"
+  file: "shr/build/distributions/shr-0.1-1.noarch.rpm"
   on:
     tags: true
 
