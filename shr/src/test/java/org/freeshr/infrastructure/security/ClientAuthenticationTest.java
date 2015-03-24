@@ -1,8 +1,6 @@
 package org.freeshr.infrastructure.security;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import javax.naming.AuthenticationException;
 
@@ -11,74 +9,59 @@ import static org.junit.Assert.assertTrue;
 
 public class ClientAuthenticationTest {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     @Test
     public void shouldAuthenticateUser() throws Exception {
         String client_id = "123";
         String email = "email@gmail.com";
         String token = "xyz";
 
-        UserAuthInfo userAuthInfo = new UserAuthInfo(client_id, email);
+        UserAuthInfo userAuthInfo = new UserAuthInfo(client_id, email, token);
         UserInfo userInfo = getUserInfo(client_id, email, true, token);
 
         assertTrue(new ClientAuthentication().verify(userInfo, userAuthInfo, token));
     }
 
-    @Test
+    @Test(expected = AuthenticationException.class)
     public void shouldNotAuthenticateIfClientIsNotActivated() throws Exception {
         String client_id = "123";
         String email = "email@gmail.com";
         String token = "xyz";
-        UserAuthInfo userAuthInfo = new UserAuthInfo(client_id, email);
+        UserAuthInfo userAuthInfo = new UserAuthInfo(client_id, email, token);
         UserInfo userInfo = getUserInfo(client_id, email, false, token);
-
-        thrown.expect(AuthenticationException.class);
-        thrown.expectMessage(ClientAuthentication.CLIENT_IS_NOT_ACTIVATED);
 
         new ClientAuthentication().verify(userInfo, userAuthInfo, token);
     }
-    
-    @Test
+
+    @Test(expected = AuthenticationException.class)
     public void shouldNotAuthenticateIfClientIdIsInvalid() throws Exception {
         String email = "email@gmail.com";
         String token = "xyz";
-        UserAuthInfo userAuthInfo = new UserAuthInfo("123", email);
+        UserAuthInfo userAuthInfo = new UserAuthInfo("123", email, token);
         UserInfo userInfo = getUserInfo("432", email, true, token);
-
-        thrown.expect(AuthenticationException.class);
-        thrown.expectMessage(ClientAuthentication.CLIENT_ID_IS_INVALID);
 
         new ClientAuthentication().verify(userInfo, userAuthInfo, token);
     }
 
-    @Test
+    @Test(expected = AuthenticationException.class)
     public void shouldNotAuthenticateIfTokenIsInvalid() throws Exception {
         String email = "email@gmail.com";
         String token = "xyz";
         String clientId = "123";
 
-        UserAuthInfo userAuthInfo = new UserAuthInfo(clientId, email);
+        UserAuthInfo userAuthInfo = new UserAuthInfo(clientId, email, token);
         UserInfo userInfo = getUserInfo(clientId, email, true, "abc");
-
-        thrown.expect(AuthenticationException.class);
-        thrown.expectMessage(ClientAuthentication.TOKEN_IS_INVALID_OR_EXPIRED);
 
         new ClientAuthentication().verify(userInfo, userAuthInfo, token);
     }
 
-    @Test
+    @Test(expected = AuthenticationException.class)
     public void shouldNotAuthenticateIfEmailIsInvalid() throws Exception {
         String email = "email@gmail.com";
         String token = "xyz";
         String clientId = "123";
 
-        UserAuthInfo userAuthInfo = new UserAuthInfo(clientId, email);
+        UserAuthInfo userAuthInfo = new UserAuthInfo(clientId, email, token);
         UserInfo userInfo = getUserInfo(clientId, "abc@gmail.com", true, token);
-
-        thrown.expect(AuthenticationException.class);
-        thrown.expectMessage(ClientAuthentication.EMAIL_IS_INVALID);
 
         new ClientAuthentication().verify(userInfo, userAuthInfo, token);
     }

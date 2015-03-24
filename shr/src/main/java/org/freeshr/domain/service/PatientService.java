@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.mci.MCIClient;
 import org.freeshr.infrastructure.persistence.PatientRepository;
+import org.freeshr.infrastructure.security.UserAuthInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rx.Observable;
@@ -27,19 +28,19 @@ public class PatientService {
         this.mciClient = mciClient;
     }
 
-    public Observable<Patient> ensurePresent(final String healthId, final String clientId, final String userEmail, final String accessToken) throws ExecutionException, InterruptedException {
+    public Observable<Patient> ensurePresent(final String healthId, final UserAuthInfo userAuthInfo) throws ExecutionException, InterruptedException {
         Observable<Patient> patient = patientRepository.find(healthId);
         return patient.flatMap(new Func1<Patient, Observable<Patient>>() {
             @Override
             public Observable<Patient> call(Patient patient) {
                 if (null != patient) return Observable.just(patient);
-                return findRemote(healthId, clientId, userEmail, accessToken);
+                return findRemote(healthId, userAuthInfo);
             }
         });
     }
 
-    private Observable<Patient> findRemote(String healthId, String clientId, String userEmail, String accessToken) {
-        Observable<Patient> remotePatient = mciClient.getPatient(healthId, clientId, userEmail, accessToken);
+    private Observable<Patient> findRemote(String healthId, UserAuthInfo userAuthInfo) {
+        Observable<Patient> remotePatient = mciClient.getPatient(healthId, userAuthInfo);
         savePatient(remotePatient);
         return remotePatient.onErrorReturn(new Func1<Throwable, Patient>() {
             @Override

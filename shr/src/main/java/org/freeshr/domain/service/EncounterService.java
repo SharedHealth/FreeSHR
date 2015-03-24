@@ -8,6 +8,7 @@ import org.freeshr.domain.model.Catchment;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
+import org.freeshr.infrastructure.security.UserAuthInfo;
 import org.freeshr.utils.Confidentiality;
 import org.freeshr.utils.DateUtil;
 import org.freeshr.utils.ResourceOrFeedDeserializer;
@@ -51,13 +52,13 @@ public class EncounterService {
         this.facilityService = facilityService;
     }
 
-    public Observable<EncounterResponse> ensureCreated(final EncounterBundle encounterBundle, String clientId, String userEmail, String accessToken)
+    public Observable<EncounterResponse> ensureCreated(final EncounterBundle encounterBundle, UserAuthInfo userAuthInfo)
             throws
             ExecutionException, InterruptedException {
         EncounterValidationResponse validationResult = validate(encounterBundle);
         if (null == validationResult) {
             Observable<Patient> patientObservable = patientService.ensurePresent(encounterBundle.getHealthId(),
-                    clientId, userEmail, accessToken);
+                    userAuthInfo);
             return patientObservable.flatMap(success(encounterBundle), error(), complete());
 
         } else {

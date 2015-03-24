@@ -6,6 +6,7 @@ import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
+import org.freeshr.infrastructure.security.UserAuthInfo;
 import org.junit.Before;
 import org.freeshr.utils.Confidentiality;
 import org.junit.Rule;
@@ -69,7 +70,7 @@ public class MCIClientIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/patient.json"))));
 
-        Patient patient = mci.getPatient(heathId, clientId, userEmail, accessToken).toBlocking().first();
+        Patient patient = mci.getPatient(heathId, new UserAuthInfo(clientId, userEmail, accessToken)).toBlocking().first();
 
         assertThat(patient, is(notNullValue()));
         assertThat(patient.getHealthId(), is(heathId));

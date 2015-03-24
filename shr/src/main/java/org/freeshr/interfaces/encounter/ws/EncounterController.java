@@ -4,14 +4,23 @@ import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.domain.service.EncounterService;
+import org.freeshr.infrastructure.security.UserAuthInfo;
 import org.freeshr.infrastructure.security.UserInfo;
-import org.freeshr.interfaces.encounter.ws.exceptions.*;
-import org.freeshr.utils.CollectionUtils;
+import org.freeshr.interfaces.encounter.ws.exceptions.BadRequest;
+import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
+import org.freeshr.interfaces.encounter.ws.exceptions.PreconditionFailed;
+import org.freeshr.interfaces.encounter.ws.exceptions.ResourceNotFound;
+import org.freeshr.interfaces.encounter.ws.exceptions.UnProcessableEntity;
 import org.freeshr.utils.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.util.UriComponentsBuilder;
 import rx.Observable;
@@ -31,9 +40,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static org.freeshr.infrastructure.security.AccessFilter.*;
-import static org.freeshr.utils.HttpUtil.*;
 
 @RestController
 public class EncounterController extends ShrController {
@@ -60,7 +67,7 @@ public class EncounterController extends ShrController {
             encounterBundle.setHealthId(healthId);
             validateAccessToSaveEncounter(userInfo);
             Observable<EncounterResponse> encounterResponse = encounterService.ensureCreated(encounterBundle,
-                    request.getHeader(CLIENT_ID_KEY), request.getHeader(FROM_KEY), request.getHeader(AUTH_TOKEN_KEY));
+                    new UserAuthInfo(userInfo.getId(), userInfo.getEmail(), userInfo.getAccessToken()));
 
             encounterResponse.subscribe(new Action1<EncounterResponse>() {
                 @Override
@@ -96,7 +103,7 @@ public class EncounterController extends ShrController {
             produces = {"application/json", "application/atom+xml"})
     public DeferredResult<EncounterSearchResponse> findEncountersForPatient(
             final HttpServletRequest request,
-            @PathVariable String healthId,
+            @PathVariable final String healthId,
             @RequestParam(value = "updatedSince", required = false) String updatedSince) {
         logger.debug("Find all encounters by health id: " + healthId);
         final UserInfo userInfo = getUserInfo();
@@ -112,11 +119,17 @@ public class EncounterController extends ShrController {
                 @Override
                 public void call(List<EncounterBundle> encounterBundles) {
                     try {
-                        encounterBundles = filterEncounters(isRestrictedAccess, encounterBundles);
-                        EncounterSearchResponse searchResponse = new EncounterSearchResponse(
-                                getRequestUri(request, requestedDate, null), encounterBundles);
-                        logger.debug(searchResponse.toString());
-                        deferredResult.setResult(searchResponse);
+                        if (isRestrictedAccess && isConfidentialPatient(encounterBundles)) {
+                            Forbidden errorResult = new Forbidden(format("Access for patient %s data for is denied", healthId));
+                            logger.debug(errorResult.getMessage());
+                            deferredResult.setErrorResult(errorResult);
+                        } else {
+                            encounterBundles = filterEncounters(isRestrictedAccess, encounterBundles);
+                            EncounterSearchResponse searchResponse = new EncounterSearchResponse(
+                                    getRequestUri(request, requestedDate, null), encounterBundles);
+                            logger.debug(searchResponse.toString());
+                            deferredResult.setResult(searchResponse);
+                        }
                     } catch (UnsupportedEncodingException e) {
                         logger.debug(e.getMessage());
                         deferredResult.setErrorResult(e);
@@ -206,7 +219,7 @@ public class EncounterController extends ShrController {
                                      public void call(EncounterBundle encounterBundle) {
                                          if (encounterBundle != null) {
                                              logger.debug(encounterBundle.toString());
-                                             if (CollectionUtils.isEmpty(filterEncounters(isRestrictedAccess, asList(encounterBundle)))) {
+                                             if (isRestrictedAccess && isConfidentialEncounter(encounterBundle)) {
                                                  Forbidden errorResult = new Forbidden(format("Access for encounter %s for is denied",
                                                          encounterId));
                                                  logger.debug(errorResult.getMessage());

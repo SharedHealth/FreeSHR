@@ -56,7 +56,7 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
     }
 
     private void processTokenAuthentication(String clientId, String email, String token) throws AuthenticationException {
-        UserAuthInfo userAuthInfo = new UserAuthInfo(clientId, email);
+        UserAuthInfo userAuthInfo = new UserAuthInfo(clientId, email, token);
         Authentication authentication = authenticationManager.authenticate(new PreAuthenticatedAuthenticationToken(userAuthInfo, token));
 
         if (authentication == null || !authentication.isAuthenticated()) {

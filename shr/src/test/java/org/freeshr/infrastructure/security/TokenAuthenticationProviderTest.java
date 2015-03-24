@@ -33,7 +33,7 @@ public class TokenAuthenticationProviderTest {
     @Test
     public void shouldAuthenticateAgainstIdentityService() throws Exception {
         UUID token = UUID.randomUUID();
-        UserAuthInfo userAuthInfo = new UserAuthInfo("123", "email@gmail.com");
+        UserAuthInfo userAuthInfo = new UserAuthInfo("123", "email@gmail.com", token.toString());
 
         when(authentication.getCredentials()).thenReturn(token.toString());
         when(authentication.getPrincipal()).thenReturn(userAuthInfo);

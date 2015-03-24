@@ -202,22 +202,22 @@ public class AccessFilterTest {
         encounterBundle.setPatientConfidentiality(Confidentiality.Normal);
 
         encounterBundle.setEncounterConfidentiality(Confidentiality.Unrestricted);
-        assertFalse(toBeRestricted(encounterBundle));
+        assertFalse(isConfidentialEncounter(encounterBundle));
 
         encounterBundle.setEncounterConfidentiality(Confidentiality.Low);
-        assertFalse(toBeRestricted(encounterBundle));
+        assertFalse(isConfidentialEncounter(encounterBundle));
 
         encounterBundle.setEncounterConfidentiality(Confidentiality.Moderate);
-        assertFalse(toBeRestricted(encounterBundle));
+        assertFalse(isConfidentialEncounter(encounterBundle));
 
         encounterBundle.setEncounterConfidentiality(Confidentiality.Normal);
-        assertFalse(toBeRestricted(encounterBundle));
+        assertFalse(isConfidentialEncounter(encounterBundle));
 
         encounterBundle.setEncounterConfidentiality(Confidentiality.Restricted);
-        assertTrue(toBeRestricted(encounterBundle));
+        assertTrue(isConfidentialEncounter(encounterBundle));
 
         encounterBundle.setEncounterConfidentiality(Confidentiality.VeryRestricted);
-        assertTrue(toBeRestricted(encounterBundle));
+        assertTrue(isConfidentialEncounter(encounterBundle));
     }
 
     @Test
@@ -226,22 +226,46 @@ public class AccessFilterTest {
         encounterBundle.setEncounterConfidentiality(Confidentiality.Normal);
 
         encounterBundle.setPatientConfidentiality(Confidentiality.Unrestricted);
-        assertFalse(toBeRestricted(encounterBundle));
+        assertFalse(isConfidentialEncounter(encounterBundle));
 
         encounterBundle.setPatientConfidentiality(Confidentiality.Low);
-        assertFalse(toBeRestricted(encounterBundle));
+        assertFalse(isConfidentialEncounter(encounterBundle));
 
         encounterBundle.setPatientConfidentiality(Confidentiality.Moderate);
-        assertFalse(toBeRestricted(encounterBundle));
+        assertFalse(isConfidentialEncounter(encounterBundle));
 
         encounterBundle.setPatientConfidentiality(Confidentiality.Normal);
-        assertFalse(toBeRestricted(encounterBundle));
+        assertFalse(isConfidentialEncounter(encounterBundle));
 
         encounterBundle.setPatientConfidentiality(Confidentiality.Restricted);
-        assertTrue(toBeRestricted(encounterBundle));
+        assertTrue(isConfidentialEncounter(encounterBundle));
 
         encounterBundle.setPatientConfidentiality(Confidentiality.VeryRestricted);
-        assertTrue(toBeRestricted(encounterBundle));
+        assertTrue(isConfidentialEncounter(encounterBundle));
+    }
+
+    @Test
+    public void shouldCheckPatientConfidentiality() throws Exception {
+        EncounterBundle encounterBundle = new EncounterBundle();
+        encounterBundle.setEncounterConfidentiality(Confidentiality.Normal);
+
+        encounterBundle.setPatientConfidentiality(Confidentiality.Unrestricted);
+        assertFalse(isConfidentialPatient(asList(encounterBundle)));
+
+        encounterBundle.setPatientConfidentiality(Confidentiality.Low);
+        assertFalse(isConfidentialPatient(asList(encounterBundle)));
+
+        encounterBundle.setPatientConfidentiality(Confidentiality.Moderate);
+        assertFalse(isConfidentialPatient(asList(encounterBundle)));
+
+        encounterBundle.setPatientConfidentiality(Confidentiality.Normal);
+        assertFalse(isConfidentialPatient(asList(encounterBundle)));
+
+        encounterBundle.setPatientConfidentiality(Confidentiality.Restricted);
+        assertTrue(isConfidentialPatient(asList(encounterBundle)));
+
+        encounterBundle.setPatientConfidentiality(Confidentiality.VeryRestricted);
+        assertTrue(isConfidentialPatient(asList(encounterBundle)));
     }
 
     @Test

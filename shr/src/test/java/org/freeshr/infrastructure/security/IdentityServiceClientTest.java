@@ -49,7 +49,7 @@ public class IdentityServiceClientTest {
     @Test
     public void shouldCallIdentityServerToAuthenticate() throws Exception {
         String token = UUID.randomUUID().toString();
-        UserAuthInfo userAuthInfo = new UserAuthInfo("123", "email@gmail.com");
+        UserAuthInfo userAuthInfo = new UserAuthInfo("123", "email@gmail.com", token);
 
         when(shrProperties.getIdPClientId()).thenReturn("123");
         when(shrProperties.getIdPAuthToken()).thenReturn("xyz");
@@ -59,7 +59,7 @@ public class IdentityServiceClientTest {
         when(clientAuthentication.verify(userInfo(token), userAuthInfo, token)).thenReturn(true);
 
         TokenAuthentication tokenAuthentication = new IdentityServiceClient(asyncRestTemplate,
-                shrProperties).authenticate(userAuthInfo, token);
+                shrProperties, clientAuthentication).authenticate(userAuthInfo, token);
 
         assertEquals(tokenAuthentication.getCredentials().toString(), token);
         UserInfo expectedUserInfo = userInfo(token);
@@ -77,7 +77,7 @@ public class IdentityServiceClientTest {
     @Test(expected = AuthenticationServiceException.class)
     public void shouldFailIfIdentityServerGetFails() throws Exception {
         String token = UUID.randomUUID().toString();
-        UserAuthInfo userAuthInfo = new UserAuthInfo("123", "email@gmail.com");
+        UserAuthInfo userAuthInfo = new UserAuthInfo("123", "email@gmail.com", token);
 
         when(shrProperties.getIdPClientId()).thenReturn("123");
         when(shrProperties.getIdPAuthToken()).thenReturn("xyz");
@@ -85,13 +85,13 @@ public class IdentityServiceClientTest {
         when(asyncRestTemplate.exchange("foo/" + token, GET, new HttpEntity(httpHeaders),
                 UserInfo.class)).thenReturn(createResponse(token, UNAUTHORIZED));
         new IdentityServiceClient(asyncRestTemplate,
-                shrProperties).authenticate(userAuthInfo, token);
+                shrProperties, clientAuthentication).authenticate(userAuthInfo, token);
     }
 
     @Test
     public void shouldCallClientAuthenticator() throws Exception {
         String token = UUID.randomUUID().toString();
-        UserAuthInfo userAuthInfo = new UserAuthInfo("123", "email@gmail.com");
+        UserAuthInfo userAuthInfo = new UserAuthInfo("123", "email@gmail.com", token);
         UserInfo userInfo = userInfo(token);
 
         when(shrProperties.getIdPClientId()).thenReturn("123");
@@ -102,7 +102,7 @@ public class IdentityServiceClientTest {
         when(clientAuthentication.verify(userInfo, userAuthInfo, token)).thenReturn(true);
 
         new IdentityServiceClient(asyncRestTemplate,
-                shrProperties).authenticate(userAuthInfo, token);
+                shrProperties, clientAuthentication).authenticate(userAuthInfo, token);
 
         verify(clientAuthentication,times(1)).verify(any(UserInfo.class), eq(userAuthInfo), eq(token));
     }

@@ -2,6 +2,7 @@ package org.freeshr.infrastructure.security;
 
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
+import org.freeshr.utils.CollectionUtils;
 import org.freeshr.utils.Confidentiality;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class AccessFilter {
         if (!isRestrictedAccess) return encounterBundles;
         List<EncounterBundle> filteredEncounterBundle = new ArrayList<>();
         for (EncounterBundle encounterBundle : encounterBundles) {
-            if (toBeRestricted(encounterBundle)) {
+            if (isConfidentialEncounter(encounterBundle)) {
                 continue;
             }
             filteredEncounterBundle.add(encounterBundle);
@@ -39,10 +40,15 @@ public class AccessFilter {
         return filteredEncounterBundle;
     }
 
-    public static boolean toBeRestricted(EncounterBundle encounterBundle) {
-        return encounterBundle.getEncounterConfidentiality().equals(Confidentiality.VeryRestricted)
-                || encounterBundle.getPatientConfidentiality().equals(Confidentiality.VeryRestricted)
-                || encounterBundle.getEncounterConfidentiality().equals(Confidentiality.Restricted)
-                || encounterBundle.getPatientConfidentiality().equals(Confidentiality.Restricted);
+    public static boolean isConfidentialEncounter(EncounterBundle encounterBundle) {
+        return encounterBundle.getEncounterConfidentiality().ordinal() > Confidentiality.Normal.ordinal()
+                || encounterBundle.getPatientConfidentiality().ordinal() > Confidentiality.Normal.ordinal();
+    }
+
+    public static boolean isConfidentialPatient(List<EncounterBundle> encounterBundles) {
+        if(CollectionUtils.isNotEmpty(encounterBundles)) {
+            return encounterBundles.get(0).getPatientConfidentiality().ordinal() > Confidentiality.Normal.ordinal();
+        }
+        return false;
     }
 }
