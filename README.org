@@ -8,7 +8,7 @@ For more information, please see sharedhealth wiki
 Build Status
 
 -------------
-[[https://travis-ci.org/SharedHealth/FreeSHR.svg?branch=master][https://travis-ci.org/SharedHealth/FreeSHR]]
+[[https://travis-ci.org/SharedHealth/FreeSHR][https://travis-ci.org/SharedHealth/FreeSHR.svg?branch=master]]
 
 
 Getting started
