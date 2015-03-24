@@ -10,3 +10,5 @@ deploy:
   file: "./shr/build/libs/shr.war"
   on:
     repo: SharedHealth/FreeSHR
+
+before_deploy: git fetch --tags
