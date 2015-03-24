@@ -8,7 +8,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
@@ -50,6 +49,7 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
             chain.doFilter(request, response);
 
         } catch (AuthenticationException ex) {
+            logger.info(String.format("Access to user=%s with email=%s is denied.", clientId, email));
             SecurityContextHolder.clearContext();
             httpResponse.sendError(SC_UNAUTHORIZED, ex.getMessage());
         }
@@ -60,7 +60,7 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
         Authentication authentication = authenticationManager.authenticate(new PreAuthenticatedAuthenticationToken(userAuthInfo, token));
 
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new BadCredentialsException("Unable to authenticate user");
+            throw new BadCredentialsException("Unable to authenticate user.");
         }
         logger.debug("User successfully authenticated");
         SecurityContextHolder.getContext().setAuthentication(authentication);

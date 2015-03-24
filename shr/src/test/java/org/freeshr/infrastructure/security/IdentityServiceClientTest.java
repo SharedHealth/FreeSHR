@@ -59,7 +59,7 @@ public class IdentityServiceClientTest {
         when(clientAuthentication.verify(userInfo(token), userAuthInfo, token)).thenReturn(true);
 
         TokenAuthentication tokenAuthentication = new IdentityServiceClient(asyncRestTemplate,
-                shrProperties, clientAuthentication).authenticate(userAuthInfo, token);
+                shrProperties).authenticate(userAuthInfo, token);
 
         assertEquals(tokenAuthentication.getCredentials().toString(), token);
         UserInfo expectedUserInfo = userInfo(token);
@@ -85,7 +85,7 @@ public class IdentityServiceClientTest {
         when(asyncRestTemplate.exchange("foo/" + token, GET, new HttpEntity(httpHeaders),
                 UserInfo.class)).thenReturn(createResponse(token, UNAUTHORIZED));
         new IdentityServiceClient(asyncRestTemplate,
-                shrProperties, clientAuthentication).authenticate(userAuthInfo, token);
+                shrProperties).authenticate(userAuthInfo, token);
     }
 
     @Test
@@ -102,7 +102,7 @@ public class IdentityServiceClientTest {
         when(clientAuthentication.verify(userInfo, userAuthInfo, token)).thenReturn(true);
 
         new IdentityServiceClient(asyncRestTemplate,
-                shrProperties, clientAuthentication).authenticate(userAuthInfo, token);
+                shrProperties).authenticate(userAuthInfo, token);
 
         verify(clientAuthentication,times(1)).verify(any(UserInfo.class), eq(userAuthInfo), eq(token));
     }

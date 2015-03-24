@@ -7,21 +7,17 @@ import javax.naming.AuthenticationException;
 @Component
 public class ClientAuthentication {
 
-    public static final String CLIENT_IS_NOT_ACTIVATED = "Client is not activated.";
-    public static final String TOKEN_IS_INVALID_OR_EXPIRED = "Token is invalid or expired.";
-    public static final String CLIENT_ID_IS_INVALID = "Client Id is invalid.";
-    public static final String EMAIL_IS_INVALID = "Email is invalid.";
-
     public boolean verify(UserInfo userInfo, UserAuthInfo userAuthInfo, String token) throws AuthenticationException {
-
-        if (isInactiveUser(userInfo))
-            throw new AuthenticationException(CLIENT_IS_NOT_ACTIVATED);
+        String exceptionMessage = "User credentials is invalid";
+        if (isInactiveUser(userInfo)) {
+            throw new AuthenticationException(exceptionMessage);
+        }
         else if (isInvalidToken(userInfo, token))
-            throw new AuthenticationException(TOKEN_IS_INVALID_OR_EXPIRED);
+            throw new AuthenticationException(exceptionMessage);
         else if (isInvalidClient(userInfo, userAuthInfo))
-            throw new AuthenticationException(CLIENT_ID_IS_INVALID);
+            throw new AuthenticationException(exceptionMessage);
         else if (isInvalidEmail(userInfo, userAuthInfo))
-            throw new AuthenticationException(EMAIL_IS_INVALID);
+            throw new AuthenticationException(exceptionMessage);
 
         return true;
     }

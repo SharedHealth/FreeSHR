@@ -1,6 +1,5 @@
 package org.freeshr.interfaces.encounter.ws;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
 import org.freeshr.domain.model.Facility;
@@ -72,7 +71,6 @@ public class FacilityMessageConverter extends AbstractHttpMessageConverter<Facil
         address.setUnionOrUrbanWardId((String) linkedHashMap.get("union_code"));
         return address;
     }
-
 
     @Override
     protected void writeInternal(Facility facility, HttpOutputMessage outputMessage) throws IOException,

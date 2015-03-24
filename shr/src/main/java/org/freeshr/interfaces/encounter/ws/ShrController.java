@@ -1,8 +1,13 @@
 package org.freeshr.interfaces.encounter.ws;
 
-import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.infrastructure.security.UserInfo;
-import org.freeshr.interfaces.encounter.ws.exceptions.*;
+import org.freeshr.interfaces.encounter.ws.exceptions.BadRequest;
+import org.freeshr.interfaces.encounter.ws.exceptions.ErrorInfo;
+import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
+import org.freeshr.interfaces.encounter.ws.exceptions.PreconditionFailed;
+import org.freeshr.interfaces.encounter.ws.exceptions.ResourceNotFound;
+import org.freeshr.interfaces.encounter.ws.exceptions.UnProcessableEntity;
+import org.freeshr.interfaces.encounter.ws.exceptions.Unauthorized;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -26,8 +31,10 @@ public class ShrController {
     @ResponseStatus(value = HttpStatus.PRECONDITION_FAILED)
     @ResponseBody
     @ExceptionHandler(PreconditionFailed.class)
-    public EncounterResponse preConditionFailed(PreconditionFailed preconditionFailed) {
-        return preconditionFailed.getResult();
+    public ErrorInfo preConditionFailed(PreconditionFailed preconditionFailed) {
+        ErrorInfo errorInfo = new ErrorInfo(HttpStatus.PRECONDITION_FAILED, preconditionFailed);
+        errorInfo.setErrors(preconditionFailed.getResult().getErrors());
+        return errorInfo;
     }
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
@@ -40,8 +47,10 @@ public class ShrController {
     @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)
     @ResponseBody
     @ExceptionHandler(UnProcessableEntity.class)
-    public EncounterResponse unProcessableEntity(UnProcessableEntity unProcessableEntity) {
-        return unProcessableEntity.getResult();
+    public ErrorInfo unProcessableEntity(UnProcessableEntity unProcessableEntity) {
+        ErrorInfo errorInfo = new ErrorInfo(HttpStatus.UNPROCESSABLE_ENTITY, unProcessableEntity);
+        errorInfo.setErrors(unProcessableEntity.getResult().getErrors());
+        return errorInfo;
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND)

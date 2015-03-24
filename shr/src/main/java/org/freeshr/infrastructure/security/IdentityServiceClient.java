@@ -25,7 +25,8 @@ public class IdentityServiceClient {
 
     @Autowired
     public IdentityServiceClient(@Qualifier("SHRRestTemplate") AsyncRestTemplate shrRestTemplate,
-                                 SHRProperties shrProperties, ClientAuthentication clientAuthentication) {
+                                 SHRProperties shrProperties,
+                                 ClientAuthentication clientAuthentication) {
         this.shrRestTemplate = shrRestTemplate;
         this.shrProperties = shrProperties;
         this.clientAuthentication = clientAuthentication;
@@ -40,8 +41,7 @@ public class IdentityServiceClient {
                 new HttpEntity(httpHeaders), UserInfo.class);
         ResponseEntity<UserInfo> responseEntity = listenableFuture.get();
         if (!responseEntity.getStatusCode().is2xxSuccessful())
-            throw new AuthenticationServiceException("Identity Server responded :" + responseEntity.getStatusCode()
-                    .toString());
+            throw new AuthenticationServiceException("Unable to authenticate user.");
         UserInfo userInfo = responseEntity.getBody();
         userInfo.loadUserProperties();
         return new TokenAuthentication(userInfo, clientAuthentication.verify(userInfo, userAuthInfo, token));
