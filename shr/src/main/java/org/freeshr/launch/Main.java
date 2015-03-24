@@ -32,6 +32,9 @@ public class Main {
 
                 ServletRegistration.Dynamic shr = servletContext.addServlet("shr", DispatcherServlet.class);
                 shr.addMapping(String.format("/%s/*", env.get("SHR_VERSION")));
+                if("true".equals(env.get("IS_LATEST_SHR"))){
+                    shr.addMapping("/*");
+                }
                 shr.setInitParameter("contextClass", "org.springframework.web.context.support" +
                         ".AnnotationConfigWebApplicationContext");
                 shr.setInitParameter("contextConfigLocation", "org.freeshr.launch.WebMvcConfig");
