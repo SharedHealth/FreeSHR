@@ -3,3 +3,13 @@ jdk:
 - oraclejdk7
 script:
 - "./gradlew clean test dist"
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: D9LX+bDj7QyFRSzfUGpYf55cGEHn6zIWVi6N0hjDZQeCZGreE8XY6uewVy4lI+RdE1VOkBMdj/J/mJInF6yDBQm+uwn9BMsk/O2YoCalIb9rcTptkrw+OMZiuI82FXqp8fbMjdazKitB4TZzvBsnd58KmVxhBen9ldNcszRNa1Y=
+  file: "shr/build/libs/shr.war"
+  on:
+    tags: true
+
+before_deploy: git fetch --tags
