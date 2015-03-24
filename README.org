@@ -1,4 +1,4 @@
-FreeSHR
+FreeSHR     [![Build Status](https://travis-ci.org/SharedHealth/FreeSHR.svg?branch=master)](https://travis-ci.org/SharedHealth/FreeSHR)
 -------
   
 FreeSHR is an implementation of a shared health record, which uses FHIR as encounter contract.
