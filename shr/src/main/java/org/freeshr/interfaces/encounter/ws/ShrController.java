@@ -20,7 +20,7 @@ public class ShrController {
     }
 
     protected void logAccessDetails(UserInfo userInfo, String action) {
-        logger.info(String.format("ACCESS: USER=%s TYPE=%s ACTION=%s", userInfo.getId(), userInfo.getName(), action));
+        logger.info(String.format("ACCESS: USER=%s EMAIL=%s ACTION=%s", userInfo.getId(), userInfo.getEmail(), action));
     }
 
     @ResponseStatus(value = HttpStatus.PRECONDITION_FAILED)
