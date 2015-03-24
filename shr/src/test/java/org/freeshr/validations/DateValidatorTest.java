@@ -40,6 +40,10 @@ public class DateValidatorTest {
         endDate = new DateAndTime("2014-12-31T00:00:00+05:30");
         assertTrue(dateValidator.isValidPeriod(startDate, endDate));
 
+        startDate = null;
+        endDate = null;
+        assertTrue(dateValidator.isValidPeriod(startDate, endDate));
+
     }
 
     @Test
