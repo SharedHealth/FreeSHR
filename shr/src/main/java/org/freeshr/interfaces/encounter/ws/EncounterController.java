@@ -6,12 +6,22 @@ import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.domain.service.EncounterService;
 import org.freeshr.infrastructure.security.UserAuthInfo;
 import org.freeshr.infrastructure.security.UserInfo;
-import org.freeshr.interfaces.encounter.ws.exceptions.*;
+import org.freeshr.interfaces.encounter.ws.exceptions.BadRequest;
+import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
+import org.freeshr.interfaces.encounter.ws.exceptions.PreconditionFailed;
+import org.freeshr.interfaces.encounter.ws.exceptions.ResourceNotFound;
+import org.freeshr.interfaces.encounter.ws.exceptions.UnProcessableEntity;
 import org.freeshr.utils.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.util.UriComponentsBuilder;
 import rx.Observable;
@@ -44,6 +54,7 @@ public class EncounterController extends ShrController {
         this.encounterService = encounterService;
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER')")
     @RequestMapping(value = "/patients/{healthId}/encounters", method = RequestMethod.POST)
     public DeferredResult<EncounterResponse> create(
             @PathVariable String healthId,
@@ -56,7 +67,6 @@ public class EncounterController extends ShrController {
         try {
             logger.debug("Create encounter. " + encounterBundle.getContent());
             encounterBundle.setHealthId(healthId);
-            validateAccessToSaveEncounter(userInfo);
             Observable<EncounterResponse> encounterResponse = encounterService.ensureCreated(encounterBundle,
                     new UserAuthInfo(userInfo.getId(), userInfo.getEmail(), userInfo.getAccessToken()));
 
@@ -89,7 +99,7 @@ public class EncounterController extends ShrController {
         return deferredResult;
     }
 
-
+    @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER', 'ROLE_SHR_PATIENT', 'ROLE_Datasense Facility')")
     @RequestMapping(value = "/patients/{healthId}/encounters", method = RequestMethod.GET,
             produces = {"application/json", "application/atom+xml"})
     public DeferredResult<EncounterSearchResponse> findEncountersForPatient(
@@ -143,6 +153,7 @@ public class EncounterController extends ShrController {
         return deferredResult;
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER', 'ROLE_Datasense Facility')")
     @RequestMapping(value = "/catchments/{catchment}/encounters", method = RequestMethod.GET,
             produces = {"application/json", "application/atom+xml"})
     public DeferredResult<EncounterSearchResponse> findEncountersForCatchment(
@@ -192,6 +203,7 @@ public class EncounterController extends ShrController {
         return deferredResult;
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER', 'ROLE_SHR_PATIENT', 'ROLE_Datasense Facility')")
     @RequestMapping(value = "/patients/{healthId}/encounters/{encounterId}", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
     public DeferredResult<EncounterBundle> findEncountersForPatient(

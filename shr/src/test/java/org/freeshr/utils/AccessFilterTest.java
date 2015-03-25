@@ -68,31 +68,6 @@ public class AccessFilterTest {
     }
 
     @Test
-    public void shouldAllowAccessForEncounterPushForFacility() throws Exception {
-        assertTrue(validateAccessToSaveEncounter(facility));
-    }
-
-    @Test(expected = Forbidden.class)
-    public void shouldNotAllowAccessForEncounterPushForDatasense() throws Exception {
-        validateAccessToSaveEncounter(datasenseFacility);
-    }
-
-    @Test
-    public void shouldAllowAccessForEncounterPushForFacilityAndProvider() throws Exception {
-        assertTrue(validateAccessToSaveEncounter(facilityAndProvider));
-    }
-
-    @Test
-    public void shouldAllowAccessForEncounterPushForProviderWithPatient() throws Exception {
-        assertTrue(validateAccessToSaveEncounter(providerAndPatient));
-    }
-
-    @Test
-    public void shouldAllowAccessForEncounterPushForProvider() throws Exception {
-        assertTrue(validateAccessToSaveEncounter(provider));
-    }
-
-    @Test
     public void shouldAllowRestrictedAccessForEncounterFetchToFacility() throws Exception {
         assertTrue(isAccessRestrictedToEncounterFetchForPatient("some health id", facility));
     }

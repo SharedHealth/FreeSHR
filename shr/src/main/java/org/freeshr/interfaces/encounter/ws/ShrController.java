@@ -5,6 +5,7 @@ import org.freeshr.interfaces.encounter.ws.exceptions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -66,6 +67,13 @@ public class ShrController {
     @ExceptionHandler(Forbidden.class)
     public ErrorInfo forbidden(Forbidden forbidden) {
         return new ErrorInfo(HttpStatus.FORBIDDEN, forbidden.getMessage());
+    }
+
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    @ResponseBody
+    @ExceptionHandler(AccessDeniedException.class)
+    public ErrorInfo accessDenied(AccessDeniedException exception) {
+        return new ErrorInfo(HttpStatus.FORBIDDEN, exception.getMessage());
     }
 
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)

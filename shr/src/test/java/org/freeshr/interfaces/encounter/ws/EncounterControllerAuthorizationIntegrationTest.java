@@ -116,7 +116,7 @@ public class EncounterControllerAuthorizationIntegrationTest extends APIIntegrat
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
                 .content(asString("xmls/encounters/encounter_to_save.xml")))
-                .andExpect(request().asyncResult(isForbidden()));
+                .andExpect(status().isForbidden());
     }
 
     @Test
