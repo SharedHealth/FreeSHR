@@ -24,7 +24,7 @@ public class MedicationCodeValidator implements CodeValidator {
 
     @Autowired
     public MedicationCodeValidator(AsyncRestTemplate shrRestTemplate,
-                                 SHRProperties shrProperties) {
+                                   SHRProperties shrProperties) {
 
         this.shrRestTemplate = shrRestTemplate;
         this.shrProperties = shrProperties;
@@ -32,7 +32,7 @@ public class MedicationCodeValidator implements CodeValidator {
 
     @Override
     public Observable<Boolean> isValid(String uri, String code) {
-        if(isEmpty(code) || substringAfterLast(uri, "/").equalsIgnoreCase(code)){
+        if (isEmpty(code) || substringAfterLast(uri, "/").equalsIgnoreCase(code)) {
             String medicationReferenceUrl = formMedicationReferenceUrl(uri);
             Observable<Boolean> map = get(medicationReferenceUrl).map(new Func1<ResponseEntity<String>, Boolean>() {
                 @Override

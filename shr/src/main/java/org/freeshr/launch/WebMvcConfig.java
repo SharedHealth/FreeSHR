@@ -42,7 +42,7 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     }
 
     @Bean
-    public HttpMessageConverters messageConverters(){
+    public HttpMessageConverters messageConverters() {
         List<HttpMessageConverter<?>> converters = new ArrayList<>();
         converters.add(new EncounterBundleMessageConverter());
         converters.add(new EncounterSearchResponseFeedConverter());

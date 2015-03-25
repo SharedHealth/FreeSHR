@@ -30,9 +30,8 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -117,7 +116,8 @@ public class EncounterValidatorIntegrationTest {
                 FileUtil.asString("xmls/encounters/encounterWithInvalidFacility.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new ResourceOrFeedDeserializer());
         EncounterValidationResponse response = validator.validate(validationContext);
-        assertFailureFromResponseErrors("urn:d3cc23c3-1f12-4b89-a415-356feeba0690", FacilityValidator.INVALID_SERVICE_PROVIDER, response.getErrors());
+        assertFailureFromResponseErrors("urn:d3cc23c3-1f12-4b89-a415-356feeba0690", FacilityValidator.INVALID_SERVICE_PROVIDER, response
+                .getErrors());
         assertEquals(1, response.getErrors().size());
     }
 
@@ -127,7 +127,8 @@ public class EncounterValidatorIntegrationTest {
                 FileUtil.asString("xmls/encounters/encounterWithInvalidFacilityUrl.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new ResourceOrFeedDeserializer());
         EncounterValidationResponse response = validator.validate(validationContext);
-        assertFailureFromResponseErrors("urn:d3cc23c3-1f12-4b89-a415-356feeba0690", FacilityValidator.INVALID_SERVICE_PROVIDER_URL, response.getErrors());
+        assertFailureFromResponseErrors("urn:d3cc23c3-1f12-4b89-a415-356feeba0690", FacilityValidator.INVALID_SERVICE_PROVIDER_URL,
+                response.getErrors());
         assertEquals(1, response.getErrors().size());
     }
 
@@ -149,7 +150,8 @@ public class EncounterValidatorIntegrationTest {
         assertFalse(response.isSuccessful());
         assertEquals(1, response.getErrors().size());
         assertEquals("Unknown", response.getErrors().get(0).getField());
-        assertTrue("Should have failed for unknown ConditionStatus code", response.getErrors().get(0).getReason().contains("ConditionStatus code"));
+        assertTrue("Should have failed for unknown ConditionStatus code", response.getErrors().get(0).getReason().contains
+                ("ConditionStatus code"));
     }
 
     @Test
@@ -163,7 +165,8 @@ public class EncounterValidatorIntegrationTest {
                 FileUtil.asString("xmls/encounters/invalid_concept.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new ResourceOrFeedDeserializer());
         EncounterValidationResponse response = validator.validate(validationContext);
-        assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "Invalid code invalid-eddb01eb-61fc-4f9e-aca5", response.getErrors());
+        assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "Invalid code " +
+                "invalid-eddb01eb-61fc-4f9e-aca5", response.getErrors());
         assertEquals(1, response.getErrors().size());
     }
 
@@ -178,7 +181,8 @@ public class EncounterValidatorIntegrationTest {
                 FileUtil.asString("xmls/encounters/invalid_ref.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new ResourceOrFeedDeserializer());
         EncounterValidationResponse response = validator.validate(validationContext);
-        assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "INVALID_REFERENCE_TERM", response.getErrors());
+        assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "INVALID_REFERENCE_TERM", response
+                .getErrors());
         assertEquals(1, response.getErrors().size());
     }
 
@@ -188,9 +192,11 @@ public class EncounterValidatorIntegrationTest {
                 FileUtil.asString("xmls/encounters/diagnosis_system_missing.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new ResourceOrFeedDeserializer());
         EncounterValidationResponse response = validator.validate(validationContext);
-        assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:category/f:coding/f:system", "@value cannot be empty", response.getErrors());
+        assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:category/f:coding/f:system", "@value cannot be " +
+                "empty", response.getErrors());
         assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:category",
-                "None of the codes are in the expected value set http://hl7.org/fhir/vs/condition-category (http://hl7.org/fhir/vs/condition-category)", response.getErrors());
+                "None of the codes are in the expected value set http://hl7.org/fhir/vs/condition-category (http://hl7" +
+                        ".org/fhir/vs/condition-category)", response.getErrors());
         assertEquals(2, response.getErrors().size());
     }
 
@@ -212,7 +218,8 @@ public class EncounterValidatorIntegrationTest {
         validationContext = new EncounterValidationContext(encounterBundle, new ResourceOrFeedDeserializer());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:category",
-                "None of the codes are in the expected value set http://hl7.org/fhir/vs/condition-category (http://hl7.org/fhir/vs/condition-category)",
+                "None of the codes are in the expected value set http://hl7.org/fhir/vs/condition-category (http://hl7" +
+                        ".org/fhir/vs/condition-category)",
                 response.getErrors());
         assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:category/f:coding",
                 "Unknown Code System http://hl7.org/fhir/condition-category-invalid",
@@ -228,7 +235,8 @@ public class EncounterValidatorIntegrationTest {
         EncounterValidationResponse response = validator.validate(validationContext);
         assertFalse(response.isSuccessful());
         assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:category",
-                "None of the codes are in the expected value set http://hl7.org/fhir/vs/condition-category (http://hl7.org/fhir/vs/condition-category)",
+                "None of the codes are in the expected value set http://hl7.org/fhir/vs/condition-category (http://hl7" +
+                        ".org/fhir/vs/condition-category)",
                 response.getErrors());
         assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:category/f:coding",
                 "Unknown Code (http://hl7.org/fhir/condition-category#invalid)",
@@ -369,7 +377,8 @@ public class EncounterValidatorIntegrationTest {
         validationContext = new EncounterValidationContext(encounterBundle, new ResourceOrFeedDeserializer());
         EncounterValidationResponse response = validator.validate(validationContext);
         verify(trConceptLocator, times(1)).verifiesSystem("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration");
-        verify(trConceptLocator, times(1)).validate("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration", "implant", "implant");
+        verify(trConceptLocator, times(1)).validate("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration", "implant",
+                "implant");
         assertTrue(response.isSuccessful());
     }
 
@@ -380,7 +389,8 @@ public class EncounterValidatorIntegrationTest {
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         validationContext = new EncounterValidationContext(encounterBundle, new ResourceOrFeedDeserializer());
         EncounterValidationResponse response = validator.validate(validationContext);
-        verify(trConceptLocator, times(1)).validate("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration", "implant", "implant");
+        verify(trConceptLocator, times(1)).validate("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration", "implant",
+                "implant");
         assertTrue("Medication prescription pass through validation", response.isSuccessful());
     }
 
@@ -401,8 +411,10 @@ public class EncounterValidatorIntegrationTest {
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         validationContext = new EncounterValidationContext(encounterBundle, new ResourceOrFeedDeserializer());
         EncounterValidationResponse response = validator.validate(validationContext);
-        verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/dosageInstruction-site", "181220002", "Entire oral cavity");
-        verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/prescription-reason", "38341003", "High blood pressure");
+        verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/dosageInstruction-site",
+                "181220002", "Entire oral cavity");
+        verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/prescription-reason", "38341003",
+                "High blood pressure");
         assertTrue(response.isSuccessful());
 
     }
@@ -438,7 +450,8 @@ public class EncounterValidatorIntegrationTest {
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         validationContext = new EncounterValidationContext(encounterBundle, new ResourceOrFeedDeserializer());
         EncounterValidationResponse response = validator.validate(validationContext);
-        verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/substitution-type", "291220002", "Paracetamol");
+        verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/substitution-type", "291220002",
+                "Paracetamol");
         verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/substitution-reason", "301220005"
                 , "Paracetamol can be taken in place of this drug");
         assertTrue(response.isSuccessful());
@@ -460,7 +473,8 @@ public class EncounterValidatorIntegrationTest {
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         validationContext = new EncounterValidationContext(encounterBundle, new ResourceOrFeedDeserializer());
         EncounterValidationResponse response = validator.validate(validationContext);
-        verify(trConceptLocator, times(1)).validate("http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba",
+        verify(trConceptLocator, times(1)).validate("http://172.18.46" +
+                        ".56:9080/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba",
                 "79647ed4-a60e-4cf5-ba68-cf4d55956cba", "Hemoglobin");
         verify(trConceptLocator, times(1)).validate("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/administration-method-codes",
                 "320276009", "Salmeterol+fluticasone 25/250ug inhaler");
@@ -500,7 +514,8 @@ public class EncounterValidatorIntegrationTest {
         List<Error> errors = response.getErrors();
         assertEquals(1, errors.size());
         assertEquals("Unknown", errors.get(0).getField());
-        assertTrue("Should have failed for unknown ConditionStatus code", errors.get(0).getReason().contains("Unknown ConditionStatus code 'foo-bar'"));
+        assertTrue("Should have failed for unknown ConditionStatus code", errors.get(0).getReason().contains("Unknown ConditionStatus " +
+                "code 'foo-bar'"));
     }
 
     @Test
@@ -540,7 +555,7 @@ public class EncounterValidatorIntegrationTest {
         EncounterValidationResponse response = validator.validate(validationContext);
         assertFailureFromResponseErrors("/f:entry[2]/f:content/f:Observation/f:Observation/f:name/f:coding",
                 "Invalid code a6e20fe1-4044-4ce7-8440-577f7f814765-invalid", response.getErrors());
-        verify(trConceptLocator, times(5)).validate(anyString(),eq("a6e20fe1-4044-4ce7-8440-577f7f814765-invalid"), anyString());
+        verify(trConceptLocator, times(5)).validate(anyString(), eq("a6e20fe1-4044-4ce7-8440-577f7f814765-invalid"), anyString());
         assertEquals(5, response.getErrors().size());
     }
 

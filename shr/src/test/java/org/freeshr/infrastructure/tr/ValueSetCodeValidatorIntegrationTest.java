@@ -3,7 +3,6 @@ package org.freeshr.infrastructure.tr;
 
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
-import org.freeshr.config.SHRProperties;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +37,8 @@ public class ValueSetCodeValidatorIntegrationTest {
 
     @Test
     public void shouldRejectInvalidValueSetCode() {
-        Observable<Boolean> observable = validator.isValid("http://random.org" + ValueSetCodeValidator.VALUE_SET_PATTERN + "encounter-type", "REG");
+        Observable<Boolean> observable = validator.isValid("http://random.org" + ValueSetCodeValidator.VALUE_SET_PATTERN +
+                "encounter-type", "REG");
         assertFalse("Should have failed for invalid valueset reference URL", observable.toBlocking().first());
     }
 

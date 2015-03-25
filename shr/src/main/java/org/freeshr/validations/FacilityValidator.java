@@ -12,11 +12,10 @@ import rx.Observable;
 import rx.functions.Func0;
 import rx.functions.Func1;
 
-import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity;
-
-
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity;
 
 @Component
 public class FacilityValidator implements Validator<AtomFeed> {
@@ -45,14 +44,16 @@ public class FacilityValidator implements Validator<AtomFeed> {
         }
         String facilityUrl = serviceProvider.getReferenceSimple();
         if (facilityUrl.isEmpty() || !isValidFacilityUrl(facilityUrl)) {
-            validationMessages.add(buildValidationMessage(ResourceValidator.INVALID, encounterEntry.getId() , INVALID_SERVICE_PROVIDER_URL, IssueSeverity.error));
+            validationMessages.add(buildValidationMessage(ResourceValidator.INVALID, encounterEntry.getId(),
+                    INVALID_SERVICE_PROVIDER_URL, IssueSeverity.error));
             logger.info("Encounter failed for invalid facility URL");
             return validationMessages;
         }
 
         Facility facility = checkForFacility(facilityUrl).toBlocking().first();
         if (facility == null) {
-            validationMessages.add(buildValidationMessage(ResourceValidator.INVALID, encounterEntry.getId(), INVALID_SERVICE_PROVIDER, IssueSeverity.error));
+            validationMessages.add(buildValidationMessage(ResourceValidator.INVALID, encounterEntry.getId(), INVALID_SERVICE_PROVIDER,
+                    IssueSeverity.error));
             return validationMessages;
         }
 
@@ -61,7 +62,7 @@ public class FacilityValidator implements Validator<AtomFeed> {
     }
 
     private ResourceReference getServiceProviderRef(AtomEntry encounterEntry) {
-       return (encounterEntry !=null) ? ((Encounter) encounterEntry.getResource()).getServiceProvider() : null;
+        return (encounterEntry != null) ? ((Encounter) encounterEntry.getResource()).getServiceProvider() : null;
     }
 
     private AtomEntry<? extends Resource> identifyEncounterEntry(AtomFeed feed) {
@@ -75,29 +76,29 @@ public class FacilityValidator implements Validator<AtomFeed> {
     }
 
     private ValidationMessage buildValidationMessage(String type, String path, String message, IssueSeverity error) {
-        return new ValidationMessage(ValidationMessage.Source.ResourceValidator,type, path,message, error);
+        return new ValidationMessage(ValidationMessage.Source.ResourceValidator, type, path, message, error);
     }
 
     private Observable<Facility> checkForFacility(String facilityUrl) {
         Observable<Facility> facilityObservable = facilityService.ensurePresent(extractFacilityId(facilityUrl));
         return facilityObservable.flatMap(new Func1<Facility, Observable<Facility>>() {
-            @Override
-            public Observable<Facility> call(Facility facility) {
-                return Observable.just(facility);
-            }
-        },
-        new Func1<Throwable, Observable<Facility>>() {
-            @Override
-            public Observable<Facility> call(Throwable throwable) {
-                return Observable.just(null);
-            }
-        },
-        new Func0<Observable<Facility>>() {
-            @Override
-            public Observable<Facility> call() {
-                return null;
-            }
-        });
+                                              @Override
+                                              public Observable<Facility> call(Facility facility) {
+                                                  return Observable.just(facility);
+                                              }
+                                          },
+                new Func1<Throwable, Observable<Facility>>() {
+                    @Override
+                    public Observable<Facility> call(Throwable throwable) {
+                        return Observable.just(null);
+                    }
+                },
+                new Func0<Observable<Facility>>() {
+                    @Override
+                    public Observable<Facility> call() {
+                        return null;
+                    }
+                });
     }
 
     private String extractFacilityId(String referenceSimple) {

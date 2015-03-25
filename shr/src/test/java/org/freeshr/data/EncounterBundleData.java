@@ -2,7 +2,6 @@ package org.freeshr.data;
 
 
 import org.freeshr.application.fhir.EncounterBundle;
-import org.freeshr.utils.Confidentiality;
 
 import static org.freeshr.utils.FileUtil.asString;
 

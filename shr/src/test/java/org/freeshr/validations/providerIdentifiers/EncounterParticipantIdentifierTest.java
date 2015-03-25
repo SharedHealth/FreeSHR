@@ -11,7 +11,8 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class EncounterParticipantIdentifierTest {
 
@@ -24,14 +25,16 @@ public class EncounterParticipantIdentifierTest {
 
     @Test
     public void shouldValidateResourceOfTypeEncounter() {
-        ValidationSubject<AtomEntry<? extends Resource>> validationSubject = AtomFeedHelper.getAtomFeed("xmls/encounters/providers_identifiers/encounter_with_valid_participant.xml",
+        ValidationSubject<AtomEntry<? extends Resource>> validationSubject = AtomFeedHelper.getAtomFeed
+                ("xmls/encounters/providers_identifiers/encounter_with_valid_participant.xml",
                 ResourceType.Encounter);
         assertTrue(encounterParticipantIdentifier.validates(validationSubject.extract().getResource()));
     }
 
     @Test
     public void shouldExtractProperEncounterParticipantReferences() {
-        ValidationSubject<AtomEntry<? extends Resource>> validationSubject = AtomFeedHelper.getAtomFeed("xmls/encounters/providers_identifiers/encounter_with_valid_participant.xml",
+        ValidationSubject<AtomEntry<? extends Resource>> validationSubject = AtomFeedHelper.getAtomFeed
+                ("xmls/encounters/providers_identifiers/encounter_with_valid_participant.xml",
                 ResourceType.Encounter);
         List<String> references = encounterParticipantIdentifier.extractUrls(validationSubject.extract().getResource());
         assertTrue(!CollectionUtils.isEmpty(references));

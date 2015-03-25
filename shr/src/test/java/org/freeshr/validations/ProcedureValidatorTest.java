@@ -24,7 +24,8 @@ public class ProcedureValidatorTest {
     @Test
     public void shouldValidateProcedure() {
 
-        ValidationSubject<AtomEntry<? extends Resource>> feed = AtomFeedHelper.getAtomFeed("xmls/encounters/procedure/encounter_Procedure.xml", ResourceType.Procedure);
+        ValidationSubject<AtomEntry<? extends Resource>> feed = AtomFeedHelper.getAtomFeed("xmls/encounters/procedure/encounter_Procedure" +
+                ".xml", ResourceType.Procedure);
         List<ValidationMessage> validationMessages = procedureValidator.validate(feed);
         assertTrue(validationMessages.isEmpty());
 
@@ -33,7 +34,8 @@ public class ProcedureValidatorTest {
     @Test
     public void shouldValidateDateInProcedure() {
 
-        ValidationSubject<AtomEntry<? extends Resource>> feed = AtomFeedHelper.getAtomFeed("xmls/encounters/procedure/encounter_invalid_period_Procedure.xml", ResourceType.Procedure);
+        ValidationSubject<AtomEntry<? extends Resource>> feed = AtomFeedHelper.getAtomFeed
+                ("xmls/encounters/procedure/encounter_invalid_period_Procedure.xml", ResourceType.Procedure);
         List<ValidationMessage> validationMessages = procedureValidator.validate(feed);
         assertFalse(validationMessages.isEmpty());
         assertEquals(ValidationMessages.INVALID_PERIOD, validationMessages.get(0).getMessage());
@@ -44,7 +46,8 @@ public class ProcedureValidatorTest {
     @Test
     public void shouldValidateDiagnosticReportResourceReference() {
 
-        ValidationSubject<AtomEntry<? extends Resource>> feed = AtomFeedHelper.getAtomFeed("xmls/encounters/procedure/encounter_invalid_report_reference_Procedure.xml", ResourceType.Procedure);
+        ValidationSubject<AtomEntry<? extends Resource>> feed = AtomFeedHelper.getAtomFeed
+                ("xmls/encounters/procedure/encounter_invalid_report_reference_Procedure.xml", ResourceType.Procedure);
         List<ValidationMessage> validationMessages = procedureValidator.validate(feed);
         assertFalse(validationMessages.isEmpty());
         assertEquals(ValidationMessages.INVALID_DIAGNOSTIC_REPORT_REFERENCE, validationMessages.get(0).getMessage());

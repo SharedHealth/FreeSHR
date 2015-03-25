@@ -5,7 +5,8 @@ import org.freeshr.validations.ValidationSubject;
 import org.hl7.fhir.instance.model.AtomEntry;
 import org.hl7.fhir.instance.model.Resource;
 import org.hl7.fhir.instance.model.ResourceType;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.List;
 
@@ -22,19 +23,22 @@ public class ProcedurePerformerIdentifierTest {
 
     @Test
     public void shouldValidateResourceOfTypeProcedure() {
-        assertTrue(procedurePerformerIdentifier.validates(getResource("xmls/encounters/providers_identifiers/procedure.xml", ResourceType.Procedure)));
+        assertTrue(procedurePerformerIdentifier.validates(getResource("xmls/encounters/providers_identifiers/procedure.xml", ResourceType
+                .Procedure)));
     }
 
     @Test
     public void shouldExtractProperProcedurePerformerReferences() {
-        List<String> references = procedurePerformerIdentifier.extractUrls(getResource("xmls/encounters/providers_identifiers/procedure.xml", ResourceType.Procedure));
+        List<String> references = procedurePerformerIdentifier.extractUrls(getResource("xmls/encounters/providers_identifiers/procedure" +
+                ".xml", ResourceType.Procedure));
         assertEquals(1, references.size());
         assertEquals("http://127.0.0.1:9997/providers/18.json", references.get(0));
     }
 
     @Test
     public void shouldNotValidateResourceOfOtherType() {
-        assertFalse(procedurePerformerIdentifier.validates(getResource("xmls/encounters/providers_identifiers/encounter_with_valid_participant.xml", ResourceType.Encounter)));
+        assertFalse(procedurePerformerIdentifier.validates(getResource
+                ("xmls/encounters/providers_identifiers/encounter_with_valid_participant.xml", ResourceType.Encounter)));
     }
 
     private Resource getResource(String file, ResourceType resType) {

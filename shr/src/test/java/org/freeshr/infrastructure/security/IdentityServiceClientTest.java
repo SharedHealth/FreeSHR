@@ -20,9 +20,7 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
@@ -104,7 +102,7 @@ public class IdentityServiceClientTest {
         new IdentityServiceClient(asyncRestTemplate,
                 shrProperties, clientAuthentication).authenticate(userAuthInfo, token);
 
-        verify(clientAuthentication,times(1)).verify(any(UserInfo.class), eq(userAuthInfo), eq(token));
+        verify(clientAuthentication, times(1)).verify(any(UserInfo.class), eq(userAuthInfo), eq(token));
     }
 
     private ListenableFuture<ResponseEntity<UserInfo>> createResponse(String token, HttpStatus statusCode) {

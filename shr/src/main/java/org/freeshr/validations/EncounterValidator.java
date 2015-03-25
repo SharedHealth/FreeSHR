@@ -1,10 +1,8 @@
 package org.freeshr.validations;
 
 
-import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.application.fhir.FhirMessageFilter;
-import org.freeshr.utils.ResourceOrFeedDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -11,8 +11,7 @@ public class ClientAuthentication {
         String exceptionMessage = "User credentials is invalid";
         if (isInactiveUser(userInfo)) {
             throw new AuthenticationException(exceptionMessage);
-        }
-        else if (isInvalidToken(userInfo, token))
+        } else if (isInvalidToken(userInfo, token))
             throw new AuthenticationException(exceptionMessage);
         else if (isInvalidClient(userInfo, userAuthInfo))
             throw new AuthenticationException(exceptionMessage);
@@ -22,9 +21,11 @@ public class ClientAuthentication {
         return true;
     }
 
-    private boolean isInvalidEmail(UserInfo userInfo, UserAuthInfo userAuthInfo) {return !userAuthInfo.getEmail().equals(userInfo.getEmail());}
+    private boolean isInvalidEmail(UserInfo userInfo, UserAuthInfo userAuthInfo) {return !userAuthInfo.getEmail().equals(userInfo
+            .getEmail());}
 
-    private boolean isInvalidClient(UserInfo userInfo, UserAuthInfo userAuthInfo) {return !userAuthInfo.getClientId().equals(userInfo.getId());}
+    private boolean isInvalidClient(UserInfo userInfo, UserAuthInfo userAuthInfo) {return !userAuthInfo.getClientId().equals(userInfo
+            .getId());}
 
     private boolean isInvalidToken(UserInfo userInfo, String token) {return !token.equals(userInfo.getAccessToken());}
 

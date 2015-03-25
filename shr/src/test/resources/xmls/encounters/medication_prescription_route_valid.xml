@@ -101,7 +101,8 @@
                     <reference value="http://127.0.0.1:9997/providers/18.json"/>
                 </prescriber>
                 <medication>
-                    <reference value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>
+                    <reference
+                            value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>
                     <display value="Paracetamol1"/>
                 </medication>
                 <dosageInstruction>
@@ -168,7 +169,8 @@
                     <reference value="http://127.0.0.1:9997/providers/18.json"/>
                 </prescriber>
                 <medication>
-                    <reference value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>
+                    <reference
+                            value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>
                     <display value="Paracetamol1"/>
                 </medication>
                 <reasonCodeableConcept>
@@ -207,16 +209,17 @@
                         <code value="TU"/>
                     </doseQuantity>
                     <asNeededCodeableConcept>
-                            <coding>
-                                <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba"/>
-                                <code value="79647ed4-a60e-4cf5-ba68-cf4d55956cba"/>
-                                <display value="Hemoglobin"/>
-                            </coding>
+                        <coding>
+                            <system value="http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba"/>
+                            <code value="79647ed4-a60e-4cf5-ba68-cf4d55956cba"/>
+                            <display value="Hemoglobin"/>
+                        </coding>
                     </asNeededCodeableConcept>
                 </dosageInstruction>
                 <dispense>
                     <medication>
-                        <reference value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>
+                        <reference
+                                value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>
                         <display value="Paracetamol1"/>
                     </medication>
                 </dispense>

@@ -1,28 +1,28 @@
 {
-    "resourceType": "ValueSet",
-    "identifier": "/rest/v1/tr/vs/encounter-type",
-    "name": "Encounter Type",
-    "description": "Encounter Types",
-    "status": "active",
-    "define": {
-        "system": "/rest/v1/tr/vs/encounter-type",
-        "caseSensitive": true,
-        "concept": [
-            {
-                "code": "REG",
-                "display": "registration",
-                "definition": "Encounter Type Registration"
-            },
-            {
-                "code": "ADMISSION",
-                "display": "admission",
-                "definition": "Encounter Type admission in a hospital"
-            },
-            {
-                "code": "DISCHARGE",
-                "display": "discharge",
-                "definition": "Encounter Type discharge from hospital"
-            }
-        ]
-    }
+  "resourceType": "ValueSet",
+  "identifier": "/rest/v1/tr/vs/encounter-type",
+  "name": "Encounter Type",
+  "description": "Encounter Types",
+  "status": "active",
+  "define": {
+    "system": "/rest/v1/tr/vs/encounter-type",
+    "caseSensitive": true,
+    "concept": [
+      {
+        "code": "REG",
+        "display": "registration",
+        "definition": "Encounter Type Registration"
+      },
+      {
+        "code": "ADMISSION",
+        "display": "admission",
+        "definition": "Encounter Type admission in a hospital"
+      },
+      {
+        "code": "DISCHARGE",
+        "display": "discharge",
+        "definition": "Encounter Type discharge from hospital"
+      }
+    ]
+  }
 }

@@ -23,23 +23,27 @@ public class DiagnosticOrdererIdentifierTest {
 
     @Test
     public void shouldValidateResourceOfTypeDiagnosticOrder() {
-        assertTrue(diagnosticOrdererIdentifier.validates(getResource("xmls/encounters/providers_identifiers/diagnostic_order.xml", ResourceType.DiagnosticOrder)));
+        assertTrue(diagnosticOrdererIdentifier.validates(getResource("xmls/encounters/providers_identifiers/diagnostic_order.xml",
+                ResourceType.DiagnosticOrder)));
     }
 
     @Test
     public void shouldExtractProperDiagnosticOrdererReference() {
-        List<String> references = diagnosticOrdererIdentifier.extractUrls(getResource("xmls/encounters/providers_identifiers/diagnostic_order.xml", ResourceType.DiagnosticOrder));
+        List<String> references = diagnosticOrdererIdentifier.extractUrls(getResource
+                ("xmls/encounters/providers_identifiers/diagnostic_order.xml", ResourceType.DiagnosticOrder));
         assertEquals(1, references.size());
         assertEquals("http://127.0.0.1:9997/providers/18.json", references.get(0));
 
-        references= diagnosticOrdererIdentifier.extractUrls(getResource("xmls/encounters/providers_identifiers/diagnostic_order_no_orderer.xml", ResourceType.DiagnosticOrder));
+        references = diagnosticOrdererIdentifier.extractUrls(getResource
+                ("xmls/encounters/providers_identifiers/diagnostic_order_no_orderer.xml", ResourceType.DiagnosticOrder));
         assertNull(references);
 
     }
 
     @Test
     public void shouldNotValidateResourceOfOtherType() {
-        assertFalse(diagnosticOrdererIdentifier.validates(getResource("xmls/encounters/providers_identifiers/encounter_with_valid_participant.xml", ResourceType.Encounter)));
+        assertFalse(diagnosticOrdererIdentifier.validates(getResource
+                ("xmls/encounters/providers_identifiers/encounter_with_valid_participant.xml", ResourceType.Encounter)));
     }
 
     private Resource getResource(String file, ResourceType resType) {

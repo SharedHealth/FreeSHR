@@ -257,7 +257,7 @@
                     </individual>
                 </participant>
                 <serviceProvider>
-                    <reference value="http://127.0.0.1:9997/facilities/*.json" />
+                    <reference value="http://127.0.0.1:9997/facilities/*.json"/>
                 </serviceProvider>
                 <indication>
                     <reference value="urn:07f02524-7647-43c1-a579-0c2c80f285ed"/>
@@ -1008,7 +1008,8 @@
                     <reference value="http://127.0.0.1:9997/providers/18.json"/>
                 </prescriber>
                 <medication>
-                    <reference value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>
+                    <reference
+                            value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>
                     <display value="Lactic Acid"/>
                 </medication>
                 <reasonCodeableConcept>

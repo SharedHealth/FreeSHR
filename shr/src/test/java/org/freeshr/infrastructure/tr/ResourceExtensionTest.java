@@ -7,10 +7,8 @@ import org.hl7.fhir.instance.formats.JsonParser;
 import org.hl7.fhir.instance.model.Extension;
 import org.hl7.fhir.instance.model.Resource;
 import org.hl7.fhir.instance.model.String_;
-import org.hl7.fhir.instance.model.Type;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.List;
 
 public class ResourceExtensionTest {

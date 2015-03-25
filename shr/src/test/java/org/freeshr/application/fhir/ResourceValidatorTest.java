@@ -31,7 +31,8 @@ public class ResourceValidatorTest {
     @Before
     public void setup() {
         initMocks(this);
-        resourceValidator = new ResourceValidator(new ConditionValidator(), medicationPrescriptionValidator, immunizationValidator, procedureValidator);
+        resourceValidator = new ResourceValidator(new ConditionValidator(), medicationPrescriptionValidator, immunizationValidator,
+                procedureValidator);
         resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
     }
 

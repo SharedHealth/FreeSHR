@@ -54,7 +54,8 @@ public class TokenAuthenticationProviderTest {
     public void shouldRespond401OnException() throws Exception {
         UUID token = UUID.randomUUID();
         when(authentication.getPrincipal()).thenReturn(token.toString());
-        when(identityServiceClient.authenticate(any(UserAuthInfo.class), eq(token.toString()))).thenThrow(new BadCredentialsException("bar"));
+        when(identityServiceClient.authenticate(any(UserAuthInfo.class), eq(token.toString()))).thenThrow(new BadCredentialsException
+                ("bar"));
         TokenAuthenticationProvider authenticationProvider = new TokenAuthenticationProvider
                 (identityServiceClient);
         authenticationProvider.authenticate(authentication);

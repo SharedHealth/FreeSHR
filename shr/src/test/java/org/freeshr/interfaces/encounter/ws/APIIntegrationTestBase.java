@@ -124,7 +124,8 @@ public abstract class APIIntegrationTestBase {
         return java.util.UUID.randomUUID().toString();
     }
 
-    protected EncounterBundle createEncounterBundle(String encounterId, String healthId, Confidentiality encounterConfidentiality, Confidentiality patientConfidentiality) {
+    protected EncounterBundle createEncounterBundle(String encounterId, String healthId, Confidentiality encounterConfidentiality,
+                                                    Confidentiality patientConfidentiality) {
         EncounterBundle bundle = new EncounterBundle();
         bundle.setEncounterId(encounterId);
         bundle.setHealthId(healthId);

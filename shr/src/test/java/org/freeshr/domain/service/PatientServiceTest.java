@@ -35,7 +35,7 @@ public class PatientServiceTest {
     @Test
     public void shouldQueryAllPatientsToVerifyValidity() throws ExecutionException, InterruptedException {
         String healthId = "healthId";
-        String clientId="123";
+        String clientId = "123";
         String email = "email@gmail.com";
         String securityToken = UUID.randomUUID().toString();
 
@@ -47,10 +47,10 @@ public class PatientServiceTest {
     @Test
     public void shouldNotQueryMasterClientIndexEagerly() throws ExecutionException, InterruptedException {
         String healthId = "healthId";
-        String clientId="123";
+        String clientId = "123";
         String email = "email@gmail.com";
         String securityToken = UUID.randomUUID().toString();
-        
+
         when(patientRepository.find(healthId)).thenReturn(Observable.just(new Patient()));
         patientService.ensurePresent(healthId, new UserAuthInfo(clientId, email, securityToken));
         verify(mciClient, never()).getPatient(healthId, new UserAuthInfo(clientId, email, securityToken));
@@ -60,10 +60,10 @@ public class PatientServiceTest {
     public void shouldReturnTrueWhenPatientIsNotFoundLocallyButFoundInTheClientIndex() throws ExecutionException,
             InterruptedException {
         String healthId = "healthId";
-        String clientId="123";
+        String clientId = "123";
         String email = "email@gmail.com";
         String securityToken = UUID.randomUUID().toString();
-        
+
         when(patientRepository.find(healthId)).thenReturn(Observable.<Patient>just(null));
         Patient somePatient = new Patient();
         when(mciClient.getPatient(healthId, new UserAuthInfo(clientId, email, securityToken))).thenReturn(Observable.just(somePatient));
@@ -75,7 +75,7 @@ public class PatientServiceTest {
     public void shouldReturnNullWhenPatientIsNotFoundEitherLocallyOrInTheClientIndex() throws ExecutionException,
             InterruptedException {
         String healthId = "healthId";
-        String clientId="123";
+        String clientId = "123";
         String email = "email@gmail.com";
         String securityToken = UUID.randomUUID().toString();
 

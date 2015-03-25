@@ -101,7 +101,8 @@
                     <reference value="http://localhost:9997/e8a8bdb9-9fdd-4e66-81ca-5abbb6308ccd"/>
                 </prescriber>
                 <medication>
-                    <reference value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>
+                    <reference
+                            value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>
                     <display value="Paracetamol1"/>
                 </medication>
                 <dosageInstruction>
@@ -168,7 +169,8 @@
                     <reference value="e8a8bdb9-9fdd-4e66-81ca-5abbb6308ccd"/>
                 </prescriber>
                 <medication>
-                    <reference value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>
+                    <reference
+                            value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>
                     <display value="Paracetamol1"/>
                 </medication>
                 <reasonCodeableConcept>
@@ -216,7 +218,8 @@
                 </dosageInstruction>
                 <dispense>
                     <medication>
-                        <reference value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>
+                        <reference
+                                value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"/>
                         <display value="Paracetamol1"/>
                     </medication>
                 </dispense>

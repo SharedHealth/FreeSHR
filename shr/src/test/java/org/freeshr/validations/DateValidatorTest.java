@@ -44,7 +44,7 @@ public class DateValidatorTest {
 
     @Test
     public void shouldValidateInvalidPeriod() throws Exception {
-        DateValidator dateValidator= new DateValidator();
+        DateValidator dateValidator = new DateValidator();
 
         DateAndTime startDate = new DateAndTime("2014-12-31T00:00:00+05:30");
         DateAndTime endDate = new DateAndTime("2014-11-30T00:00:00+05:30");

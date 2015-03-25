@@ -1,8 +1,5 @@
 package org.freeshr.validations;
 
-import org.hl7.fhir.instance.model.OperationOutcome;
-import org.hl7.fhir.instance.validation.ValidationMessage;
-
 public class ValidationMessages {
 
     public static final String INVALID_DOSAGE_QUANTITY = "Invalid Dosage Quantity";

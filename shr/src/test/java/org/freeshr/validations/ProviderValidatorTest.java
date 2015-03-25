@@ -1,7 +1,7 @@
 package org.freeshr.validations;
 
-import org.freeshr.application.fhir.*;
-import org.freeshr.application.fhir.Error;
+import org.freeshr.application.fhir.EncounterBundle;
+import org.freeshr.application.fhir.FhirMessageFilter;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.utils.FileUtil;
@@ -16,9 +16,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -76,7 +74,7 @@ public class ProviderValidatorTest {
         };
     }
 
-    private void assertFailureFromResponseErrors(String fieldName, String reason,List<ValidationMessage> validationMessages) {
+    private void assertFailureFromResponseErrors(String fieldName, String reason, List<ValidationMessage> validationMessages) {
         for (ValidationMessage msg : validationMessages) {
             if (msg.getMessage().equals(reason)) {
                 assertEquals(reason, msg.getMessage());

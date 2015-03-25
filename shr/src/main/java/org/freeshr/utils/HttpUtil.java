@@ -2,7 +2,6 @@ package org.freeshr.utils;
 
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.HttpRequest;
 import org.freeshr.config.SHRProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;

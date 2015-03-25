@@ -46,7 +46,7 @@ public class AccessFilter {
     }
 
     public static boolean isConfidentialPatient(List<EncounterBundle> encounterBundles) {
-        if(CollectionUtils.isNotEmpty(encounterBundles)) {
+        if (CollectionUtils.isNotEmpty(encounterBundles)) {
             return encounterBundles.get(0).getPatientConfidentiality().ordinal() > Confidentiality.Normal.ordinal();
         }
         return false;

@@ -21,8 +21,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
-import static org.freeshr.validations.ValidationMessages.INVALID_DOSAGE_QUANTITY;
 import static org.freeshr.utils.AtomFeedHelper.getAtomFeed;
+import static org.freeshr.validations.ValidationMessages.INVALID_DOSAGE_QUANTITY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
@@ -50,7 +50,8 @@ public class ImmunizationValidatorTest {
 
     @Test
     public void shouldValidateImmunization() throws Exception {
-        ValidationSubject<AtomEntry<? extends Resource>> feed = getAtomFeed("xmls/encounters/immunization/immunization_valid.xml", ResourceType.Immunization);
+        ValidationSubject<AtomEntry<? extends Resource>> feed = getAtomFeed("xmls/encounters/immunization/immunization_valid.xml",
+                ResourceType.Immunization);
 
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         ImmunizationValidator immunizationValidator = getValidator();
@@ -63,7 +64,8 @@ public class ImmunizationValidatorTest {
     @Test
     public void shouldRejectInvalidDoseQuantityType() {
 
-        ValidationSubject<AtomEntry<? extends Resource>> feed = getAtomFeed("xmls/encounters/immunization/immunization_invalid_dose_quantity.xml",ResourceType.Immunization);
+        ValidationSubject<AtomEntry<? extends Resource>> feed = getAtomFeed
+                ("xmls/encounters/immunization/immunization_invalid_dose_quantity.xml", ResourceType.Immunization);
 
         when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
         when(trConceptLocator.validate(anyString(), eq("INVALID-CODE"),
@@ -74,7 +76,7 @@ public class ImmunizationValidatorTest {
 
         List<ValidationMessage> validationMessasges = immunizationValidator.validate(feed);
 
-        assertEquals(1,validationMessasges.size());
-        assertEquals(INVALID_DOSAGE_QUANTITY,validationMessasges.get(0).getMessage());
+        assertEquals(1, validationMessasges.size());
+        assertEquals(INVALID_DOSAGE_QUANTITY, validationMessasges.get(0).getMessage());
     }
 }

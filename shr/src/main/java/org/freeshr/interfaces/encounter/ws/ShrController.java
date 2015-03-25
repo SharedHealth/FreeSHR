@@ -1,13 +1,7 @@
 package org.freeshr.interfaces.encounter.ws;
 
 import org.freeshr.infrastructure.security.UserInfo;
-import org.freeshr.interfaces.encounter.ws.exceptions.BadRequest;
-import org.freeshr.interfaces.encounter.ws.exceptions.ErrorInfo;
-import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
-import org.freeshr.interfaces.encounter.ws.exceptions.PreconditionFailed;
-import org.freeshr.interfaces.encounter.ws.exceptions.ResourceNotFound;
-import org.freeshr.interfaces.encounter.ws.exceptions.UnProcessableEntity;
-import org.freeshr.interfaces.encounter.ws.exceptions.Unauthorized;
+import org.freeshr.interfaces.encounter.ws.exceptions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

@@ -12,13 +12,9 @@ import org.mockito.Mock;
 import java.util.ArrayList;
 
 import static java.util.Arrays.asList;
-import static org.freeshr.infrastructure.security.UserInfo.DATASENSE_FACILITY_GROUP;
-import static org.freeshr.infrastructure.security.UserInfo.FACILITY_ADMIN_GROUP;
-import static org.freeshr.infrastructure.security.UserInfo.SHR_USER_GROUP;
-import static org.freeshr.infrastructure.security.UserProfile.FACILITY_TYPE;
-import static org.freeshr.infrastructure.security.UserProfile.PATIENT_TYPE;
-import static org.freeshr.infrastructure.security.UserProfile.PROVIDER_TYPE;
 import static org.freeshr.infrastructure.security.AccessFilter.*;
+import static org.freeshr.infrastructure.security.UserInfo.*;
+import static org.freeshr.infrastructure.security.UserProfile.*;
 import static org.junit.Assert.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 

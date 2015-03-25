@@ -311,7 +311,8 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
                 .andExpect(request().asyncResult(hasEncountersOfSize(0)));
     }
 
-    private BaseMatcher<EncounterSearchResponse> assertConfidentiality(final Confidentiality encounterConfidentiality, final Confidentiality patientConfidentiality) {
+    private BaseMatcher<EncounterSearchResponse> assertConfidentiality(final Confidentiality encounterConfidentiality, final
+    Confidentiality patientConfidentiality) {
         return new BaseMatcher<EncounterSearchResponse>() {
             @Override
             public void describeTo(Description description) {

@@ -4,7 +4,9 @@ public class EncounterContent {
 
     private String content = null;
 
-    public EncounterContent() {};
+    public EncounterContent() {}
+
+    ;
 
     public EncounterContent(String content) {
         this.content = content;

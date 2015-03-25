@@ -12,7 +12,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 import javax.servlet.Servlet;
 import javax.servlet.ServletRegistration;
 
-@ConditionalOnClass({ Servlet.class, DispatcherServlet.class, ServletRegistration.class })
+@ConditionalOnClass({Servlet.class, DispatcherServlet.class, ServletRegistration.class})
 @Configuration
 public class ActuatorConfig {
 

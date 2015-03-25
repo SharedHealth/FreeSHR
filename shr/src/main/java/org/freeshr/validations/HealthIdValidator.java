@@ -10,7 +10,8 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.freeshr.validations.ValidationMessages.*;
+import static org.freeshr.validations.ValidationMessages.HEALTH_ID_NOT_MATCH;
+import static org.freeshr.validations.ValidationMessages.HEALTH_ID_NOT_PRESENT_IN_COMPOSITION;
 
 @Component
 public class HealthIdValidator implements Validator<EncounterValidationContext> {

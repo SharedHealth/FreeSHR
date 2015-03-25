@@ -7,8 +7,8 @@ import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.security.UserAuthInfo;
-import org.junit.Before;
 import org.freeshr.utils.Confidentiality;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,7 +60,7 @@ public class MCIClientIntegrationTest {
         String accessToken = UUID.randomUUID().toString();
         String clientId = "123";
         String userEmail = "email@gmail.com";
-        
+
         givenThat(get(urlEqualTo("/api/v1/patients/" + heathId))
                 .withHeader(AUTH_TOKEN_KEY, equalTo(accessToken))
                 .withHeader(CLIENT_ID_KEY, equalTo(clientId))

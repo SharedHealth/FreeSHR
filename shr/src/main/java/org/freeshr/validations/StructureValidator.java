@@ -4,7 +4,6 @@ import org.hl7.fhir.instance.model.*;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.springframework.stereotype.Component;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,8 +34,8 @@ public class StructureValidator implements Validator<AtomFeed> {
 
             validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, entryReferenceId, String
                     .format
-                    ("No entry present" +
-                            " for the section with id %s", entryReferenceId), OperationOutcome.IssueSeverity.error));
+                            ("No entry present" +
+                                    " for the section with id %s", entryReferenceId), OperationOutcome.IssueSeverity.error));
         }
 
         return validationMessages;

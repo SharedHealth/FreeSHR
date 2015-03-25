@@ -13,7 +13,7 @@ import java.util.List;
 
 public class AtomFeedHelper {
 
-    public static  ValidationSubject<AtomEntry<? extends Resource>> getAtomFeed(String feedFile,ResourceType resourceType) {
+    public static ValidationSubject<AtomEntry<? extends Resource>> getAtomFeed(String feedFile, ResourceType resourceType) {
         EncounterBundle encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString(feedFile));
         final EncounterValidationContext validationContext = new EncounterValidationContext(encounterBundle,
@@ -22,9 +22,9 @@ public class AtomFeedHelper {
         AtomFeed feed = validationContext.feedFragment().extract();
         List<AtomEntry<? extends Resource>> feedEntryList = feed.getEntryList();
         for (AtomEntry<? extends Resource> atomEntry : feedEntryList) {
-             if (atomEntry.getResource().getResourceType().equals(resourceType)) {
-                 return atomEntryFragment(atomEntry);
-             }
+            if (atomEntry.getResource().getResourceType().equals(resourceType)) {
+                return atomEntryFragment(atomEntry);
+            }
         }
         return null;
     }

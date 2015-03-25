@@ -28,7 +28,8 @@ public class PatientService {
         this.mciClient = mciClient;
     }
 
-    public Observable<Patient> ensurePresent(final String healthId, final UserAuthInfo userAuthInfo) throws ExecutionException, InterruptedException {
+    public Observable<Patient> ensurePresent(final String healthId, final UserAuthInfo userAuthInfo) throws ExecutionException,
+            InterruptedException {
         Observable<Patient> patient = patientRepository.find(healthId);
         return patient.flatMap(new Func1<Patient, Observable<Patient>>() {
             @Override

@@ -25,7 +25,8 @@ public class ResourceValidator implements Validator<AtomFeed> {
     @Autowired
     public ResourceValidator(ConditionValidator conditionValidator,
                              MedicationPrescriptionValidator medicationPrescriptionValidator,
-                             Validator<AtomEntry<? extends Resource>> immunizationValidator,Validator<AtomEntry<? extends Resource>> procedureValidator) {
+                             Validator<AtomEntry<? extends Resource>> immunizationValidator, Validator<AtomEntry<? extends Resource>>
+                                     procedureValidator) {
         assignDefaultValidatorToAllResourceTypes();
         resourceTypeValidatorMap.put(ResourceType.Condition, conditionValidator);
         resourceTypeValidatorMap.put(ResourceType.MedicationPrescription, medicationPrescriptionValidator);
@@ -54,7 +55,7 @@ public class ResourceValidator implements Validator<AtomFeed> {
     }
 
     private ValidationSubject<AtomEntry<? extends Resource>>
-            atomEntryFragment(final AtomEntry<? extends Resource> atomEntry) {
+    atomEntryFragment(final AtomEntry<? extends Resource> atomEntry) {
         return new ValidationSubject<AtomEntry<? extends Resource>>() {
             @Override
             public AtomEntry<? extends Resource> extract() {

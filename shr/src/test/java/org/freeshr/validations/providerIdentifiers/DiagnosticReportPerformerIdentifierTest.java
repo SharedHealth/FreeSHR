@@ -23,22 +23,26 @@ public class DiagnosticReportPerformerIdentifierTest {
 
     @Test
     public void shouldValidateResourceOfTypeDiagnosticReport() {
-        assertTrue(diagnosticReportPerformerIdentifier.validates(getResource("xmls/encounters/providers_identifiers/diagnostic_report.xml", ResourceType.DiagnosticReport)));
+        assertTrue(diagnosticReportPerformerIdentifier.validates(getResource("xmls/encounters/providers_identifiers/diagnostic_report" +
+                ".xml", ResourceType.DiagnosticReport)));
     }
 
     @Test
     public void shouldExtractProperDiagnosticReportPerformerReferences() {
-        List<String> references = diagnosticReportPerformerIdentifier.extractUrls(getResource("xmls/encounters/providers_identifiers/diagnostic_report.xml", ResourceType.DiagnosticReport));
+        List<String> references = diagnosticReportPerformerIdentifier.extractUrls(getResource
+                ("xmls/encounters/providers_identifiers/diagnostic_report.xml", ResourceType.DiagnosticReport));
         assertEquals(1, references.size());
         assertEquals("http://127.0.0.1:9997/providers/18.json", references.get(0));
 
-        references = diagnosticReportPerformerIdentifier.extractUrls(getResource("xmls/encounters/providers_identifiers/diagnostic_report_no_performer.xml", ResourceType.DiagnosticReport));
+        references = diagnosticReportPerformerIdentifier.extractUrls(getResource
+                ("xmls/encounters/providers_identifiers/diagnostic_report_no_performer.xml", ResourceType.DiagnosticReport));
         assertNull(references);
     }
 
     @Test
     public void shouldNotValidateResourceOfOtherType() {
-        assertFalse(diagnosticReportPerformerIdentifier.validates(getResource("xmls/encounters/providers_identifiers/encounter_with_valid_participant.xml", ResourceType.Encounter)));
+        assertFalse(diagnosticReportPerformerIdentifier.validates(getResource
+                ("xmls/encounters/providers_identifiers/encounter_with_valid_participant.xml", ResourceType.Encounter)));
     }
 
     private Resource getResource(String file, ResourceType resType) {

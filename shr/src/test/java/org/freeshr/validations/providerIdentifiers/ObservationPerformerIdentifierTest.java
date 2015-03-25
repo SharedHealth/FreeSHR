@@ -23,19 +23,22 @@ public class ObservationPerformerIdentifierTest {
 
     @Test
     public void shouldValidateResourceOfTypeObservation() {
-        assertTrue(observationPerformerIdentifier.validates(getResource("xmls/encounters/providers_identifiers/observation.xml", ResourceType.Observation)));
+        assertTrue(observationPerformerIdentifier.validates(getResource("xmls/encounters/providers_identifiers/observation.xml",
+                ResourceType.Observation)));
     }
 
     @Test
     public void shouldExtractProperObservationPerformerReferences() {
-        List<String> references = observationPerformerIdentifier.extractUrls(getResource("xmls/encounters/providers_identifiers/observation.xml", ResourceType.Observation));
+        List<String> references = observationPerformerIdentifier.extractUrls(getResource
+                ("xmls/encounters/providers_identifiers/observation.xml", ResourceType.Observation));
         assertEquals(1, references.size());
         assertEquals("http://127.0.0.1:9997/providers/18.json", references.get(0));
     }
 
     @Test
     public void shouldNotValidateResourceOfOtherType() {
-        assertFalse(observationPerformerIdentifier.validates(getResource("xmls/encounters/providers_identifiers/encounter_with_valid_participant.xml", ResourceType.Encounter)));
+        assertFalse(observationPerformerIdentifier.validates(getResource
+                ("xmls/encounters/providers_identifiers/encounter_with_valid_participant.xml", ResourceType.Encounter)));
     }
 
     private Resource getResource(String file, ResourceType resType) {

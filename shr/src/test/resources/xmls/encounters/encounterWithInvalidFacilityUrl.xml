@@ -71,7 +71,7 @@
                     <display value="encounter"/>
                 </indication>
                 <serviceProvider>
-                    <reference value="http://invalid:9997/facilities/10000069.json" />
+                    <reference value="http://invalid:9997/facilities/10000069.json"/>
                 </serviceProvider>
             </Encounter>
         </content>

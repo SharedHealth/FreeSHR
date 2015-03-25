@@ -42,7 +42,8 @@ public class UserInfo {
     public UserInfo() {
     }
 
-    public UserInfo(String id, String name, String email, int isActive, boolean activated, String accessToken, List<String> groups, List<UserProfile> userProfiles) {
+    public UserInfo(String id, String name, String email, int isActive, boolean activated, String accessToken, List<String> groups,
+                    List<UserProfile> userProfiles) {
         this.id = id;
         this.name = name;
         this.email = email;

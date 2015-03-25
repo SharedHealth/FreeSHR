@@ -15,10 +15,11 @@ public abstract class ClinicalResourceProviderIdentifier {
     private static final String JSON = ".json";
 
     protected abstract boolean validates(Resource resource);
+
     protected abstract List<String> extractUrls(Resource resource);
 
     public final boolean isValid(Resource resource, SHRProperties shrProperties) {
-        if (!validates(resource))  return true;
+        if (!validates(resource)) return true;
         List<String> urls = extractUrls(resource);
         return validateUrlPattern(urls, shrProperties);
     }

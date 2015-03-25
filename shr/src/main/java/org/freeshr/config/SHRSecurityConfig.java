@@ -55,11 +55,11 @@ public class SHRSecurityConfig extends WebSecurityConfigurerAdapter {
                 }))
                 .authorizeRequests()
                 .regexMatchers(HttpMethod.GET, "\\/patients\\/.*\\/encounters(\\/.*){0,1}")
-                    .hasAnyRole(SHR_FACILITY_GROUP, SHR_PROVIDER_GROUP, SHR_PATIENT_GROUP)
+                .hasAnyRole(SHR_FACILITY_GROUP, SHR_PROVIDER_GROUP, SHR_PATIENT_GROUP)
                 .regexMatchers(HttpMethod.POST, "\\/patients\\/.*\\/encounters.*")
-                    .hasAnyRole(SHR_FACILITY_GROUP, SHR_PROVIDER_GROUP)
+                .hasAnyRole(SHR_FACILITY_GROUP, SHR_PROVIDER_GROUP)
                 .regexMatchers(HttpMethod.GET, "\\/catchments\\/\\d.*\\/encounters.*")
-                    .hasAnyRole(SHR_FACILITY_GROUP, SHR_PROVIDER_GROUP)
+                .hasAnyRole(SHR_FACILITY_GROUP, SHR_PROVIDER_GROUP)
                 .and()
                 .addFilterBefore(new TokenAuthenticationFilter(authenticationManager()), BasicAuthenticationFilter
                         .class)
@@ -92,7 +92,8 @@ public class SHRSecurityConfig extends WebSecurityConfigurerAdapter {
     private AccessDeniedHandler unauthorizedEntryPoint() {
         return new AccessDeniedHandler() {
             @Override
-            public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+            public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException)
+                    throws IOException, ServletException {
                 logger.error(accessDeniedException.getMessage());
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, accessDeniedException.getMessage());
             }

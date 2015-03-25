@@ -11,10 +11,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class ConditionAsserterIdentifierTest {
 
@@ -27,7 +24,8 @@ public class ConditionAsserterIdentifierTest {
 
     @Test
     public void shouldValidateResourceOfTypeCondition() {
-        assertTrue(conditionAsserterIdentifier.validates(getResource("xmls/encounters/providers_identifiers/condition.xml", ResourceType.Condition)));
+        assertTrue(conditionAsserterIdentifier.validates(getResource("xmls/encounters/providers_identifiers/condition.xml", ResourceType
+                .Condition)));
     }
 
     @Test
@@ -37,14 +35,16 @@ public class ConditionAsserterIdentifierTest {
         assertEquals(1, references.size());
         assertEquals("http://127.0.0.1:9997/providers/18.json", references.get(0));
 
-        references = conditionAsserterIdentifier.extractUrls(getResource("xmls/encounters/providers_identifiers/condition_no_asserter.xml", ResourceType.Condition));
+        references = conditionAsserterIdentifier.extractUrls(getResource("xmls/encounters/providers_identifiers/condition_no_asserter" +
+                ".xml", ResourceType.Condition));
         assertNull(references);
 
     }
 
     @Test
     public void shouldNotValidateResourceOfOtherType() {
-        assertFalse(conditionAsserterIdentifier.validates(getResource("xmls/encounters/providers_identifiers/encounter_with_valid_participant.xml",
+        assertFalse(conditionAsserterIdentifier.validates(getResource
+                ("xmls/encounters/providers_identifiers/encounter_with_valid_participant.xml",
                 ResourceType.Encounter)));
     }
 

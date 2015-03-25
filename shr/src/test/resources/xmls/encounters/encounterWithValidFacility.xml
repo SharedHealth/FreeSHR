@@ -75,7 +75,7 @@
                     <display value="encounter"/>
                 </indication>
                 <serviceProvider>
-                    <reference value="http://127.0.0.1:9997/facilities/10000069.json" />
+                    <reference value="http://127.0.0.1:9997/facilities/10000069.json"/>
                 </serviceProvider>
             </Encounter>
         </content>

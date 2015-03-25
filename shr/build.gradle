@@ -61,10 +61,10 @@ dependencies {
             libraries.spring_context_support, libraries.ehcache_core, libraries.commons_lang,
             libraries.joda_time, libraries.lz4
 
-    compile(libraries.spring_boot_security){
+    compile(libraries.spring_boot_security) {
         exclude group: 'ch.qos.logback', module: "logback-classic"
     }
-    compile(libraries.spring_boot_actuator){
+    compile(libraries.spring_boot_actuator) {
         exclude group: 'ch.qos.logback', module: "logback-classic"
     }
 
@@ -102,7 +102,7 @@ task exportProperties(dependsOn: 'copyZip') << {
     }
 }
 
-task dist(dependsOn: [project(":schema").tasks.build,'exportProperties'], type: Rpm) {
+task dist(dependsOn: [project(":schema").tasks.build, 'exportProperties'], type: Rpm) {
     packageName = 'shr'
     version = '0.1'
     release = 1
@@ -155,7 +155,7 @@ war {
     }
 }
 
-task runSHR(type: JavaExec){
+task runSHR(type: JavaExec) {
     Properties properties = new Properties();
     properties.load(new FileInputStream(file('../env/local.properties')))
     main = mainClassName
@@ -164,7 +164,7 @@ task runSHR(type: JavaExec){
     environment properties
 }
 
-task debugSHR(type: JavaExec){
+task debugSHR(type: JavaExec) {
     Properties properties = new Properties();
     properties.load(new FileInputStream(file('../env/local.properties')))
     main = mainClassName

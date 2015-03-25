@@ -1,28 +1,28 @@
 {
-    "uuid": "fa460ea6-04c7-45af-a6fa-5072e7caed40",
-    "name": "Superficial injury of shoulder and upper arm",
-    "conceptSource": {
-        "uuid": "1fe5d49f-f3d2-44a5-8b01-30cb836ed747",
-        "display": "ICD10-BD",
-        "name": "ICD10-BD",
-        "description": "ICD10-BD",
-        "hl7Code": "ICD10-BD-A",
-        "retired": false,
-        "links": [
-            {
-                "uri": "https://bdshr-tr.twhosted.com/openmrs/ws/rest/v1/conceptsource/1fe5d49f-f3d2-44a5-8b01-30cb836ed747",
-                "rel": "self"
-            },
-            {
-                "uri": "https://bdshr-tr.twhosted.com/openmrs/ws/rest/v1/conceptsource/1fe5d49f-f3d2-44a5-8b01-30cb836ed747?v=full",
-                "rel": "full"
-            }
-        ],
-        "resourceVersion": "1.8"
-    },
-    "description": "Superficial injury of shoulder and upper arm",
-    "code": "S40",
-    "version": "1.0",
+  "uuid": "fa460ea6-04c7-45af-a6fa-5072e7caed40",
+  "name": "Superficial injury of shoulder and upper arm",
+  "conceptSource": {
+    "uuid": "1fe5d49f-f3d2-44a5-8b01-30cb836ed747",
+    "display": "ICD10-BD",
+    "name": "ICD10-BD",
+    "description": "ICD10-BD",
+    "hl7Code": "ICD10-BD-A",
     "retired": false,
-    "conceptReferenceTermMaps": []
+    "links": [
+      {
+        "uri": "https://bdshr-tr.twhosted.com/openmrs/ws/rest/v1/conceptsource/1fe5d49f-f3d2-44a5-8b01-30cb836ed747",
+        "rel": "self"
+      },
+      {
+        "uri": "https://bdshr-tr.twhosted.com/openmrs/ws/rest/v1/conceptsource/1fe5d49f-f3d2-44a5-8b01-30cb836ed747?v=full",
+        "rel": "full"
+      }
+    ],
+    "resourceVersion": "1.8"
+  },
+  "description": "Superficial injury of shoulder and upper arm",
+  "code": "S40",
+  "version": "1.0",
+  "retired": false,
+  "conceptReferenceTermMaps": []
 }

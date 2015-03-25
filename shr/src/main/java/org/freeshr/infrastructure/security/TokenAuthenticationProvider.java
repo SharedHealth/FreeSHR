@@ -23,12 +23,11 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         try {
-            return identityServiceClient.authenticate((UserAuthInfo) authentication.getPrincipal(), (String) authentication.getCredentials());
-        }
-        catch (AuthenticationException ex){
+            return identityServiceClient.authenticate((UserAuthInfo) authentication.getPrincipal(), (String) authentication
+                    .getCredentials());
+        } catch (AuthenticationException ex) {
             throw new BadCredentialsException(ex.getMessage());
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             throw new BadCredentialsException("Unable to authenticate user.");
         }
     }
