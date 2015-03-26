@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.interfaces.encounter.ws.FacilityMessageConverter;
+import org.freeshr.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
@@ -54,6 +55,6 @@ public class FacilityRegistryClient {
     }
 
     private String getFacilityUrl(String facilityId) {
-        return shrProperties.getFRLocationPath() + facilityId + ".json";
+        return StringUtils.ensureEndsWithBackSlash(shrProperties.getFRLocationPath()) + facilityId + ".json";
     }
 }

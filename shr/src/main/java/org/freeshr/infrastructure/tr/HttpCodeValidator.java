@@ -2,6 +2,7 @@ package org.freeshr.infrastructure.tr;
 
 
 import org.freeshr.config.SHRProperties;
+import org.freeshr.utils.StringUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -59,8 +60,8 @@ public class HttpCodeValidator implements CodeValidator {
     }
 
     private String formTerminologyReferenceUrl(String uri) {
-        String trLocationPath = shrProperties.getTRLocationPath();
-        String trRefPath = shrProperties.getTerminologyServerReferencePath();
+        String trLocationPath = StringUtils.ensureEndsWithBackSlash(shrProperties.getTRLocationPath());
+        String trRefPath = StringUtils.ensureEndsWithBackSlash(shrProperties.getTerminologyServerReferencePath());
         return uri.replace(trRefPath, trLocationPath);
     }
 

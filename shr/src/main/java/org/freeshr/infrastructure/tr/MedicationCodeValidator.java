@@ -1,6 +1,7 @@
 package org.freeshr.infrastructure.tr;
 
 import org.freeshr.config.SHRProperties;
+import org.freeshr.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -52,8 +53,8 @@ public class MedicationCodeValidator implements CodeValidator {
     }
 
     private String formMedicationReferenceUrl(String uri) {
-        String terminologyServerReferencePath = shrProperties.getTerminologyServerReferencePath();
-        String trLocationPath = shrProperties.getTRLocationPath();
+        String terminologyServerReferencePath = StringUtils.ensureEndsWithBackSlash(shrProperties.getTerminologyServerReferencePath());
+        String trLocationPath = StringUtils.ensureEndsWithBackSlash(shrProperties.getTRLocationPath());
         return uri.replace(terminologyServerReferencePath, trLocationPath);
     }
 

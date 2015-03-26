@@ -2,11 +2,14 @@ package org.freeshr.validations.providerIdentifiers;
 
 import org.freeshr.config.SHRProperties;
 import org.freeshr.utils.CollectionUtils;
+import org.freeshr.utils.StringUtils;
 import org.hl7.fhir.instance.model.Resource;
 
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.freeshr.utils.StringUtils.ensureEndsWithBackSlash;
 
 public abstract class ClinicalResourceProviderIdentifier {
     private static final String START_MARKER = "^";
@@ -35,7 +38,7 @@ public abstract class ClinicalResourceProviderIdentifier {
 
     private boolean isUrlPatternMatched(String url, SHRProperties shrProperties) {
         String providerReferencePath = shrProperties.getProviderReferencePath();
-        String regex = START_MARKER + providerReferencePath + PROVIDER_ID_MATCHER + JSON + END_MARKER;
+        String regex = START_MARKER + ensureEndsWithBackSlash(providerReferencePath) + PROVIDER_ID_MATCHER + JSON + END_MARKER;
         Matcher matcher = Pattern.compile(regex).matcher(url);
         return matcher.matches();
     }

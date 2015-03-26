@@ -60,6 +60,7 @@ public class HealthIdValidatorTest {
 
     @Test
     public void shouldRejectEncounterIfHealthIdInTheXmlDoesNotMatchTheGivenHealthId() {
+        when(shrProperties.getPatientReferencePath()).thenReturn("http://172.18.46.56:8081/api/v1/patients");
         String xml = FileUtil.asString("xmls/encounters/encounter.xml");
         AtomFeed feed = resourceOrFeedDeserializer.deserialize(xml);
         EncounterValidationResponse response = EncounterValidationResponse.fromValidationMessages(
@@ -71,6 +72,7 @@ public class HealthIdValidatorTest {
 
     @Test
     public void shouldRejectEncounterIfThereIsNoHealthIdInTheComposition() {
+        when(shrProperties.getPatientReferencePath()).thenReturn("http://172.18.46.56:8081/api/v1/patients");
         String xml = FileUtil.asString("xmls/encounters/encounter.xml");
         AtomFeed feed = resourceOrFeedDeserializer.deserialize(xml);
         EncounterValidationResponse response = EncounterValidationResponse.fromValidationMessages(

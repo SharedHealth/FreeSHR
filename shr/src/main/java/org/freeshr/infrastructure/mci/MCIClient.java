@@ -3,6 +3,7 @@ package org.freeshr.infrastructure.mci;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.security.UserAuthInfo;
+import org.freeshr.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
@@ -37,10 +38,10 @@ public class MCIClient {
         headers.add(FROM_KEY, userAuthInfo.getEmail());
 
         Observable<ResponseEntity<Patient>> responseEntityObservable = Observable.from(shrRestTemplate.exchange(
-                shrProperties.getMCIPatientLocationPath() + "/" + healthId,
-                HttpMethod.GET,
-                new HttpEntity(headers),
-                Patient.class));
+                StringUtils.ensureEndsWithBackSlash(shrProperties.getMCIPatientLocationPath()) + healthId,
+                        HttpMethod.GET,
+                        new HttpEntity(headers),
+                        Patient.class));
 
         return responseEntityObservable.map(new Func1<ResponseEntity<Patient>, Patient>() {
             @Override

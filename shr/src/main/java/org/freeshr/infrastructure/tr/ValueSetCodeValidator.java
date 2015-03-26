@@ -3,6 +3,7 @@ package org.freeshr.infrastructure.tr;
 
 import org.apache.commons.io.IOUtils;
 import org.freeshr.config.SHRProperties;
+import org.freeshr.utils.StringUtils;
 import org.hl7.fhir.instance.formats.JsonParser;
 import org.hl7.fhir.instance.model.Resource;
 import org.hl7.fhir.instance.model.ValueSet;
@@ -109,8 +110,8 @@ public class ValueSetCodeValidator implements CodeValidator {
     }
 
     private String formValueSetReferenceUrl(String uri) {
-        String terminologyServerReferencePath = shrProperties.getTerminologyServerReferencePath();
-        String trLocationPath = shrProperties.getTRLocationPath();
+        String terminologyServerReferencePath = StringUtils.ensureEndsWithBackSlash(shrProperties.getTerminologyServerReferencePath());
+        String trLocationPath = StringUtils.ensureEndsWithBackSlash(shrProperties.getTRLocationPath());
         return uri.replace(terminologyServerReferencePath, trLocationPath);
     }
 }

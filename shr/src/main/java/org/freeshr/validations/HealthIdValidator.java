@@ -2,6 +2,7 @@ package org.freeshr.validations;
 
 
 import org.freeshr.config.SHRProperties;
+import org.freeshr.utils.StringUtils;
 import org.hl7.fhir.instance.model.*;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +59,7 @@ public class HealthIdValidator implements Validator<EncounterValidationContext> 
     }
 
     private String validateAndIdentifyPatientId(String patientUrl, String healthId) {
-        String expectedUrl = shrProperties.getPatientReferencePath() + "/" + healthId;
+        String expectedUrl = StringUtils.ensureEndsWithBackSlash(shrProperties.getPatientReferencePath()) + healthId;
         if (expectedUrl.trim().equalsIgnoreCase(patientUrl.trim())) {
             return getHealthIdFromUrl(patientUrl);
         }

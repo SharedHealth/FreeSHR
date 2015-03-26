@@ -14,4 +14,13 @@ public class StringUtils {
         });
         return builder.toString();
     }
+
+    public static String ensureEndsWithBackSlash(String value) {
+        String trimmedValue = value.trim();
+        if (!trimmedValue.endsWith("/")) {
+            return trimmedValue + "/";
+        } else {
+            return trimmedValue;
+        }
+    }
 }

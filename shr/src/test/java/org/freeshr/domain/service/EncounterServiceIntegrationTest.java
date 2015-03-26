@@ -34,6 +34,7 @@ import java.util.concurrent.ExecutionException;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.freeshr.data.EncounterBundleData.*;
 import static org.freeshr.utils.FileUtil.asString;
+import static org.freeshr.utils.StringUtils.ensureEndsWithBackSlash;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.*;
@@ -82,7 +83,7 @@ public class EncounterServiceIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/patient_not_confidential.json"))));
 
-        givenThat(get(urlEqualTo(shrProperties.getFRLocationPath() + "/" + VALID_FACILITY_ID + ".json"))
+        givenThat(get(urlEqualTo(ensureEndsWithBackSlash(shrProperties.getFRLocationPath()) + VALID_FACILITY_ID + ".json"))
                 .withHeader("X-Auth-Token", matching(shrProperties.getIdPAuthToken()))
                 .withHeader("client_id", matching(shrProperties.getIdPClientId()))
                 .willReturn(aResponse()

@@ -1,6 +1,7 @@
 package org.freeshr.infrastructure.security;
 
 import org.freeshr.config.SHRProperties;
+import org.freeshr.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
@@ -34,7 +35,7 @@ public class IdentityServiceClient {
 
     public TokenAuthentication authenticate(UserAuthInfo userAuthInfo, String token) throws AuthenticationException, ExecutionException,
             InterruptedException {
-        String userInfoUrl = shrProperties.getIdentityServerBaseUrl() + token;
+        String userInfoUrl = StringUtils.ensureEndsWithBackSlash(shrProperties.getIdentityServerBaseUrl()) + token;
         HttpHeaders httpHeaders = getSHRIdentityHeaders(shrProperties);
         ListenableFuture<ResponseEntity<UserInfo>> listenableFuture = shrRestTemplate.exchange(userInfoUrl,
                 HttpMethod.GET,
