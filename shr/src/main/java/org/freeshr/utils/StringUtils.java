@@ -23,4 +23,13 @@ public class StringUtils {
             return trimmedValue;
         }
     }
+
+    public static String removeEndBackSlash(String value) {
+        String trimmedValue = value.trim();
+        if (!trimmedValue.endsWith("/")) {
+            return trimmedValue;
+        } else {
+            return trimmedValue.substring(0, trimmedValue.length() -1);
+        }
+    }
 }

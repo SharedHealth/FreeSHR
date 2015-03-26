@@ -95,7 +95,7 @@ public class ValueSetCodeValidator implements CodeValidator {
     }
 
     String formatUrl(String code) {
-        return shrProperties.getTRLocationPath() + VALUE_SET_PATTERN + code;
+        return StringUtils.removeEndBackSlash(shrProperties.getTRLocationPath()) + VALUE_SET_PATTERN + code;
     }
 
     boolean shouldCreateUrl(String uri) {
