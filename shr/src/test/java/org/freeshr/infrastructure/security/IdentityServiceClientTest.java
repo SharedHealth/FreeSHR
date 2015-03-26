@@ -27,6 +27,7 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 public class IdentityServiceClientTest {
+    private final String identityServerBaseUrl = "http://localhost:9997/token/";
     @Mock
     AsyncRestTemplate asyncRestTemplate;
     @Mock
@@ -51,8 +52,8 @@ public class IdentityServiceClientTest {
 
         when(shrProperties.getIdPClientId()).thenReturn("123");
         when(shrProperties.getIdPAuthToken()).thenReturn("xyz");
-        when(shrProperties.getIdentityServerBaseUrl()).thenReturn("foo/");
-        when(asyncRestTemplate.exchange("foo/" + token, GET, new HttpEntity(httpHeaders),
+        when(shrProperties.getIdentityServerBaseUrl()).thenReturn(identityServerBaseUrl);
+        when(asyncRestTemplate.exchange(identityServerBaseUrl + token, GET, new HttpEntity(httpHeaders),
                 UserInfo.class)).thenReturn(createResponse(token, OK));
         when(clientAuthentication.verify(userInfo(token), userAuthInfo, token)).thenReturn(true);
 
@@ -79,8 +80,8 @@ public class IdentityServiceClientTest {
 
         when(shrProperties.getIdPClientId()).thenReturn("123");
         when(shrProperties.getIdPAuthToken()).thenReturn("xyz");
-        when(shrProperties.getIdentityServerBaseUrl()).thenReturn("foo/");
-        when(asyncRestTemplate.exchange("foo/" + token, GET, new HttpEntity(httpHeaders),
+        when(shrProperties.getIdentityServerBaseUrl()).thenReturn(identityServerBaseUrl);
+        when(asyncRestTemplate.exchange(identityServerBaseUrl + token, GET, new HttpEntity(httpHeaders),
                 UserInfo.class)).thenReturn(createResponse(token, UNAUTHORIZED));
         new IdentityServiceClient(asyncRestTemplate,
                 shrProperties, clientAuthentication).authenticate(userAuthInfo, token);
@@ -94,8 +95,8 @@ public class IdentityServiceClientTest {
 
         when(shrProperties.getIdPClientId()).thenReturn("123");
         when(shrProperties.getIdPAuthToken()).thenReturn("xyz");
-        when(shrProperties.getIdentityServerBaseUrl()).thenReturn("foo/");
-        when(asyncRestTemplate.exchange("foo/" + token, GET, new HttpEntity(httpHeaders),
+        when(shrProperties.getIdentityServerBaseUrl()).thenReturn(identityServerBaseUrl);
+        when(asyncRestTemplate.exchange(identityServerBaseUrl + token, GET, new HttpEntity(httpHeaders),
                 UserInfo.class)).thenReturn(createResponse(token, OK));
         when(clientAuthentication.verify(userInfo, userAuthInfo, token)).thenReturn(true);
 

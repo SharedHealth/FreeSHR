@@ -121,7 +121,7 @@ public class EncounterController extends ShrController {
                 public void call(List<EncounterBundle> encounterBundles) {
                     try {
                         if (isRestrictedAccess && isConfidentialPatient(encounterBundles)) {
-                            Forbidden errorResult = new Forbidden(format("Access for patient %s data for is denied", healthId));
+                            Forbidden errorResult = new Forbidden(format("Access for patient %s data for user %s is denied", healthId, userInfo.getId()));
                             logger.debug(errorResult.getMessage());
                             deferredResult.setErrorResult(errorResult);
                         } else {
