@@ -15,21 +15,21 @@ public class StringUtils {
         return builder.toString();
     }
 
-    public static String ensureEndsWithBackSlash(String value) {
+    public static String ensureSuffix(String value, String pattern) {
         String trimmedValue = value.trim();
-        if (!trimmedValue.endsWith("/")) {
-            return trimmedValue + "/";
-        } else {
+        if (trimmedValue.endsWith(pattern)) {
             return trimmedValue;
+        } else {
+            return trimmedValue + pattern;
         }
     }
 
-    public static String removeEndBackSlash(String value) {
+    public static String removeSuffix(String value, String pattern) {
         String trimmedValue = value.trim();
-        if (!trimmedValue.endsWith("/")) {
-            return trimmedValue;
+        if (trimmedValue.endsWith(pattern)) {
+            return trimmedValue.substring(0, trimmedValue.lastIndexOf(pattern));
         } else {
-            return trimmedValue.substring(0, trimmedValue.length() -1);
+            return trimmedValue;
         }
     }
 }

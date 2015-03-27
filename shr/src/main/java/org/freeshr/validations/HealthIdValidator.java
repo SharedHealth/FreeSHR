@@ -59,7 +59,7 @@ public class HealthIdValidator implements Validator<EncounterValidationContext> 
     }
 
     private String validateAndIdentifyPatientId(String patientUrl, String healthId) {
-        String expectedUrl = StringUtils.ensureEndsWithBackSlash(shrProperties.getPatientReferencePath()) + healthId;
+        String expectedUrl = StringUtils.ensureSuffix(shrProperties.getPatientReferencePath(), "/") + healthId;
         if (expectedUrl.trim().equalsIgnoreCase(patientUrl.trim())) {
             return getHealthIdFromUrl(patientUrl);
         }

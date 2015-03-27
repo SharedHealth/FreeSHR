@@ -55,6 +55,6 @@ public class FacilityRegistryClient {
     }
 
     private String getFacilityUrl(String facilityId) {
-        return StringUtils.ensureEndsWithBackSlash(shrProperties.getFRLocationPath()) + facilityId + ".json";
+        return StringUtils.ensureSuffix(shrProperties.getFRLocationPath(), "/") + facilityId + ".json";
     }
 }

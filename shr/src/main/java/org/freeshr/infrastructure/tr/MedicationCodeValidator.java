@@ -53,8 +53,8 @@ public class MedicationCodeValidator implements CodeValidator {
     }
 
     private String formMedicationReferenceUrl(String uri) {
-        String terminologyServerReferencePath = StringUtils.ensureEndsWithBackSlash(shrProperties.getTerminologyServerReferencePath());
-        String trLocationPath = StringUtils.ensureEndsWithBackSlash(shrProperties.getTRLocationPath());
+        String terminologyServerReferencePath = StringUtils.ensureSuffix(shrProperties.getTerminologyServerReferencePath(), "/");
+        String trLocationPath = StringUtils.ensureSuffix(shrProperties.getTRLocationPath(), "/");
         return uri.replace(terminologyServerReferencePath, trLocationPath);
     }
 

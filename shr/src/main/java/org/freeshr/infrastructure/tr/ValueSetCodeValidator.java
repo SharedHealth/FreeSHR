@@ -95,7 +95,7 @@ public class ValueSetCodeValidator implements CodeValidator {
     }
 
     String formatUrl(String code) {
-        return StringUtils.removeEndBackSlash(shrProperties.getTRLocationPath()) + VALUE_SET_PATTERN + code;
+        return StringUtils.removeSuffix(shrProperties.getTRLocationPath(), "/") + VALUE_SET_PATTERN + code;
     }
 
     boolean shouldCreateUrl(String uri) {
@@ -110,8 +110,8 @@ public class ValueSetCodeValidator implements CodeValidator {
     }
 
     private String formValueSetReferenceUrl(String uri) {
-        String terminologyServerReferencePath = StringUtils.ensureEndsWithBackSlash(shrProperties.getTerminologyServerReferencePath());
-        String trLocationPath = StringUtils.ensureEndsWithBackSlash(shrProperties.getTRLocationPath());
+        String terminologyServerReferencePath = StringUtils.ensureSuffix(shrProperties.getTerminologyServerReferencePath(), "/");
+        String trLocationPath = StringUtils.ensureSuffix(shrProperties.getTRLocationPath(), "/");
         return uri.replace(terminologyServerReferencePath, trLocationPath);
     }
 }

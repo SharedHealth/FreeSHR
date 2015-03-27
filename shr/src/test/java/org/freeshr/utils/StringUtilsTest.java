@@ -3,8 +3,8 @@ package org.freeshr.utils;
 import org.junit.Test;
 
 import static org.freeshr.utils.StringUtils.concat;
-import static org.freeshr.utils.StringUtils.ensureEndsWithBackSlash;
-import static org.freeshr.utils.StringUtils.removeEndBackSlash;
+import static org.freeshr.utils.StringUtils.ensureSuffix;
+import static org.freeshr.utils.StringUtils.removeSuffix;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -20,12 +20,14 @@ public class StringUtilsTest {
     }
 
     @Test
-    public void shouldEnsureBackSlashAtEnd() {
-        assertEquals("http://example.org/", ensureEndsWithBackSlash("http://example.org"));
+    public void shouldEnsureSuffix() {
+        assertEquals("http://example.org/", ensureSuffix("http://example.org", "/"));
+        assertEquals("1234", ensureSuffix("12", "34"));
     }
 
     @Test
-    public void shouldRemoveEndingBackSlash() {
-        assertEquals("http://example.org", removeEndBackSlash("http://example.org/"));
+    public void shouldRemoveSuffix() {
+        assertEquals("http://example.org", removeSuffix("http://example.org/", "/"));
+        assertEquals("12", removeSuffix("1234", "34"));
     }
 }

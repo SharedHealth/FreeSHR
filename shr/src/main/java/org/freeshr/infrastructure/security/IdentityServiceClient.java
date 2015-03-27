@@ -35,7 +35,7 @@ public class IdentityServiceClient {
 
     public TokenAuthentication authenticate(UserAuthInfo userAuthInfo, String token) throws AuthenticationException, ExecutionException,
             InterruptedException {
-        String userInfoUrl = StringUtils.ensureEndsWithBackSlash(shrProperties.getIdentityServerBaseUrl()) + token;
+        String userInfoUrl = StringUtils.ensureSuffix(shrProperties.getIdentityServerBaseUrl(), "/") + token;
         HttpHeaders httpHeaders = getSHRIdentityHeaders(shrProperties);
         ListenableFuture<ResponseEntity<UserInfo>> listenableFuture = shrRestTemplate.exchange(userInfoUrl,
                 HttpMethod.GET,

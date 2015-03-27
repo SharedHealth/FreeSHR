@@ -60,8 +60,8 @@ public class HttpCodeValidator implements CodeValidator {
     }
 
     private String formTerminologyReferenceUrl(String uri) {
-        String trLocationPath = StringUtils.ensureEndsWithBackSlash(shrProperties.getTRLocationPath());
-        String trRefPath = StringUtils.ensureEndsWithBackSlash(shrProperties.getTerminologyServerReferencePath());
+        String trLocationPath = StringUtils.ensureSuffix(shrProperties.getTRLocationPath(), "/");
+        String trRefPath = StringUtils.ensureSuffix(shrProperties.getTerminologyServerReferencePath(), "/");
         return uri.replace(trRefPath, trLocationPath);
     }
 
