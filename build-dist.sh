@@ -1,2 +1,2 @@
 #!/bin/sh
-./gradlew clean -x test dist -Prelease=$GO_PIPELINE_COUNTER
+./gradlew clean test dist -Prelease=$GO_PIPELINE_COUNTER
