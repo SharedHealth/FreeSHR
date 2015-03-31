@@ -32,4 +32,13 @@ public class StringUtils {
             return trimmedValue;
         }
     }
+
+    public static String removePrefix(String value, String prefix) {
+        String trimmedValue = value.trim();
+        if (trimmedValue.startsWith(prefix)) {
+            return trimmedValue.substring(prefix.length());
+        } else {
+            return trimmedValue;
+        }
+    }
 }

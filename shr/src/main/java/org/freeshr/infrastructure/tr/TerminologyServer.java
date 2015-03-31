@@ -1,36 +1,51 @@
 package org.freeshr.infrastructure.tr;
 
 import org.freeshr.config.SHRProperties;
+import org.freeshr.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import rx.Observable;
 
+import java.util.List;
+
 @Component
 public class TerminologyServer {
 
-    private final CodeValidatorFactory factory;
     private SHRProperties shrProperties;
+    private List<CodeValidator> codeValidatorList;
 
     @Autowired
-    public TerminologyServer(CodeValidatorFactory factory, SHRProperties shrProperties) {
-        this.factory = factory;
+    public TerminologyServer(SHRProperties shrProperties, List<CodeValidator> codeValidatorList) {
         this.shrProperties = shrProperties;
+        this.codeValidatorList = codeValidatorList;
     }
 
-    public Observable<Boolean> isValid(String uri, String code) {
-        String trServerBaseUrl = shrProperties.getTerminologyServerReferencePath();
-        if (!uri.startsWith(trServerBaseUrl)) {
+    public Observable<Boolean> isValid(String system, String code) {
+        String trServerReferencePath = StringUtils.ensureSuffix(shrProperties.getTerminologyServerReferencePath(), "/");
+        if (!system.startsWith(trServerReferencePath)) {
             return Observable.just(false);
         }
 
-        CodeValidator validator = factory.getValidator(uri);
+        String trLocationPath = StringUtils.ensureSuffix(shrProperties.getTRLocationPath(), "/");
+        String terminologyRefSystem = system.replace(trServerReferencePath, trLocationPath);
+
+        CodeValidator validator = identifyCodeValidator(terminologyRefSystem);
         if (validator != null) {
-            return validator.isValid(uri, code);
+            return validator.isValid(terminologyRefSystem, code);
         }
         return Observable.just(false);
     }
 
     public boolean verifiesSystem(String system) {
-        return factory.getValidator(system) != null;
+        return identifyCodeValidator(system) != null;
+    }
+
+    private CodeValidator identifyCodeValidator(String system) {
+        for (CodeValidator codeValidator : codeValidatorList) {
+            if (codeValidator.supports(system)) {
+                return codeValidator;
+            }
+        }
+        return null;
     }
 }

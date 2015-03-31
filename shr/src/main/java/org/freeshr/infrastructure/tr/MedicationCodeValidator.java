@@ -18,8 +18,6 @@ import static org.springframework.util.StringUtils.isEmpty;
 @Component
 public class MedicationCodeValidator implements CodeValidator {
 
-    public static final String MEDICATION_URL_PATTERN = "/openmrs/ws/rest/v1/tr/drugs/";
-
     private final AsyncRestTemplate shrRestTemplate;
     private final SHRProperties shrProperties;
 
@@ -32,10 +30,14 @@ public class MedicationCodeValidator implements CodeValidator {
     }
 
     @Override
-    public Observable<Boolean> isValid(String uri, String code) {
-        if (isEmpty(code) || substringAfterLast(uri, "/").equalsIgnoreCase(code)) {
-            String medicationReferenceUrl = formMedicationReferenceUrl(uri);
-            Observable<Boolean> map = get(medicationReferenceUrl).map(new Func1<ResponseEntity<String>, Boolean>() {
+    public boolean supports(String system) {
+        return (system != null) && system.contains(shrProperties.getTerminologiesContextPathForMedication());
+    }
+
+    @Override
+    public Observable<Boolean> isValid(String system, String code) {
+        if (isEmpty(code) || substringAfterLast(system, "/").equalsIgnoreCase(code)) {
+            Observable<Boolean> map = get(system).map(new Func1<ResponseEntity<String>, Boolean>() {
                 @Override
                 public Boolean call(ResponseEntity<String> response) {
                     return !response.getBody().isEmpty();
@@ -50,12 +52,6 @@ public class MedicationCodeValidator implements CodeValidator {
             });
         }
         return Observable.just(Boolean.FALSE);
-    }
-
-    private String formMedicationReferenceUrl(String uri) {
-        String terminologyServerReferencePath = StringUtils.ensureSuffix(shrProperties.getTerminologyServerReferencePath(), "/");
-        String trLocationPath = StringUtils.ensureSuffix(shrProperties.getTRLocationPath(), "/");
-        return uri.replace(terminologyServerReferencePath, trLocationPath);
     }
 
     private Observable<ResponseEntity<String>> get(String uri) {

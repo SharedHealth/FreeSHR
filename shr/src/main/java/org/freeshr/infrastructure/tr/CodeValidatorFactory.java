@@ -8,10 +8,6 @@ import org.springframework.web.client.AsyncRestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.freeshr.infrastructure.tr.HttpCodeValidator.CONCEPT_PATTERN;
-import static org.freeshr.infrastructure.tr.HttpCodeValidator.REF_TERM_PATTERN;
-import static org.freeshr.infrastructure.tr.MedicationCodeValidator.MEDICATION_URL_PATTERN;
-import static org.freeshr.infrastructure.tr.ValueSetCodeValidator.VALUE_SET_PATTERN;
 
 @Component
 public class CodeValidatorFactory {
@@ -24,16 +20,16 @@ public class CodeValidatorFactory {
                                 ValueSetCodeValidator valueSetCodeValidator,
                                 MedicationCodeValidator medicationCodeValidator) {
         codeValidatorMap = new HashMap<>();
-        codeValidatorMap.put(REF_TERM_PATTERN, new HttpCodeValidator(shrRestTemplate, shrProperties, "code", REF_TERM_PATTERN));
-        codeValidatorMap.put(CONCEPT_PATTERN, new HttpCodeValidator(shrRestTemplate, shrProperties, "uuid", CONCEPT_PATTERN));
-        codeValidatorMap.put(VALUE_SET_PATTERN, valueSetCodeValidator);
-        codeValidatorMap.put(MEDICATION_URL_PATTERN, medicationCodeValidator);
+        codeValidatorMap.put(shrProperties.getReferenceTermContextPath(), new HttpCodeValidator(shrRestTemplate, shrProperties));
+        codeValidatorMap.put(shrProperties.getInterfaceTermContextPath(), new HttpCodeValidator(shrRestTemplate, shrProperties));
+        codeValidatorMap.put(shrProperties.getTerminologiesContextPathForValueSet(), valueSetCodeValidator);
+        codeValidatorMap.put(shrProperties.getTerminologiesContextPathForMedication(), medicationCodeValidator);
     }
 
 
-    public CodeValidator getValidator(String url) {
+    public CodeValidator getValidator(String systemUrl) {
         for (String urlKey : codeValidatorMap.keySet()) {
-            if (url.contains(urlKey)) {
+            if (systemUrl.contains(urlKey)) {
                 return codeValidatorMap.get(urlKey);
             }
         }

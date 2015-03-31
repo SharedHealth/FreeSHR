@@ -2,9 +2,7 @@ package org.freeshr.utils;
 
 import org.junit.Test;
 
-import static org.freeshr.utils.StringUtils.concat;
-import static org.freeshr.utils.StringUtils.ensureSuffix;
-import static org.freeshr.utils.StringUtils.removeSuffix;
+import static org.freeshr.utils.StringUtils.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -29,5 +27,11 @@ public class StringUtilsTest {
     public void shouldRemoveSuffix() {
         assertEquals("http://example.org", removeSuffix("http://example.org/", "/"));
         assertEquals("12", removeSuffix("1234", "34"));
+    }
+
+    @Test
+    public void shouldRemovePrefix() {
+        assertEquals("abcd", removePrefix("/abcd", "/"));
+        assertEquals("abcd", removePrefix("1234abcd", "1234"));
     }
 }

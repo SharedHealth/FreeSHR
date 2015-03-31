@@ -23,8 +23,6 @@ import static org.freeshr.utils.HttpUtil.basicAuthHeaders;
 @Component
 public class ValueSetCodeValidator implements CodeValidator {
 
-    public static final String VALUE_SET_PATTERN = "/openmrs/ws/rest/v1/tr/vs/";
-
     private AsyncRestTemplate shrRestTemplate;
     private SHRProperties shrProperties;
 
@@ -37,9 +35,13 @@ public class ValueSetCodeValidator implements CodeValidator {
     }
 
     @Override
-    public Observable<Boolean> isValid(final String uri, final String code) {
-        String valueSetUrl = formValueSetReferenceUrl(uri);
-        Observable<Boolean> map = get(valueSetUrl).map(new Func1<ResponseEntity<String>, Boolean>() {
+    public boolean supports(String system) {
+        return system != null && system.contains(shrProperties.getTerminologiesContextPathForValueSet());
+    }
+
+    @Override
+    public Observable<Boolean> isValid(final String system, final String code) {
+        Observable<Boolean> map = get(system).map(new Func1<ResponseEntity<String>, Boolean>() {
             @Override
             public Boolean call(ResponseEntity<String> stringResponseEntity) {
                 try {
@@ -95,7 +97,7 @@ public class ValueSetCodeValidator implements CodeValidator {
     }
 
     String formatUrl(String code) {
-        return StringUtils.removeSuffix(shrProperties.getTRLocationPath(), "/") + VALUE_SET_PATTERN + code;
+        return StringUtils.removeSuffix(shrProperties.getTRLocationPath(), "/") + shrProperties.getTerminologiesContextPathForValueSet() + code;
     }
 
     boolean shouldCreateUrl(String uri) {
@@ -107,11 +109,5 @@ public class ValueSetCodeValidator implements CodeValidator {
                 HttpMethod.GET,
                 new HttpEntity(basicAuthHeaders(shrProperties.getTrUser(), shrProperties.getTrPassword())),
                 String.class));
-    }
-
-    private String formValueSetReferenceUrl(String uri) {
-        String terminologyServerReferencePath = StringUtils.ensureSuffix(shrProperties.getTerminologyServerReferencePath(), "/");
-        String trLocationPath = StringUtils.ensureSuffix(shrProperties.getTRLocationPath(), "/");
-        return uri.replace(terminologyServerReferencePath, trLocationPath);
     }
 }

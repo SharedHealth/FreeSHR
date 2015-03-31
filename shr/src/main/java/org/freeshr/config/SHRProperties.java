@@ -13,6 +13,10 @@ public class SHRProperties {
     public static final int ONE_DAY = 86400;
     public static final int ONE_MINUTE = 6000;
     public static final String DIAGNOSTICS_SERVLET_PATH = "/diagnostics/health";
+    private static final String REF_TERM_PATTERN = "/openmrs/ws/rest/v1/tr/referenceterms/";
+    private static final String CONCEPT_PATTERN = "/openmrs/ws/rest/v1/tr/concepts/";
+    private static final String MEDICATION_URL_PATTERN = "/openmrs/ws/rest/v1/tr/drugs/";
+    private static final String VALUE_SET_PATTERN = "/openmrs/ws/rest/v1/tr/vs/";
 
     @Value("${MCI_PATIENT_PATH}")
     private String mciPatientPath;
@@ -71,6 +75,22 @@ public class SHRProperties {
     private String[] facilityServerLocationUrls = null;
     private String[] providerServerLocationUrls = null;
     private String[] terminologyServerLocationUrls = null;
+
+    public String getInterfaceTermContextPath() {
+        return CONCEPT_PATTERN;
+    }
+
+    public String getTerminologiesContextPathForValueSet() {
+        return VALUE_SET_PATTERN;
+    }
+
+    public String getTerminologiesContextPathForMedication() {
+        return MEDICATION_URL_PATTERN;
+    }
+
+    public String getReferenceTermContextPath() {
+        return REF_TERM_PATTERN;
+    }
 
     public String getIdentityServerBaseUrl() {
         return identityServerBaseUrl;
