@@ -112,7 +112,13 @@ public class EncounterController extends ShrController {
         final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<>();
 
         try {
-            final boolean isRestrictedAccess = isAccessRestrictedToEncounterFetchForPatient(healthId, userInfo);
+            final Boolean isRestrictedAccess = isAccessRestrictedToEncounterFetchForPatient(healthId, userInfo);
+            if (isRestrictedAccess == null) {
+                Forbidden errorResult = new Forbidden(String.format("Access is denied to user %s for patient %s", userInfo.getProperties().getId(), healthId));
+                deferredResult.setErrorResult(errorResult);
+                logger.debug(errorResult.getMessage());
+                return deferredResult;
+            }
             final Date requestedDate = getRequestedDate(updatedSince);
             Observable<List<EncounterBundle>> encountersForPatient =
                     encounterService.findEncountersForPatient(healthId, requestedDate, 200);
@@ -121,7 +127,7 @@ public class EncounterController extends ShrController {
                 public void call(List<EncounterBundle> encounterBundles) {
                     try {
                         if (isRestrictedAccess && isConfidentialPatient(encounterBundles)) {
-                            Forbidden errorResult = new Forbidden(format("Access for patient %s data for user %s is denied", healthId, userInfo.getProperties().getId()));
+                            Forbidden errorResult = new Forbidden(format("Access is denied to user %s for patient %s", userInfo.getProperties().getId(), healthId));
                             logger.debug(errorResult.getMessage());
                             deferredResult.setErrorResult(errorResult);
                         } else {
@@ -171,7 +177,13 @@ public class EncounterController extends ShrController {
                 throw new BadRequest("Catchment should have division and district");
             }
             final Date requestedDate = getRequestedDateForCatchment(updatedSince);
-            final boolean isRestrictedAccess = isAccessRestrictedToEncounterFetchForCatchment(catchment, userInfo);
+            final Boolean isRestrictedAccess = isAccessRestrictedToEncounterFetchForCatchment(catchment, userInfo);
+            if(isRestrictedAccess == null) {
+                Forbidden errorResult = new Forbidden(String.format("Access is denied to user %s for catchment %s", userInfo.getProperties().getId(), catchment));
+                logger.debug(errorResult.getMessage());
+                deferredResult.setErrorResult(errorResult);
+                return deferredResult;
+            }
             final Observable<List<EncounterBundle>> catchmentEncounters =
                     findFacilityCatchmentEncounters(catchment, lastMarker, requestedDate);
             catchmentEncounters.subscribe(new Action1<List<EncounterBundle>>() {
@@ -210,11 +222,11 @@ public class EncounterController extends ShrController {
             @PathVariable String healthId, @PathVariable final String encounterId) {
         final DeferredResult<EncounterBundle> deferredResult = new DeferredResult<>();
         logger.debug(format("Find encounter %s for patient %s", encounterId, healthId));
-        UserInfo userInfo = getUserInfo();
+        final UserInfo userInfo = getUserInfo();
         logAccessDetails(userInfo, format("Find encounter %s for patient %s", encounterId, healthId));
 
         try {
-            final boolean isRestrictedAccess = isAccessRestrictedToEncounterFetchForPatient(healthId, userInfo);
+            final Boolean isRestrictedAccess = isAccessRestrictedToEncounterFetchForPatient(healthId, userInfo);
             Observable<EncounterBundle> observable = encounterService.findEncounter(healthId,
                     encounterId).firstOrDefault(null);
             observable.subscribe(new Action1<EncounterBundle>() {
@@ -222,9 +234,9 @@ public class EncounterController extends ShrController {
                                      public void call(EncounterBundle encounterBundle) {
                                          if (encounterBundle != null) {
                                              logger.debug(encounterBundle.toString());
-                                             if (isRestrictedAccess && isConfidentialEncounter(encounterBundle)) {
-                                                 Forbidden errorResult = new Forbidden(format("Access for encounter %s for is denied",
-                                                         encounterId));
+                                             if ((isRestrictedAccess == null || isRestrictedAccess) && isConfidentialEncounter(encounterBundle)) {
+                                                 Forbidden errorResult = new Forbidden(format("Access is denied to user %s for encounter %s",
+                                                         userInfo.getProperties().getId(), encounterId));
                                                  logger.debug(errorResult.getMessage());
                                                  deferredResult.setErrorResult(errorResult);
                                              } else {

@@ -4,7 +4,6 @@ import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.infrastructure.security.UserProfile;
-import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -81,9 +80,9 @@ public class AccessFilterTest {
         assertFalse(isAccessRestrictedToEncounterFetchForPatient(HEALTH_ID, patient));
     }
 
-    @Test(expected = Forbidden.class)
+    @Test
     public void shouldNotAllowAccessForEncounterFetchToPatientForOtherHid() throws Exception {
-        isAccessRestrictedToEncounterFetchForPatient("some hid", patient);
+        assertNull(isAccessRestrictedToEncounterFetchForPatient("some hid", patient));
     }
 
     @Test
@@ -106,9 +105,9 @@ public class AccessFilterTest {
         assertTrue(isAccessRestrictedToEncounterFetchForCatchment(FACILITY_CATCHMENT, facility));
     }
 
-    @Test(expected = Forbidden.class)
+    @Test
     public void shouldNotAllowAccessForCatchmentFetchToFacilityWithOtherCatchment() throws Exception {
-        assertTrue(isAccessRestrictedToEncounterFetchForCatchment(PROVIDER_CATCHMENT, facility));
+        assertNull(isAccessRestrictedToEncounterFetchForCatchment(PROVIDER_CATCHMENT, facility));
     }
 
     @Test
@@ -116,9 +115,9 @@ public class AccessFilterTest {
         assertFalse(isAccessRestrictedToEncounterFetchForCatchment(FACILITY_CATCHMENT, datasenseFacility));
     }
 
-    @Test(expected = Forbidden.class)
+    @Test
     public void shouldNotAllowAccessForCatchmentFetchToDatasenseForOtherCatchment() throws Exception {
-        assertFalse(isAccessRestrictedToEncounterFetchForCatchment(PROVIDER_CATCHMENT, datasenseFacility));
+        assertNull(isAccessRestrictedToEncounterFetchForCatchment(PROVIDER_CATCHMENT, datasenseFacility));
     }
 
     @Test
@@ -131,14 +130,14 @@ public class AccessFilterTest {
         assertTrue(isAccessRestrictedToEncounterFetchForCatchment(PROVIDER_CATCHMENT, facilityAndProvider));
     }
 
-    @Test(expected = Forbidden.class)
+    @Test
     public void shouldNotAllowAccessForCatchmentFetchToFacilityAndProviderWithOtherCatchment() throws Exception {
-        assertTrue(isAccessRestrictedToEncounterFetchForCatchment("1029", facilityAndProvider));
+        assertNull(isAccessRestrictedToEncounterFetchForCatchment("1029", facilityAndProvider));
     }
 
-    @Test(expected = Forbidden.class)
+    @Test
     public void shouldNotAllowAccessForCatchmentFetchToPatient() throws Exception {
-        assertTrue(isAccessRestrictedToEncounterFetchForCatchment("1029", patient));
+        assertNull(isAccessRestrictedToEncounterFetchForCatchment("1029", patient));
     }
 
     @Test
@@ -146,9 +145,9 @@ public class AccessFilterTest {
         assertTrue(isAccessRestrictedToEncounterFetchForCatchment(PROVIDER_CATCHMENT, providerAndPatient));
     }
 
-    @Test(expected = Forbidden.class)
+    @Test
     public void shouldNotAllowAccessForCatchmentFetchToProviderAndPatientWithOtherCatchment() throws Exception {
-        assertTrue(isAccessRestrictedToEncounterFetchForCatchment("1029", providerAndPatient));
+        assertNull(isAccessRestrictedToEncounterFetchForCatchment("1029", providerAndPatient));
     }
 
     @Test
@@ -156,9 +155,9 @@ public class AccessFilterTest {
         assertTrue(isAccessRestrictedToEncounterFetchForCatchment(PROVIDER_CATCHMENT, provider));
     }
 
-    @Test(expected = Forbidden.class)
+    @Test
     public void shouldNotAllowAccessForCatchmentFetchToProviderWithOtherCatchment() throws Exception {
-        assertTrue(isAccessRestrictedToEncounterFetchForCatchment("1029", provider));
+        assertNull(isAccessRestrictedToEncounterFetchForCatchment("1029", provider));
     }
 
     @Test
