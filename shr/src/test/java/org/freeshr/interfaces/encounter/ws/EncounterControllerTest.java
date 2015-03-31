@@ -218,7 +218,6 @@ public class EncounterControllerTest {
 
     private TokenAuthentication tokenAuthentication() {
         return new TokenAuthentication(new UserInfo("1232", "foo", "email@gmail.com", 1, true,
-                "xyz", new ArrayList<String>(), asList(new UserProfile("facility", "10000069", asList("3026"))))
-                .loadUserProperties(), true);
+                "xyz", new ArrayList<String>(), asList(new UserProfile("facility", "10000069", asList("3026")))), true);
     }
 }

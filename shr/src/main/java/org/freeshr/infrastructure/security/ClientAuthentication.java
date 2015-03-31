@@ -22,12 +22,12 @@ public class ClientAuthentication {
     }
 
     private boolean isInvalidEmail(UserInfo userInfo, UserAuthInfo userAuthInfo) {return !userAuthInfo.getEmail().equals(userInfo
-            .getEmail());}
+            .getProperties().getEmail());}
 
     private boolean isInvalidClient(UserInfo userInfo, UserAuthInfo userAuthInfo) {return !userAuthInfo.getClientId().equals(userInfo
-            .getId());}
+            .getProperties().getId());}
 
-    private boolean isInvalidToken(UserInfo userInfo, String token) {return !token.equals(userInfo.getAccessToken());}
+    private boolean isInvalidToken(UserInfo userInfo, String token) {return !token.equals(userInfo.getProperties().getAccessToken());}
 
-    private boolean isInactiveUser(UserInfo userInfo) {return !userInfo.isActivated() || userInfo.getIsActive() != 1;}
+    private boolean isInactiveUser(UserInfo userInfo) {return !userInfo.getProperties().isActivated() || userInfo.getProperties().getIsActive() != 1;}
 }

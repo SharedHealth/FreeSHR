@@ -68,7 +68,7 @@ public class EncounterController extends ShrController {
             logger.debug("Create encounter. " + encounterBundle.getContent());
             encounterBundle.setHealthId(healthId);
             Observable<EncounterResponse> encounterResponse = encounterService.ensureCreated(encounterBundle,
-                    new UserAuthInfo(userInfo.getId(), userInfo.getEmail(), userInfo.getAccessToken()));
+                    new UserAuthInfo(userInfo.getProperties().getId(), userInfo.getProperties().getEmail(), userInfo.getProperties().getAccessToken()));
 
             encounterResponse.subscribe(new Action1<EncounterResponse>() {
                 @Override
@@ -99,7 +99,7 @@ public class EncounterController extends ShrController {
         return deferredResult;
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER', 'ROLE_SHR_PATIENT', 'ROLE_Datasense Facility')")
+    @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER', 'ROLE_SHR_PATIENT', 'ROLE_SHR System Admin')")
     @RequestMapping(value = "/patients/{healthId}/encounters", method = RequestMethod.GET,
             produces = {"application/json", "application/atom+xml"})
     public DeferredResult<EncounterSearchResponse> findEncountersForPatient(
@@ -121,7 +121,7 @@ public class EncounterController extends ShrController {
                 public void call(List<EncounterBundle> encounterBundles) {
                     try {
                         if (isRestrictedAccess && isConfidentialPatient(encounterBundles)) {
-                            Forbidden errorResult = new Forbidden(format("Access for patient %s data for user %s is denied", healthId, userInfo.getId()));
+                            Forbidden errorResult = new Forbidden(format("Access for patient %s data for user %s is denied", healthId, userInfo.getProperties().getId()));
                             logger.debug(errorResult.getMessage());
                             deferredResult.setErrorResult(errorResult);
                         } else {
@@ -153,7 +153,7 @@ public class EncounterController extends ShrController {
         return deferredResult;
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER', 'ROLE_Datasense Facility')")
+    @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER', 'ROLE_SHR System Admin')")
     @RequestMapping(value = "/catchments/{catchment}/encounters", method = RequestMethod.GET,
             produces = {"application/json", "application/atom+xml"})
     public DeferredResult<EncounterSearchResponse> findEncountersForCatchment(
@@ -164,8 +164,8 @@ public class EncounterController extends ShrController {
             throws ExecutionException, InterruptedException, ParseException, UnsupportedEncodingException {
         final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<>();
         final UserInfo userInfo = getUserInfo();
-        logger.debug(format("Find all encounters for facility %s in catchment %s", userInfo.getFacilityId(), catchment));
-        logAccessDetails(userInfo, format("Find all encounters for facility %s in catchment %s", userInfo.getFacilityId(), catchment));
+        logger.debug(format("Find all encounters for facility %s in catchment %s", userInfo.getProperties().getFacilityId(), catchment));
+        logAccessDetails(userInfo, format("Find all encounters for facility %s in catchment %s", userInfo.getProperties().getFacilityId(), catchment));
         try {
             if (catchment.length() < 4) {
                 throw new BadRequest("Catchment should have division and district");
@@ -203,7 +203,7 @@ public class EncounterController extends ShrController {
         return deferredResult;
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER', 'ROLE_SHR_PATIENT', 'ROLE_Datasense Facility')")
+    @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER', 'ROLE_SHR_PATIENT', 'ROLE_SHR System Admin')")
     @RequestMapping(value = "/patients/{healthId}/encounters/{encounterId}", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
     public DeferredResult<EncounterBundle> findEncountersForPatient(

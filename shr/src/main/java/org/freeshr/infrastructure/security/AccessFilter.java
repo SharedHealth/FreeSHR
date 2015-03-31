@@ -8,21 +8,27 @@ import org.freeshr.utils.Confidentiality;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Arrays.asList;
+import static org.freeshr.infrastructure.security.UserProfile.FACILITY_TYPE;
+import static org.freeshr.infrastructure.security.UserProfile.PROVIDER_TYPE;
+
 public class AccessFilter {
     public static boolean isAccessRestrictedToEncounterFetchForPatient(String healthId, UserInfo userInfo) {
-        if (userInfo.getPatientHid() != null && userInfo.getPatientHid().equals(healthId))
+        if (userInfo.getProperties().getPatientHid() != null && userInfo.getProperties().getPatientHid().equals(healthId)) {
             return false;
-        else if (userInfo.getFacilityId() != null || userInfo.getProviderId() != null) {
-            return userInfo.isNotDatasenseFacility();
+        } else if (userInfo.getProperties().isShrSystemAdmin()) {
+            return false;
+        } else if (userInfo.getProperties().getFacilityId() != null || userInfo.getProperties().getProviderId() != null) {
+            return true;
         }
-        throw new Forbidden(String.format("Access for patient %s is denied for user %s", healthId, userInfo.getId()));
+        throw new Forbidden(String.format("Access is denied to user %s for patient %s", userInfo.getProperties().getId(), healthId));
     }
 
     public static boolean isAccessRestrictedToEncounterFetchForCatchment(String catchment, UserInfo userInfo) {
-        if (userInfo.hasCatchment(catchment)) {
-            return userInfo.isNotDatasenseFacility();
+        if (userInfo.getProperties().hasCatchmentForProfileType(catchment, asList(FACILITY_TYPE, PROVIDER_TYPE))) {
+            return !userInfo.getProperties().isShrSystemAdmin();
         }
-        throw new Forbidden(String.format("Access to catchment [%s] is denied for user [%s]", catchment, userInfo.getId()));
+        throw new Forbidden(String.format("Access is denied to user %s for catchment %s", userInfo.getProperties().getId(), catchment));
     }
 
     public static List<EncounterBundle> filterEncounters(boolean isRestrictedAccess, List<EncounterBundle> encounterBundles) {

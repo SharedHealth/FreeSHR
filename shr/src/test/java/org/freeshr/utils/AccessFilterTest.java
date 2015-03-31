@@ -41,30 +41,24 @@ public class AccessFilterTest {
         initMocks(this);
         facility = new UserInfo("1", "bahmni", "bahmni@gmail.com", 1,
                 true, "xyz", new ArrayList<>(asList(FACILITY_ADMIN_GROUP, SHR_USER_GROUP)),
-                asList(new UserProfile(FACILITY_TYPE, FACILITY_ID, asList(FACILITY_CATCHMENT))))
-                .loadUserProperties();
+                asList(new UserProfile(FACILITY_TYPE, FACILITY_ID, asList(FACILITY_CATCHMENT))));
         datasenseFacility = new UserInfo("2", "datasense", "datasense@gmail.com", 1,
-                true, "xyz", new ArrayList<>(asList(FACILITY_ADMIN_GROUP, SHR_USER_GROUP, DATASENSE_FACILITY_GROUP)),
-                asList(new UserProfile(FACILITY_TYPE, DATASENSE_FACILITY_ID, asList(FACILITY_CATCHMENT))))
-                .loadUserProperties();
+                true, "xyz", new ArrayList<>(asList(FACILITY_ADMIN_GROUP, SHR_SYSTEM_ADMIN_GROUP)),
+                asList(new UserProfile(FACILITY_TYPE, DATASENSE_FACILITY_ID, asList(FACILITY_CATCHMENT))));
         facilityAndProvider = new UserInfo("3", "facilityandprovider", "facilityandprovider@gmail.com", 1,
                 true, "xyz", new ArrayList<>(asList("Facility Admin", SHR_USER_GROUP)),
                 asList(new UserProfile(FACILITY_TYPE, FACILITY_ID, asList(FACILITY_CATCHMENT)),
-                        new UserProfile("provider", PROVIDER_ID, asList(PROVIDER_CATCHMENT))))
-                .loadUserProperties();
+                        new UserProfile("provider", PROVIDER_ID, asList(PROVIDER_CATCHMENT))));
         patient = new UserInfo("4", "patient", "patient@gmail.com", 1,
                 true, "xyz", new ArrayList<>(asList(SHR_USER_GROUP)),
-                asList(new UserProfile(PATIENT_TYPE, HEALTH_ID, null)))
-                .loadUserProperties();
+                asList(new UserProfile(PATIENT_TYPE, HEALTH_ID, null)));
         providerAndPatient = new UserInfo("5", "providerAndPatient", "providerAndPatient@gmail.com", 1,
                 true, "xyz", new ArrayList<>(asList(SHR_USER_GROUP)),
                 asList(new UserProfile(PROVIDER_TYPE, PROVIDER_ID, asList(PROVIDER_CATCHMENT)),
-                        new UserProfile(PATIENT_TYPE, HEALTH_ID_FOR_PROVIDER, null)))
-                .loadUserProperties();
+                        new UserProfile(PATIENT_TYPE, HEALTH_ID_FOR_PROVIDER, null)));
         provider = new UserInfo("6", "provider", "provider@gmail.com", 1,
                 true, "xyz", new ArrayList<>(asList(SHR_USER_GROUP)),
-                asList(new UserProfile(PROVIDER_TYPE, PROVIDER_ID, asList(PROVIDER_CATCHMENT))))
-                .loadUserProperties();
+                asList(new UserProfile(PROVIDER_TYPE, PROVIDER_ID, asList(PROVIDER_CATCHMENT))));
     }
 
     @Test

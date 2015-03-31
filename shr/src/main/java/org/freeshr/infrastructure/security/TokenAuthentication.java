@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.List;
 
 public class TokenAuthentication implements Authentication {
-    public static final String ROLE_PREFIX = "ROLE_";
     private UserInfo userInfo;
     private List<? extends GrantedAuthority> groups;
     private boolean isAuthenticated;
@@ -21,16 +20,8 @@ public class TokenAuthentication implements Authentication {
     }
 
     private List<GrantedAuthority> getUserGroups(UserInfo userInfo) {
-        List<String> userRoles = prefixGroupNames(userInfo.getGroups());
-        String commaSeparatedRoles = StringUtils.join(userRoles, ",");
+        String commaSeparatedRoles = StringUtils.join(userInfo.getProperties().getGroups(), ",");
         return AuthorityUtils.commaSeparatedStringToAuthorityList(commaSeparatedRoles);
-    }
-
-    private List<String> prefixGroupNames(List<String> userGroups) {
-        for (int index = 0; index < userGroups.size(); index++) {
-            userGroups.set(index, String.format("%s%s", ROLE_PREFIX, userGroups.get(index)));
-        }
-        return userGroups;
     }
 
     @Override
@@ -40,7 +31,7 @@ public class TokenAuthentication implements Authentication {
 
     @Override
     public Object getCredentials() {
-        return userInfo.getAccessToken();
+        return userInfo.getProperties().getAccessToken();
     }
 
     @Override
@@ -82,6 +73,6 @@ public class TokenAuthentication implements Authentication {
 
     @Override
     public String getName() {
-        return userInfo.getName();
+        return userInfo.getProperties().getName();
     }
 }

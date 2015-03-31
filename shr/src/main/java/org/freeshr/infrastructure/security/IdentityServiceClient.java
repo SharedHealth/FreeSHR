@@ -44,7 +44,6 @@ public class IdentityServiceClient {
         if (!responseEntity.getStatusCode().is2xxSuccessful())
             throw new AuthenticationServiceException("Unable to authenticate user.");
         UserInfo userInfo = responseEntity.getBody();
-        userInfo.loadUserProperties();
         return new TokenAuthentication(userInfo, clientAuthentication.verify(userInfo, userAuthInfo, token));
     }
 }

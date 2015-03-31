@@ -43,7 +43,7 @@ public class TokenAuthenticationProviderTest {
         Authentication tokenAuthentication = authenticationProvider.authenticate(authentication);
 
         assertEquals("foo", tokenAuthentication.getName());
-        assertEquals(getUserInfo(token).getId(), ((UserInfo) tokenAuthentication.getPrincipal()).getId());
+        assertEquals(getUserInfo(token).getProperties().getId(), ((UserInfo) tokenAuthentication.getPrincipal()).getProperties().getId());
         assertEquals(token.toString(), tokenAuthentication.getCredentials());
         assertTrue(tokenAuthentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_MCI_ADMIN")));
         assertTrue(tokenAuthentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_SHR_USER")));
