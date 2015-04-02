@@ -1,5 +1,7 @@
 package org.freeshr.utils;
 
+import org.hl7.fhir.instance.model.DateAndTime;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -14,6 +16,9 @@ public class DateUtil {
     public static final String ISO_DATE_IN_MILLIS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"; //2015-02-17T11:36:11.587+0530
     public static final String ISO_DATE_IN_SECS_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"; //2015-02-17T11:37:16+0530
     public static final String ISO_DATE_IN_HOUR_MIN_FORMAT = "yyyy-MM-dd'T'HH:mmZ"; //2015-02-17T11:37+0530
+    public static final String ISO_8601_DATE_IN_MILLIS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"; //2015-02-17T11:36:11.587+05:30
+    public static final String ISO_8601_DATE_IN_SECS_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ"; //2015-02-17T11:37:16+05:30
+    public static final String ISO_8601_DATE_IN_HOUR_MIN_FORMAT = "yyyy-MM-dd'T'HH:mmZZ"; //2015-02-17T11:37+05:30
 
     public static final String UTC_DATE_MILLIS_TZD_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSX"; //2011-04-15T20:08:18.032Z
     public static final String UTC_DATE_IN_SECS_TZD_FORMAT = "yyyy-MM-dd'T'HH:mm:ssX"; //2011-04-15T20:08:18Z;
@@ -29,7 +34,9 @@ public class DateUtil {
             SIMPLE_DATE_WITH_SECS_FORMAT, SIMPLE_DATE_FORMAT,
             UTC_DATE_MILLIS_TZD_FORMAT, UTC_DATE_IN_SECS_TZD_FORMAT,
             UTC_DATE_IN_MIN_TZD_FORMAT, UTC_DATE_IN_HOUR_TZD_FORMAT,
-            UTC_DATE_IN_DATE_TZD_FORMAT, UTC_DATE_IN_SIMPLE_TZD_FORMAT};
+            UTC_DATE_IN_DATE_TZD_FORMAT, UTC_DATE_IN_SIMPLE_TZD_FORMAT,
+            ISO_8601_DATE_IN_SECS_FORMAT, ISO_8601_DATE_IN_MILLIS_FORMAT,
+            ISO_8601_DATE_IN_HOUR_MIN_FORMAT};
 
     public static String getCurrentTimeInUTCString() {
         SimpleDateFormat dateFormat = new SimpleDateFormat(UTC_DATE_IN_MILLIS_FORMAT);
@@ -52,7 +59,7 @@ public class DateUtil {
 
     public static Date parseDate(String date) {
         try {
-            return parseDate(date, DateUtil.DATE_FORMATS);
+            return parseDate(date, DATE_FORMATS);
         } catch (ParseException e) {
             throw new RuntimeException("invalid date:" + date);
         }
@@ -78,5 +85,28 @@ public class DateUtil {
     public static String toDateString(Date date, String format) {
         SimpleDateFormat dateFormat = new SimpleDateFormat(format);
         return dateFormat.format(date);
+    }
+
+    public static boolean isValidPeriod(DateAndTime startDate, DateAndTime endDate) {
+        Date parsedStartDate = null;
+        Date parsedEndDate = null;
+        try {
+            if (startDate != null) {
+                parsedStartDate = parseDate(startDate.toString(), DATE_FORMATS);
+            }
+            if (endDate != null) {
+                parsedEndDate = parseDate(endDate.toString(), DATE_FORMATS);
+            }
+        } catch (ParseException e) {
+            return false;
+        }
+        if(parsedStartDate != null && parsedEndDate != null) {
+            return isValidRangeOfDates(parsedStartDate, parsedEndDate);
+        }
+        return true;
+    }
+
+    private static boolean isValidRangeOfDates(Date startDate, Date endDate) {
+        return startDate.before(endDate) || startDate.equals(endDate);
     }
 }

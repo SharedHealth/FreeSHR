@@ -1,6 +1,7 @@
 package org.freeshr.validations;
 
 
+import org.freeshr.utils.DateUtil;
 import org.hl7.fhir.instance.model.*;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.slf4j.Logger;
@@ -11,16 +12,10 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.freeshr.utils.DateUtil.isValidPeriod;
+
 @Component
 public class ProcedureValidator implements Validator<AtomEntry<? extends Resource>> {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProcedureValidator.class);
-    private DateValidator dateValidator;
-
-    @Autowired
-    public ProcedureValidator(DateValidator dateValidator) {
-        this.dateValidator = dateValidator;
-    }
 
     @Override
     public List<ValidationMessage> validate(ValidationSubject<AtomEntry<? extends Resource>> subject) {
@@ -55,10 +50,7 @@ public class ProcedureValidator implements Validator<AtomEntry<? extends Resourc
             if (!(element instanceof Period)) continue;
 
             Period period = (Period) element;
-            DateAndTime endDate = period.getEndSimple();
-            DateAndTime startDate = period.getStartSimple();
-
-            if (!dateValidator.isValidPeriod(startDate, endDate))
+            if (!isValidPeriod(period.getStartSimple(), period.getEndSimple()))
                 return validationMessages(new ValidationMessage(null, ResourceValidator.INVALID, atomEntry.getId(), ValidationMessages
                         .INVALID_PERIOD, OperationOutcome.IssueSeverity.error));
         }

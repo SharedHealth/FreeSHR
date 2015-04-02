@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static org.freeshr.utils.AtomFeedHelper.getAtomFeed;
 import static org.junit.Assert.*;
 
 public class ProcedureValidatorTest {
@@ -18,14 +19,14 @@ public class ProcedureValidatorTest {
 
     @Before
     public void setUp() {
-        procedureValidator = new ProcedureValidator(new DateValidator());
+        procedureValidator = new ProcedureValidator();
     }
 
     @Test
     public void shouldValidateProcedure() {
 
-        ValidationSubject<AtomEntry<? extends Resource>> feed = AtomFeedHelper.getAtomFeed("xmls/encounters/procedure/encounter_Procedure" +
-                ".xml", ResourceType.Procedure);
+        ValidationSubject<AtomEntry<? extends Resource>> feed = getAtomFeed("xmls/encounters/procedure/encounter_Procedure.xml",
+                ResourceType.Procedure);
         List<ValidationMessage> validationMessages = procedureValidator.validate(feed);
         assertTrue(validationMessages.isEmpty());
 
@@ -34,7 +35,7 @@ public class ProcedureValidatorTest {
     @Test
     public void shouldValidateDateInProcedure() {
 
-        ValidationSubject<AtomEntry<? extends Resource>> feed = AtomFeedHelper.getAtomFeed
+        ValidationSubject<AtomEntry<? extends Resource>> feed = getAtomFeed
                 ("xmls/encounters/procedure/encounter_invalid_period_Procedure.xml", ResourceType.Procedure);
         List<ValidationMessage> validationMessages = procedureValidator.validate(feed);
         assertFalse(validationMessages.isEmpty());
@@ -46,7 +47,7 @@ public class ProcedureValidatorTest {
     @Test
     public void shouldValidateDiagnosticReportResourceReference() {
 
-        ValidationSubject<AtomEntry<? extends Resource>> feed = AtomFeedHelper.getAtomFeed
+        ValidationSubject<AtomEntry<? extends Resource>> feed = getAtomFeed
                 ("xmls/encounters/procedure/encounter_invalid_report_reference_Procedure.xml", ResourceType.Procedure);
         List<ValidationMessage> validationMessages = procedureValidator.validate(feed);
         assertFalse(validationMessages.isEmpty());
