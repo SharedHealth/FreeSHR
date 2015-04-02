@@ -49,7 +49,7 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
             chain.doFilter(request, response);
 
         } catch (AuthenticationException ex) {
-            logger.info(String.format("Access to user=%s with email=%s is denied.", clientId, email));
+            logger.debug(String.format("Access to user=%s with email=%s is denied.", clientId, email));
             SecurityContextHolder.clearContext();
             httpResponse.sendError(SC_UNAUTHORIZED, ex.getMessage());
         }

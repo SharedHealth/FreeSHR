@@ -81,19 +81,17 @@ public class EncounterController extends ShrController {
                         RuntimeException errorResult = encounterResponse.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition) ?
                                 new PreconditionFailed(encounterResponse)
                                 : new UnProcessableEntity(encounterResponse);
-                        logger.debug(errorResult.getMessage());
                         deferredResult.setErrorResult(errorResult);
                     }
                 }
             }, new Action1<Throwable>() {
                 @Override
                 public void call(Throwable error) {
-                    logger.debug(error.getMessage());
                     deferredResult.setErrorResult(error);
                 }
             });
         } catch (Exception e) {
-            logger.debug(e.getMessage());
+            logger.error(e.getMessage());
             deferredResult.setErrorResult(e);
         }
         return deferredResult;
@@ -114,9 +112,7 @@ public class EncounterController extends ShrController {
         try {
             final Boolean isRestrictedAccess = isAccessRestrictedToEncounterFetchForPatient(healthId, userInfo);
             if (isRestrictedAccess == null) {
-                Forbidden errorResult = new Forbidden(String.format("Access is denied to user %s for patient %s", userInfo.getProperties().getId(), healthId));
-                deferredResult.setErrorResult(errorResult);
-                logger.debug(errorResult.getMessage());
+                deferredResult.setErrorResult(new Forbidden(String.format("Access is denied to user %s for patient %s", userInfo.getProperties().getId(), healthId)));
                 return deferredResult;
             }
             final Date requestedDate = getRequestedDate(updatedSince);
@@ -127,9 +123,7 @@ public class EncounterController extends ShrController {
                 public void call(List<EncounterBundle> encounterBundles) {
                     try {
                         if (isRestrictedAccess && isConfidentialPatient(encounterBundles)) {
-                            Forbidden errorResult = new Forbidden(format("Access is denied to user %s for patient %s", userInfo.getProperties().getId(), healthId));
-                            logger.debug(errorResult.getMessage());
-                            deferredResult.setErrorResult(errorResult);
+                            deferredResult.setErrorResult(new Forbidden(format("Access is denied to user %s for patient %s", userInfo.getProperties().getId(), healthId)));
                         } else {
                             encounterBundles = filterEncounters(isRestrictedAccess, encounterBundles);
                             EncounterSearchResponse searchResponse = new EncounterSearchResponse(
@@ -138,22 +132,18 @@ public class EncounterController extends ShrController {
                             deferredResult.setResult(searchResponse);
                         }
                     } catch (UnsupportedEncodingException e) {
-                        logger.debug(e.getMessage());
                         deferredResult.setErrorResult(e);
                     }
 
                 }
-
-
             }, new Action1<Throwable>() {
                 @Override
                 public void call(Throwable throwable) {
-                    logger.debug(throwable.getMessage());
                     deferredResult.setErrorResult(throwable);
                 }
             });
         } catch (Exception e) {
-            logger.debug(e.getMessage());
+            logger.error(e.getMessage());
             deferredResult.setErrorResult(e);
         }
         return deferredResult;
@@ -174,14 +164,13 @@ public class EncounterController extends ShrController {
         logAccessDetails(userInfo, format("Find all encounters for facility %s in catchment %s", userInfo.getProperties().getFacilityId(), catchment));
         try {
             if (catchment.length() < 4) {
-                throw new BadRequest("Catchment should have division and district");
+                deferredResult.setErrorResult(new BadRequest("Catchment should have division and district"));
+                return deferredResult;
             }
             final Date requestedDate = getRequestedDateForCatchment(updatedSince);
             final Boolean isRestrictedAccess = isAccessRestrictedToEncounterFetchForCatchment(catchment, userInfo);
             if(isRestrictedAccess == null) {
-                Forbidden errorResult = new Forbidden(String.format("Access is denied to user %s for catchment %s", userInfo.getProperties().getId(), catchment));
-                logger.debug(errorResult.getMessage());
-                deferredResult.setErrorResult(errorResult);
+                deferredResult.setErrorResult(new Forbidden(String.format("Access is denied to user %s for catchment %s", userInfo.getProperties().getId(), catchment)));
                 return deferredResult;
             }
             final Observable<List<EncounterBundle>> catchmentEncounters =
@@ -197,19 +186,17 @@ public class EncounterController extends ShrController {
                         logger.debug(searchResponse.toString());
                         deferredResult.setResult(searchResponse);
                     } catch (Throwable t) {
-                        logger.debug(t.getMessage());
                         deferredResult.setErrorResult(t);
                     }
                 }
             }, new Action1<Throwable>() {
                 @Override
                 public void call(Throwable throwable) {
-                    logger.debug(throwable.getMessage());
                     deferredResult.setErrorResult(throwable);
                 }
             });
         } catch (Exception e) {
-            logger.debug(e.getMessage());
+            logger.error(e.getMessage());
             deferredResult.setErrorResult(e);
         }
         return deferredResult;
@@ -235,29 +222,24 @@ public class EncounterController extends ShrController {
                                          if (encounterBundle != null) {
                                              logger.debug(encounterBundle.toString());
                                              if ((isRestrictedAccess == null || isRestrictedAccess) && isConfidentialEncounter(encounterBundle)) {
-                                                 Forbidden errorResult = new Forbidden(format("Access is denied to user %s for encounter %s",
-                                                         userInfo.getProperties().getId(), encounterId));
-                                                 logger.debug(errorResult.getMessage());
-                                                 deferredResult.setErrorResult(errorResult);
+                                                 deferredResult.setErrorResult(new Forbidden(format("Access is denied to user %s for encounter %s",
+                                                         userInfo.getProperties().getId(), encounterId)));
                                              } else {
                                                  deferredResult.setResult(encounterBundle);
                                              }
                                          } else {
-                                             String errorMessage = format("Encounter %s not found", encounterId);
-                                             logger.debug(errorMessage);
-                                             deferredResult.setErrorResult(new ResourceNotFound(errorMessage));
+                                             deferredResult.setErrorResult(new ResourceNotFound(format("Encounter %s not found", encounterId)));
                                          }
                                      }
                                  },
                     new Action1<Throwable>() {
                         @Override
                         public void call(Throwable throwable) {
-                            logger.debug(throwable.getMessage());
                             deferredResult.setErrorResult(throwable);
                         }
                     });
         } catch (Exception e) {
-            logger.debug(e.getMessage());
+            logger.error(e.getMessage());
             deferredResult.setErrorResult(e);
         }
         return deferredResult;
