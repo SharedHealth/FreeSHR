@@ -169,7 +169,7 @@ public class EncounterController extends ShrController {
             }
             final Date requestedDate = getRequestedDateForCatchment(updatedSince);
             final Boolean isRestrictedAccess = isAccessRestrictedToEncounterFetchForCatchment(catchment, userInfo);
-            if(isRestrictedAccess == null) {
+            if (isRestrictedAccess == null) {
                 deferredResult.setErrorResult(new Forbidden(String.format("Access is denied to user %s for catchment %s", userInfo.getProperties().getId(), catchment)));
                 return deferredResult;
             }
