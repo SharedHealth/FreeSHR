@@ -29,9 +29,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        HttpServletRequest httpRequest = request;
-        HttpServletResponse httpResponse = response;
+    protected void doFilterInternal(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FilterChain filterChain) throws ServletException, IOException {
         String token = httpRequest.getHeader(AUTH_TOKEN_KEY);
         String clientId = httpRequest.getHeader(CLIENT_ID_KEY);
         String email = httpRequest.getHeader(FROM_KEY);
@@ -44,8 +42,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         try {
             SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
             processTokenAuthentication(clientId, email, token);
-            filterChain.doFilter(request, response);
-
+            filterChain.doFilter(httpRequest, httpResponse);
         } catch (AuthenticationException ex) {
             logger.debug(String.format("Access to user=%s with email=%s is denied.", clientId, email));
             SecurityContextHolder.clearContext();
