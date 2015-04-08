@@ -170,7 +170,6 @@ public class UserInfo {
 
         public void loadUserProperties() {
             addRolePrefixToGroups();
-            containsCaseInsensitive(groups, SHR_USER_GROUP);
             if (containsCaseInsensitive(groups, SHR_USER_GROUP)) {
                 addAddtionalUserGroupsBasedOnProfiles();
             }
