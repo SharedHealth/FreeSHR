@@ -52,7 +52,7 @@ public class EncounterBundle {
 
     @JsonIgnore
     @XmlTransient
-    private String updatedAt;
+    private String updatedDate;
 
     public void setEncounterContent(EncounterContent encounterContent) {
         this.encounterContent = encounterContent;
@@ -194,11 +194,11 @@ public class EncounterBundle {
         this.updatedBy = updatedBy;
     }
 
-    public String getUpdatedAt() {
-        return updatedAt;
+    public String getUpdatedDate() {
+        return updatedDate;
     }
 
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setUpdatedDate(String updatedDate) {
+        this.updatedDate = updatedDate;
     }
 }

@@ -6,6 +6,7 @@ import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Facility;
+import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
 import org.freeshr.infrastructure.persistence.FacilityRepository;
@@ -126,14 +127,18 @@ public abstract class APIIntegrationTestBase {
     }
 
     protected EncounterBundle createEncounterBundle(String encounterId, String healthId, Confidentiality encounterConfidentiality,
-                                                    Confidentiality patientConfidentiality) {
+                                                    Confidentiality patientConfidentiality, Requester requester) {
         EncounterBundle bundle = new EncounterBundle();
         bundle.setEncounterId(encounterId);
         bundle.setHealthId(healthId);
         bundle.setEncounterConfidentiality(encounterConfidentiality);
         bundle.setPatientConfidentiality(patientConfidentiality);
         bundle.setEncounterContent(asString("jsons/encounters/valid.json"));
-        bundle.setReceivedDate(DateUtil.getCurrentTimeInISOString());
+        String receivedDate = DateUtil.getCurrentTimeInISOString();
+        bundle.setReceivedDate(receivedDate);
+        bundle.setUpdatedDate(receivedDate);
+        bundle.setCreatedBy(requester);
+        bundle.setUpdatedBy(requester);
         return bundle;
     }
 }

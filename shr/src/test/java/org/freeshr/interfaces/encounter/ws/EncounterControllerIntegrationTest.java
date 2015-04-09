@@ -5,6 +5,7 @@ import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Facility;
+import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.interfaces.encounter.ws.exceptions.PreconditionFailed;
@@ -25,6 +26,7 @@ import java.util.Date;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.freeshr.utils.Confidentiality.Normal;
+import static org.freeshr.utils.Confidentiality.Restricted;
 import static org.freeshr.utils.FileUtil.asString;
 import static org.freeshr.utils.HttpUtil.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -188,9 +190,9 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
         patient.setHealthId(healthId);
         patient.setAddress(new Address("01", "02", "03", "04", "05"));
 
-        createEncounter(createEncounterBundle("e-0-" + healthId, healthId, Normal, Normal), patient);
-        createEncounter(createEncounterBundle("e-1-" + healthId, healthId, Normal, Normal), patient);
-        createEncounter(createEncounterBundle("e-2-" + healthId, healthId, Normal, Normal), patient);
+        createEncounter(createEncounterBundle("e-0-" + healthId, healthId, Normal, Normal, new Requester("facilityId", "providerId")), patient);
+        createEncounter(createEncounterBundle("e-1-" + healthId, healthId, Normal, Normal, new Requester("facilityId", "providerId")), patient);
+        createEncounter(createEncounterBundle("e-2-" + healthId, healthId, Normal, Normal, new Requester("facilityId", "providerId")), patient);
         mockMvc.perform(MockMvcRequestBuilders.get(
                 String.format("/patients/%s/encounters", healthId))
                 .header(AUTH_TOKEN_KEY, validAccessToken)
@@ -207,17 +209,17 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
         String healthId1 = generateHealthId();
         patient1.setHealthId(healthId1);
         patient1.setAddress(new Address("30", "26", "18", "01", "02"));
-        createEncounter(createEncounterBundle("e-0100-" + healthId1, healthId1, Normal, Normal), patient1);
-        createEncounter(createEncounterBundle("e-1100-" + healthId1, healthId1, Normal, Normal), patient1);
-        createEncounter(createEncounterBundle("e-2100-" + healthId1, healthId1, Normal, Normal), patient1);
+        createEncounter(createEncounterBundle("e-0100-" + healthId1, healthId1, Normal, Normal, new Requester("facilityId", "providerId")), patient1);
+        createEncounter(createEncounterBundle("e-1100-" + healthId1, healthId1, Normal, Normal, new Requester("facilityId", "providerId")), patient1);
+        createEncounter(createEncounterBundle("e-2100-" + healthId1, healthId1, Normal, Normal, new Requester("facilityId", "providerId")), patient1);
 
         Patient patient2 = new Patient();
         String healthId2 = generateHealthId();
         patient2.setHealthId(healthId2);
         patient2.setAddress(new Address("30", "26", "18", "02", "02"));
-        createEncounter(createEncounterBundle("e-0200-" + healthId2, healthId2, Normal, Normal), patient2);
-        createEncounter(createEncounterBundle("e-1200-" + healthId2, healthId2, Normal, Normal), patient2);
-        createEncounter(createEncounterBundle("e-2200-" + healthId2, healthId2, Normal, Normal), patient2);
+        createEncounter(createEncounterBundle("e-0200-" + healthId2, healthId2, Normal, Normal, new Requester("facilityId", "providerId")), patient2);
+        createEncounter(createEncounterBundle("e-1200-" + healthId2, healthId2, Normal, Normal, new Requester("facilityId", "providerId")), patient2);
+        createEncounter(createEncounterBundle("e-2200-" + healthId2, healthId2, Normal, Normal, new Requester("facilityId", "providerId")), patient2);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String today = dateFormat.format(new Date());
@@ -290,16 +292,11 @@ public class EncounterControllerIntegrationTest extends APIIntegrationTestBase {
 
     @Test
     public void shouldNotGetRestrictedEncounters() throws Exception {
-        mockMvc.perform(post("/patients/" + VALID_HEALTH_ID_NOT_CONFIDENTIAL + "/encounters")
-                .header(AUTH_TOKEN_KEY, validAccessToken)
-                .header(FROM_KEY, validEmail)
-                .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_XML)
-                .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/encounter_restricted_with_normal_patient.xml")))
-                .andExpect(status().isOk())
-                .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
+        Patient patient1 = new Patient();
+        String healthId1 = generateHealthId();
+        patient1.setHealthId(healthId1);
+        patient1.setAddress(new Address("30", "26", "18", "01", "02"));
+        createEncounter(createEncounterBundle("e-0100-" + healthId1, healthId1, Restricted, Normal, new Requester("facilityId", "providerId")), patient1);
 
         mockMvc.perform(MockMvcRequestBuilders.get(
                 String.format("/patients/%s/encounters", VALID_HEALTH_ID_NOT_CONFIDENTIAL))

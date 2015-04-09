@@ -3,6 +3,7 @@ package org.freeshr.interfaces.encounter.ws;
 import com.google.common.base.Charsets;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.config.SHRProperties;
+import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
 import org.junit.Before;
@@ -462,13 +463,13 @@ public class EncounterControllerAuthorizationIntegrationTest extends APIIntegrat
     private void createNonConfidentialEncounter(String healthId, String division, String district) throws Exception {
         Patient patient = createPatient(healthId, division, district);
 
-        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, Normal, Normal), patient);
+        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, Normal, Normal, new Requester("facilityId", "providerId")), patient);
     }
 
     private void createConfidentialEncounter(String healthId) throws Exception {
         Patient patient = createPatient(healthId, DATASENSE_REGISTERED_DIVISION, DATASENSE_REGISTERED_DISTRICT);
 
-        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, VeryRestricted, Normal), patient);
+        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, VeryRestricted, Normal, new Requester("facilityId", "providerId")), patient);
     }
 
     private Patient createPatient(String healthId, String division, String district) {

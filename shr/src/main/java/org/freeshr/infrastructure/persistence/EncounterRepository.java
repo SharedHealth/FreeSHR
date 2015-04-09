@@ -8,10 +8,13 @@ import com.datastax.driver.core.querybuilder.Batch;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Catchment;
+import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.utils.DateUtil;
@@ -25,6 +28,7 @@ import rx.Observable;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashSet;
@@ -57,12 +61,15 @@ public class EncounterRepository {
         insertEncounterStmt.value("encounter_id", encounterBundle.getEncounterId());
         insertEncounterStmt.value("health_id", encounterBundle.getHealthId());
         insertEncounterStmt.value("received_date", encounterBundle.getReceivedDate()); //TODO check timefunction
+        insertEncounterStmt.value("created_by", serializeRequester(encounterBundle.getCreatedBy())); //TODO check timefunction
         insertEncounterStmt.value("content_version", encounterBundle.getContentVersion());
-        insertEncounterStmt.value(format("content_version_%s", fhirDocumentSchemaVersion), 1);
+        insertEncounterStmt.value(getSchemaContentVersionColumnName(), encounterBundle.getContentVersion());
         insertEncounterStmt.value(getContentColumnName(), encounterBundle.getEncounterContent().toString());
         insertEncounterStmt.value("patient_location_code", address.getLocationCode());
         insertEncounterStmt.value("encounter_confidentiality", encounterBundle.getEncounterConfidentiality().getLevel());
         insertEncounterStmt.value("patient_confidentiality", encounterBundle.getPatientConfidentiality().getLevel());
+        insertEncounterStmt.value("updated_date", encounterBundle.getUpdatedDate());
+        insertEncounterStmt.value("updated_by", serializeRequester(encounterBundle.getUpdatedBy()));
 
         String encCatchmentInsertQuery =
                 format("INSERT INTO enc_by_catchment (division_id, district_id, year, " +
@@ -110,7 +117,9 @@ public class EncounterRepository {
 
     public Observable<EncounterBundle> findEncounterById(String encounterId) {
         Select findEncounter = QueryBuilder
-                .select("encounter_id", "health_id", "received_date", getContentColumnName(), "encounter_confidentiality", "patient_confidentiality")
+                .select("encounter_id", "health_id", "received_date", getContentColumnName(), "created_by",
+                        "updated_date", "updated_by", "content_version", getSchemaContentVersionColumnName(),
+                        "encounter_confidentiality", "patient_confidentiality")
                 .from("encounter")
                 .where(eq("encounter_id", encounterId))
                 .limit(1);
@@ -127,6 +136,49 @@ public class EncounterRepository {
                         }
                     }
                 });
+    }
+
+    public Observable<List<EncounterBundle>> findEncountersForPatient(String healthId, Date updatedSince,
+                                                                      int limit) throws ExecutionException,
+            InterruptedException {
+        StringBuilder queryBuilder = buildQuery(healthId, updatedSince, limit);
+        Observable<LinkedHashSet<String>> encounterIdsObservable = Observable.from(cqlOperations.queryAsynchronously
+                (queryBuilder.toString()), Schedulers.io())
+                .map(new Func1<ResultSet, LinkedHashSet<String>>() {
+                    @Override
+                    public LinkedHashSet<String> call(ResultSet rows) {
+                        LinkedHashSet<String> encounterIds = new LinkedHashSet<>();
+                        for (Row row : rows) {
+                            encounterIds.add(row.getString("encounter_id"));
+                        }
+                        return encounterIds;
+                    }
+                });
+
+        return encounterIdsObservable.flatMap(
+                new Func1<LinkedHashSet<String>, Observable<List<EncounterBundle>>>() {
+                    @Override
+                    public Observable<List<EncounterBundle>> call(LinkedHashSet<String> encounterIds) {
+                        if (encounterIds.isEmpty()) {
+                            return Observable.<List<EncounterBundle>>just(new ArrayList<EncounterBundle>());
+                        }
+                        String encounterQuery = buildEncounterSelectionQuery(encounterIds);
+                        return executeFindQuery(encounterQuery);
+                    }
+                });
+    }
+
+    private String serializeRequester(Requester requester) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(requester);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+    }
+
+    private String getSchemaContentVersionColumnName() {
+        return format("content_version_%s", fhirDocumentSchemaVersion);
     }
 
     private String buildCatchmentSearchQuery(Catchment catchment, Date updatedSince, int limit) {
@@ -149,7 +201,8 @@ public class EncounterRepository {
 
     private String buildEncounterSelectionQuery(LinkedHashSet<String> encounterIds) {
         StringBuilder encounterQuery = new StringBuilder("SELECT encounter_id, health_id, received_date, " +
-                getContentColumnName() + ", " +
+                getContentColumnName() + ", created_by, updated_date, updated_by, content_version, " +
+                getSchemaContentVersionColumnName() + ", " +
                 "patient_confidentiality, encounter_confidentiality FROM encounter where encounter_id in (");
         int noOfEncounters = encounterIds.size();
         int idx = 0;
@@ -201,42 +254,24 @@ public class EncounterRepository {
             bundle.setEncounterId(result.getString("encounter_id"));
             bundle.setHealthId(result.getString("health_id"));
             bundle.setReceivedDate(DateUtil.toISOString(result.getDate("received_date")));
+            bundle.setCreatedBy(getRequesterValue(result, "created_by"));
             bundle.setEncounterContent(result.getString(getContentColumnName()));
             bundle.setEncounterConfidentiality(getConfidentiality(result.getString("encounter_confidentiality")));
             bundle.setPatientConfidentiality(getConfidentiality(result.getString("patient_confidentiality")));
+            bundle.setUpdatedBy(getRequesterValue(result, "updated_by"));
+            bundle.setUpdatedDate(DateUtil.toISOString(result.getDate("updated_date")));
+
             bundles.add(bundle);
         }
         return bundles;
     }
 
-    public Observable<List<EncounterBundle>> findEncountersForPatient(String healthId, Date updatedSince,
-                                                                      int limit) throws ExecutionException,
-            InterruptedException {
-        StringBuilder queryBuilder = buildQuery(healthId, updatedSince, limit);
-        Observable<LinkedHashSet<String>> encounterIdsObservable = Observable.from(cqlOperations.queryAsynchronously
-                (queryBuilder.toString()), Schedulers.io())
-                .map(new Func1<ResultSet, LinkedHashSet<String>>() {
-                    @Override
-                    public LinkedHashSet<String> call(ResultSet rows) {
-                        LinkedHashSet<String> encounterIds = new LinkedHashSet<>();
-                        for (Row row : rows) {
-                            encounterIds.add(row.getString("encounter_id"));
-                        }
-                        return encounterIds;
-                    }
-                });
-
-        return encounterIdsObservable.flatMap(
-                new Func1<LinkedHashSet<String>, Observable<List<EncounterBundle>>>() {
-                    @Override
-                    public Observable<List<EncounterBundle>> call(LinkedHashSet<String> encounterIds) {
-                        if (encounterIds.isEmpty()) {
-                            return Observable.<List<EncounterBundle>>just(new ArrayList<EncounterBundle>());
-                        }
-                        String encounterQuery = buildEncounterSelectionQuery(encounterIds);
-                        return executeFindQuery(encounterQuery);
-                    }
-                });
+    private Requester getRequesterValue(Row result, String colName) {
+        try {
+            return new ObjectMapper().readValue(result.getString(colName), Requester.class);
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     private StringBuilder buildQuery(String healthId, Date updatedSince, int limit) {

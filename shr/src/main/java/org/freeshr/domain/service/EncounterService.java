@@ -168,9 +168,13 @@ public class EncounterService {
         encounterBundle.setEncounterId(UUID.randomUUID().toString());
         encounterBundle.setPatientConfidentiality(patient.getConfidentiality());
         encounterBundle.setEncounterConfidentiality(getEncounterConfidentiality(feed));
-        encounterBundle.setReceivedDate(getCurrentTimeInISOString());
+        String currentTimestamp = getCurrentTimeInISOString();
+        encounterBundle.setReceivedDate(currentTimestamp);
+        encounterBundle.setUpdatedDate(currentTimestamp);
+
         Requester requester = new Requester(userInfo.getProperties().getFacilityId(), userInfo.getProperties().getProviderId());
         encounterBundle.setCreatedBy(requester);
+        encounterBundle.setUpdatedBy(requester);
     }
 
     private EncounterValidationResponse validate(EncounterBundle encounterBundle) {
