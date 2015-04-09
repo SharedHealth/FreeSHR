@@ -100,7 +100,6 @@ public class EncounterValidatorIntegrationTest {
 
     }
 
-
     @Test
     public void shouldValidateEncounterIfItHasAValidFacility() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,

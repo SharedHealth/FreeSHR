@@ -48,6 +48,9 @@ public class EncounterValidator {
             if (validationResponse.isNotSuccessful()) return validationResponse;
 
             validationResponse.mergeErrors(fromValidationMessages(
+                    healthIdValidator.validate(validationContext.context()), fhirMessageFilter));
+
+            validationResponse.mergeErrors(fromValidationMessages(
                     facilityValidator.validate(validationContext.feedFragment()), fhirMessageFilter));
             //if (validationResponse.isNotSuccessful()) return validationResponse;
 
@@ -58,10 +61,10 @@ public class EncounterValidator {
             validationResponse.mergeErrors(fromValidationMessages(
                     resourceValidator.validate(validationContext.feedFragment()), fhirMessageFilter));
 
-
-            return validationResponse.isSuccessful()
-                    ? fromValidationMessages(healthIdValidator.validate(validationContext.context()), fhirMessageFilter)
-                    : validationResponse;
+            if(validationResponse.isSuccessful()) {
+                validationResponse.setFeed(validationContext.getFeed());
+            }
+            return validationResponse;
         } catch (Exception e) {
             e.printStackTrace();
             return createErrorResponse(e);

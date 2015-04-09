@@ -5,16 +5,20 @@ import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.domain.model.Catchment;
-import org.freeshr.domain.model.Facility;
+import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
-import org.freeshr.infrastructure.security.UserAuthInfo;
+import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.utils.Confidentiality;
-import org.freeshr.utils.DateUtil;
 import org.freeshr.utils.ResourceOrFeedDeserializer;
 import org.freeshr.validations.EncounterValidationContext;
 import org.freeshr.validations.EncounterValidator;
-import org.hl7.fhir.instance.model.*;
+import org.hl7.fhir.instance.model.AtomEntry;
+import org.hl7.fhir.instance.model.AtomFeed;
+import org.hl7.fhir.instance.model.Coding;
+import org.hl7.fhir.instance.model.Composition;
+import org.hl7.fhir.instance.model.Resource;
+import org.hl7.fhir.instance.model.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,15 +26,15 @@ import org.springframework.stereotype.Service;
 import rx.Observable;
 import rx.functions.Func0;
 import rx.functions.Func1;
-import rx.functions.FuncN;
 
-import java.lang.Boolean;
-import java.lang.Integer;
-import java.util.*;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import static org.freeshr.utils.Confidentiality.getConfidentiality;
+import static org.freeshr.utils.DateUtil.getCurrentTimeInISOString;
 
 @Service
 public class EncounterService {
@@ -52,18 +56,66 @@ public class EncounterService {
         this.facilityService = facilityService;
     }
 
-    public Observable<EncounterResponse> ensureCreated(final EncounterBundle encounterBundle, UserAuthInfo userAuthInfo)
+    public Observable<EncounterResponse> ensureCreated(final EncounterBundle encounterBundle, UserInfo userInfo)
             throws
             ExecutionException, InterruptedException {
         EncounterValidationResponse validationResult = validate(encounterBundle);
-        if (null == validationResult) {
+        if (validationResult.isSuccessful()) {
             Observable<Patient> patientObservable = patientService.ensurePresent(encounterBundle.getHealthId(),
-                    userAuthInfo);
-            return patientObservable.flatMap(success(encounterBundle), error(), complete());
+                    userInfo);
+            return patientObservable.flatMap(success(encounterBundle, validationResult.getFeed(), userInfo), error(), complete());
 
         } else {
             return Observable.just(new EncounterResponse().setValidationFailure(validationResult));
         }
+    }
+
+    /**
+     * @param healthId
+     * @param sinceDate
+     * @param limit
+     * @return
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
+    public Observable<List<EncounterBundle>> findEncountersForPatient(String healthId, Date sinceDate,
+                                                                      int limit) throws ExecutionException,
+            InterruptedException {
+        return encounterRepository.findEncountersForPatient(healthId, sinceDate, limit);
+    }
+
+    /**
+     * @param facilityId
+     * @param catchment
+     * @param sinceDate
+     * @return list of encounters. limited to 20
+     */
+    public Observable<List<EncounterBundle>> findEncountersForFacilityCatchment(final String catchment,
+                                                                                final Date sinceDate, final int limit) {
+        return encounterRepository.findEncountersForCatchment(new Catchment(catchment), sinceDate, limit);
+    }
+
+    public static int getEncounterFetchLimit() {
+        Map<String, String> env = System.getenv();
+        String encounterFetchLimit = env.get(ENCOUNTER_FETCH_LIMIT_LOOKUP_KEY);
+        int fetchLimit = DEFAULT_FETCH_LIMIT;
+        if (!StringUtils.isBlank(encounterFetchLimit)) {
+            try {
+                fetchLimit = Integer.valueOf(encounterFetchLimit);
+            } catch (NumberFormatException nfe) {
+                //Do nothing
+            }
+        }
+        return fetchLimit;
+    }
+
+    public Observable<EncounterBundle> findEncounter(final String healthId, String encounterId) {
+        return encounterRepository.findEncounterById(encounterId).filter(new Func1<EncounterBundle, Boolean>() {
+            @Override
+            public Boolean call(EncounterBundle encounterBundle) {
+                return encounterBundle.getHealthId().equals(healthId);
+            }
+        });
     }
 
     private Func0<Observable<EncounterResponse>> complete() {
@@ -85,14 +137,14 @@ public class EncounterService {
         };
     }
 
-    private Func1<Patient, Observable<EncounterResponse>> success(final EncounterBundle encounterBundle) {
+    private Func1<Patient, Observable<EncounterResponse>> success(final EncounterBundle encounterBundle, final AtomFeed feed, final UserInfo userInfo) {
         return new Func1<Patient, Observable<EncounterResponse>>() {
             @Override
             public Observable<EncounterResponse> call(Patient patient) {
                 final EncounterResponse response = new EncounterResponse();
                 if (patient != null) {
-                    encounterBundle.setEncounterId(UUID.randomUUID().toString());
-                    encounterBundle.setPatientConfidentiality(patient.getConfidentiality());
+                    populateEncounterBundleFields(patient, encounterBundle, feed, userInfo);
+
                     Observable<Boolean> save = encounterRepository.save(encounterBundle, patient);
 
                     return save.flatMap(new Func1<Boolean, Observable<EncounterResponse>>() {
@@ -112,34 +164,23 @@ public class EncounterService {
         };
     }
 
-
-    /**
-     * @param healthId
-     * @param sinceDate
-     * @param limit
-     * @return
-     * @throws ExecutionException
-     * @throws InterruptedException
-     */
-    public Observable<List<EncounterBundle>> findEncountersForPatient(String healthId, Date sinceDate,
-                                                                      int limit) throws ExecutionException,
-            InterruptedException {
-        return encounterRepository.findEncountersForPatient(healthId, sinceDate, limit);
+    private void populateEncounterBundleFields(Patient patient, EncounterBundle encounterBundle, AtomFeed feed, UserInfo userInfo) {
+        encounterBundle.setEncounterId(UUID.randomUUID().toString());
+        encounterBundle.setPatientConfidentiality(patient.getConfidentiality());
+        encounterBundle.setEncounterConfidentiality(getEncounterConfidentiality(feed));
+        encounterBundle.setReceivedDate(getCurrentTimeInISOString());
+        Requester requester = new Requester(userInfo.getProperties().getFacilityId(), userInfo.getProperties().getProviderId());
+        encounterBundle.setCreatedBy(requester);
     }
 
     private EncounterValidationResponse validate(EncounterBundle encounterBundle) {
         EncounterValidationContext validationContext = new EncounterValidationContext(encounterBundle, new ResourceOrFeedDeserializer());
-        final EncounterValidationResponse encounterValidationResponse = encounterValidator.validate(validationContext);
-        if (encounterValidationResponse.isNotSuccessful())
-            return encounterValidationResponse;
-        Confidentiality encounterConfidentiality = getEncounterConfidentiality(validationContext);
-        encounterBundle.setEncounterConfidentiality(encounterConfidentiality);
-        return null;
+        return encounterValidator.validate(validationContext);
     }
 
-    private Confidentiality getEncounterConfidentiality(EncounterValidationContext validationContext) {
+
+    private Confidentiality getEncounterConfidentiality(AtomFeed feed) {
         Confidentiality encounterConfidentiality = Confidentiality.Normal;
-        AtomFeed feed = validationContext.feedFragment().extract();
         for (AtomEntry<? extends Resource> entry : feed.getEntryList()) {
             if (entry.getResource().getResourceType().equals(ResourceType.Composition)) {
                 Composition composition = (Composition) entry.getResource();
@@ -153,94 +194,5 @@ public class EncounterService {
             }
         }
         return encounterConfidentiality;
-    }
-
-    /**
-     * @param facilityId
-     * @param date
-     * @return
-     * @deprecated do not use this. can not guarantee order of encounters across all catchments.
-     */
-    public Observable<List<EncounterBundle>> findAllEncountersByFacilityCatchments(String facilityId,
-                                                                                   final String date) {
-        Observable<Facility> facilityObservable = facilityService.ensurePresent(facilityId);
-
-        return facilityObservable.flatMap(new Func1<Facility, Observable<List<EncounterBundle>>>() {
-            @Override
-            public Observable<List<EncounterBundle>> call(Facility facility) {
-                if (facility == null) return Observable.<List<EncounterBundle>>just(new ArrayList<EncounterBundle>());
-                return findEncountersForCatchments(facility.getCatchments(), date);
-            }
-        }, new Func1<Throwable, Observable<List<EncounterBundle>>>() {
-            @Override
-            public Observable<List<EncounterBundle>> call(Throwable throwable) {
-                logger.error(throwable.getMessage());
-                return Observable.error(throwable);
-            }
-
-        }, new Func0<Observable<List<EncounterBundle>>>() {
-            @Override
-            public Observable<List<EncounterBundle>> call() {
-                return null;
-            }
-        });
-    }
-
-    /**
-     * @param facilityId
-     * @param catchment
-     * @param sinceDate
-     * @return list of encounters. limited to 20
-     */
-    public Observable<List<EncounterBundle>> findEncountersForFacilityCatchment(final String catchment,
-                                                                                final Date sinceDate, final int limit) {
-        return encounterRepository.findEncountersForCatchment(new Catchment(catchment), sinceDate, limit);
-    }
-
-    private Observable<List<EncounterBundle>> findEncountersForCatchments(final List<String> catchments,
-                                                                          String sinceDate) {
-        Date updateSince = DateUtil.parseDate(sinceDate);
-        List<Observable<List<EncounterBundle>>> observablesForCatchment = new ArrayList<>();
-        for (String catchment : catchments) {
-            Catchment facilityCatchment = new Catchment(catchment);
-            observablesForCatchment.add(encounterRepository.findEncountersForCatchment(facilityCatchment,
-                    updateSince, getEncounterFetchLimit()));
-        }
-
-        return Observable.zip(observablesForCatchment, new FuncN<List<EncounterBundle>>() {
-            @Override
-            public List<EncounterBundle> call(Object... args) {
-                Set<EncounterBundle> uniqueEncounterBundles = new HashSet<>();
-                for (Object encounterBundles : args) {
-                    uniqueEncounterBundles.addAll((List<EncounterBundle>) encounterBundles);
-                }
-                return new ArrayList<>(uniqueEncounterBundles);
-            }
-        });
-    }
-
-
-    public static int getEncounterFetchLimit() {
-        Map<String, String> env = System.getenv();
-        String encounterFetchLimit = env.get(ENCOUNTER_FETCH_LIMIT_LOOKUP_KEY);
-        int fetchLimit = DEFAULT_FETCH_LIMIT;
-        if (!StringUtils.isBlank(encounterFetchLimit)) {
-            try {
-                fetchLimit = Integer.valueOf(encounterFetchLimit);
-            } catch (NumberFormatException nfe) {
-                //Do nothing
-            }
-        }
-        return fetchLimit;
-    }
-
-
-    public Observable<EncounterBundle> findEncounter(final String healthId, String encounterId) {
-        return encounterRepository.findEncounterById(encounterId).filter(new Func1<EncounterBundle, Boolean>() {
-            @Override
-            public Boolean call(EncounterBundle encounterBundle) {
-                return encounterBundle.getHealthId().equals(healthId);
-            }
-        });
     }
 }

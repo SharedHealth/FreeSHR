@@ -25,8 +25,8 @@ public class HealthIdValidator implements Validator<EncounterValidationContext> 
     }
 
     @Override
-    public List<ValidationMessage> validate(ValidationSubject<EncounterValidationContext> fragment) {
-        EncounterValidationContext validationContext = fragment.extract();
+    public List<ValidationMessage> validate(ValidationSubject<EncounterValidationContext> validationSubject) {
+        EncounterValidationContext validationContext = validationSubject.extract();
         AtomFeed feed = validationContext.getFeed();
         String expectedHealthId = validationContext.getHealthId();
         List<ValidationMessage> validationMessages = new ArrayList<>();

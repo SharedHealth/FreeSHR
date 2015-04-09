@@ -7,6 +7,7 @@ import org.freeshr.domain.model.Catchment;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.utils.Confidentiality;
+import org.freeshr.utils.DateUtil;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -80,7 +81,6 @@ public class EncounterRepositoryIntegrationTest {
         encounterRepository.save(createEncounterBundle("e-2", healthId), patient).toBlocking().first();
         List<EncounterBundle> encountersForCatchment = encounterRepository.
                 findEncountersForCatchment(new Catchment("0102"), date, 10).toBlocking().first();
-        System.out.println(encountersForCatchment);
         assertEquals(2, encountersForCatchment.size());
         EncounterBundle encounter = encountersForCatchment.get(0);
         assertThat(encounter.getReceivedDate(), is(notNullValue()));
@@ -112,6 +112,7 @@ public class EncounterRepositoryIntegrationTest {
         bundle.setEncounterConfidentiality(Confidentiality.Normal);
         bundle.setPatientConfidentiality(Confidentiality.Normal);
         bundle.setEncounterContent(asString("jsons/encounters/valid.json"));
+        bundle.setReceivedDate(DateUtil.getCurrentTimeInISOString());
         return bundle;
     }
 

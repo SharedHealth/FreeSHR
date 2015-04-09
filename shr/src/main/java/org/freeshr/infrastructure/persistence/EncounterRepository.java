@@ -10,6 +10,7 @@ import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
+import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Catchment;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
+import static java.lang.String.format;
 import static org.freeshr.infrastructure.persistence.RxMaps.completeResponds;
 import static org.freeshr.infrastructure.persistence.RxMaps.respondOnNext;
 import static org.freeshr.utils.Confidentiality.getConfidentiality;
@@ -40,10 +42,12 @@ public class EncounterRepository {
     private static final Logger logger = LoggerFactory.getLogger(EncounterRepository.class);
 
     private CqlOperations cqlOperations;
+    private String fhirDocumentSchemaVersion;
 
     @Autowired
-    public EncounterRepository(@Qualifier("SHRCassandraTemplate") CqlOperations cassandraTemplate) {
+    public EncounterRepository(@Qualifier("SHRCassandraTemplate") CqlOperations cassandraTemplate, SHRProperties shrProperties) {
         this.cqlOperations = cassandraTemplate;
+        fhirDocumentSchemaVersion = shrProperties.getFhirDocumentSchemaVersion();
     }
 
     public Observable<Boolean> save(EncounterBundle encounterBundle, Patient patient) {
@@ -52,14 +56,16 @@ public class EncounterRepository {
         Insert insertEncounterStmt = QueryBuilder.insertInto("encounter");
         insertEncounterStmt.value("encounter_id", encounterBundle.getEncounterId());
         insertEncounterStmt.value("health_id", encounterBundle.getHealthId());
-        insertEncounterStmt.value("received_date", DateUtil.getCurrentTimeInISOString()); //TODO check timefunction
-        insertEncounterStmt.value("content", encounterBundle.getEncounterContent().toString());
+        insertEncounterStmt.value("received_date", encounterBundle.getReceivedDate()); //TODO check timefunction
+        insertEncounterStmt.value("content_version", encounterBundle.getContentVersion());
+        insertEncounterStmt.value(format("content_version_%s", fhirDocumentSchemaVersion), 1);
+        insertEncounterStmt.value(getContentColumnName(), encounterBundle.getEncounterContent().toString());
         insertEncounterStmt.value("patient_location_code", address.getLocationCode());
         insertEncounterStmt.value("encounter_confidentiality", encounterBundle.getEncounterConfidentiality().getLevel());
         insertEncounterStmt.value("patient_confidentiality", encounterBundle.getPatientConfidentiality().getLevel());
 
         String encCatchmentInsertQuery =
-                String.format("INSERT INTO enc_by_catchment (division_id, district_id, year, " +
+                format("INSERT INTO enc_by_catchment (division_id, district_id, year, " +
                                 " received_date, upazila_id, city_corporation_id, union_urban_ward_id, encounter_id) " +
                                 " values ('%s', '%s', %s, now(), '%s', '%s', '%s', '%s');",
                         address.getDivision(),
@@ -71,7 +77,7 @@ public class EncounterRepository {
                         encounterBundle.getEncounterId());
         RegularStatement encCatchmentStmt = new SimpleStatement(encCatchmentInsertQuery);
         String encByPatientInsertQuery =
-                String.format("INSERT INTO enc_by_patient (health_id, received_date, encounter_id) " +
+                format("INSERT INTO enc_by_patient (health_id, received_date, encounter_id) " +
                         " VALUES ('%s', now(), '%s')", encounterBundle.getHealthId(), encounterBundle.getEncounterId());
         RegularStatement encByPatientStmt = new SimpleStatement(encByPatientInsertQuery);
 
@@ -104,7 +110,7 @@ public class EncounterRepository {
 
     public Observable<EncounterBundle> findEncounterById(String encounterId) {
         Select findEncounter = QueryBuilder
-                .select("encounter_id", "health_id", "received_date", "content", "encounter_confidentiality", "patient_confidentiality")
+                .select("encounter_id", "health_id", "received_date", getContentColumnName(), "encounter_confidentiality", "patient_confidentiality")
                 .from("encounter")
                 .where(eq("encounter_id", encounterId))
                 .limit(1);
@@ -127,7 +133,7 @@ public class EncounterRepository {
         int yearOfDate = DateUtil.getYearOf(updatedSince);
         String lastUpdateTime = DateUtil.toDateString(updatedSince, DateUtil.UTC_DATE_IN_MILLIS_FORMAT);
         //TODO test. condition should be >=
-        return String.format("SELECT encounter_id FROM enc_by_catchment " +
+        return format("SELECT encounter_id FROM enc_by_catchment " +
                         " WHERE year = %s and received_date >= minTimeUuid('%s') and %s LIMIT %s ALLOW FILTERING;",
                 yearOfDate, lastUpdateTime, buildClauseForCatchment(catchment), limit);
     }
@@ -143,7 +149,8 @@ public class EncounterRepository {
 
     private String buildEncounterSelectionQuery(LinkedHashSet<String> encounterIds) {
         StringBuilder encounterQuery = new StringBuilder("SELECT encounter_id, health_id, received_date, " +
-                "content, patient_confidentiality, encounter_confidentiality FROM encounter where encounter_id in (");
+                getContentColumnName() + ", " +
+                "patient_confidentiality, encounter_confidentiality FROM encounter where encounter_id in (");
         int noOfEncounters = encounterIds.size();
         int idx = 0;
         for (String encounterId : encounterIds) {
@@ -157,13 +164,17 @@ public class EncounterRepository {
         return encounterQuery.toString();
     }
 
+    private String getContentColumnName() {
+        return format("content_%s", fhirDocumentSchemaVersion);
+    }
+
     private String buildClauseForCatchment(Catchment catchment) {
         int level = catchment.getLevel();
         String clause = "";
         for (int l = 1; l <= level; l++) {
             String levelType = catchment.levelType(l);
             if (!StringUtils.isBlank(levelType)) {
-                clause = clause + String.format("%s = '%s'", levelType, catchment.levelCode(l));
+                clause = clause + format("%s = '%s'", levelType, catchment.levelCode(l));
                 if (l < level) {
                     clause = clause + " and ";
                 }
@@ -190,7 +201,7 @@ public class EncounterRepository {
             bundle.setEncounterId(result.getString("encounter_id"));
             bundle.setHealthId(result.getString("health_id"));
             bundle.setReceivedDate(DateUtil.toISOString(result.getDate("received_date")));
-            bundle.setEncounterContent(result.getString("content"));
+            bundle.setEncounterContent(result.getString(getContentColumnName()));
             bundle.setEncounterConfidentiality(getConfidentiality(result.getString("encounter_confidentiality")));
             bundle.setPatientConfidentiality(getConfidentiality(result.getString("patient_confidentiality")));
             bundles.add(bundle);
@@ -229,13 +240,13 @@ public class EncounterRepository {
     }
 
     private StringBuilder buildQuery(String healthId, Date updatedSince, int limit) {
-        StringBuilder queryBuilder = new StringBuilder(String.format("SELECT encounter_id FROM enc_by_patient where " +
+        StringBuilder queryBuilder = new StringBuilder(format("SELECT encounter_id FROM enc_by_patient where " +
                 "health_id='%s'", healthId));
         if (updatedSince != null) {
             String lastUpdateTime = DateUtil.toDateString(updatedSince, DateUtil.UTC_DATE_IN_MILLIS_FORMAT);
-            queryBuilder.append(String.format(" and received_date >= minTimeUuid('%s')", lastUpdateTime));
+            queryBuilder.append(format(" and received_date >= minTimeUuid('%s')", lastUpdateTime));
         }
-        queryBuilder.append(String.format(" LIMIT %d;", limit));
+        queryBuilder.append(format(" LIMIT %d;", limit));
         return queryBuilder;
     }
 }

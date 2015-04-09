@@ -21,7 +21,7 @@
                 <status value="final"/>
                 <subject>
                     <reference
-                            value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <encounter>
@@ -249,7 +249,7 @@
                     <text value="DISCHARGE"/>
                 </type>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <participant>
@@ -288,7 +288,7 @@
                     <value value="urn:a175b480-f703-4de6-9f1a-9838dc24e431"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -317,7 +317,7 @@
                     <value value="urn:01e9d0d0-4636-4215-9c6b-09294878f18e"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -347,7 +347,7 @@
                     <value value="urn:d918c92a-5a96-4a93-9920-4d6cbc24bd33"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -381,7 +381,7 @@
                     <value value="urn:82611657-d212-4d72-9a68-1c2fd14a9642"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <related>
@@ -427,7 +427,7 @@
                     <value value="urn:b91319de-382d-41a2-951c-c0e6c00c97e1"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -447,7 +447,7 @@
                     <value value="urn:b741c977-833c-4252-9992-50907c297c05"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <encounter>
@@ -491,7 +491,7 @@
                     <value value="urn:4ea22196-932a-4ad9-b880-5ed57b7dde47"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <relation>
@@ -539,7 +539,7 @@
                     <value value="urn:1a38ed9e-b19d-40df-9ba3-092655387464"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -569,7 +569,7 @@
                     <value value="urn:5e88c7b2-469b-4b7c-b87f-184f61a4c5cc"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -598,7 +598,7 @@
                     <value value="urn:772fb91f-a460-4053-9886-703819d58bed"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <related>
@@ -640,7 +640,7 @@
                     <value value="urn:293e2936-7ad6-4fa5-bffa-68626f2fb421"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -670,7 +670,7 @@
                     <value value="urn:40b43d8a-b582-4080-8c04-93697b82a795"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -699,7 +699,7 @@
                     <value value="urn:83078e46-e7c2-4b4f-808b-42e64fe2cb79"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <related>
@@ -737,7 +737,7 @@
                     <value value="urn:e45dbdca-4e39-4a79-b1b8-fd622fdff6e3"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <encounter>
@@ -788,7 +788,7 @@
                     <value value="urn:13b177c1-fca0-48e8-9f80-ce05a7c03ef4"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -820,7 +820,7 @@
                     <value value="urn:e0316ce9-7d96-45db-af97-024ce52516f6"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -847,7 +847,7 @@
                     <value value="urn:e7d9d7f2-38a1-4619-b581-6d1dfabe1936"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <related>
@@ -889,7 +889,7 @@
                     <value value="urn:251e944b-6713-4b6d-821a-3d40f7f646d2"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -919,7 +919,7 @@
                     <value value="urn:0ea771b2-7bf3-47cc-93ad-8cb273f567e9"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -949,7 +949,7 @@
                     <value value="urn:23e8c7b9-4007-4da2-bae9-d14695adef96"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -979,7 +979,7 @@
                     <value value="urn:8670c03c-a12b-4a53-bf38-c87ab63d96b6"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -999,7 +999,7 @@
                 </identifier>
                 <dateWritten value="2014-12-17T18:26:46+05:30"/>
                 <patient>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </patient>
                 <prescriber>
@@ -1094,7 +1094,7 @@
                     <value value="urn:1fccab13-1c50-4f0b-840e-d5ed763d626d"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <related>
@@ -1134,7 +1134,7 @@
         <content type="text/xml">
             <DiagnosticOrder xmlns="http://hl7.org/fhir">
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                 </subject>
                 <orderer>
                     <reference value="http://127.0.0.1:9997/providers/18.json"/>
@@ -1191,7 +1191,7 @@
                 <status value="final"/>
                 <issued value="2014-10-13T15:04:30+05:30"/>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                 </subject>
                 <performer>
                     <reference value="http://127.0.0.1:9997/providers/18.json"/>
@@ -1231,7 +1231,7 @@
                     </coding>
                 </vaccineType>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <refusedIndicator value="true"/>
@@ -1287,7 +1287,7 @@
                 <status value="final"/>
                 <issued value="2015-01-21T17:39:37+05:30"/>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <performer>
@@ -1321,7 +1321,7 @@
                     <value value="urn:b9b8da08-1d9a-4968-b5be-0d47e518b2ec"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <type>

@@ -15,7 +15,9 @@ public class UserInfo {
     public static final String SHR_USER_GROUP = ROLE_PREFIX + "SHR User";
     public static final String PROVIDER_GROUP = ROLE_PREFIX + "SHR_PROVIDER";
     public static final String PATIENT_GROUP = ROLE_PREFIX + "SHR_PATIENT";
-    public static final String FACILITY_ADMIN_GROUP = ROLE_PREFIX + "Facility Admin";
+    public static final String HRM_PROVIDER_GROUP = ROLE_PREFIX + "Provider";
+    public static final String HRM_PATIENT_GROUP = ROLE_PREFIX + "Patient";
+    public static final String HRM_FACILITY_ADMIN_GROUP = ROLE_PREFIX + "Facility Admin";
     public static final String SHR_SYSTEM_ADMIN_GROUP = ROLE_PREFIX + "SHR System Admin";
 
     @JsonProperty("id")
@@ -203,17 +205,13 @@ public class UserInfo {
             }
         }
 
-        public boolean isPatientUserOnly() {
-            return patientHid != null && providerId == null && facilityId == null;
-        }
-
         private void addGroupsBasedOnProfiles(UserProfile userProfile) {
-            if (userProfile.isFacility() && containsCaseInsensitive(groups, FACILITY_ADMIN_GROUP)
+            if (userProfile.isFacility() && containsCaseInsensitive(groups, HRM_FACILITY_ADMIN_GROUP)
                     && !containsCaseInsensitive(groups, SHR_SYSTEM_ADMIN_GROUP)) {
                 groups.add(FACILITY_GROUP);
-            } else if (userProfile.isProvider()) {
+            } else if (userProfile.isProvider() && containsCaseInsensitive(groups, HRM_PROVIDER_GROUP)) {
                 groups.add(PROVIDER_GROUP);
-            } else if (userProfile.isPatient()) {
+            } else if (userProfile.isPatient() && containsCaseInsensitive(groups, HRM_PATIENT_GROUP)) {
                 groups.add(PATIENT_GROUP);
             }
         }

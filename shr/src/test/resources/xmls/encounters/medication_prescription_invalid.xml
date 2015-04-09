@@ -19,7 +19,7 @@
                 <date value="2014-12-17T18:26:46+05:30"/>
                 <status value="final"/>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <encounter>
@@ -59,7 +59,7 @@
                     <text value="Consultation"/>
                 </type>
                 <subject>
-                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <participant>
@@ -89,7 +89,7 @@
                 <dateWritten value="2014-12-17T18:26:46+05:30"/>
                 <status value="active"/>
                 <patient>
-                    <reference value="http://172.18.46.56:8081/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </patient>
                 <prescriber>

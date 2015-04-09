@@ -4,6 +4,7 @@ package org.freeshr.application.fhir;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.eclipse.persistence.oxm.annotations.XmlCDATA;
+import org.freeshr.domain.model.Requester;
 import org.freeshr.utils.Confidentiality;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -13,11 +14,8 @@ import java.util.Arrays;
 
 @XmlRootElement(name = "encounter")
 public class EncounterBundle {
-
     @JsonProperty("id")
     private String encounterId;
-
-
     private String healthId;
 
     @JsonProperty("publishedDate")
@@ -38,6 +36,23 @@ public class EncounterBundle {
     @JsonIgnore
     @XmlTransient
     private Confidentiality patientConfidentiality;
+
+    //TODO : change on encounter update.
+    @JsonIgnore
+    @XmlTransient
+    private int contentVersion = 1;
+
+    @JsonIgnore
+    @XmlTransient
+    private Requester createdBy;
+
+    @JsonIgnore
+    @XmlTransient
+    private Requester updatedBy;
+
+    @JsonIgnore
+    @XmlTransient
+    private String updatedAt;
 
     public void setEncounterContent(EncounterContent encounterContent) {
         this.encounterContent = encounterContent;
@@ -113,19 +128,6 @@ public class EncounterBundle {
         return String.format("/patients/%s/encounters/%s", getHealthId(), getEncounterId());
     }
 
-    public void setCategories(String[] categories) {
-        this.categories = categories;
-    }
-
-
-    public String[] getCategories() {
-        return categories != null ? categories : new String[]{};
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     @JsonProperty("title")
     public String getTitle() {
         return title + ":" + getEncounterId();
@@ -143,6 +145,19 @@ public class EncounterBundle {
                 '}';
     }
 
+    public void setCategories(String[] categories) {
+        this.categories = categories;
+    }
+
+
+    public String[] getCategories() {
+        return categories != null ? categories : new String[]{};
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public Confidentiality getEncounterConfidentiality() {
         return encounterConfidentiality;
     }
@@ -157,5 +172,33 @@ public class EncounterBundle {
 
     public Confidentiality getPatientConfidentiality() {
         return patientConfidentiality;
+    }
+
+    public int getContentVersion() {
+        return contentVersion;
+    }
+
+    public Requester getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(Requester createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Requester getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(Requester updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

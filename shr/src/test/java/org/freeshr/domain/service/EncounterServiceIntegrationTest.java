@@ -11,7 +11,8 @@ import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.persistence.FacilityRepository;
 import org.freeshr.infrastructure.persistence.PatientRepository;
-import org.freeshr.infrastructure.security.UserAuthInfo;
+import org.freeshr.infrastructure.security.UserInfo;
+import org.freeshr.infrastructure.security.UserProfile;
 import org.freeshr.util.ValidationFailures;
 import org.junit.After;
 import org.junit.Before;
@@ -28,10 +29,15 @@ import rx.Observable;
 import rx.observers.TestSubscriber;
 
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static java.util.Arrays.asList;
 import static org.freeshr.data.EncounterBundleData.*;
 import static org.freeshr.utils.FileUtil.asString;
 import static org.freeshr.utils.StringUtils.ensureSuffix;
@@ -122,8 +128,7 @@ public class EncounterServiceIntegrationTest {
         String email = "email@gmail.com";
         String securityToken = UUID.randomUUID().toString();
 
-        EncounterResponse response = encounterService.ensureCreated(withInvalidReferenceTerm(), new UserAuthInfo(clientId, email,
-                securityToken))
+        EncounterResponse response = encounterService.ensureCreated(withInvalidReferenceTerm(), getUserInfo(clientId, email, securityToken))
                 .toBlocking().first();
         assertTrue(new ValidationFailures(response).matches(new
                 String[]{"/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "code-unknown", null}));
@@ -135,8 +140,7 @@ public class EncounterServiceIntegrationTest {
         String email = "email@gmail.com";
         String securityToken = UUID.randomUUID().toString();
 
-        EncounterResponse response = encounterService.ensureCreated(withInvalidConcept(), new UserAuthInfo(clientId, email,
-                securityToken)).toBlocking()
+        EncounterResponse response = encounterService.ensureCreated(withInvalidConcept(), getUserInfo(clientId, email, securityToken)).toBlocking()
                 .first();
         assertTrue(new ValidationFailures(response).matches(new
                 String[]{"/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "code-unknown",
@@ -150,7 +154,7 @@ public class EncounterServiceIntegrationTest {
         String securityToken = UUID.randomUUID().toString();
 
         Observable<EncounterResponse> encounterResponseObservable = encounterService.ensureCreated
-                (encounterForUnknownPatient(), new UserAuthInfo(clientId, email, securityToken));
+                (encounterForUnknownPatient(), getUserInfo(clientId, email, securityToken));
         EncounterResponse response = encounterResponseObservable.toBlocking().first();
         assertThat(true, is(response.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition)));
     }
@@ -161,8 +165,7 @@ public class EncounterServiceIntegrationTest {
         String email = "email@gmail.com";
         String securityToken = UUID.randomUUID().toString();
 
-        Observable<EncounterResponse> response = encounterService.ensureCreated(withValidEncounter(), new UserAuthInfo(clientId, email,
-                securityToken));
+        Observable<EncounterResponse> response = encounterService.ensureCreated(withValidEncounter(), getUserInfo(clientId, email, securityToken));
         TestSubscriber<EncounterResponse> encounterResponseSubscriber = new TestSubscriber<>();
         response.subscribe(encounterResponseSubscriber);
         encounterResponseSubscriber.awaitTerminalEvent();
@@ -198,7 +201,7 @@ public class EncounterServiceIntegrationTest {
                 null, null));
         Date date = new Date();
         facilityRepository.save(facility).toBlocking().first();
-        encounterService.ensureCreated(withValidEncounter(), new UserAuthInfo(clientId, email, securityToken)).toBlocking().first();
+        encounterService.ensureCreated(withValidEncounter(), getUserInfo(clientId, email, securityToken)).toBlocking().first();
 
         List<EncounterBundle> encounterBundles = encounterService.findEncountersForFacilityCatchment("305610",
                 date, 20).toBlocking().first();
@@ -219,10 +222,9 @@ public class EncounterServiceIntegrationTest {
         facilityRepository.save(facility).toBlocking().first();
 
         assertNotNull(facilityRepository.find("3").toBlocking().first());
-        assertTrue(encounterService.ensureCreated(withValidEncounter(), new UserAuthInfo(clientId, email, securityToken)).toBlocking()
+        assertTrue(encounterService.ensureCreated(withValidEncounter(), getUserInfo(clientId, email, securityToken)).toBlocking()
                 .first().isSuccessful());
-        assertTrue(encounterService.ensureCreated(withNewEncounterForPatient(VALID_HEALTH_ID_NEW), new UserAuthInfo(clientId, email,
-                securityToken)).toBlocking().first()
+        assertTrue(encounterService.ensureCreated(withNewEncounterForPatient(VALID_HEALTH_ID_NEW), getUserInfo(clientId, email, securityToken)).toBlocking().first()
                 .isSuccessful());
 
         assertEquals(1, encounterService.findEncountersForPatient(VALID_HEALTH_ID, null,
@@ -247,8 +249,7 @@ public class EncounterServiceIntegrationTest {
                 null, null));
         facilityRepository.save(facility).toBlocking().first();
 
-        EncounterResponse first = encounterService.ensureCreated(withNewEncounterForPatient(VALID_HEALTH_ID), new UserAuthInfo(clientId,
-                email, securityToken))
+        EncounterResponse first = encounterService.ensureCreated(withNewEncounterForPatient(VALID_HEALTH_ID), getUserInfo(clientId, email, securityToken))
                 .toBlocking().first();
         String encounterId = first.getEncounterId();
         EncounterBundle encounterBundle = encounterService.findEncounter(VALID_HEALTH_ID,
@@ -266,8 +267,7 @@ public class EncounterServiceIntegrationTest {
 
         facilityRepository.save(facility).toBlocking().first();
 
-        EncounterResponse first = encounterService.ensureCreated(withNewEncounterForPatient(VALID_HEALTH_ID_NEW), new UserAuthInfo
-                (clientId, email, securityToken))
+        EncounterResponse first = encounterService.ensureCreated(withNewEncounterForPatient(VALID_HEALTH_ID_NEW), getUserInfo(clientId, email, securityToken))
                 .toBlocking().first();
         String encounterId = first.getEncounterId();
 
@@ -296,5 +296,8 @@ public class EncounterServiceIntegrationTest {
         assertThat(address.getCityCorporation(), is("99"));
     }
 
-
+    private UserInfo getUserInfo(String clientId, String email, String securityToken) {
+        return new UserInfo(clientId, "foo", email, 1, true,
+                securityToken, new ArrayList<String>(), asList(new UserProfile("facility", "10000069", asList("3026"))));
+    }
 }

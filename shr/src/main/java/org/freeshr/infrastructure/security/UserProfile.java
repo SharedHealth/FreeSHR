@@ -28,15 +28,15 @@ public class UserProfile {
     }
 
     public boolean isFacility() {
-        return name.equalsIgnoreCase(FACILITY_TYPE);
+        return name.equalsIgnoreCase(FACILITY_TYPE) && id != null;
     }
 
     public boolean isProvider() {
-        return name.equalsIgnoreCase(PROVIDER_TYPE);
+        return name.equalsIgnoreCase(PROVIDER_TYPE) && id != null;
     }
 
     public boolean isPatient() {
-        return name.equalsIgnoreCase(PATIENT_TYPE);
+        return name.equalsIgnoreCase(PATIENT_TYPE) && id != null;
     }
 
     public String getId() {

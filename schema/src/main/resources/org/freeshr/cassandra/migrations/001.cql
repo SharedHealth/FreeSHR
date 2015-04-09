@@ -6,6 +6,7 @@ create table patient (health_id varchar,
  upazila_id varchar,
  city_corporation_id varchar,
  union_urban_ward_id varchar,
+ confidentiality varchar,
  PRIMARY KEY(health_id) );
 
 

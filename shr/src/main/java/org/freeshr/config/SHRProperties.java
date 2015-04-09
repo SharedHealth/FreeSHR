@@ -76,6 +76,8 @@ public class SHRProperties {
     @Value("${MCI_SERVER_URL}")
     private String mciServerUrl;
 
+    @Value("${FHIR_DOCUMENT_SCHEMA_VERSION}")
+    private String fhirDocumentSchemaVersion;
 
     private String[] mciServerLocationUrls = null;
     private String[] facilityServerLocationUrls = null;
@@ -137,6 +139,10 @@ public class SHRProperties {
 
     public String getTrPassword() {
         return trPassword;
+    }
+
+    public String getFhirDocumentSchemaVersion() {
+        return fhirDocumentSchemaVersion;
     }
 
     public String getFacilityReferencePath() {

@@ -4,24 +4,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.domain.service.EncounterService;
-import org.freeshr.infrastructure.security.UserAuthInfo;
 import org.freeshr.infrastructure.security.UserInfo;
-import org.freeshr.interfaces.encounter.ws.exceptions.BadRequest;
-import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
-import org.freeshr.interfaces.encounter.ws.exceptions.PreconditionFailed;
-import org.freeshr.interfaces.encounter.ws.exceptions.ResourceNotFound;
-import org.freeshr.interfaces.encounter.ws.exceptions.UnProcessableEntity;
+import org.freeshr.interfaces.encounter.ws.exceptions.*;
 import org.freeshr.utils.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.util.UriComponentsBuilder;
 import rx.Observable;
@@ -68,7 +58,7 @@ public class EncounterController extends ShrController {
             logger.debug("Create encounter. " + encounterBundle.getContent());
             encounterBundle.setHealthId(healthId);
             Observable<EncounterResponse> encounterResponse = encounterService.ensureCreated(encounterBundle,
-                    new UserAuthInfo(userInfo.getProperties().getId(), userInfo.getProperties().getEmail(), userInfo.getProperties().getAccessToken()));
+                    userInfo);
 
             encounterResponse.subscribe(new Action1<EncounterResponse>() {
                 @Override

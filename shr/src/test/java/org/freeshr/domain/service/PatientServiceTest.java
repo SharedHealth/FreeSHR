@@ -3,15 +3,18 @@ package org.freeshr.domain.service;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.mci.MCIClient;
 import org.freeshr.infrastructure.persistence.PatientRepository;
-import org.freeshr.infrastructure.security.UserAuthInfo;
+import org.freeshr.infrastructure.security.UserInfo;
+import org.freeshr.infrastructure.security.UserProfile;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import rx.Observable;
 
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
@@ -40,7 +43,8 @@ public class PatientServiceTest {
         String securityToken = UUID.randomUUID().toString();
 
         when(patientRepository.find(healthId)).thenReturn(Observable.just(new Patient()));
-        assertNotNull(patientService.ensurePresent(healthId, new UserAuthInfo(clientId, email, securityToken)).toBlocking().first());
+        assertNotNull(patientService.ensurePresent(healthId, getUserInfo(clientId, email, securityToken)).toBlocking().first());
+
         verify(patientRepository).find(healthId);
     }
 
@@ -52,8 +56,9 @@ public class PatientServiceTest {
         String securityToken = UUID.randomUUID().toString();
 
         when(patientRepository.find(healthId)).thenReturn(Observable.just(new Patient()));
-        patientService.ensurePresent(healthId, new UserAuthInfo(clientId, email, securityToken));
-        verify(mciClient, never()).getPatient(healthId, new UserAuthInfo(clientId, email, securityToken));
+        patientService.ensurePresent(healthId, getUserInfo(clientId, email, securityToken));
+
+        verify(mciClient, never()).getPatient(healthId, getUserInfo(clientId, email, securityToken));
     }
 
     @Test
@@ -66,8 +71,10 @@ public class PatientServiceTest {
 
         when(patientRepository.find(healthId)).thenReturn(Observable.<Patient>just(null));
         Patient somePatient = new Patient();
-        when(mciClient.getPatient(healthId, new UserAuthInfo(clientId, email, securityToken))).thenReturn(Observable.just(somePatient));
-        assertNotNull(patientService.ensurePresent(healthId, new UserAuthInfo(clientId, email, securityToken)).toBlocking().first());
+        UserInfo userInfo = getUserInfo(clientId, email, securityToken);
+        when(mciClient.getPatient(healthId, userInfo)).thenReturn(Observable.just(somePatient));
+
+        assertNotNull(patientService.ensurePresent(healthId, userInfo).toBlocking().first());
         verify(patientRepository).save(somePatient);
     }
 
@@ -80,7 +87,14 @@ public class PatientServiceTest {
         String securityToken = UUID.randomUUID().toString();
 
         when(patientRepository.find(healthId)).thenReturn(Observable.<Patient>just(null));
-        when(mciClient.getPatient(healthId, new UserAuthInfo(clientId, email, securityToken))).thenReturn(Observable.<Patient>just(null));
-        assertTrue(null == patientService.ensurePresent(healthId, new UserAuthInfo(clientId, email, securityToken)).toBlocking().first());
+        UserInfo userInfo = getUserInfo(clientId, email, securityToken);
+        when(mciClient.getPatient(healthId, userInfo)).thenReturn(Observable.<Patient>just(null));
+
+        assertTrue(null == patientService.ensurePresent(healthId, userInfo).toBlocking().first());
+    }
+
+    private UserInfo getUserInfo(String clientId, String email, String securityToken) {
+        return new UserInfo(clientId, "foo", email, 1, true,
+                securityToken, new ArrayList<String>(), asList(new UserProfile("facility", "10000069", asList("3026"))));
     }
 }

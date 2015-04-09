@@ -6,8 +6,6 @@ public class EncounterContent {
 
     public EncounterContent() {}
 
-    ;
-
     public EncounterContent(String content) {
         this.content = content;
     }

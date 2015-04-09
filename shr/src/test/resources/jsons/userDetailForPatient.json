@@ -11,7 +11,8 @@
   "updated_at": "2015-03-20 06:55:28",
   "deleted_at": "2015-03-20 06:55:28",
   "groups": [
-    "SHR User"
+    "SHR User",
+    "Patient"
   ],
   "profiles": [
     {

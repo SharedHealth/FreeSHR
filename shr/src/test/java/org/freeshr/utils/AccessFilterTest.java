@@ -39,10 +39,10 @@ public class AccessFilterTest {
     public void setUp() throws Exception {
         initMocks(this);
         facility = new UserInfo("1", "bahmni", "bahmni@gmail.com", 1,
-                true, "xyz", new ArrayList<>(asList(FACILITY_ADMIN_GROUP, SHR_USER_GROUP)),
+                true, "xyz", new ArrayList<>(asList(HRM_FACILITY_ADMIN_GROUP, SHR_USER_GROUP)),
                 asList(new UserProfile(FACILITY_TYPE, FACILITY_ID, asList(FACILITY_CATCHMENT))));
         datasenseFacility = new UserInfo("2", "datasense", "datasense@gmail.com", 1,
-                true, "xyz", new ArrayList<>(asList(FACILITY_ADMIN_GROUP, SHR_SYSTEM_ADMIN_GROUP)),
+                true, "xyz", new ArrayList<>(asList(HRM_FACILITY_ADMIN_GROUP, SHR_SYSTEM_ADMIN_GROUP)),
                 asList(new UserProfile(FACILITY_TYPE, DATASENSE_FACILITY_ID, asList(FACILITY_CATCHMENT))));
         facilityAndProvider = new UserInfo("3", "facilityandprovider", "facilityandprovider@gmail.com", 1,
                 true, "xyz", new ArrayList<>(asList("Facility Admin", SHR_USER_GROUP)),

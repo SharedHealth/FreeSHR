@@ -12,6 +12,7 @@ import org.freeshr.infrastructure.persistence.FacilityRepository;
 import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
 import org.freeshr.launch.WebMvcConfig;
 import org.freeshr.utils.Confidentiality;
+import org.freeshr.utils.DateUtil;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.After;
@@ -132,6 +133,7 @@ public abstract class APIIntegrationTestBase {
         bundle.setEncounterConfidentiality(encounterConfidentiality);
         bundle.setPatientConfidentiality(patientConfidentiality);
         bundle.setEncounterContent(asString("jsons/encounters/valid.json"));
+        bundle.setReceivedDate(DateUtil.getCurrentTimeInISOString());
         return bundle;
     }
 }

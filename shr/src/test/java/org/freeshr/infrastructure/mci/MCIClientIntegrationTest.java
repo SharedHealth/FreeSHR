@@ -6,7 +6,8 @@ import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
-import org.freeshr.infrastructure.security.UserAuthInfo;
+import org.freeshr.infrastructure.security.UserInfo;
+import org.freeshr.infrastructure.security.UserProfile;
 import org.freeshr.utils.Confidentiality;
 import org.junit.Before;
 import org.junit.Rule;
@@ -19,10 +20,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.AsyncRestTemplate;
 
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static java.util.Arrays.asList;
 import static org.freeshr.utils.FileUtil.asString;
 import static org.freeshr.utils.HttpUtil.*;
 import static org.hamcrest.CoreMatchers.is;
@@ -70,7 +73,7 @@ public class MCIClientIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/patient.json"))));
 
-        Patient patient = mci.getPatient(heathId, new UserAuthInfo(clientId, userEmail, accessToken)).toBlocking().first();
+        Patient patient = mci.getPatient(heathId, getUserInfo(clientId, userEmail, accessToken)).toBlocking().first();
 
         assertThat(patient, is(notNullValue()));
         assertThat(patient.getHealthId(), is(heathId));
@@ -84,4 +87,10 @@ public class MCIClientIntegrationTest {
         assertThat(address.getUnionOrUrbanWardId(), is("17"));
         assertThat(address.getCityCorporation(), is("99"));
     }
+
+    private UserInfo getUserInfo(String clientId, String email, String securityToken) {
+        return new UserInfo(clientId, "foo", email, 1, true,
+                securityToken, new ArrayList<String>(), asList(new UserProfile("facility", "10000069", asList("3026"))));
+    }
+
 }
