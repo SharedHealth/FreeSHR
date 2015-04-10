@@ -34,7 +34,6 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import static org.freeshr.utils.Confidentiality.getConfidentiality;
-import static org.freeshr.utils.DateUtil.getCurrentTimeInISOString;
 
 @Service
 public class EncounterService {
@@ -43,17 +42,15 @@ public class EncounterService {
     private EncounterRepository encounterRepository;
     private PatientService patientService;
     private EncounterValidator encounterValidator;
-    private FacilityService facilityService;
 
     private static final Logger logger = LoggerFactory.getLogger(EncounterService.class);
 
     @Autowired
     public EncounterService(EncounterRepository encounterRepository, PatientService patientService,
-                            EncounterValidator encounterValidator, FacilityService facilityService) {
+                            EncounterValidator encounterValidator) {
         this.encounterRepository = encounterRepository;
         this.patientService = patientService;
         this.encounterValidator = encounterValidator;
-        this.facilityService = facilityService;
     }
 
     public Observable<EncounterResponse> ensureCreated(final EncounterBundle encounterBundle, UserInfo userInfo)
@@ -168,7 +165,7 @@ public class EncounterService {
         encounterBundle.setEncounterId(UUID.randomUUID().toString());
         encounterBundle.setPatientConfidentiality(patient.getConfidentiality());
         encounterBundle.setEncounterConfidentiality(getEncounterConfidentiality(feed));
-        String currentTimestamp = getCurrentTimeInISOString();
+        Date currentTimestamp = new Date();
         encounterBundle.setReceivedDate(currentTimestamp);
         encounterBundle.setUpdatedDate(currentTimestamp);
 

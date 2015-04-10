@@ -282,7 +282,7 @@ public class EncounterController extends ShrController {
         }
 
         EncounterBundle lastEncounter = requestResults.get(size - 1);
-        String lastEncounterDate = URLEncoder.encode(lastEncounter.getReceivedDate(), "UTF-8");
+        String lastEncounterDate = URLEncoder.encode(lastEncounter.getReceivedDateISOString(), "UTF-8");
 
         return UriComponentsBuilder.fromUriString(request.getRequestURL().toString())
                 .queryParam("updatedSince", lastEncounterDate)

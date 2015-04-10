@@ -52,7 +52,7 @@ public class EncounterServiceTest {
         mockEncounterValidator = mock(EncounterValidator.class);
         mockPatientService = mock(PatientService.class);
         encounterService = new EncounterService(mockEncounterRepository, mockPatientService,
-                mockEncounterValidator, mockFacilityService);
+                mockEncounterValidator);
     }
 
 

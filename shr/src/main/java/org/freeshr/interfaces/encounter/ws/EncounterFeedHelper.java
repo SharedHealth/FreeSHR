@@ -46,7 +46,7 @@ public class EncounterFeedHelper {
     }
 
     private Date newestEventDate(List<EncounterBundle> encounters) {
-        return (encounters.size() > 0) ? DateUtil.parseDate(encounters.get(0).getReceivedDate()) : null;
+        return (encounters.size() > 0) ? DateUtil.parseDate(encounters.get(0).getReceivedDateISOString()) : null;
     }
 
     private List<Entry> getEntries(List<EncounterBundle> encounters) {
@@ -63,7 +63,7 @@ public class EncounterFeedHelper {
             entry.setAlternateLinks(Arrays.asList(encLink));
 
 
-            entry.setUpdated(DateUtil.parseDate(encounter.getReceivedDate()));
+            entry.setUpdated(DateUtil.parseDate(encounter.getReceivedDateISOString()));
             entry.setContents(generateContents(encounter));
             Category category = new Category();
             category.setTerm("encounter");

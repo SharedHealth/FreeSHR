@@ -123,14 +123,6 @@ public class Address {
                 (unionOrUrbanWardId);
     }
 
-    public String getCountryCode() {
-        return countryCode;
-    }
-
-    public void setCountryCode(String countryCode) {
-        this.countryCode = countryCode;
-    }
-
     @Override
     public String toString() {
         return "Address{" +

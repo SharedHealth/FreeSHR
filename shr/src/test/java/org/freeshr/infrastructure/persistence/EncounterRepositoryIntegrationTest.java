@@ -1,5 +1,8 @@
 package org.freeshr.infrastructure.persistence;
 
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.querybuilder.QueryBuilder;
+import com.datastax.driver.core.querybuilder.Select;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
@@ -7,7 +10,11 @@ import org.freeshr.domain.model.Catchment;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
+import org.freeshr.utils.CollectionUtils;
 import org.freeshr.utils.Confidentiality;
+import org.freeshr.utils.DateUtil;
+import org.freeshr.utils.TimeUuidUtil;
+import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,9 +29,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static org.freeshr.utils.DateUtil.getCurrentTimeInISOString;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static org.freeshr.utils.FileUtil.asString;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
@@ -45,19 +51,24 @@ public class EncounterRepositoryIntegrationTest {
         String healthId = generateHealthId();
         patient.setHealthId(healthId);
         patient.setAddress(new Address("01", "02", "03", "04", "05"));
-        Date received_date = new Date();
-        encounterRepository.save(createEncounterBundle("e-0", healthId, getCurrentTimeInISOString(), "facilityId"), patient).toBlocking().first();
-        encounterRepository.save(createEncounterBundle("e-1", healthId, getCurrentTimeInISOString(), "facilityId"), patient).toBlocking().first();
-        encounterRepository.save(createEncounterBundle("e-2", healthId, getCurrentTimeInISOString(), "facilityId"), patient).toBlocking().first();
+        DateTime today = new DateTime(2015,02,01,0,0);
+        Date monthAfter = today.plusMonths(1).toDate();
+        Date twoMonthsAfter = today.plusMonths(2).toDate();
+        Date updatedSinceYesterday = today.minusDays(1).toDate();
+        encounterRepository.save(createEncounterBundle("e-1", healthId, today.toDate(), "facilityId"), patient).toBlocking().first();
+        encounterRepository.save(createEncounterBundle("e-2", healthId, monthAfter, "facilityId"), patient).toBlocking().first();
+        encounterRepository.save(createEncounterBundle("e-3", healthId, twoMonthsAfter, "facilityId"), patient).toBlocking().first();
 
         List<EncounterBundle> encounterBundles = encounterRepository.findEncountersForPatient(healthId,
-                received_date, 200).toBlocking().single();
-        EncounterBundle encounter = encounterBundles.get(0);
+                updatedSinceYesterday, 200).toBlocking().single();
         assertEquals(3, encounterBundles.size());
-        assertThat(encounter.getReceivedDate(), is(notNullValue()));
-        assertThat(encounter.getEncounterContent().toString(), is(content()));
 
-        encounterBundles = encounterRepository.findEncountersForPatient(healthId, new Date(),
+        assertEncounter(encounterBundles, "e-1", today.toDate());
+        assertEncounter(encounterBundles, "e-2", monthAfter);
+        assertEncounter(encounterBundles, "e-3", twoMonthsAfter);
+
+        Date updatedAfterThreeMonths = today.plusMonths(3).toDate();
+        encounterBundles = encounterRepository.findEncountersForPatient(healthId, updatedAfterThreeMonths,
                 200).toBlocking().single();
         assertEquals("Should not have returned any encounter as updatedSince is after existing encounter dates", 0,
                 encounterBundles.size());
@@ -68,21 +79,25 @@ public class EncounterRepositoryIntegrationTest {
         Patient patient = new Patient();
         String healthId = generateHealthId();
         patient.setHealthId(healthId);
-        Date date = new Date();
+        DateTime today = new DateTime(2015,02,01,0,0);
         patient.setAddress(new Address("01", "02", "03", "04", "05"));
-        encounterRepository.save(createEncounterBundle("e-0", healthId, getCurrentTimeInISOString(), "facilityId"), patient).toBlocking().first();
-        encounterRepository.save(createEncounterBundle("e-2", healthId, getCurrentTimeInISOString(), "facilityId"), patient).toBlocking().first();
+
+        Date e1ReceivedDate = today.plusDays(1).toDate();
+        Date e2ReceivedDate = today.plusDays(2).toDate();
+        encounterRepository.save(createEncounterBundle("e-11", healthId, e1ReceivedDate, "facilityId"), patient).toBlocking().first();
+        encounterRepository.save(createEncounterBundle("e-12", healthId, e2ReceivedDate, "facilityId"), patient).toBlocking().first();
+
         List<EncounterBundle> encountersForCatchment = encounterRepository.
-                findEncountersForCatchment(new Catchment("0102"), date, 10).toBlocking().first();
+                findEncountersForCatchment(new Catchment("0102"), today.toDate(), 10).toBlocking().first();
         assertEquals(2, encountersForCatchment.size());
-        EncounterBundle encounter = encountersForCatchment.get(0);
-        assertThat(encounter.getReceivedDate(), is(notNullValue()));
+        assertEncounter(encountersForCatchment, "e-11", e1ReceivedDate);
+        assertEncounter(encountersForCatchment, "e-12", e2ReceivedDate);
     }
 
     @Test
     public void shouldFetchEncounterById() throws ExecutionException, InterruptedException {
         String facilityId = "facilityId";
-        String encounterRecievedTime = getCurrentTimeInISOString();
+        Date encounterRecievedTime = new Date();
         Patient patient = new Patient();
         String healthId = generateHealthId();
         patient.setHealthId(healthId);
@@ -101,34 +116,74 @@ public class EncounterRepositoryIntegrationTest {
     }
 
     @Test
-    public void shouldFetchEncounterByCatchment() throws ExecutionException, InterruptedException {
-        Date date = new Date();
+    public void shouldSaveEncounterReceivedDateFromTheBundle() throws Exception {
         String facilityId = "facilityId";
-        String encounterRecievedTime = getCurrentTimeInISOString();
+        String encounterId = "e-111";
+        Date encounterRecievedDate = new Date();
         Patient patient = new Patient();
         String healthId = generateHealthId();
         patient.setHealthId(healthId);
         patient.setAddress(new Address("01", "02", "03", "04", "05"));
 
-        encounterRepository.save(createEncounterBundle("e-0", healthId, encounterRecievedTime, facilityId), patient).toBlocking().first();
-        encounterRepository.save(createEncounterBundle("e-2", healthId, encounterRecievedTime, facilityId), patient).toBlocking().first();
+        encounterRepository.save(createEncounterBundle(encounterId, healthId, encounterRecievedDate, facilityId), patient).toBlocking().first();
 
-        List<EncounterBundle> savedEncounters = encounterRepository.findEncountersForCatchment(new Catchment("0102"), date, 10).toBlocking().first();
+        Select selectEncounterQuery = QueryBuilder
+                .select("encounter_id", "received_date")
+                .from("encounter")
+                .where(eq("encounter_id", encounterId))
+                .limit(1);
+        ResultSet resultSet = cqlOperations.query(selectEncounterQuery);
+        assertFalse(resultSet.isExhausted());
+        assertEquals(encounterRecievedDate.getTime(), TimeUuidUtil.getTimeFromUUID(resultSet.one().getUUID("received_date")));
 
-        assertEquals(2, savedEncounters.size());
+        Select selectEncByPatientQuery = QueryBuilder
+                .select("encounter_id", "received_date")
+                .from("enc_by_patient")
+                .where(eq("health_id", healthId))
+                .limit(1);
+        resultSet = cqlOperations.query(selectEncByPatientQuery);
+        assertFalse(resultSet.isExhausted());
+        assertEquals(encounterRecievedDate.getTime(), TimeUuidUtil.getTimeFromUUID(resultSet.one().getUUID("received_date")));
+
+        Select selectEncByCatchmentQuery = QueryBuilder
+                .select("encounter_id", "received_date")
+                .from("enc_by_catchment")
+                .where(eq("division_id", "01"))
+                .and(eq("district_id", "0102"))
+                .and(eq("year", DateUtil.getYearOf(encounterRecievedDate)))
+                .limit(1);
+        resultSet = cqlOperations.query(selectEncByCatchmentQuery);
+        assertFalse(resultSet.isExhausted());
+        assertEquals(encounterRecievedDate, TimeUuidUtil.getDateFromUUID(resultSet.one().getUUID("received_date")));
     }
-
 
     @After
     public void teardown() {
         cqlOperations.execute("truncate encounter");
+        cqlOperations.execute("truncate enc_by_catchment");
+        cqlOperations.execute("truncate enc_by_patient");
+    }
+
+    private void assertEncounter(List<EncounterBundle> encounterBundles, String encounterId, Date receivedDate) {
+        EncounterBundle encounter1 = getEncounterById(encounterBundles, encounterId);
+        assertThat(encounter1.getReceivedDate(), is(receivedDate));
+        assertThat(encounter1.getEncounterContent().toString(), is(content()));
+    }
+
+    private EncounterBundle getEncounterById(List<EncounterBundle> encounterBundles, final String encounterId) {
+        return CollectionUtils.find(encounterBundles, new CollectionUtils.Fn<EncounterBundle, Boolean>() {
+            @Override
+            public Boolean call(EncounterBundle encounterBundle) {
+                return encounterBundle.getEncounterId().equals(encounterId);
+            }
+        });
     }
 
     private String generateHealthId() {
         return java.util.UUID.randomUUID().toString();
     }
 
-    private EncounterBundle createEncounterBundle(String encounterId, String healthId, String receivedDate, String facilityId) {
+    private EncounterBundle createEncounterBundle(String encounterId, String healthId, Date receivedDate, String facilityId) {
         EncounterBundle bundle = new EncounterBundle();
         bundle.setEncounterId(encounterId);
         bundle.setHealthId(healthId);

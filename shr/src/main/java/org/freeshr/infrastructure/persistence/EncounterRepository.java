@@ -18,6 +18,7 @@ import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.utils.DateUtil;
+import org.freeshr.utils.TimeUuidUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
@@ -56,11 +58,13 @@ public class EncounterRepository {
 
     public Observable<Boolean> save(EncounterBundle encounterBundle, Patient patient) {
         Address address = patient.getAddress();
+        UUID receivedTimeUUID = TimeUuidUtil.uuidForDate(encounterBundle.getReceivedDate());
+        UUID updatedTimeUUID = TimeUuidUtil.uuidForDate(encounterBundle.getUpdatedDate());
 
         Insert insertEncounterStmt = QueryBuilder.insertInto("encounter");
         insertEncounterStmt.value("encounter_id", encounterBundle.getEncounterId());
         insertEncounterStmt.value("health_id", encounterBundle.getHealthId());
-        insertEncounterStmt.value("received_date", encounterBundle.getReceivedDate()); //TODO check timefunction
+        insertEncounterStmt.value("received_date", receivedTimeUUID); //TODO check timefunction
         insertEncounterStmt.value("created_by", serializeRequester(encounterBundle.getCreatedBy())); //TODO check timefunction
         insertEncounterStmt.value("content_version", encounterBundle.getContentVersion());
         insertEncounterStmt.value(getSchemaContentVersionColumnName(), encounterBundle.getContentVersion());
@@ -68,16 +72,17 @@ public class EncounterRepository {
         insertEncounterStmt.value("patient_location_code", address.getLocationCode());
         insertEncounterStmt.value("encounter_confidentiality", encounterBundle.getEncounterConfidentiality().getLevel());
         insertEncounterStmt.value("patient_confidentiality", encounterBundle.getPatientConfidentiality().getLevel());
-        insertEncounterStmt.value("updated_date", encounterBundle.getUpdatedDate());
+        insertEncounterStmt.value("updated_date", updatedTimeUUID);
         insertEncounterStmt.value("updated_by", serializeRequester(encounterBundle.getUpdatedBy()));
 
         String encCatchmentInsertQuery =
                 format("INSERT INTO enc_by_catchment (division_id, district_id, year, " +
                                 " received_date, upazila_id, city_corporation_id, union_urban_ward_id, encounter_id) " +
-                                " values ('%s', '%s', %s, now(), '%s', '%s', '%s', '%s');",
+                                " values ('%s', '%s', %s, %s, '%s', '%s', '%s', '%s');",
                         address.getDivision(),
                         address.getConcatenatedDistrictId(),
                         DateUtil.getCurrentYear(),
+                        receivedTimeUUID,
                         address.getConcatenatedUpazilaId(),
                         StringUtils.defaultString(address.getConcatenatedCityCorporationId()),
                         StringUtils.defaultString(address.getConcatenatedWardId()),
@@ -85,7 +90,8 @@ public class EncounterRepository {
         RegularStatement encCatchmentStmt = new SimpleStatement(encCatchmentInsertQuery);
         String encByPatientInsertQuery =
                 format("INSERT INTO enc_by_patient (health_id, received_date, encounter_id) " +
-                        " VALUES ('%s', now(), '%s')", encounterBundle.getHealthId(), encounterBundle.getEncounterId());
+                                " VALUES ('%s', %s, '%s')", encounterBundle.getHealthId(), receivedTimeUUID,
+                        encounterBundle.getEncounterId());
         RegularStatement encByPatientStmt = new SimpleStatement(encByPatientInsertQuery);
 
         Batch batch = QueryBuilder.batch(insertEncounterStmt, encCatchmentStmt, encByPatientStmt);
@@ -253,13 +259,13 @@ public class EncounterRepository {
             EncounterBundle bundle = new EncounterBundle();
             bundle.setEncounterId(result.getString("encounter_id"));
             bundle.setHealthId(result.getString("health_id"));
-            bundle.setReceivedDate(DateUtil.toISOString(result.getDate("received_date")));
+            bundle.setReceivedDate(TimeUuidUtil.getDateFromUUID(result.getUUID("received_date")));
             bundle.setCreatedBy(getRequesterValue(result, "created_by"));
             bundle.setEncounterContent(result.getString(getContentColumnName()));
             bundle.setEncounterConfidentiality(getConfidentiality(result.getString("encounter_confidentiality")));
             bundle.setPatientConfidentiality(getConfidentiality(result.getString("patient_confidentiality")));
             bundle.setUpdatedBy(getRequesterValue(result, "updated_by"));
-            bundle.setUpdatedDate(DateUtil.toISOString(result.getDate("updated_date")));
+            bundle.setUpdatedDate(TimeUuidUtil.getDateFromUUID(result.getUUID("updated_date")));
 
             bundles.add(bundle);
         }

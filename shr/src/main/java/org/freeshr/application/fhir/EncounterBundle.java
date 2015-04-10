@@ -6,20 +6,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.eclipse.persistence.oxm.annotations.XmlCDATA;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.utils.Confidentiality;
+import org.freeshr.utils.DateUtil;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.Arrays;
+import java.util.Date;
 
 @XmlRootElement(name = "encounter")
 public class EncounterBundle {
     @JsonProperty("id")
     private String encounterId;
     private String healthId;
-
-    @JsonProperty("publishedDate")
-    private String receivedDate;
+    @JsonIgnore
+    @XmlTransient
+    private Date receivedDate;
 
     @JsonIgnore
     @XmlTransient
@@ -52,15 +54,17 @@ public class EncounterBundle {
 
     @JsonIgnore
     @XmlTransient
-    private String updatedDate;
-
-    public void setEncounterContent(EncounterContent encounterContent) {
-        this.encounterContent = encounterContent;
-    }
+    private Date updatedDate;
 
     @XmlElement(name = "id")
     public String getEncounterId() {
         return encounterId;
+    }
+
+    @JsonProperty("publishedDate")
+    @XmlElement(name = "updated")
+    public String getReceivedDateISOString() {
+        return DateUtil.toISOString(receivedDate);
     }
 
     public void setEncounterId(String encounterId) {
@@ -75,35 +79,12 @@ public class EncounterBundle {
         this.healthId = healthId;
     }
 
-    @XmlElement(name = "updated")
-    public String getReceivedDate() {
-        return receivedDate;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        EncounterBundle that = (EncounterBundle) o;
-
-        if (receivedDate != null ? !receivedDate.equals(that.receivedDate) : that.receivedDate != null) return false;
-        if (encounterId != null ? !encounterId.equals(that.encounterId) : that.encounterId != null) return false;
-        if (healthId != null ? !healthId.equals(that.healthId) : that.healthId != null) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = encounterId != null ? encounterId.hashCode() : 0;
-        result = 31 * result + (healthId != null ? healthId.hashCode() : 0);
-        result = 31 * result + (receivedDate != null ? receivedDate.hashCode() : 0);
-        return result;
-    }
-
-    public void setReceivedDate(String date) {
+    public void setReceivedDate(Date date) {
         this.receivedDate = date;
+    }
+
+    public Date getReceivedDate() {
+        return receivedDate;
     }
 
     @XmlTransient
@@ -133,22 +114,9 @@ public class EncounterBundle {
         return title + ":" + getEncounterId();
     }
 
-    @Override
-    public String toString() {
-        return "EncounterBundle{" +
-                "encounterId='" + encounterId + '\'' +
-                ", healthId='" + healthId + '\'' +
-                ", receivedDate='" + receivedDate + '\'' +
-                ", encounterContent=" + encounterContent +
-                ", categories=" + Arrays.toString(categories) +
-                ", title='" + title + '\'' +
-                '}';
-    }
-
     public void setCategories(String[] categories) {
         this.categories = categories;
     }
-
 
     public String[] getCategories() {
         return categories != null ? categories : new String[]{};
@@ -194,11 +162,45 @@ public class EncounterBundle {
         this.updatedBy = updatedBy;
     }
 
-    public String getUpdatedDate() {
+    public Date getUpdatedDate() {
         return updatedDate;
     }
 
-    public void setUpdatedDate(String updatedDate) {
+    public void setUpdatedDate(Date updatedDate) {
         this.updatedDate = updatedDate;
+    }
+
+    @Override
+    public String toString() {
+        return "EncounterBundle{" +
+                "encounterId='" + encounterId + '\'' +
+                ", healthId='" + healthId + '\'' +
+                ", receivedDate='" + receivedDate + '\'' +
+                ", encounterContent=" + encounterContent +
+                ", categories=" + Arrays.toString(categories) +
+                ", title='" + title + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        EncounterBundle that = (EncounterBundle) o;
+
+        if (receivedDate != null ? !receivedDate.equals(that.receivedDate) : that.receivedDate != null) return false;
+        if (encounterId != null ? !encounterId.equals(that.encounterId) : that.encounterId != null) return false;
+        if (healthId != null ? !healthId.equals(that.healthId) : that.healthId != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = encounterId != null ? encounterId.hashCode() : 0;
+        result = 31 * result + (healthId != null ? healthId.hashCode() : 0);
+        result = 31 * result + (receivedDate != null ? receivedDate.hashCode() : 0);
+        return result;
     }
 }

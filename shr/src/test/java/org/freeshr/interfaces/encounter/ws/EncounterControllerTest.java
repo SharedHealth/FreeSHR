@@ -193,7 +193,7 @@ public class EncounterControllerTest {
             encounter.setEncounterId("e-" + (i + 1));
             encounter.setHealthId(healthId);
             calendar.set(Calendar.SECOND, i);
-            encounter.setReceivedDate(DateUtil.toISOString(calendar.getTime()));
+            encounter.setReceivedDate(calendar.getTime());
             encounter.setEncounterContent("content-" + (i + 1));
             encounter.setPatientConfidentiality(Confidentiality.Normal);
             encounter.setEncounterConfidentiality(Confidentiality.Normal);

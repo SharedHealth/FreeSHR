@@ -13,7 +13,6 @@ import org.freeshr.infrastructure.persistence.FacilityRepository;
 import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
 import org.freeshr.launch.WebMvcConfig;
 import org.freeshr.utils.Confidentiality;
-import org.freeshr.utils.DateUtil;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.After;
@@ -32,6 +31,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.annotation.Resource;
 import javax.servlet.Filter;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
 import static org.freeshr.utils.FileUtil.asString;
@@ -134,7 +134,7 @@ public abstract class APIIntegrationTestBase {
         bundle.setEncounterConfidentiality(encounterConfidentiality);
         bundle.setPatientConfidentiality(patientConfidentiality);
         bundle.setEncounterContent(asString("jsons/encounters/valid.json"));
-        String receivedDate = DateUtil.getCurrentTimeInISOString();
+        Date receivedDate = new Date();
         bundle.setReceivedDate(receivedDate);
         bundle.setUpdatedDate(receivedDate);
         bundle.setCreatedBy(requester);
