@@ -2,12 +2,11 @@ package org.freeshr.infrastructure.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
 import static java.lang.String.format;
-import static org.springframework.util.StringUtils.isEmpty;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserInfo {
@@ -158,7 +157,7 @@ public class UserInfo {
         }
 
         private UserProfile getUserProfileByType(String profileType) {
-            if (!CollectionUtils.isEmpty(userProfiles)) {
+            if (!isEmpty(userProfiles)) {
                 for (UserProfile userProfile : userProfiles) {
                     if (userProfile.getName().equalsIgnoreCase(profileType)) {
                         return userProfile;
