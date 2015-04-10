@@ -3,9 +3,6 @@ package org.freeshr.domain.service;
 
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterValidationResponse;
-import org.freeshr.domain.model.Catchment;
-import org.freeshr.domain.model.Facility;
-import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
 import org.freeshr.infrastructure.security.UserInfo;
@@ -18,29 +15,20 @@ import org.junit.Before;
 import org.junit.Test;
 import rx.Observable;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.freeshr.infrastructure.security.UserInfo.HRM_FACILITY_ADMIN_GROUP;
 import static org.freeshr.infrastructure.security.UserInfo.SHR_USER_GROUP;
 import static org.freeshr.utils.FileUtil.asString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-public class EncounterServiceTest {
+public class PatientEncounterServiceTest {
 
-    private FacilityService mockFacilityService;
-    private EncounterService encounterService;
+    private PatientEncounterService patientEncounterService;
     private EncounterRepository mockEncounterRepository;
     private EncounterValidator mockEncounterValidator;
     private PatientService mockPatientService;
@@ -48,34 +36,12 @@ public class EncounterServiceTest {
     @Before
     public void setup() {
         mockEncounterRepository = mock(EncounterRepository.class);
-        mockFacilityService = mock(FacilityService.class);
         mockEncounterValidator = mock(EncounterValidator.class);
         mockPatientService = mock(PatientService.class);
-        encounterService = new EncounterService(mockEncounterRepository, mockPatientService,
+        patientEncounterService = new PatientEncounterService(mockEncounterRepository, mockPatientService,
                 mockEncounterValidator);
     }
 
-
-    @Test
-    public void shouldReturnErrorEvenIfOneGetEncounterFails() throws ParseException {
-        Date date = new SimpleDateFormat("dd/mm/YYYY").parse("10/9/2014");
-        when(mockFacilityService.ensurePresent("1")).thenReturn(
-                Observable.just(new Facility("1", "facility1", "Main hospital", "3056,30", new Address("1", "2", "3",
-                        null, null))));
-
-        final String exceptionMessage = "I bombed";
-
-        when(mockEncounterRepository.findEncountersForCatchment(eq(new Catchment("30")),
-                any(Date.class), eq(20))).
-                thenReturn(Observable.<List<EncounterBundle>>error(new Exception(exceptionMessage)));
-        try {
-            encounterService.findEncountersForFacilityCatchment(
-                    "30", date, 20).toBlocking().first();
-        } catch (Exception e) {
-            assertEquals(RuntimeException.class, e.getClass());
-            assertEquals(e.getCause().getMessage(), exceptionMessage);
-        }
-    }
 
     @Test
     public void shouldPopulateEncounterBundleFields() throws Exception {
@@ -93,7 +59,7 @@ public class EncounterServiceTest {
         when(mockPatientService.ensurePresent(any(String.class), eq(userInfo))).thenReturn(Observable.just(confidentialPatient));
         when(mockEncounterRepository.save(bundle, confidentialPatient)).thenReturn(Observable.just(true));
 
-        encounterService.ensureCreated(bundle, userInfo).toBlocking().first();
+        patientEncounterService.ensureCreated(bundle, userInfo).toBlocking().first();
 
         verify(mockEncounterRepository).save(bundle, confidentialPatient);
         assertEquals(Confidentiality.VeryRestricted, bundle.getPatientConfidentiality());

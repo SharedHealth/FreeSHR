@@ -7,7 +7,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.config.SHRProperties;
-import org.freeshr.domain.service.EncounterService;
+import org.freeshr.domain.service.CatchmentEncounterService;
 import org.freeshr.infrastructure.security.TokenAuthentication;
 import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.infrastructure.security.UserProfile;
@@ -44,11 +44,10 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-
-public class EncounterControllerTest {
+public class CatchmentEncounterControllerTest {
 
     @Mock
-    EncounterService mockedEncounterService;
+    CatchmentEncounterService mockCatchmentEncounterService;
 
     @Mock
     private SHRProperties shrProperties;
@@ -56,17 +55,17 @@ public class EncounterControllerTest {
     @Mock
     private SecurityContext securityContext;
 
-    private EncounterController controller;
+    private CatchmentEncounterController controller;
 
     @Before
     public void setUp() {
         initMocks(this);
-        controller = new EncounterController(mockedEncounterService);
+        controller = new CatchmentEncounterController(mockCatchmentEncounterService);
     }
 
     @Test
     public void shouldGetPagedEncountersForCatchment() throws Exception {
-        int encounterFetchLimit = EncounterService.getEncounterFetchLimit();
+        int encounterFetchLimit = CatchmentEncounterService.getEncounterFetchLimit();
         List<EncounterBundle> dummyEncounters = createEncounterBundles("hid01", 50, DateUtil.parseDate("2014-10-10"));
 
         ArrayList<String> datasenseFacilityCodes = new ArrayList<>();
@@ -74,7 +73,7 @@ public class EncounterControllerTest {
         TokenAuthentication tokenAuthentication = tokenAuthentication();
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication()).thenReturn(tokenAuthentication);
-        when(mockedEncounterService.findEncountersForFacilityCatchment(anyString(),
+        when(mockCatchmentEncounterService.findEncountersForFacilityCatchment(anyString(),
                 any(Date.class),
                 eq(encounterFetchLimit * 2))).thenReturn(Observable.just(slice(encounterFetchLimit * 2,
                 dummyEncounters)));
@@ -100,13 +99,13 @@ public class EncounterControllerTest {
 
     @Test
     public void shouldGetAtomFeed() throws Exception {
-        int encounterFetchLimit = EncounterService.getEncounterFetchLimit();
+        int encounterFetchLimit = CatchmentEncounterService.getEncounterFetchLimit();
         List<EncounterBundle> dummyEncounters = createEncounterBundles("hid01", 50, DateUtil.parseDate("2014-10-10"));
 
         TokenAuthentication tokenAuthentication = tokenAuthentication();
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication()).thenReturn(tokenAuthentication);
-        when(mockedEncounterService.findEncountersForFacilityCatchment(anyString(),
+        when(mockCatchmentEncounterService.findEncountersForFacilityCatchment(anyString(),
                 any(Date.class),
                 eq(encounterFetchLimit * 2))).thenReturn(Observable.just(slice(encounterFetchLimit * 2,
                 dummyEncounters)));

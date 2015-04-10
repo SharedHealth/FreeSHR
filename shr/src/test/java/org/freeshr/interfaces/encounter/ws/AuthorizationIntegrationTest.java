@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @TestPropertySource(properties = "MCI_SERVER_URL=http://localhost:9997")
-public class EncounterControllerAuthorizationIntegrationTest extends APIIntegrationTestBase {
+public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
     private static final String VALID_HEALTH_ID = "5893922485019082753";
     private static final String ENCOUNTER_ID = "dfbc9b30-ceef-473e-9q22-4ee31qfceqdd";
     private static final String PATIENT_CATCHMENT = "0102";
@@ -463,13 +463,13 @@ public class EncounterControllerAuthorizationIntegrationTest extends APIIntegrat
     private void createNonConfidentialEncounter(String healthId, String division, String district) throws Exception {
         Patient patient = createPatient(healthId, division, district);
 
-        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, Normal, Normal, new Requester("facilityId", "providerId")), patient);
+        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, Normal, Normal, new Requester("facilityId", "providerId"), asString("jsons/encounters/valid.json")), patient);
     }
 
     private void createConfidentialEncounter(String healthId) throws Exception {
         Patient patient = createPatient(healthId, DATASENSE_REGISTERED_DIVISION, DATASENSE_REGISTERED_DISTRICT);
 
-        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, VeryRestricted, Normal, new Requester("facilityId", "providerId")), patient);
+        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, VeryRestricted, Normal, new Requester("facilityId", "providerId"), asString("jsons/encounters/valid.json")), patient);
     }
 
     private Patient createPatient(String healthId, String division, String district) {

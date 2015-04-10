@@ -28,10 +28,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -48,14 +45,17 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
 @TestPropertySource(properties = "MCI_SERVER_URL=http://localhost:9997")
-public class EncounterServiceIntegrationTest {
+public class PatientEncounterServiceIntegrationTest {
 
     private static final String VALID_FACILITY_ID = "10000001";
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(9997);
 
     @Autowired
-    private EncounterService encounterService;
+    private PatientEncounterService patientEncounterService;
+
+    @Autowired
+    private CatchmentEncounterService catchmentEncounterService;
 
     @Autowired
     private PatientRepository patientRepository;
@@ -115,20 +115,13 @@ public class EncounterServiceIntegrationTest {
 
     }
 
-    @After
-    public void teardown() {
-        cqlOperations.execute("truncate encounter;");
-        cqlOperations.execute("truncate patient;");
-        cqlOperations.execute("truncate FACILITIES;");
-    }
-
     @Test
     public void shouldRejectEncounterWithInvalidReferenceCode() throws Exception {
         String clientId = "123";
         String email = "email@gmail.com";
         String securityToken = UUID.randomUUID().toString();
 
-        EncounterResponse response = encounterService.ensureCreated(withInvalidReferenceTerm(), getUserInfo(clientId, email, securityToken))
+        EncounterResponse response = patientEncounterService.ensureCreated(withInvalidReferenceTerm(), getUserInfo(clientId, email, securityToken))
                 .toBlocking().first();
         assertTrue(new ValidationFailures(response).matches(new
                 String[]{"/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "code-unknown", null}));
@@ -140,7 +133,7 @@ public class EncounterServiceIntegrationTest {
         String email = "email@gmail.com";
         String securityToken = UUID.randomUUID().toString();
 
-        EncounterResponse response = encounterService.ensureCreated(withInvalidConcept(), getUserInfo(clientId, email, securityToken)).toBlocking()
+        EncounterResponse response = patientEncounterService.ensureCreated(withInvalidConcept(), getUserInfo(clientId, email, securityToken)).toBlocking()
                 .first();
         assertTrue(new ValidationFailures(response).matches(new
                 String[]{"/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "code-unknown",
@@ -153,7 +146,7 @@ public class EncounterServiceIntegrationTest {
         String email = "email@gmail.com";
         String securityToken = UUID.randomUUID().toString();
 
-        Observable<EncounterResponse> encounterResponseObservable = encounterService.ensureCreated
+        Observable<EncounterResponse> encounterResponseObservable = patientEncounterService.ensureCreated
                 (encounterForUnknownPatient(), getUserInfo(clientId, email, securityToken));
         EncounterResponse response = encounterResponseObservable.toBlocking().first();
         assertThat(true, is(response.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition)));
@@ -165,7 +158,7 @@ public class EncounterServiceIntegrationTest {
         String email = "email@gmail.com";
         String securityToken = UUID.randomUUID().toString();
 
-        Observable<EncounterResponse> response = encounterService.ensureCreated(withValidEncounter(), getUserInfo(clientId, email, securityToken));
+        Observable<EncounterResponse> response = patientEncounterService.ensureCreated(withValidEncounter(), getUserInfo(clientId, email, securityToken));
         TestSubscriber<EncounterResponse> encounterResponseSubscriber = new TestSubscriber<>();
         response.subscribe(encounterResponseSubscriber);
         encounterResponseSubscriber.awaitTerminalEvent();
@@ -179,8 +172,7 @@ public class EncounterServiceIntegrationTest {
         patientTestSubscriber.awaitTerminalEvent();
         assertValidPatient(patientTestSubscriber.getOnNextEvents().get(0));
 
-        Observable<List<EncounterBundle>> encountersForPatientObservable = encounterService.findEncountersForPatient
-                (VALID_HEALTH_ID, null, 200);
+        Observable<List<EncounterBundle>> encountersForPatientObservable = patientEncounterService.findEncountersForPatient(VALID_HEALTH_ID, null, 200);
         TestSubscriber<List<EncounterBundle>> encounterBundleTestSubscriber = new TestSubscriber<>();
         encountersForPatientObservable.subscribe(encounterBundleTestSubscriber);
         encounterBundleTestSubscriber.awaitTerminalEvent();
@@ -188,55 +180,6 @@ public class EncounterServiceIntegrationTest {
         List<EncounterBundle> encounterBundles = encounterBundleTestSubscriber.getOnNextEvents().get(0);
         assertThat(encounterBundles.size(), is(1));
         assertThat(encounterBundles.get(0).getHealthId(), is(VALID_HEALTH_ID));
-    }
-
-    @Test
-    public void shouldReturnUniqueListOfEncountersForGivenListOfCatchments() throws ExecutionException,
-            InterruptedException, ParseException {
-        String clientId = "123";
-        String email = "email@gmail.com";
-        String securityToken = UUID.randomUUID().toString();
-
-        Facility facility = new Facility("4", "facility1", "Main hospital", "305610", new Address("1", "2", "3",
-                null, null));
-        Date date = new Date();
-        facilityRepository.save(facility).toBlocking().first();
-        encounterService.ensureCreated(withValidEncounter(), getUserInfo(clientId, email, securityToken)).toBlocking().first();
-
-        List<EncounterBundle> encounterBundles = encounterService.findEncountersForFacilityCatchment("305610",
-                date, 20).toBlocking().first();
-        assertEquals(1, encounterBundles.size());
-        assertEquals(VALID_HEALTH_ID, encounterBundles.iterator().next().getHealthId());
-    }
-
-    @Test
-    public void shouldReturnUniqueListOfEncountersForFacilityCatchment() throws ExecutionException,
-            InterruptedException, ParseException {
-        String clientId = "123";
-        String email = "email@gmail.com";
-        String securityToken = UUID.randomUUID().toString();
-        Date date = new Date();
-
-        Facility facility = new Facility("3", "facility", "Main hospital", "305610,3056", new Address("1", "2", "3",
-                null, null));
-        facilityRepository.save(facility).toBlocking().first();
-
-        assertNotNull(facilityRepository.find("3").toBlocking().first());
-        assertTrue(encounterService.ensureCreated(withValidEncounter(), getUserInfo(clientId, email, securityToken)).toBlocking()
-                .first().isSuccessful());
-        assertTrue(encounterService.ensureCreated(withNewEncounterForPatient(VALID_HEALTH_ID_NEW), getUserInfo(clientId, email, securityToken)).toBlocking().first()
-                .isSuccessful());
-
-        assertEquals(1, encounterService.findEncountersForPatient(VALID_HEALTH_ID, null,
-                200).toBlocking().first().size());
-
-        List<EncounterBundle> encounterBundles = encounterService.findEncountersForFacilityCatchment(
-                "3056", date, 10).toBlocking().first();
-        assertEquals(2, encounterBundles.size());
-
-        ArrayList<String> healthIds = extractListOfHealthIds(encounterBundles);
-        assertEquals(2, healthIds.size());
-        assertTrue(healthIds.containsAll(Arrays.asList(VALID_HEALTH_ID, VALID_HEALTH_ID)));
     }
 
     @Test
@@ -249,10 +192,10 @@ public class EncounterServiceIntegrationTest {
                 null, null));
         facilityRepository.save(facility).toBlocking().first();
 
-        EncounterResponse first = encounterService.ensureCreated(withNewEncounterForPatient(VALID_HEALTH_ID), getUserInfo(clientId, email, securityToken))
+        EncounterResponse first = patientEncounterService.ensureCreated(withNewEncounterForPatient(VALID_HEALTH_ID), getUserInfo(clientId, email, securityToken))
                 .toBlocking().first();
         String encounterId = first.getEncounterId();
-        EncounterBundle encounterBundle = encounterService.findEncounter(VALID_HEALTH_ID,
+        EncounterBundle encounterBundle = patientEncounterService.findEncounter(VALID_HEALTH_ID,
                 encounterId).toBlocking().first();
         assertEquals(encounterId, encounterBundle.getEncounterId());
     }
@@ -267,22 +210,14 @@ public class EncounterServiceIntegrationTest {
 
         facilityRepository.save(facility).toBlocking().first();
 
-        EncounterResponse first = encounterService.ensureCreated(withNewEncounterForPatient(VALID_HEALTH_ID_NEW), getUserInfo(clientId, email, securityToken))
+        EncounterResponse first = patientEncounterService.ensureCreated(withNewEncounterForPatient(VALID_HEALTH_ID_NEW), getUserInfo(clientId, email, securityToken))
                 .toBlocking().first();
         String encounterId = first.getEncounterId();
 
-        EncounterBundle encounterBundle = encounterService.findEncounter(INVALID_HEALTH_ID,
+        EncounterBundle encounterBundle = patientEncounterService.findEncounter(INVALID_HEALTH_ID,
                 encounterId).toBlocking().firstOrDefault(null);
         assertNull("Should have returned empty encounter for invalid healthId", encounterBundle);
 
-    }
-
-    private ArrayList<String> extractListOfHealthIds(List<EncounterBundle> encounterBundles) {
-        ArrayList<String> healthIds = new ArrayList<>();
-        for (EncounterBundle encounterBundle : encounterBundles) {
-            healthIds.add(encounterBundle.getHealthId());
-        }
-        return healthIds;
     }
 
     private void assertValidPatient(Patient patient) {
@@ -299,5 +234,12 @@ public class EncounterServiceIntegrationTest {
     private UserInfo getUserInfo(String clientId, String email, String securityToken) {
         return new UserInfo(clientId, "foo", email, 1, true,
                 securityToken, new ArrayList<String>(), asList(new UserProfile("facility", "10000069", asList("3026"))));
+    }
+
+    @After
+    public void teardown() {
+        cqlOperations.execute("truncate encounter;");
+        cqlOperations.execute("truncate patient;");
+        cqlOperations.execute("truncate FACILITIES;");
     }
 }

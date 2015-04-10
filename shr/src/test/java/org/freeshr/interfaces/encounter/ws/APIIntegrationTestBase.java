@@ -34,8 +34,6 @@ import javax.servlet.Filter;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
-import static org.freeshr.utils.FileUtil.asString;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = {WebMvcConfig.class, SHRConfig.class})
 @WebAppConfiguration
@@ -127,13 +125,13 @@ public abstract class APIIntegrationTestBase {
     }
 
     protected EncounterBundle createEncounterBundle(String encounterId, String healthId, Confidentiality encounterConfidentiality,
-                                                    Confidentiality patientConfidentiality, Requester requester) {
+                                                    Confidentiality patientConfidentiality, Requester requester, String content) {
         EncounterBundle bundle = new EncounterBundle();
         bundle.setEncounterId(encounterId);
         bundle.setHealthId(healthId);
         bundle.setEncounterConfidentiality(encounterConfidentiality);
         bundle.setPatientConfidentiality(patientConfidentiality);
-        bundle.setEncounterContent(asString("jsons/encounters/valid.json"));
+        bundle.setEncounterContent(content);
         Date receivedDate = new Date();
         bundle.setReceivedDate(receivedDate);
         bundle.setUpdatedDate(receivedDate);

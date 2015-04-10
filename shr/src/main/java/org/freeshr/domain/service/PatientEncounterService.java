@@ -1,10 +1,8 @@
 package org.freeshr.domain.service;
 
-import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.application.fhir.EncounterValidationResponse;
-import org.freeshr.domain.model.Catchment;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
@@ -13,12 +11,7 @@ import org.freeshr.utils.Confidentiality;
 import org.freeshr.utils.ResourceOrFeedDeserializer;
 import org.freeshr.validations.EncounterValidationContext;
 import org.freeshr.validations.EncounterValidator;
-import org.hl7.fhir.instance.model.AtomEntry;
-import org.hl7.fhir.instance.model.AtomFeed;
-import org.hl7.fhir.instance.model.Coding;
-import org.hl7.fhir.instance.model.Composition;
-import org.hl7.fhir.instance.model.Resource;
-import org.hl7.fhir.instance.model.ResourceType;
+import org.hl7.fhir.instance.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,27 +20,25 @@ import rx.Observable;
 import rx.functions.Func0;
 import rx.functions.Func1;
 
+import java.lang.Boolean;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import static org.freeshr.utils.Confidentiality.getConfidentiality;
 
 @Service
-public class EncounterService {
-    private static final int DEFAULT_FETCH_LIMIT = 20;
-    private static final String ENCOUNTER_FETCH_LIMIT_LOOKUP_KEY = "ENCOUNTER_FETCH_LIMIT";
+public class PatientEncounterService {
     private EncounterRepository encounterRepository;
     private PatientService patientService;
     private EncounterValidator encounterValidator;
 
-    private static final Logger logger = LoggerFactory.getLogger(EncounterService.class);
+    private static final Logger logger = LoggerFactory.getLogger(PatientEncounterService.class);
 
     @Autowired
-    public EncounterService(EncounterRepository encounterRepository, PatientService patientService,
-                            EncounterValidator encounterValidator) {
+    public PatientEncounterService(EncounterRepository encounterRepository, PatientService patientService,
+                                   EncounterValidator encounterValidator) {
         this.encounterRepository = encounterRepository;
         this.patientService = patientService;
         this.encounterValidator = encounterValidator;
@@ -67,45 +58,6 @@ public class EncounterService {
         }
     }
 
-    /**
-     * @param healthId
-     * @param sinceDate
-     * @param limit
-     * @return
-     * @throws ExecutionException
-     * @throws InterruptedException
-     */
-    public Observable<List<EncounterBundle>> findEncountersForPatient(String healthId, Date sinceDate,
-                                                                      int limit) throws ExecutionException,
-            InterruptedException {
-        return encounterRepository.findEncountersForPatient(healthId, sinceDate, limit);
-    }
-
-    /**
-     * @param facilityId
-     * @param catchment
-     * @param sinceDate
-     * @return list of encounters. limited to 20
-     */
-    public Observable<List<EncounterBundle>> findEncountersForFacilityCatchment(final String catchment,
-                                                                                final Date sinceDate, final int limit) {
-        return encounterRepository.findEncountersForCatchment(new Catchment(catchment), sinceDate, limit);
-    }
-
-    public static int getEncounterFetchLimit() {
-        Map<String, String> env = System.getenv();
-        String encounterFetchLimit = env.get(ENCOUNTER_FETCH_LIMIT_LOOKUP_KEY);
-        int fetchLimit = DEFAULT_FETCH_LIMIT;
-        if (!StringUtils.isBlank(encounterFetchLimit)) {
-            try {
-                fetchLimit = Integer.valueOf(encounterFetchLimit);
-            } catch (NumberFormatException nfe) {
-                //Do nothing
-            }
-        }
-        return fetchLimit;
-    }
-
     public Observable<EncounterBundle> findEncounter(final String healthId, String encounterId) {
         return encounterRepository.findEncounterById(encounterId).filter(new Func1<EncounterBundle, Boolean>() {
             @Override
@@ -113,6 +65,12 @@ public class EncounterService {
                 return encounterBundle.getHealthId().equals(healthId);
             }
         });
+    }
+
+    public Observable<List<EncounterBundle>> findEncountersForPatient(String healthId, Date sinceDate,
+                                                                      int limit) throws ExecutionException,
+            InterruptedException {
+        return encounterRepository.findEncountersForPatient(healthId, sinceDate, limit);
     }
 
     private Func0<Observable<EncounterResponse>> complete() {
