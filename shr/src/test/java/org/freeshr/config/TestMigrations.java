@@ -35,6 +35,7 @@ public class TestMigrations extends Migrations {
                 .withLoadBalancingPolicy(new RoundRobinPolicy())
                 .withPoolingOptions(poolingOptions)
                 .withProtocolVersion(Integer.parseInt(env.get("CASSANDRA_VERSION")))
+                .withAuthProvider(new PlainTextAuthProvider(env.get("CASSANDRA_USER"), env.get("CASSANDRA_PASSWORD")))
                 .withQueryOptions(queryOptions)
                 .withReconnectionPolicy(new ConstantReconnectionPolicy(SHRProperties.ONE_MINUTE))
                 .addContactPoint(env.get("CASSANDRA_HOST"));

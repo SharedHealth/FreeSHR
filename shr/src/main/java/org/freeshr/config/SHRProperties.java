@@ -25,6 +25,12 @@ public class SHRProperties {
     @Value("${TR_PASSWORD}")
     private String trPassword;
 
+
+    @Value("${CASSANDRA_USER}")
+    private String cassandraUser;
+    @Value("${CASSANDRA_PASSWORD}")
+    private String cassandraPassword;
+
     @Value("${CASSANDRA_KEYSPACE}")
     private String cassandraKeySpace;
     @Value("${CASSANDRA_HOST}")
@@ -94,6 +100,15 @@ public class SHRProperties {
 
     public String getIdentityServerBaseUrl() {
         return identityServerBaseUrl;
+    }
+
+
+    public String getCassandraUser() {
+        return cassandraUser;
+    }
+
+    public String getCassandraPassword() {
+        return cassandraPassword;
     }
 
     public String getCassandraKeySpace() {

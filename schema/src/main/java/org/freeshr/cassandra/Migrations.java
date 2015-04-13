@@ -9,6 +9,7 @@ import com.toddfast.mutagen.cassandra.CassandraSubject;
 import com.toddfast.mutagen.cassandra.impl.CassandraMutagenImpl;
 
 import java.io.IOException;
+import java.net.PasswordAuthentication;
 import java.util.Map;
 
 import static java.lang.System.getenv;
@@ -68,6 +69,7 @@ public class Migrations {
                 .withClusterName(env.get("CASSANDRA_KEYSPACE"))
                 .withLoadBalancingPolicy(new RoundRobinPolicy())
                 .withPoolingOptions(new PoolingOptions())
+                .withAuthProvider(new PlainTextAuthProvider(env.get("CASSANDRA_USER"), env.get("CASSANDRA_PASSWORD")))
                 .withProtocolVersion(Integer.parseInt(env.get("CASSANDRA_VERSION")))
                 .withQueryOptions(queryOptions)
                 .withReconnectionPolicy(new ConstantReconnectionPolicy(ONE_MINUTE))
