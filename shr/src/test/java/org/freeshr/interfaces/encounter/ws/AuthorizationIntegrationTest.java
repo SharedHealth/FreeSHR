@@ -14,6 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.Date;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.freeshr.utils.Confidentiality.Normal;
 import static org.freeshr.utils.Confidentiality.VeryRestricted;
@@ -463,13 +465,15 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
     private void createNonConfidentialEncounter(String healthId, String division, String district) throws Exception {
         Patient patient = createPatient(healthId, division, district);
 
-        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, Normal, Normal, new Requester("facilityId", "providerId"), asString("jsons/encounters/valid.json")), patient);
+        final Requester createdBy = new Requester("facilityId", "providerId");
+        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, new Date()), patient);
     }
 
     private void createConfidentialEncounter(String healthId) throws Exception {
         Patient patient = createPatient(healthId, DATASENSE_REGISTERED_DIVISION, DATASENSE_REGISTERED_DISTRICT);
 
-        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, VeryRestricted, Normal, new Requester("facilityId", "providerId"), asString("jsons/encounters/valid.json")), patient);
+        final Requester createdBy = new Requester("facilityId", "providerId");
+        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, VeryRestricted, Normal, asString("jsons/encounters/valid.json"), createdBy, new Date()), patient);
     }
 
     private Patient createPatient(String healthId, String division, String district) {

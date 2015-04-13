@@ -3,7 +3,6 @@ package org.freeshr.interfaces.encounter.ws;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
-import org.freeshr.domain.service.CatchmentEncounterService;
 import org.freeshr.domain.service.PatientEncounterService;
 import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
@@ -36,12 +35,10 @@ public class PatientEncounterController extends ShrController {
     private static final Logger logger = LoggerFactory.getLogger(PatientEncounterController.class);
 
     private PatientEncounterService patientEncounterService;
-    private CatchmentEncounterService catchmentEncounterService;
 
     @Autowired
-    public PatientEncounterController(PatientEncounterService patientEncounterService, CatchmentEncounterService catchmentEncounterService) {
+    public PatientEncounterController(PatientEncounterService patientEncounterService) {
         this.patientEncounterService = patientEncounterService;
-        this.catchmentEncounterService = catchmentEncounterService;
     }
 
     @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER')")
@@ -66,6 +63,7 @@ public class PatientEncounterController extends ShrController {
         }
         return deferredResult;
     }
+
 
     @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER', 'ROLE_SHR_PATIENT', 'ROLE_SHR System Admin')")
     @RequestMapping(value = "/{healthId}/encounters", method = RequestMethod.GET,
@@ -134,27 +132,27 @@ public class PatientEncounterController extends ShrController {
             Observable<EncounterBundle> observable = patientEncounterService.findEncounter(healthId,
                     encounterId).firstOrDefault(null);
             observable.subscribe(new Action1<EncounterBundle>() {
-                                     @Override
-                                     public void call(EncounterBundle encounterBundle) {
-                                         if (encounterBundle != null) {
-                                             logger.debug(encounterBundle.toString());
-                                             if ((isRestrictedAccess == null || isRestrictedAccess) && isConfidentialEncounter(encounterBundle)) {
-                                                 deferredResult.setErrorResult(new Forbidden(format("Access is denied to user %s for encounter %s",
-                                                         userInfo.getProperties().getId(), encounterId)));
-                                             } else {
-                                                 deferredResult.setResult(encounterBundle);
-                                             }
-                                         } else {
-                                             deferredResult.setErrorResult(new ResourceNotFound(format("Encounter %s not found", encounterId)));
-                                         }
-                                     }
-                                 },
-                    new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
-                            deferredResult.setErrorResult(throwable);
-                        }
-                    });
+                 @Override
+                 public void call(EncounterBundle encounterBundle) {
+                     if (encounterBundle != null) {
+                         logger.debug(encounterBundle.toString());
+                         if ((isRestrictedAccess == null || isRestrictedAccess) && isConfidentialEncounter(encounterBundle)) {
+                             deferredResult.setErrorResult(new Forbidden(format("Access is denied to user %s for encounter %s",
+                                     userInfo.getProperties().getId(), encounterId)));
+                         } else {
+                             deferredResult.setResult(encounterBundle);
+                         }
+                     } else {
+                         deferredResult.setErrorResult(new ResourceNotFound(format("Encounter %s not found", encounterId)));
+                     }
+                 }
+             },
+            new Action1<Throwable>() {
+                @Override
+                public void call(Throwable throwable) {
+                    deferredResult.setErrorResult(throwable);
+                }
+            });
         } catch (Exception e) {
             logger.error(e.getMessage());
             deferredResult.setErrorResult(e);
@@ -162,7 +160,7 @@ public class PatientEncounterController extends ShrController {
         return deferredResult;
     }
 
-    private Action1<Throwable> errorCallback(final DeferredResult<EncounterResponse> deferredResult) {
+    private Action1<Throwable>  errorCallback(final DeferredResult<EncounterResponse> deferredResult) {
         return new Action1<Throwable>() {
             @Override
             public void call(Throwable error) {

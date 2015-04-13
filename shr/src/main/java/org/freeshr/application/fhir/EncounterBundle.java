@@ -21,7 +21,7 @@ public class EncounterBundle {
     private String healthId;
     @JsonIgnore
     @XmlTransient
-    private Date receivedDate;
+    private Date receivedAt;
 
     @JsonIgnore
     @XmlTransient
@@ -54,7 +54,7 @@ public class EncounterBundle {
 
     @JsonIgnore
     @XmlTransient
-    private Date updatedDate;
+    private Date updatedAt;
 
     @XmlElement(name = "id")
     public String getEncounterId() {
@@ -64,7 +64,7 @@ public class EncounterBundle {
     @JsonProperty("publishedDate")
     @XmlElement(name = "updated")
     public String getReceivedDateISOString() {
-        return DateUtil.toISOString(receivedDate);
+        return DateUtil.toISOString(receivedAt);
     }
 
     public void setEncounterId(String encounterId) {
@@ -79,12 +79,12 @@ public class EncounterBundle {
         this.healthId = healthId;
     }
 
-    public void setReceivedDate(Date date) {
-        this.receivedDate = date;
+    public void setReceivedAt(Date date) {
+        this.receivedAt = date;
     }
 
-    public Date getReceivedDate() {
-        return receivedDate;
+    public Date getReceivedAt() {
+        return receivedAt;
     }
 
     @XmlTransient
@@ -146,6 +146,10 @@ public class EncounterBundle {
         return contentVersion;
     }
 
+    public void setContentVersion(int contentVersion) {
+        this.contentVersion = contentVersion;
+    }
+
     public Requester getCreatedBy() {
         return createdBy;
     }
@@ -162,12 +166,12 @@ public class EncounterBundle {
         this.updatedBy = updatedBy;
     }
 
-    public Date getUpdatedDate() {
-        return updatedDate;
+    public Date getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setUpdatedDate(Date updatedDate) {
-        this.updatedDate = updatedDate;
+    public void setUpdatedAt(Date updatedDate) {
+        this.updatedAt = updatedDate;
     }
 
     @Override
@@ -175,7 +179,7 @@ public class EncounterBundle {
         return "EncounterBundle{" +
                 "encounterId='" + encounterId + '\'' +
                 ", healthId='" + healthId + '\'' +
-                ", receivedDate='" + receivedDate + '\'' +
+                ", receivedAt='" + receivedAt + '\'' +
                 ", encounterContent=" + encounterContent +
                 ", categories=" + Arrays.toString(categories) +
                 ", title='" + title + '\'' +
@@ -189,7 +193,7 @@ public class EncounterBundle {
 
         EncounterBundle that = (EncounterBundle) o;
 
-        if (receivedDate != null ? !receivedDate.equals(that.receivedDate) : that.receivedDate != null) return false;
+        if (receivedAt != null ? !receivedAt.equals(that.receivedAt) : that.receivedAt != null) return false;
         if (encounterId != null ? !encounterId.equals(that.encounterId) : that.encounterId != null) return false;
         if (healthId != null ? !healthId.equals(that.healthId) : that.healthId != null) return false;
 
@@ -200,7 +204,7 @@ public class EncounterBundle {
     public int hashCode() {
         int result = encounterId != null ? encounterId.hashCode() : 0;
         result = 31 * result + (healthId != null ? healthId.hashCode() : 0);
-        result = 31 * result + (receivedDate != null ? receivedDate.hashCode() : 0);
+        result = 31 * result + (receivedAt != null ? receivedAt.hashCode() : 0);
         return result;
     }
 }

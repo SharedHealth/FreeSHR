@@ -20,6 +20,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.Date;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.freeshr.utils.Confidentiality.Normal;
 import static org.freeshr.utils.Confidentiality.Restricted;
@@ -185,9 +187,10 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
         patient.setHealthId(healthId);
         patient.setAddress(new Address("01", "02", "03", "04", "05"));
 
-        createEncounter(createEncounterBundle("e-0-" + healthId, healthId, Normal, Normal, new Requester("facilityId", "providerId"), asString("jsons/encounters/valid.json")), patient);
-        createEncounter(createEncounterBundle("e-1-" + healthId, healthId, Normal, Normal, new Requester("facilityId", "providerId"), asString("jsons/encounters/valid.json")), patient);
-        createEncounter(createEncounterBundle("e-2-" + healthId, healthId, Normal, Normal, new Requester("facilityId", "providerId"), asString("jsons/encounters/valid.json")), patient);
+        final Requester createdBy = new Requester("facilityId", "providerId");
+        createEncounter(createEncounterBundle("e-0-" + healthId, healthId, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, new Date()), patient);
+        createEncounter(createEncounterBundle("e-1-" + healthId, healthId, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, new Date()), patient);
+        createEncounter(createEncounterBundle("e-2-" + healthId, healthId, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, new Date()), patient);
         mockMvc.perform(MockMvcRequestBuilders.get(
                 String.format("/patients/%s/encounters", healthId))
                 .header(AUTH_TOKEN_KEY, validAccessToken)
@@ -251,7 +254,8 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
         String healthId1 = generateHealthId();
         patient1.setHealthId(healthId1);
         patient1.setAddress(new Address("30", "26", "18", "01", "02"));
-        createEncounter(createEncounterBundle("e-0100-" + healthId1, healthId1, Restricted, Normal, new Requester("facilityId", "providerId"), asString("jsons/encounters/valid.json")), patient1);
+        final Requester createdBy = new Requester("facilityId", "providerId");
+        createEncounter(createEncounterBundle("e-0100-" + healthId1, healthId1, Restricted, Normal, asString("jsons/encounters/valid.json"), createdBy, new Date()), patient1);
 
         mockMvc.perform(MockMvcRequestBuilders.get(
                 String.format("/patients/%s/encounters", VALID_HEALTH_ID_NOT_CONFIDENTIAL))

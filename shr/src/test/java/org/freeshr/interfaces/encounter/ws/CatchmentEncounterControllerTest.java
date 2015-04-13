@@ -192,7 +192,7 @@ public class CatchmentEncounterControllerTest {
             encounter.setEncounterId("e-" + (i + 1));
             encounter.setHealthId(healthId);
             calendar.set(Calendar.SECOND, i);
-            encounter.setReceivedDate(calendar.getTime());
+            encounter.setReceivedAt(calendar.getTime());
             encounter.setEncounterContent("content-" + (i + 1));
             encounter.setPatientConfidentiality(Confidentiality.Normal);
             encounter.setEncounterConfidentiality(Confidentiality.Normal);

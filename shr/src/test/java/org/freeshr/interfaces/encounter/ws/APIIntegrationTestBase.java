@@ -125,18 +125,29 @@ public abstract class APIIntegrationTestBase {
     }
 
     protected EncounterBundle createEncounterBundle(String encounterId, String healthId, Confidentiality encounterConfidentiality,
-                                                    Confidentiality patientConfidentiality, Requester requester, String content) {
+                                                    Confidentiality patientConfidentiality, String content, Requester createdBy, Date receivedAt) {
         EncounterBundle bundle = new EncounterBundle();
         bundle.setEncounterId(encounterId);
         bundle.setHealthId(healthId);
         bundle.setEncounterConfidentiality(encounterConfidentiality);
         bundle.setPatientConfidentiality(patientConfidentiality);
         bundle.setEncounterContent(content);
-        Date receivedDate = new Date();
-        bundle.setReceivedDate(receivedDate);
-        bundle.setUpdatedDate(receivedDate);
-        bundle.setCreatedBy(requester);
-        bundle.setUpdatedBy(requester);
+        bundle.setReceivedAt(receivedAt);
+        bundle.setUpdatedAt(receivedAt);
+        bundle.setCreatedBy(createdBy);
+        bundle.setUpdatedBy(createdBy);
         return bundle;
     }
+
+    protected EncounterBundle createUpdateEncounterBundle(String encounterId, String healthId, Confidentiality encounterConfidentiality, String content, Requester updatedBy, Date updatedAt) {
+        EncounterBundle bundle = new EncounterBundle();
+        bundle.setEncounterId(encounterId);
+        bundle.setHealthId(healthId);
+        bundle.setEncounterConfidentiality(encounterConfidentiality);
+        bundle.setEncounterContent(content);
+        bundle.setUpdatedAt(updatedAt);
+        bundle.setUpdatedBy(updatedBy);
+        return bundle;
+    }
+
 }

@@ -40,17 +40,18 @@ public class CatchmentEncounterControllerIntegrationTest extends APIIntegrationT
         String healthId1 = generateHealthId();
         patient1.setHealthId(healthId1);
         patient1.setAddress(new Address("30", "26", "18", "01", "02"));
-        createEncounter(createEncounterBundle("e-0100-" + healthId1, healthId1, Normal, Normal, new Requester("facilityId", "providerId"), asString("jsons/encounters/valid.json")), patient1);
-        createEncounter(createEncounterBundle("e-1100-" + healthId1, healthId1, Normal, Normal, new Requester("facilityId", "providerId"), asString("jsons/encounters/valid.json")), patient1);
-        createEncounter(createEncounterBundle("e-2100-" + healthId1, healthId1, Normal, Normal, new Requester("facilityId", "providerId"), asString("jsons/encounters/valid.json")), patient1);
+        final Requester createdBy = new Requester("facilityId", "providerId");
+        createEncounter(createEncounterBundle("e-0100-" + healthId1, healthId1, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, new Date()), patient1);
+        createEncounter(createEncounterBundle("e-1100-" + healthId1, healthId1, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, new Date()), patient1);
+        createEncounter(createEncounterBundle("e-2100-" + healthId1, healthId1, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, new Date()), patient1);
 
         Patient patient2 = new Patient();
         String healthId2 = generateHealthId();
         patient2.setHealthId(healthId2);
         patient2.setAddress(new Address("30", "26", "18", "02", "02"));
-        createEncounter(createEncounterBundle("e-0200-" + healthId2, healthId2, Normal, Normal, new Requester("facilityId", "providerId"), asString("jsons/encounters/valid.json")), patient2);
-        createEncounter(createEncounterBundle("e-1200-" + healthId2, healthId2, Normal, Normal, new Requester("facilityId", "providerId"), asString("jsons/encounters/valid.json")), patient2);
-        createEncounter(createEncounterBundle("e-2200-" + healthId2, healthId2, Normal, Normal, new Requester("facilityId", "providerId"), asString("jsons/encounters/valid.json")), patient2);
+        createEncounter(createEncounterBundle("e-0200-" + healthId2, healthId2, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, new Date()), patient2);
+        createEncounter(createEncounterBundle("e-1200-" + healthId2, healthId2, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, new Date()), patient2);
+        createEncounter(createEncounterBundle("e-2200-" + healthId2, healthId2, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, new Date()), patient2);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String today = dateFormat.format(new Date());

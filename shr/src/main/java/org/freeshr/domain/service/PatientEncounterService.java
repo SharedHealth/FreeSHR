@@ -124,8 +124,8 @@ public class PatientEncounterService {
         encounterBundle.setPatientConfidentiality(patient.getConfidentiality());
         encounterBundle.setEncounterConfidentiality(getEncounterConfidentiality(feed));
         Date currentTimestamp = new Date();
-        encounterBundle.setReceivedDate(currentTimestamp);
-        encounterBundle.setUpdatedDate(currentTimestamp);
+        encounterBundle.setReceivedAt(currentTimestamp);
+        encounterBundle.setUpdatedAt(currentTimestamp);
 
         Requester requester = new Requester(userInfo.getProperties().getFacilityId(), userInfo.getProperties().getProviderId());
         encounterBundle.setCreatedBy(requester);

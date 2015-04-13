@@ -65,8 +65,8 @@ public class PatientEncounterServiceTest {
         assertEquals(Confidentiality.VeryRestricted, bundle.getPatientConfidentiality());
         assertEquals(Confidentiality.Normal, bundle.getEncounterConfidentiality());
         assertNotNull(bundle.getEncounterId());
-        assertNotNull(bundle.getReceivedDate());
-        assertNotNull(bundle.getUpdatedDate());
+        assertNotNull(bundle.getReceivedAt());
+        assertNotNull(bundle.getUpdatedAt());
         assertEquals(facilityId, bundle.getCreatedBy().getFacilityId());
         assertNull(bundle.getCreatedBy().getProviderId());
         assertEquals(facilityId, bundle.getUpdatedBy().getFacilityId());
