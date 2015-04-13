@@ -2,7 +2,6 @@ create table encounter (
  encounter_id varchar,
  health_id varchar,
  received_date timeuuid,
- patient_location_code varchar,
  patient_confidentiality varchar,
  encounter_confidentiality varchar,
  content_version int,

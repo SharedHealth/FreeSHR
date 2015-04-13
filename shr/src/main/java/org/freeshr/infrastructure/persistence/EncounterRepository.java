@@ -69,7 +69,6 @@ public class EncounterRepository {
         insertEncounterStmt.value("content_version", encounterBundle.getContentVersion());
         insertEncounterStmt.value(getSchemaContentVersionColumnName(), encounterBundle.getContentVersion());
         insertEncounterStmt.value(getContentColumnName(), encounterBundle.getEncounterContent().toString());
-        insertEncounterStmt.value("patient_location_code", address.getLocationCode());
         insertEncounterStmt.value("encounter_confidentiality", encounterBundle.getEncounterConfidentiality().getLevel());
         insertEncounterStmt.value("patient_confidentiality", encounterBundle.getPatientConfidentiality().getLevel());
         insertEncounterStmt.value("updated_date", updatedTimeUUID);
