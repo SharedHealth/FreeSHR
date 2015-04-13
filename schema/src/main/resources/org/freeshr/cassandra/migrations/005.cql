@@ -1,5 +1,5 @@
 CREATE TABLE enc_by_patient (
 health_id varchar,
-received_date timeuuid,
+created_at timeuuid,
 encounter_id varchar,
-PRIMARY KEY (health_id, received_date) );
+PRIMARY KEY (health_id, created_at));

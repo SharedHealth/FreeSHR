@@ -64,19 +64,19 @@ public class EncounterRepository {
         Insert insertEncounterStmt = QueryBuilder.insertInto("encounter");
         insertEncounterStmt.value("encounter_id", encounterBundle.getEncounterId());
         insertEncounterStmt.value("health_id", encounterBundle.getHealthId());
-        insertEncounterStmt.value("received_date", receivedTimeUUID); //TODO check timefunction
+        insertEncounterStmt.value("received_at", receivedTimeUUID); //TODO check timefunction
         insertEncounterStmt.value("created_by", serializeRequester(encounterBundle.getCreatedBy())); //TODO check timefunction
         insertEncounterStmt.value("content_version", encounterBundle.getContentVersion());
         insertEncounterStmt.value(getSchemaContentVersionColumnName(), encounterBundle.getContentVersion());
         insertEncounterStmt.value(getContentColumnName(), encounterBundle.getEncounterContent().toString());
         insertEncounterStmt.value("encounter_confidentiality", encounterBundle.getEncounterConfidentiality().getLevel());
         insertEncounterStmt.value("patient_confidentiality", encounterBundle.getPatientConfidentiality().getLevel());
-        insertEncounterStmt.value("updated_date", updatedTimeUUID);
+        insertEncounterStmt.value("updated_at", updatedTimeUUID);
         insertEncounterStmt.value("updated_by", serializeRequester(encounterBundle.getUpdatedBy()));
 
         String encCatchmentInsertQuery =
                 format("INSERT INTO enc_by_catchment (division_id, district_id, year, " +
-                                " received_date, upazila_id, city_corporation_id, union_urban_ward_id, encounter_id) " +
+                                " created_at, upazila_id, city_corporation_id, union_urban_ward_id, encounter_id) " +
                                 " values ('%s', '%s', %s, %s, '%s', '%s', '%s', '%s');",
                         address.getDivision(),
                         address.getConcatenatedDistrictId(),
@@ -88,7 +88,7 @@ public class EncounterRepository {
                         encounterBundle.getEncounterId());
         RegularStatement encCatchmentStmt = new SimpleStatement(encCatchmentInsertQuery);
         String encByPatientInsertQuery =
-                format("INSERT INTO enc_by_patient (health_id, received_date, encounter_id) " +
+                format("INSERT INTO enc_by_patient (health_id, created_at, encounter_id) " +
                                 " VALUES ('%s', %s, '%s')", encounterBundle.getHealthId(), receivedTimeUUID,
                         encounterBundle.getEncounterId());
         RegularStatement encByPatientStmt = new SimpleStatement(encByPatientInsertQuery);
@@ -122,8 +122,8 @@ public class EncounterRepository {
 
     public Observable<EncounterBundle> findEncounterById(String encounterId) {
         Select findEncounter = QueryBuilder
-                .select("encounter_id", "health_id", "received_date", getContentColumnName(), "created_by",
-                        "updated_date", "updated_by", "content_version", getSchemaContentVersionColumnName(),
+                .select("encounter_id", "health_id", "received_at", getContentColumnName(), "created_by",
+                        "updated_at", "updated_by", "content_version", getSchemaContentVersionColumnName(),
                         "encounter_confidentiality", "patient_confidentiality")
                 .from("encounter")
                 .where(eq("encounter_id", encounterId))
@@ -191,7 +191,7 @@ public class EncounterRepository {
         String lastUpdateTime = DateUtil.toDateString(updatedSince, DateUtil.UTC_DATE_IN_MILLIS_FORMAT);
         //TODO test. condition should be >=
         return format("SELECT encounter_id FROM enc_by_catchment " +
-                        " WHERE year = %s and received_date >= minTimeUuid('%s') and %s LIMIT %s ALLOW FILTERING;",
+                        " WHERE year = %s and created_at >= minTimeUuid('%s') and %s LIMIT %s ALLOW FILTERING;",
                 yearOfDate, lastUpdateTime, buildClauseForCatchment(catchment), limit);
     }
 
@@ -205,8 +205,8 @@ public class EncounterRepository {
     }
 
     private String buildEncounterSelectionQuery(LinkedHashSet<String> encounterIds) {
-        StringBuilder encounterQuery = new StringBuilder("SELECT encounter_id, health_id, received_date, " +
-                getContentColumnName() + ", created_by, updated_date, updated_by, content_version, " +
+        StringBuilder encounterQuery = new StringBuilder("SELECT encounter_id, health_id, received_at, " +
+                getContentColumnName() + ", created_by, updated_at, updated_by, content_version, " +
                 getSchemaContentVersionColumnName() + ", " +
                 "patient_confidentiality, encounter_confidentiality FROM encounter where encounter_id in (");
         int noOfEncounters = encounterIds.size();
@@ -258,13 +258,13 @@ public class EncounterRepository {
             EncounterBundle bundle = new EncounterBundle();
             bundle.setEncounterId(result.getString("encounter_id"));
             bundle.setHealthId(result.getString("health_id"));
-            bundle.setReceivedDate(TimeUuidUtil.getDateFromUUID(result.getUUID("received_date")));
+            bundle.setReceivedDate(TimeUuidUtil.getDateFromUUID(result.getUUID("received_at")));
             bundle.setCreatedBy(getRequesterValue(result, "created_by"));
             bundle.setEncounterContent(result.getString(getContentColumnName()));
             bundle.setEncounterConfidentiality(getConfidentiality(result.getString("encounter_confidentiality")));
             bundle.setPatientConfidentiality(getConfidentiality(result.getString("patient_confidentiality")));
             bundle.setUpdatedBy(getRequesterValue(result, "updated_by"));
-            bundle.setUpdatedDate(TimeUuidUtil.getDateFromUUID(result.getUUID("updated_date")));
+            bundle.setUpdatedDate(TimeUuidUtil.getDateFromUUID(result.getUUID("updated_at")));
 
             bundles.add(bundle);
         }
@@ -284,7 +284,7 @@ public class EncounterRepository {
                 "health_id='%s'", healthId));
         if (updatedSince != null) {
             String lastUpdateTime = DateUtil.toDateString(updatedSince, DateUtil.UTC_DATE_IN_MILLIS_FORMAT);
-            queryBuilder.append(format(" and received_date >= minTimeUuid('%s')", lastUpdateTime));
+            queryBuilder.append(format(" and created_at >= minTimeUuid('%s')", lastUpdateTime));
         }
         queryBuilder.append(format(" LIMIT %d;", limit));
         return queryBuilder;

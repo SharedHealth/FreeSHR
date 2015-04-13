@@ -128,25 +128,25 @@ public class EncounterRepositoryIntegrationTest {
         encounterRepository.save(createEncounterBundle(encounterId, healthId, encounterRecievedDate, facilityId), patient).toBlocking().first();
 
         Select selectEncounterQuery = QueryBuilder
-                .select("encounter_id", "received_date")
+                .select("encounter_id", "received_at")
                 .from("encounter")
                 .where(eq("encounter_id", encounterId))
                 .limit(1);
         ResultSet resultSet = cqlOperations.query(selectEncounterQuery);
         assertFalse(resultSet.isExhausted());
-        assertEquals(encounterRecievedDate.getTime(), TimeUuidUtil.getTimeFromUUID(resultSet.one().getUUID("received_date")));
+        assertEquals(encounterRecievedDate.getTime(), TimeUuidUtil.getTimeFromUUID(resultSet.one().getUUID("received_at")));
 
         Select selectEncByPatientQuery = QueryBuilder
-                .select("encounter_id", "received_date")
+                .select("encounter_id", "created_at")
                 .from("enc_by_patient")
                 .where(eq("health_id", healthId))
                 .limit(1);
         resultSet = cqlOperations.query(selectEncByPatientQuery);
         assertFalse(resultSet.isExhausted());
-        assertEquals(encounterRecievedDate.getTime(), TimeUuidUtil.getTimeFromUUID(resultSet.one().getUUID("received_date")));
+        assertEquals(encounterRecievedDate.getTime(), TimeUuidUtil.getTimeFromUUID(resultSet.one().getUUID("created_at")));
 
         Select selectEncByCatchmentQuery = QueryBuilder
-                .select("encounter_id", "received_date")
+                .select("encounter_id", "created_at")
                 .from("enc_by_catchment")
                 .where(eq("division_id", "01"))
                 .and(eq("district_id", "0102"))
@@ -154,7 +154,7 @@ public class EncounterRepositoryIntegrationTest {
                 .limit(1);
         resultSet = cqlOperations.query(selectEncByCatchmentQuery);
         assertFalse(resultSet.isExhausted());
-        assertEquals(encounterRecievedDate, TimeUuidUtil.getDateFromUUID(resultSet.one().getUUID("received_date")));
+        assertEquals(encounterRecievedDate, TimeUuidUtil.getDateFromUUID(resultSet.one().getUUID("created_at")));
     }
 
     @After
