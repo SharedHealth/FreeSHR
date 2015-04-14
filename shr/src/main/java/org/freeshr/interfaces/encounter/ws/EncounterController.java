@@ -353,7 +353,8 @@ public class EncounterController extends ShrController {
                                 limit) : remainingEncounters);
                     }
                 }
-                return Observable.just(new ArrayList<>(encounterBundles.subList(0, limit)));
+
+                return Observable.just(encounterBundles.size() > limit? encounterBundles.subList(0, limit) : encounterBundles);
             }
         }, new Func1<Throwable, Observable<? extends List<EncounterBundle>>>() {
             @Override

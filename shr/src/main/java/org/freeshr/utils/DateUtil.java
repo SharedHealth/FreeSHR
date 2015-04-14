@@ -27,6 +27,8 @@ public class DateUtil {
     public static final String UTC_DATE_IN_DATE_TZD_FORMAT = "yyyy-MM-dd'T'X"; //2011-04-15TZ
     public static final String UTC_DATE_IN_SIMPLE_TZD_FORMAT = "yyyy-MM-ddX"; //2011-04-15Z
 
+    public static final String FHIR_ISO_DATE_IN_MILLIS_FORMAT = "yyyy-MM-dd'T'HH:mm:ssXXX";
+
     public static final String[] DATE_FORMATS = new String[]{
             ISO_DATE_IN_MILLIS_FORMAT, ISO_DATE_IN_SECS_FORMAT,
             ISO_DATE_IN_HOUR_MIN_FORMAT,
@@ -36,7 +38,8 @@ public class DateUtil {
             UTC_DATE_IN_MIN_TZD_FORMAT, UTC_DATE_IN_HOUR_TZD_FORMAT,
             UTC_DATE_IN_DATE_TZD_FORMAT, UTC_DATE_IN_SIMPLE_TZD_FORMAT,
             ISO_8601_DATE_IN_SECS_FORMAT, ISO_8601_DATE_IN_MILLIS_FORMAT,
-            ISO_8601_DATE_IN_HOUR_MIN_FORMAT};
+            ISO_8601_DATE_IN_HOUR_MIN_FORMAT,
+            FHIR_ISO_DATE_IN_MILLIS_FORMAT};
 
     public static String getCurrentTimeInUTCString() {
         SimpleDateFormat dateFormat = new SimpleDateFormat(UTC_DATE_IN_MILLIS_FORMAT);
