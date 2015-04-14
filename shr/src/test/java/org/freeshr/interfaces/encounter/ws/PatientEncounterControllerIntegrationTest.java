@@ -21,6 +21,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Date;
+import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.freeshr.utils.Confidentiality.Normal;
@@ -28,6 +29,7 @@ import static org.freeshr.utils.Confidentiality.Restricted;
 import static org.freeshr.utils.FileUtil.asString;
 import static org.freeshr.utils.HttpUtil.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -113,6 +115,57 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .content(asString("xmls/encounters/encounter_to_save.xml")))
                 .andExpect(status().isOk())
                 .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
+    }
+
+    @Test
+    public void shouldUpdateEncounter() throws Exception {
+        Patient patient = new Patient();
+        patient.setHealthId(VALID_HEALTH_ID_CONFIDENTIAL);
+        patient.setAddress(new Address("01", "02", "03", "04", "05"));
+
+        String encounterId = UUID.randomUUID().toString();
+        final Requester createdBy = new Requester("facilityId", null);
+        createEncounter(createEncounterBundle(encounterId, VALID_HEALTH_ID_CONFIDENTIAL,
+                Confidentiality.Normal, Confidentiality.Restricted,
+                asString("xmls/encounters/encounter_to_save.xml"), createdBy, new Date()), patient);
+
+        mockMvc.perform(put("/patients/" + VALID_HEALTH_ID_CONFIDENTIAL + "/encounters/" + encounterId)
+                .header(AUTH_TOKEN_KEY, validAccessToken)
+                .header(FROM_KEY, validEmail)
+                .header(CLIENT_ID_KEY, validClientId)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_XML)
+                .characterEncoding(Charsets.UTF_8.name())
+                .content(asString("xmls/encounters/encounter_to_save.xml")))
+                .andExpect(status().isOk())
+                .andExpect(request().asyncResult(assertEncounterResponse(encounterId)));
+    }
+
+    @Test
+    public void shouldRejectEncounterUpdateForInvalidEncounterId() throws Exception {
+        String invalidEncounterId = "12323";
+        mockMvc.perform(put("/patients/" + VALID_HEALTH_ID_CONFIDENTIAL + "/encounters/" + invalidEncounterId)
+                .header(AUTH_TOKEN_KEY, validAccessToken)
+                .header(FROM_KEY, validEmail)
+                .header(CLIENT_ID_KEY, validClientId)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_XML)
+                .characterEncoding(Charsets.UTF_8.name())
+                .content(asString("xmls/encounters/encounter_to_save.xml")))
+                .andExpect(request().asyncResult(new InstanceOf(PreconditionFailed.class)));
+    }
+
+    @Test
+    public void shouldRejectEncounterUpdateWhenHealthIdIsInvalid() throws Exception {
+        mockMvc.perform(put("/patients/" + INVALID_HEALTH_ID + "/encounters/encounterId")
+                .header(AUTH_TOKEN_KEY, validAccessToken)
+                .header(FROM_KEY, validEmail)
+                .header(CLIENT_ID_KEY, validClientId)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_XML)
+                .characterEncoding(Charsets.UTF_8.name())
+                .content(asString("xmls/encounters/encounter_health_id_1234.xml")))
+                .andExpect(request().asyncResult(new InstanceOf(PreconditionFailed.class)));
     }
 
     @Test
@@ -279,6 +332,19 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 EncounterBundle encounterBundle = ((EncounterSearchResponse) item).getEntries().get(0);
                 return encounterBundle.getEncounterConfidentiality().equals(encounterConfidentiality) &&
                         encounterBundle.getPatientConfidentiality().equals(patientConfidentiality);
+            }
+        };
+    }
+
+    private BaseMatcher<EncounterResponse> assertEncounterResponse(final String encounterId) {
+        return new BaseMatcher<EncounterResponse>() {
+            @Override
+            public void describeTo(Description description) {
+            }
+
+            @Override
+            public boolean matches(Object item) {
+                return ((EncounterResponse) item).getEncounterId().equals(encounterId);
             }
         };
     }

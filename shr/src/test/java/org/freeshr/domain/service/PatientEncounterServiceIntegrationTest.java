@@ -55,9 +55,6 @@ public class PatientEncounterServiceIntegrationTest {
     private PatientEncounterService patientEncounterService;
 
     @Autowired
-    private CatchmentEncounterService catchmentEncounterService;
-
-    @Autowired
     private PatientRepository patientRepository;
 
     @Autowired
@@ -136,6 +133,24 @@ public class PatientEncounterServiceIntegrationTest {
         EncounterResponse response = patientEncounterService.ensureCreated(withInvalidConcept(), getUserInfo(clientId, email, securityToken)).toBlocking()
                 .first();
         assertTrue(new ValidationFailures(response).matches(new
+                String[]{"/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "code-unknown",
+                "Viral pneumonia 314247"}));
+    }
+
+    @Test
+    public void shouldRejectEncounterUpdateWithInvalidConceptCode() throws Exception {
+        String clientId = "123";
+        String email = "email@gmail.com";
+        String securityToken = UUID.randomUUID().toString();
+        UserInfo userInfo = getUserInfo(clientId, email, securityToken);
+        EncounterBundle existingEncounterBundle = withValidEncounter();
+        EncounterResponse encounterCreateResponse = patientEncounterService.ensureCreated(existingEncounterBundle, userInfo).toBlocking().first();
+
+        EncounterBundle encounterBundle = withInvalidConcept();
+        encounterBundle.setEncounterId(encounterCreateResponse.getEncounterId());
+        EncounterResponse encounterUpdateResponse = patientEncounterService.ensureUpdated(encounterBundle, userInfo).toBlocking()
+                .first();
+        assertTrue(new ValidationFailures(encounterUpdateResponse).matches(new
                 String[]{"/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "code-unknown",
                 "Viral pneumonia 314247"}));
     }

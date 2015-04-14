@@ -65,6 +65,30 @@ public class PatientEncounterController extends ShrController {
     }
 
 
+    @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER')")
+    @RequestMapping(value = "/{healthId}/encounters/{encounterId}", method = RequestMethod.PUT)
+    public DeferredResult<EncounterResponse> update(
+            @PathVariable String healthId,
+            @PathVariable final String encounterId,
+            @RequestBody final EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
+        final UserInfo userInfo = getUserInfo();
+        logAccessDetails(userInfo, String.format("Create encounter request for patient (healthId) %s", healthId));
+        final DeferredResult<EncounterResponse> deferredResult = new DeferredResult<>();
+
+        try {
+            encounterBundle.setHealthId(healthId);
+            encounterBundle.setEncounterId(encounterId);
+            logger.debug(String.format("Update encounter %s %s)", encounterId, encounterBundle.getContent()));
+            Observable<EncounterResponse> encounterResponseObservable = patientEncounterService.ensureUpdated(encounterBundle, userInfo);
+            encounterResponseObservable.subscribe(encounterSaveSuccessCallback(deferredResult), errorCallback(deferredResult));
+
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            deferredResult.setErrorResult(e);
+        }
+        return deferredResult;
+    }
+
     @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER', 'ROLE_SHR_PATIENT', 'ROLE_SHR System Admin')")
     @RequestMapping(value = "/{healthId}/encounters", method = RequestMethod.GET,
             produces = {"application/json", "application/atom+xml"})

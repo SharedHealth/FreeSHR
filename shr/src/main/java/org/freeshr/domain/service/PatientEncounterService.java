@@ -73,6 +73,61 @@ public class PatientEncounterService {
         return encounterRepository.findEncountersForPatient(healthId, sinceDate, limit);
     }
 
+    public Observable<EncounterResponse> ensureUpdated(final EncounterBundle encounterBundle, final UserInfo userInfo) throws ExecutionException, InterruptedException {
+        final EncounterValidationResponse validationResult = validate(encounterBundle);
+        if (validationResult.isSuccessful()) {
+            Observable<Patient> patientObservable = patientService.ensurePresent(encounterBundle.getHealthId(),
+                    userInfo);
+            Func1<? super Patient, ? extends Observable<? extends EncounterResponse>> patientFetchSuccessCallBack = new Func1<Patient, Observable<? extends EncounterResponse>>() {
+                @Override
+                public Observable<? extends EncounterResponse> call(Patient patient) {
+                    if (patient != null) {
+                        Observable<EncounterBundle> encounterFetchObservable = findEncounter(encounterBundle.getHealthId(), encounterBundle.getEncounterId()).firstOrDefault(null);
+                        return encounterFetchObservable.flatMap(encounterFetchSuccessCallbackForUpdate(encounterBundle, patient, validationResult.getFeed(), userInfo), error(), complete());
+                    } else {
+                        return Observable.just(new EncounterResponse().preconditionFailure("healthId", "invalid",
+                                "Patient not available in patient registry"));
+                    }
+                }
+            };
+            return patientObservable.flatMap(patientFetchSuccessCallBack, error(), complete());
+
+        } else {
+            return Observable.just(new EncounterResponse().setValidationFailure(validationResult));
+        }
+    }
+
+    private Func1<? super EncounterBundle, ? extends Observable<? extends EncounterResponse>> encounterFetchSuccessCallbackForUpdate(
+            final EncounterBundle encounterBundle, final Patient patient, final AtomFeed feed, final UserInfo userInfo) {
+        return new Func1<EncounterBundle, Observable<EncounterResponse>>() {
+            @Override
+            public Observable<EncounterResponse> call(EncounterBundle existingEncounterBundle) {
+                if(existingEncounterBundle != null){
+                    final EncounterResponse response = new EncounterResponse();
+                    encounterBundle.setEncounterConfidentiality(getEncounterConfidentiality(feed));
+                    encounterBundle.setUpdatedAt(new Date());
+                    encounterBundle.setUpdatedBy(new Requester(userInfo.getProperties().getFacilityId(), userInfo.getProperties().getProviderId()));
+                    encounterBundle.setContentVersion(existingEncounterBundle.getContentVersion() +1);
+                    encounterBundle.setReceivedAt(existingEncounterBundle.getReceivedAt());
+
+                    Observable<Boolean> update = encounterRepository.updateEncounter(encounterBundle, existingEncounterBundle, patient);
+
+                    return update.flatMap(new Func1<Boolean, Observable<EncounterResponse>>() {
+                        @Override
+                        public Observable<EncounterResponse> call(Boolean aBoolean) {
+                            if (aBoolean)
+                                response.setEncounterId(encounterBundle.getEncounterId());
+                            return Observable.just(response);
+                        }
+                    }, error(), complete());
+                } else{
+                    return Observable.just(new EncounterResponse().preconditionFailure("encounterId", "invalid",
+                            String.format("Encounter (%s) not available.", encounterBundle.getEncounterId())));
+                }
+            }
+        };
+    }
+
     private Func0<Observable<EncounterResponse>> complete() {
         return new Func0<Observable<EncounterResponse>>() {
             @Override

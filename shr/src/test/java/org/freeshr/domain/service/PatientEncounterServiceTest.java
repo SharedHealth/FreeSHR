@@ -13,6 +13,7 @@ import org.freeshr.validations.EncounterValidationContext;
 import org.freeshr.validations.EncounterValidator;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import rx.Observable;
 
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class PatientEncounterServiceTest {
 
 
     @Test
-    public void shouldPopulateEncounterBundleFields() throws Exception {
+    public void shouldPopulateEncounterBundleFieldsOnEncounterCreate() throws Exception {
         String facilityId = "10000069";
         String healthId = "10001";
         UserInfo userInfo = getUserInfo(facilityId);
@@ -71,6 +72,43 @@ public class PatientEncounterServiceTest {
         assertNull(bundle.getCreatedBy().getProviderId());
         assertEquals(facilityId, bundle.getUpdatedBy().getFacilityId());
         assertNull(bundle.getUpdatedBy().getProviderId());
+    }
+
+    @Test
+    public void shouldPopulateEncounterBundleFieldsOnEncounterUpdate() throws Exception {
+        String facilityId = "10000069";
+        String healthId = "10001";
+        UserInfo userInfo = getUserInfo(facilityId);
+        Patient confidentialPatient = new Patient();
+        confidentialPatient.setHealthId(healthId);
+        confidentialPatient.setConfidentiality(true);
+        EncounterBundle bundle = createEncounterBundle(healthId);
+        String encounterId = "encounter_id1";
+        bundle.setEncounterId(encounterId);
+        EncounterBundle existingEncounterBundle = createEncounterBundle(healthId);
+        existingEncounterBundle.setEncounterId(encounterId);
+
+        EncounterValidationResponse encounterValidationResponse = new EncounterValidationResponse();
+        encounterValidationResponse.setFeed(new ResourceOrFeedDeserializer().deserialize(bundle.getContent()));
+        when(mockEncounterValidator.validate(any(EncounterValidationContext.class))).thenReturn(encounterValidationResponse);
+        when(mockPatientService.ensurePresent(eq(healthId), eq(userInfo))).thenReturn(Observable.just(confidentialPatient));
+        when(mockEncounterRepository.findEncounterById(encounterId)).thenReturn(Observable.just(existingEncounterBundle));
+        when(mockEncounterRepository.updateEncounter(bundle, existingEncounterBundle, confidentialPatient)).thenReturn(Observable.just(true));
+
+        patientEncounterService.ensureUpdated(bundle, userInfo).toBlocking().first();
+
+        ArgumentCaptor<EncounterBundle> updatedEncounterBundleCapture = ArgumentCaptor.forClass(EncounterBundle.class);
+        verify(mockEncounterRepository).updateEncounter(updatedEncounterBundleCapture.capture(), eq(bundle), eq(confidentialPatient));
+
+        EncounterBundle updatedEncounterBundle = updatedEncounterBundleCapture.getValue();
+
+        assertEquals(Confidentiality.Normal, updatedEncounterBundle.getEncounterConfidentiality());
+        assertNotNull(updatedEncounterBundle.getEncounterId());
+        assertNotNull(updatedEncounterBundle.getUpdatedAt());
+        assertEquals(facilityId, updatedEncounterBundle.getUpdatedBy().getFacilityId());
+        assertNull(updatedEncounterBundle.getUpdatedBy().getProviderId());
+        assertEquals(2, updatedEncounterBundle.getContentVersion());
+        assertEquals(bundle.getReceivedAt(), updatedEncounterBundle.getReceivedAt());
     }
 
     private EncounterBundle createEncounterBundle(String healthId) {
