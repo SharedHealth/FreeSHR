@@ -63,8 +63,8 @@ public class EncounterBundle {
 
     @JsonProperty("publishedDate")
     @XmlElement(name = "updated")
-    public String getReceivedDateISOString() {
-        return DateUtil.toISOString(receivedAt);
+    public String getUpdatedDateISOString() {
+        return DateUtil.toISOString(updatedAt);
     }
 
     public void setEncounterId(String encounterId) {
