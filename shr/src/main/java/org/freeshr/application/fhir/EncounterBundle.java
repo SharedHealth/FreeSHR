@@ -11,7 +11,7 @@ import org.freeshr.utils.DateUtil;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
 
 @XmlRootElement(name = "encounter")
@@ -27,7 +27,7 @@ public class EncounterBundle {
     @XmlTransient
     private EncounterContent encounterContent;
 
-    private String[] categories = new String[]{"encounter"};
+    private ArrayList<String> categories = new ArrayList<String>(){{ add("encounter"); }};
 
     private String title = "Encounter";
 
@@ -114,12 +114,11 @@ public class EncounterBundle {
         return title + ":" + getEncounterId();
     }
 
-    public void setCategories(String[] categories) {
-        this.categories = categories;
-    }
-
-    public String[] getCategories() {
-        return categories != null ? categories : new String[]{};
+    public ArrayList<String> getCategories() {
+        if(isEdited()){
+            categories.add(String.format("Updated since : %s", DateUtil.toISOString(receivedAt) ));
+        };
+        return categories;
     }
 
     public void setTitle(String title) {
@@ -174,6 +173,10 @@ public class EncounterBundle {
         this.updatedAt = updatedDate;
     }
 
+    public boolean isEdited(){
+        return updatedAt.after(receivedAt);
+    }
+
     @Override
     public String toString() {
         return "EncounterBundle{" +
@@ -181,7 +184,7 @@ public class EncounterBundle {
                 ", healthId='" + healthId + '\'' +
                 ", receivedAt='" + receivedAt + '\'' +
                 ", encounterContent=" + encounterContent +
-                ", categories=" + Arrays.toString(categories) +
+                ", categories=" + categories.toString() +
                 ", title='" + title + '\'' +
                 '}';
     }

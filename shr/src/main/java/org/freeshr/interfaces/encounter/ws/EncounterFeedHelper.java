@@ -65,12 +65,20 @@ public class EncounterFeedHelper {
 
             entry.setUpdated(DateUtil.parseDate(encounter.getUpdatedDateISOString()));
             entry.setContents(generateContents(encounter));
-            Category category = new Category();
-            category.setTerm("encounter");
-            entry.setCategories(Arrays.asList(category));
+            entry.setCategories(getCategories(encounter));
             entryList.add(entry);
         }
         return entryList;
+    }
+
+    private List<Category> getCategories(EncounterBundle encounter) {
+        List<Category> categories = new ArrayList<>();
+        for (String categoryTerm : encounter.getCategories()) {
+            Category category = new Category();
+            category.setTerm(categoryTerm);
+            categories.add(category);
+        }
+        return categories;
     }
 
     private Generator getGenerator() {
