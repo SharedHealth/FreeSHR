@@ -124,7 +124,7 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
         patient.setAddress(new Address("01", "02", "03", "04", "05"));
 
         String encounterId = UUID.randomUUID().toString();
-        final Requester createdBy = new Requester("facilityId", null);
+        final Requester createdBy = new Requester("10000002", null);
         createEncounter(createEncounterBundle(encounterId, VALID_HEALTH_ID_CONFIDENTIAL,
                 Confidentiality.Normal, Confidentiality.Restricted,
                 asString("xmls/encounters/encounter_to_save.xml"), createdBy, new Date()), patient);

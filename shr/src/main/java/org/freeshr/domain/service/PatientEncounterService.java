@@ -103,29 +103,43 @@ public class PatientEncounterService {
             @Override
             public Observable<EncounterResponse> call(EncounterBundle existingEncounterBundle) {
                 if(existingEncounterBundle != null){
-                    final EncounterResponse response = new EncounterResponse();
-                    encounterBundle.setEncounterConfidentiality(getEncounterConfidentiality(feed));
-                    encounterBundle.setUpdatedAt(new Date());
-                    encounterBundle.setUpdatedBy(new Requester(userInfo.getProperties().getFacilityId(), userInfo.getProperties().getProviderId()));
-                    encounterBundle.setContentVersion(existingEncounterBundle.getContentVersion() +1);
-                    encounterBundle.setReceivedAt(existingEncounterBundle.getReceivedAt());
-
-                    Observable<Boolean> update = encounterRepository.updateEncounter(encounterBundle, existingEncounterBundle, patient);
-
-                    return update.flatMap(new Func1<Boolean, Observable<EncounterResponse>>() {
-                        @Override
-                        public Observable<EncounterResponse> call(Boolean aBoolean) {
-                            if (aBoolean)
-                                response.setEncounterId(encounterBundle.getEncounterId());
-                            return Observable.just(response);
-                        }
-                    }, error(), complete());
+                    return updateEncounter(existingEncounterBundle, userInfo, encounterBundle, feed, patient);
                 } else{
                     return Observable.just(new EncounterResponse().preconditionFailure("encounterId", "invalid",
                             String.format("Encounter (%s) not available.", encounterBundle.getEncounterId())));
                 }
             }
         };
+    }
+
+    private Observable<EncounterResponse> updateEncounter(EncounterBundle existingEncounterBundle, UserInfo userInfo, final EncounterBundle encounterBundle, AtomFeed feed, Patient patient) {
+        Requester updatedBy = new Requester(userInfo.getProperties().getFacilityId(), userInfo.getProperties().getProviderId());
+        if(isEncounterEditAllowed(existingEncounterBundle, updatedBy)){
+            final EncounterResponse response = new EncounterResponse();
+            encounterBundle.setEncounterConfidentiality(getEncounterConfidentiality(feed));
+            encounterBundle.setUpdatedAt(new Date());
+            encounterBundle.setUpdatedBy(updatedBy);
+            encounterBundle.setContentVersion(existingEncounterBundle.getContentVersion() +1);
+            encounterBundle.setReceivedAt(existingEncounterBundle.getReceivedAt());
+
+            Observable<Boolean> update = encounterRepository.updateEncounter(encounterBundle, existingEncounterBundle, patient);
+
+            return update.flatMap(new Func1<Boolean, Observable<EncounterResponse>>() {
+                @Override
+                public Observable<EncounterResponse> call(Boolean aBoolean) {
+                    if (aBoolean)
+                        response.setEncounterId(encounterBundle.getEncounterId());
+                    return Observable.just(response);
+                }
+            }, error(), complete());
+        }else {
+            return Observable.just(new EncounterResponse().preconditionFailure("updatedBy", "not authorized",
+                    String.format("Requester (%s) is not authorized to edit the encounter", encounterBundle.getUpdatedBy())));
+        }
+    }
+
+    private boolean isEncounterEditAllowed(EncounterBundle existingEncounterBundle, Requester updatedBy) {
+        return existingEncounterBundle.getCreatedBy().equals(updatedBy);
     }
 
     private Func0<Observable<EncounterResponse>> complete() {
