@@ -1,6 +1,7 @@
 package org.freeshr.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.Gson;
 
 public class Requester {
     @JsonProperty("facilityId")
@@ -42,5 +43,10 @@ public class Requester {
         int result = facilityId != null ? facilityId.hashCode() : 0;
         result = 31 * result + (providerId != null ? providerId.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return new Gson().toJson(this);
     }
 }

@@ -133,8 +133,8 @@ public class PatientEncounterService {
                 }
             }, error(), complete());
         }else {
-            return Observable.just(new EncounterResponse().preconditionFailure("updatedBy", "not authorized",
-                    String.format("Requester (%s) is not authorized to edit the encounter", encounterBundle.getUpdatedBy())));
+            return Observable.just(new EncounterResponse().forbidden("updatedBy", "not authorized",
+                    String.format("Access is denied to requester (%s) to edit the encounter", updatedBy)));
         }
     }
 

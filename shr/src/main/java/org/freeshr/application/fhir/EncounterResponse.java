@@ -2,30 +2,32 @@ package org.freeshr.application.fhir;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
+import org.freeshr.interfaces.encounter.ws.exceptions.PreconditionFailed;
+import org.freeshr.interfaces.encounter.ws.exceptions.UnProcessableEntity;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Arrays.asList;
+
 public class EncounterResponse {
 
-    private EncounterValidationResponse encounterValidationResponse;
     private TypeOfFailure typeOfFailure = TypeOfFailure.None;
     private String encounterId;
-    private Error preconditionFailure;
+    private List<Error> errors;
+
+    public EncounterResponse() {
+        this.typeOfFailure = TypeOfFailure.None;
+        this.errors = Collections.emptyList();
+    }
 
     public boolean isSuccessful() {
         return isTypeOfFailure(TypeOfFailure.None);
     }
 
     public List<Error> getErrors() {
-        if (isTypeOfFailure(TypeOfFailure.Validation)) {
-            return encounterValidationResponse.getErrors();
-        } else if (isTypeOfFailure(TypeOfFailure.Precondition)) {
-            return Arrays.asList(preconditionFailure);
-        } else {
-            return Collections.emptyList();
-        }
+        return errors;
     }
 
     public String getEncounterId() {
@@ -43,31 +45,41 @@ public class EncounterResponse {
 
     @JsonIgnore
     public EncounterResponse setValidationFailure(EncounterValidationResponse encounterValidationResponse) {
-        this.encounterValidationResponse = encounterValidationResponse;
+        this.errors = encounterValidationResponse.getErrors();
         this.typeOfFailure = TypeOfFailure.Validation;
         return this;
     }
 
     @JsonIgnore
     public EncounterResponse preconditionFailure(String field, String type, String message) {
-        this.preconditionFailure = new Error(field, type, message);
+        this.errors = asList(new Error(field, type, message));
         this.typeOfFailure = TypeOfFailure.Precondition;
         return this;
+    }
+
+    @JsonIgnore
+    public EncounterResponse forbidden(String field, String type, String message) {
+        this.errors = asList(new Error(field, type, message));
+        this.typeOfFailure = TypeOfFailure.Forbidden;
+        return this;
+    }
+
+    public Exception getErrorResult() {
+        if (isTypeOfFailure(TypeOfFailure.Precondition)) {
+            return new PreconditionFailed(this);
+        } else if (isTypeOfFailure(TypeOfFailure.Validation)) {
+            return new UnProcessableEntity(this);
+        } else if (isTypeOfFailure(TypeOfFailure.Forbidden)) {
+            return new Forbidden(this);
+        }
+        return null;
     }
 
     public static enum TypeOfFailure {
         Validation,
         Precondition,
+        Forbidden,
         None
     }
 
-    @Override
-    public String toString() {
-        return "EncounterResponse{" +
-                "encounterValidationResponse=" + encounterValidationResponse +
-                ", typeOfFailure=" + typeOfFailure +
-                ", encounterId='" + encounterId + '\'' +
-                ", preconditionFailure=" + preconditionFailure +
-                '}';
-    }
 }

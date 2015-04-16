@@ -6,9 +6,7 @@ import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.domain.service.PatientEncounterService;
 import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
-import org.freeshr.interfaces.encounter.ws.exceptions.PreconditionFailed;
 import org.freeshr.interfaces.encounter.ws.exceptions.ResourceNotFound;
-import org.freeshr.interfaces.encounter.ws.exceptions.UnProcessableEntity;
 import org.freeshr.utils.DateUtil;
 import org.freeshr.utils.UrlUtil;
 import org.slf4j.Logger;
@@ -201,11 +199,7 @@ public class PatientEncounterController extends ShrController {
                     logger.debug(encounterResponse.toString());
                     deferredResult.setResult(encounterResponse);
                 } else {
-                    //TODO: move code to encounter response class
-                    RuntimeException errorResult = encounterResponse.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition) ?
-                            new PreconditionFailed(encounterResponse)
-                            : new UnProcessableEntity(encounterResponse);
-                    deferredResult.setErrorResult(errorResult);
+                    deferredResult.setErrorResult(encounterResponse.getErrorResult());
                 }
             }
         };

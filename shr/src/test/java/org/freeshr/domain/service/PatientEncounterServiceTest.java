@@ -136,7 +136,7 @@ public class PatientEncounterServiceTest {
 
         EncounterResponse updateResponse = patientEncounterService.ensureUpdated(bundle, userInfoOfFacilityThatUpdatedEncounter).toBlocking().first();
 
-        assertTrue(updateResponse.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition));
+        assertTrue(updateResponse.isTypeOfFailure(EncounterResponse.TypeOfFailure.Forbidden));
         verify(mockEncounterRepository,never()).updateEncounter(bundle, existingEncounterBundle, patient);
 
     }
@@ -162,7 +162,7 @@ public class PatientEncounterServiceTest {
 
         EncounterResponse updateResponse = patientEncounterService.ensureUpdated(bundle, userInfoOfProviderWhoUpdatedEncounter).toBlocking().first();
 
-        assertTrue(updateResponse.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition));
+        assertTrue(updateResponse.isTypeOfFailure(EncounterResponse.TypeOfFailure.Forbidden));
         verify(mockEncounterRepository,never()).updateEncounter(bundle, existingEncounterBundle, patient);
 
     }
