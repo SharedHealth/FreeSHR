@@ -57,7 +57,7 @@ public class FacilityValidator implements Validator<AtomFeed> {
             return validationMessages;
         }
 
-        logger.info("Encounter validated for valid facility");
+        logger.info(String.format("Encounter validated for valid facility %s", facility.getFacilityId()));
         return validationMessages;
     }
 

@@ -79,6 +79,11 @@ public class SHRProperties {
     @Value("${FHIR_DOCUMENT_SCHEMA_VERSION}")
     private String fhirDocumentSchemaVersion;
 
+
+    @Value("${IDENTITY_CACHE_TTL}")
+    private int identityCacheTTL;
+
+
     private String[] mciServerLocationUrls = null;
     private String[] facilityServerLocationUrls = null;
     private String[] providerServerLocationUrls = null;
@@ -286,4 +291,9 @@ public class SHRProperties {
         }
         return this.terminologyServerLocationUrls;
     }
+
+    public int getIdentityCacheTTL() {
+        return identityCacheTTL;
+    }
+
 }

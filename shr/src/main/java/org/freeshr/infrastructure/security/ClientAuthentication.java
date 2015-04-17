@@ -1,5 +1,6 @@
 package org.freeshr.infrastructure.security;
 
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import javax.naming.AuthenticationException;
@@ -7,13 +8,17 @@ import javax.naming.AuthenticationException;
 @Component
 public class ClientAuthentication {
 
+    private Logger logger = Logger.getLogger(ClientAuthentication.class);
+
     public boolean verify(UserInfo userInfo, UserAuthInfo userAuthInfo, String token) throws AuthenticationException {
         String exceptionMessage = "User credentials is invalid";
         if (isInactiveUser(userInfo) ||
                 isInvalidToken(userInfo, token) ||
                 isInvalidClient(userInfo, userAuthInfo) ||
-                isInvalidEmail(userInfo, userAuthInfo))
+                isInvalidEmail(userInfo, userAuthInfo)) {
+            logger.error(String.format("Token %s doesn't belong to client %s with email %s", token, userAuthInfo.getClientId(), userAuthInfo.getEmail()));
             throw new AuthenticationException(exceptionMessage);
+        }
         return true;
     }
 

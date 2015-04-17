@@ -46,7 +46,7 @@ public class TRConceptLocator implements ConceptLocator {
     }
 
     @Override
-    @Cacheable(value = "shrCache", unless = "#result != null")
+    @Cacheable(value = "trCache", unless = "#result != null")
     public ValidationResult validate(String system, String code, String display) {
         if (locate(system, code) == null) {
             return new ValidationResult(OperationOutcome.IssueSeverity.error, display);

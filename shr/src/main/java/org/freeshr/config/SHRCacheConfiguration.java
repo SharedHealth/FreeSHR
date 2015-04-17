@@ -17,23 +17,27 @@ import static net.sf.ehcache.CacheManager.newInstance;
 @EnableCaching(proxyTargetClass = true)
 public class SHRCacheConfiguration implements CachingConfigurer {
 
-    public static final int A_DAY_IN_SECONDS = 86400;
-
     @Autowired
     private SHRProperties shrProperties;
 
     @Bean(destroyMethod = "shutdown", name = "ehCacheManager")
     public net.sf.ehcache.CacheManager ehCacheManager() {
-        CacheConfiguration cacheConfig = getCacheConfiguration();
-        cacheConfig.persistence(getPersistenceConfiguration());
+        CacheConfiguration trCacheConfig = getTrCacheConfiguration();
+        trCacheConfig.persistence(getPersistenceConfiguration());
+
+        CacheConfiguration identityCacheConfig = getIdentityCacheConfiguration();
+        identityCacheConfig.persistence(getPersistenceConfiguration());
+        
         net.sf.ehcache.config.Configuration ehCacheConfig = new net.sf.ehcache.config.Configuration();
-        ehCacheConfig.addCache(cacheConfig);
+        ehCacheConfig.addCache(trCacheConfig);
+        ehCacheConfig.addCache(identityCacheConfig);
+
         return newInstance(ehCacheConfig);
     }
 
-    private CacheConfiguration getCacheConfiguration() {
+    private CacheConfiguration getTrCacheConfiguration() {
         CacheConfiguration cacheConfig = new CacheConfiguration();
-        cacheConfig.setName("shrCache");
+        cacheConfig.setName("trCache");
         cacheConfig.setMemoryStoreEvictionPolicy("LRU");
         cacheConfig.setMaxEntriesLocalHeap(1000);
         cacheConfig.setTimeToLiveSeconds(shrProperties.getLocalCacheTTL());
@@ -44,6 +48,15 @@ public class SHRCacheConfiguration implements CachingConfigurer {
         PersistenceConfiguration persistenceConfiguration = new PersistenceConfiguration();
         persistenceConfiguration.setStrategy("NONE");
         return persistenceConfiguration;
+    }
+
+    private CacheConfiguration getIdentityCacheConfiguration() {
+        CacheConfiguration cacheConfig = new CacheConfiguration();
+        cacheConfig.setName("identityCache");
+        cacheConfig.setMemoryStoreEvictionPolicy("LRU");
+        cacheConfig.setMaxEntriesLocalHeap(10000);
+        cacheConfig.setTimeToLiveSeconds(shrProperties.getIdentityCacheTTL());
+        return cacheConfig;
     }
 
     @Bean

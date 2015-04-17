@@ -40,13 +40,13 @@ public class PatientService {
         });
     }
 
-    private Observable<Patient> findRemote(String healthId, UserInfo userInfo) {
+    private Observable<Patient> findRemote(final String healthId, UserInfo userInfo) {
         Observable<Patient> remotePatient = mciClient.getPatient(healthId, userInfo);
         savePatient(remotePatient);
         return remotePatient.onErrorReturn(new Func1<Throwable, Patient>() {
             @Override
             public Patient call(Throwable throwable) {
-                logger.error("Patient not found at MCI");
+                logger.error(String.format("Patient not found at MCI for health id %s", healthId));
                 return null;
             }
         });
