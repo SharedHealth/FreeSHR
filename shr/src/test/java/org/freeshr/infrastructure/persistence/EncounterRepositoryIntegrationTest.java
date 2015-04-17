@@ -231,6 +231,38 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         assertEquals("v1", encounterHistoryRow.getString("content_format"));
     }
 
+    @Test
+    public void shouldFetchUniqueEncountersForPatientInTheOrderOfEvents() throws Exception {
+        String encounterOne = "e-1";
+        String encounterTwo = "e-2";
+        Patient patient = new Patient();
+        String healthId = generateHealthId();
+        patient.setHealthId(healthId);
+        patient.setAddress(new Address("01", "02", "03", "04", "05"));
+
+        Requester createdBy = new Requester("facilityId", null);
+        EncounterBundle existingEncounterBundle = createEncounterBundle(encounterOne, healthId, Confidentiality.Normal,
+                Confidentiality.Normal, asString("jsons/encounters/valid.json"), createdBy, new Date());
+        encounterRepository.save(existingEncounterBundle, patient).toBlocking().first();
+
+        EncounterBundle secondEncounter = createEncounterBundle(encounterTwo, healthId, Confidentiality.Normal,
+                Confidentiality.Normal, asString("jsons/encounters/valid.json"), createdBy, new Date());
+        encounterRepository.save(secondEncounter, patient).toBlocking().first();
+
+        Date updatedAt = new Date();
+        Requester updatedBy = new Requester("facilityId1", null);
+        encounterRepository.updateEncounter(createUpdateEncounterBundle(encounterOne, healthId, Confidentiality.Normal,
+                        asString("jsons/encounters/valid.json"), updatedBy, updatedAt),
+                existingEncounterBundle, patient).toBlocking().first();
+
+        List<EncounterBundle> encountersForPatient = encounterRepository.findEncountersForPatient(healthId, null, 5).toBlocking().first();
+
+        assertEquals(encounterTwo,encountersForPatient.get(0).getEncounterId());
+        assertEquals(encounterOne,encountersForPatient.get(1).getEncounterId());
+
+
+    }
+
     @After
     public void teardown() {
         cqlOperations.execute("truncate encounter");

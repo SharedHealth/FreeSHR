@@ -54,11 +54,11 @@ public class EncounterRepository {
         UUID receivedTimeUUID = TimeUuidUtil.uuidForDate(encounterBundle.getReceivedAt());
         UUID updatedTimeUUID = TimeUuidUtil.uuidForDate(encounterBundle.getUpdatedAt());
 
-       Insert insertEncounterStmt = getInsertEncounterStmt(encounterBundle, receivedTimeUUID, updatedTimeUUID);
+        Insert insertEncounterStmt = getInsertEncounterStmt(encounterBundle, receivedTimeUUID, updatedTimeUUID);
 
         RegularStatement encCatchmentStmt = getInsertEncCatchmentStmt(encounterBundle, address, receivedTimeUUID);
         RegularStatement encByPatientStmt = getInsertEncByPatientStmt(encounterBundle, receivedTimeUUID);
-        
+
         Batch batch = QueryBuilder.batch(insertEncounterStmt, encCatchmentStmt, encByPatientStmt);
         Observable<ResultSet> saveObservable = Observable.from(cqlOperations.executeAsynchronously(batch),
                 Schedulers.io());
@@ -69,21 +69,11 @@ public class EncounterRepository {
 
     public Observable<List<EncounterBundle>> findEncountersForCatchment(Catchment catchment, Date updatedSince,
                                                                         int limit) {
-        String identifyEncountersQuery = buildCatchmentSearchQuery(catchment, updatedSince, limit);
-        Observable<ResultSet> resultSetObservable = Observable.from(
-                cqlOperations.queryAsynchronously(identifyEncountersQuery), Schedulers.io());
+        String identifyEncounterIdsQuery = buildCatchmentSearchQuery(catchment, updatedSince, limit);
+        Observable<ResultSet> encounterIdsObservable = Observable.from(
+                cqlOperations.queryAsynchronously(identifyEncounterIdsQuery), Schedulers.io());
 
-        return resultSetObservable.concatMap(new Func1<ResultSet, Observable<List<EncounterBundle>>>() {
-            @Override
-            public Observable<List<EncounterBundle>> call(ResultSet rows) {
-                List<Row> encounterBundles = rows.all();
-                LinkedHashSet<String> encounterIds = new LinkedHashSet<>();
-                for (Row result : encounterBundles) {
-                    encounterIds.add(result.getString("encounter_id"));
-                }
-                return findEncounters(encounterIds);
-            }
-        });
+        return encounterIdsObservable.concatMap(findEncountersOrderedByEvents());
     }
 
     public Observable<EncounterBundle> findEncounterById(String encounterId) {
@@ -113,30 +103,10 @@ public class EncounterRepository {
                                                                       int limit) throws ExecutionException,
             InterruptedException {
         StringBuilder queryBuilder = buildQuery(healthId, updatedSince, limit);
-        Observable<LinkedHashSet<String>> encounterIdsObservable = Observable.from(cqlOperations.queryAsynchronously
-                (queryBuilder.toString()), Schedulers.io())
-                .map(new Func1<ResultSet, LinkedHashSet<String>>() {
-                    @Override
-                    public LinkedHashSet<String> call(ResultSet rows) {
-                        LinkedHashSet<String> encounterIds = new LinkedHashSet<>();
-                        for (Row row : rows) {
-                            encounterIds.add(row.getString("encounter_id"));
-                        }
-                        return encounterIds;
-                    }
-                });
+        Observable<ResultSet> encounterIdsObservable = Observable.from(cqlOperations.queryAsynchronously
+                (queryBuilder.toString()), Schedulers.io());
 
-        return encounterIdsObservable.flatMap(
-                new Func1<LinkedHashSet<String>, Observable<List<EncounterBundle>>>() {
-                    @Override
-                    public Observable<List<EncounterBundle>> call(LinkedHashSet<String> encounterIds) {
-                        if (encounterIds.isEmpty()) {
-                            return Observable.<List<EncounterBundle>>just(new ArrayList<EncounterBundle>());
-                        }
-                        String encounterQuery = buildEncounterSelectionQuery(encounterIds);
-                        return executeFindQuery(encounterQuery);
-                    }
-                });
+        return encounterIdsObservable.concatMap(findEncountersOrderedByEvents());
     }
 
     public Observable<Boolean> updateEncounter(EncounterBundle encounterBundle, EncounterBundle existingEncounterBundle, Patient patient) {
@@ -147,7 +117,7 @@ public class EncounterRepository {
         Update updateEncounterStmt = getUpdateEncounterStmt(encounterBundle, receivedTimeUUID, updatedTimeUUID);
         RegularStatement encCatchmentStmt = getInsertEncCatchmentStmt(encounterBundle, address, updatedTimeUUID);
         RegularStatement encByPatientStmt = getInsertEncByPatientStmt(encounterBundle, updatedTimeUUID);
-        RegularStatement  encounterHistoryStmt = getInsertEncHistory(existingEncounterBundle);
+        RegularStatement encounterHistoryStmt = getInsertEncHistory(existingEncounterBundle);
 
         Batch batch = QueryBuilder.batch(updateEncounterStmt, encCatchmentStmt, encByPatientStmt, encounterHistoryStmt);
         Observable<ResultSet> saveObservable = Observable.from(cqlOperations.executeAsynchronously(batch),
@@ -156,6 +126,24 @@ public class EncounterRepository {
         return saveObservable.flatMap(respondOnNext(true), RxMaps.<Boolean>logAndForwardError(logger),
                 completeResponds(true));
 
+    }
+
+    private Func1<ResultSet, Observable<List<EncounterBundle>>> findEncountersOrderedByEvents() {
+        return new Func1<ResultSet, Observable<List<EncounterBundle>>>() {
+            @Override
+            public Observable<List<EncounterBundle>> call(ResultSet rows) {
+                List<Row> encounterBundles = rows.all();
+                LinkedHashSet<String> encounterIds = new LinkedHashSet<>();
+                for (Row result : encounterBundles) {
+                    String encounterId = result.getString("encounter_id");
+                    if(encounterIds.contains(encounterId)){
+                        encounterIds.remove(encounterId);
+                    }
+                    encounterIds.add(encounterId);
+                }
+                return findEncounters(encounterIds);
+            }
+        };
     }
 
     private RegularStatement getInsertEncHistory(EncounterBundle encounterBundle) {
@@ -169,21 +157,22 @@ public class EncounterRepository {
         return insertEncHistoryStmt;
     }
 
-    private Update getUpdateEncounterStmt(EncounterBundle encounterBundle, UUID receivedTimeUUID, UUID updatedTimeUUID){
+    private Update getUpdateEncounterStmt(EncounterBundle encounterBundle, UUID receivedTimeUUID, UUID updatedTimeUUID) {
         Update updateEncounterStmt = QueryBuilder.update("encounter");
 
         updateEncounterStmt.with(QueryBuilder.set(getContentColumnName(), encounterBundle.getContent()))
-                            .and(QueryBuilder.set("content_version", encounterBundle.getContentVersion()))
-                            .and(QueryBuilder.set(getSchemaContentVersionColumnName(), encounterBundle.getContentVersion()))
-                            .and(QueryBuilder.set("encounter_confidentiality", encounterBundle.getEncounterConfidentiality().getLevel()))
-                            .and(QueryBuilder.set("updated_at", updatedTimeUUID))
-                            .and(QueryBuilder.set("updated_by", serializeRequester(encounterBundle.getUpdatedBy())))
-                            .where(QueryBuilder.eq("encounter_id",encounterBundle.getEncounterId()))
-                            .and(QueryBuilder.eq("received_at", receivedTimeUUID));
+                .and(QueryBuilder.set("content_version", encounterBundle.getContentVersion()))
+                .and(QueryBuilder.set(getSchemaContentVersionColumnName(), encounterBundle.getContentVersion()))
+                .and(QueryBuilder.set("encounter_confidentiality", encounterBundle.getEncounterConfidentiality().getLevel()))
+                .and(QueryBuilder.set("updated_at", updatedTimeUUID))
+                .and(QueryBuilder.set("updated_by", serializeRequester(encounterBundle.getUpdatedBy())))
+                .where(QueryBuilder.eq("encounter_id", encounterBundle.getEncounterId()))
+                .and(QueryBuilder.eq("received_at", receivedTimeUUID));
 
         return updateEncounterStmt;
 
     }
+
     private Insert getInsertEncounterStmt(EncounterBundle encounterBundle, UUID receivedTimeUUID, UUID updatedTimeUUID) {
         Insert insertEncounterStmt = QueryBuilder.insertInto("encounter");
         insertEncounterStmt.value("encounter_id", encounterBundle.getEncounterId());

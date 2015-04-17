@@ -22,9 +22,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 import static java.util.Arrays.asList;
-import static org.freeshr.infrastructure.security.UserInfo.HRM_FACILITY_ADMIN_GROUP;
-import static org.freeshr.infrastructure.security.UserInfo.HRM_PROVIDER_GROUP;
-import static org.freeshr.infrastructure.security.UserInfo.SHR_USER_GROUP;
+import static org.freeshr.infrastructure.security.UserInfo.*;
 import static org.freeshr.utils.FileUtil.asString;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
