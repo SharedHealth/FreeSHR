@@ -106,6 +106,9 @@ public class EncounterValidatorIntegrationTest {
                 FileUtil.asString("xmls/encounters/encounterWithValidFacility.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new ResourceOrFeedDeserializer());
         EncounterValidationResponse response = validator.validate(validationContext);
+        for (Error error : response.getErrors()) {
+            System.out.println(error);
+        }
         assertTrue(response.isSuccessful());
     }
 
