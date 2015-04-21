@@ -1,11 +1,12 @@
 package org.freeshr.validations;
 
-import org.apache.log4j.Logger;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.service.FacilityService;
 import org.hl7.fhir.instance.model.*;
 import org.hl7.fhir.instance.validation.ValidationMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import rx.Observable;
@@ -22,7 +23,7 @@ public class FacilityValidator implements Validator<AtomFeed> {
 
     public static final String INVALID_SERVICE_PROVIDER = "Invalid Service Provider";
     public static final String INVALID_SERVICE_PROVIDER_URL = "Invalid Service Provider URL";
-    private final Logger logger = Logger.getLogger(FacilityValidator.class);
+    private final static Logger logger = LoggerFactory.getLogger(FacilityValidator.class);
     private SHRProperties shrProperties;
     private FacilityService facilityService;
 

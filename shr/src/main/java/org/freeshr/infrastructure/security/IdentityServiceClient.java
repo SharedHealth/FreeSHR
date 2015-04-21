@@ -1,8 +1,9 @@
 package org.freeshr.infrastructure.security;
 
-import org.apache.log4j.Logger;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
@@ -26,7 +27,7 @@ public class IdentityServiceClient {
     private SHRProperties shrProperties;
     private ClientAuthentication clientAuthentication;
 
-    private Logger logger = Logger.getLogger(IdentityServiceClient.class);
+    private final static Logger logger = LoggerFactory.getLogger(IdentityServiceClient.class);
 
     @Autowired
     public IdentityServiceClient(@Qualifier("SHRRestTemplate") AsyncRestTemplate shrRestTemplate,
@@ -45,7 +46,14 @@ public class IdentityServiceClient {
         ListenableFuture<ResponseEntity<UserInfo>> listenableFuture = shrRestTemplate.exchange(userInfoUrl,
                 HttpMethod.GET,
                 new HttpEntity(httpHeaders), UserInfo.class);
-        ResponseEntity<UserInfo> responseEntity = listenableFuture.get();
+        ResponseEntity<UserInfo> responseEntity = null;
+        try {
+            responseEntity = listenableFuture.get();
+        } catch (Exception e) {
+            logger.error(String.format("Error while validating client %s with email %s and token %s",
+                     userAuthInfo.getClientId(), userAuthInfo.getEmail(), userAuthInfo.getToken()));
+            throw new AuthenticationServiceException("Unable to authenticate user.");
+        }
         if (!responseEntity.getStatusCode().is2xxSuccessful()) {
             logger.error(String.format("Unexpected response code %s from IDP while validating client %s with email %s and token %s",
                     responseEntity.getStatusCode(), userAuthInfo.getClientId(), userAuthInfo.getEmail(), userAuthInfo.getToken()));

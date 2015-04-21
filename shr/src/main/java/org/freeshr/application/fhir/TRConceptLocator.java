@@ -1,11 +1,12 @@
 package org.freeshr.application.fhir;
 
-import org.apache.log4j.Logger;
 import org.freeshr.infrastructure.tr.TerminologyServer;
 import org.hl7.fhir.instance.model.Code;
 import org.hl7.fhir.instance.model.OperationOutcome;
 import org.hl7.fhir.instance.model.ValueSet;
 import org.hl7.fhir.instance.utils.ConceptLocator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,7 @@ public class TRConceptLocator implements ConceptLocator {
 
     private TerminologyServer terminologyServer;
 
-    private static Logger logger = Logger.getLogger(TRConceptLocator.class);
+    private final static Logger logger = LoggerFactory.getLogger(TRConceptLocator.class);
 
     @Autowired
     public TRConceptLocator(TerminologyServer terminologyServer) {
@@ -40,7 +41,7 @@ public class TRConceptLocator implements ConceptLocator {
                 return null;
             }
         } catch (Exception e) {
-            logger.warn(e);
+            logger.warn("Problem while validating concept", e);
             return null;
         }
     }

@@ -44,7 +44,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             processTokenAuthentication(clientId, email, token);
             filterChain.doFilter(httpRequest, httpResponse);
         } catch (AuthenticationException ex) {
-            logger.debug(String.format("Access to user=%s with email=%s is denied.", clientId, email));
+            logger.debug(String.format("Access to user=%s with email=%s for token=%s is denied.", clientId, email, token));
             SecurityContextHolder.clearContext();
             httpResponse.sendError(SC_UNAUTHORIZED, ex.getMessage());
         }

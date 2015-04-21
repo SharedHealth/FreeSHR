@@ -39,7 +39,7 @@ public class SHRCacheConfiguration implements CachingConfigurer {
         CacheConfiguration cacheConfig = new CacheConfiguration();
         cacheConfig.setName("trCache");
         cacheConfig.setMemoryStoreEvictionPolicy("LRU");
-        cacheConfig.setMaxEntriesLocalHeap(1000);
+        cacheConfig.setMaxEntriesLocalHeap(10000);
         cacheConfig.setTimeToLiveSeconds(shrProperties.getLocalCacheTTL());
         return cacheConfig;
     }
@@ -54,7 +54,7 @@ public class SHRCacheConfiguration implements CachingConfigurer {
         CacheConfiguration cacheConfig = new CacheConfiguration();
         cacheConfig.setName("identityCache");
         cacheConfig.setMemoryStoreEvictionPolicy("LRU");
-        cacheConfig.setMaxEntriesLocalHeap(10000);
+        cacheConfig.setMaxEntriesLocalHeap(1000);
         cacheConfig.setTimeToLiveSeconds(shrProperties.getIdentityCacheTTL());
         return cacheConfig;
     }

@@ -1,9 +1,10 @@
 package org.freeshr.domain.service;
 
-import org.apache.log4j.Logger;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.infrastructure.FacilityRegistryClient;
 import org.freeshr.infrastructure.persistence.FacilityRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rx.Observable;
@@ -12,8 +13,7 @@ import rx.functions.Func1;
 
 @Service
 public class FacilityService {
-
-    private Logger logger = Logger.getLogger(FacilityService.class);
+    private final static Logger logger = LoggerFactory.getLogger(FacilityService.class);
     private FacilityRepository facilityRepository;
     private FacilityRegistryClient facilityRegistryClient;
 

@@ -1,6 +1,5 @@
 package org.freeshr.infrastructure;
 
-import org.apache.log4j.Logger;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.interfaces.encounter.ws.FacilityMessageConverter;
@@ -23,7 +22,6 @@ public class FacilityRegistryClient {
 
     private AsyncRestTemplate shrRestTemplate;
     private SHRProperties shrProperties;
-    private Logger logger = Logger.getLogger(FacilityRegistryClient.class);
 
     @Autowired
     public FacilityRegistryClient(@Qualifier("SHRRestTemplate") AsyncRestTemplate shrRestTemplate,

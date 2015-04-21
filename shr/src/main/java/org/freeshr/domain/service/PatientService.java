@@ -1,10 +1,11 @@
 package org.freeshr.domain.service;
 
-import org.apache.log4j.Logger;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.mci.MCIClient;
 import org.freeshr.infrastructure.persistence.PatientRepository;
 import org.freeshr.infrastructure.security.UserInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rx.Observable;
@@ -17,7 +18,7 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class PatientService {
 
-    private Logger logger = Logger.getLogger(PatientService.class);
+    private final static Logger logger = LoggerFactory.getLogger(PatientService.class);
 
     private final PatientRepository patientRepository;
     private final MCIClient mciClient;

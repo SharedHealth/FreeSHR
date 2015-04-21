@@ -1,6 +1,7 @@
 package org.freeshr.infrastructure.security;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.naming.AuthenticationException;
@@ -8,7 +9,7 @@ import javax.naming.AuthenticationException;
 @Component
 public class ClientAuthentication {
 
-    private Logger logger = Logger.getLogger(ClientAuthentication.class);
+    private final static Logger logger = LoggerFactory.getLogger(ClientAuthentication.class);
 
     public boolean verify(UserInfo userInfo, UserAuthInfo userAuthInfo, String token) throws AuthenticationException {
         String exceptionMessage = "User credentials is invalid";

@@ -5,10 +5,11 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
-import org.apache.log4j.Logger;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Address;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cassandra.core.CqlTemplate;
@@ -20,7 +21,7 @@ import rx.schedulers.Schedulers;
 
 @Component
 public class FacilityRepository {
-    private Logger logger = Logger.getLogger(FacilityRepository.class);
+    private final static Logger logger = LoggerFactory.getLogger(FacilityRepository.class);
     private CqlTemplate cqlTemplate;
     private SHRProperties shrProperties;
 
