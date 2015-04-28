@@ -39,6 +39,7 @@ public class FacilityService {
     }
 
     private Observable<Facility> findRemote(String facilityId) {
+        logger.debug(String.format("Facility (%s) not present in db.Finding it from remote FR", facilityId));
         Observable<Facility> facility = facilityRegistryClient.getFacility(facilityId);
         return facility.flatMap(new Func1<Facility, Observable<Facility>>() {
             @Override
@@ -48,7 +49,7 @@ public class FacilityService {
         }, new Func1<Throwable, Observable<? extends Facility>>() {
             @Override
             public Observable<? extends Facility> call(Throwable throwable) {
-                logger.info(throwable.getMessage());
+                logger.debug(String.format("Unable to find facility. Cause: %s", throwable.getMessage()));
                 return Observable.error(throwable);
             }
         }, new Func0<Observable<? extends Facility>>() {

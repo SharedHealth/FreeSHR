@@ -85,18 +85,20 @@ public class CatchmentEncounterController extends ShrController {
                         searchResponse.setNavLinks(null, getNextResultURL(request, encounterBundles, requestedDate));
                         logger.debug(searchResponse.toString());
                         deferredResult.setResult(searchResponse);
-                    } catch (Throwable t) {
-                        deferredResult.setErrorResult(t);
+                    } catch (Throwable throwable) {
+                        logger.debug(throwable.getMessage());
+                        deferredResult.setErrorResult(throwable);
                     }
                 }
             }, new Action1<Throwable>() {
                 @Override
                 public void call(Throwable throwable) {
+                    logger.debug(throwable.getMessage());
                     deferredResult.setErrorResult(throwable);
                 }
             });
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.debug(e.getMessage());
             deferredResult.setErrorResult(e);
         }
         return deferredResult;
@@ -195,7 +197,6 @@ public class CatchmentEncounterController extends ShrController {
         }, new Func1<Throwable, Observable<? extends List<EncounterBundle>>>() {
             @Override
             public Observable<? extends List<EncounterBundle>> call(Throwable throwable) {
-                logger.error(throwable.getMessage());
                 return Observable.error(throwable);
             }
         }, new Func0<Observable<? extends List<EncounterBundle>>>() {

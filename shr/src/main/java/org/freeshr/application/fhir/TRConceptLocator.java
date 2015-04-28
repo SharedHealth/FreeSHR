@@ -41,7 +41,7 @@ public class TRConceptLocator implements ConceptLocator {
                 return null;
             }
         } catch (Exception e) {
-            logger.warn("Problem while validating concept", e);
+            logger.debug("Problem while validating concept", e);
             return null;
         }
     }

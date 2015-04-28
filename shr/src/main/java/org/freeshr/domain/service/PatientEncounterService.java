@@ -155,7 +155,7 @@ public class PatientEncounterService {
         return new Func1<Throwable, Observable<EncounterResponse>>() {
             @Override
             public Observable<EncounterResponse> call(Throwable throwable) {
-                logger.error(throwable.getMessage());
+                logger.debug(throwable.getMessage());
                 return Observable.error(throwable);
             }
         };

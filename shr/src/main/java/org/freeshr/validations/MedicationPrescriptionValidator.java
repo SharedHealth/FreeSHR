@@ -61,13 +61,18 @@ public class MedicationPrescriptionValidator implements Validator<AtomEntry<? ex
             Quantity doseQuantity = ((MedicationPrescription.MedicationPrescriptionDosageInstructionComponent)
                     dosageInstructionValue).getDoseQuantity();
             if (doseQuantityValidator.isReferenceUrlNotFound(doseQuantity)) return new ArrayList<>();
-            if (!urlValidator.isValid(doseQuantity.getSystemSimple()))
+            if (!urlValidator.isValid(doseQuantity.getSystemSimple())) {
+                logger.debug(String.format("Medication-Prescription:Encounter failed for %s", INVALID_DOSAGE_QUANTITY_REFERENCE));
                 return validationMessages(new ValidationMessage(null, ResourceValidator.INVALID, atomEntry.getId(),
                         INVALID_DOSAGE_QUANTITY_REFERENCE, error));
+            }
             ConceptLocator.ValidationResult validationResult = doseQuantityValidator.validate(doseQuantity);
-            if (validationResult != null)
+            if (validationResult != null) {
+                logger.debug(String.format("Medication-Prescription:Encounter failed for %s", INVALID_DOSAGE_QUANTITY));
                 return validationMessages(new ValidationMessage(null, ResourceValidator.INVALID, atomEntry.getId(),
                         INVALID_DOSAGE_QUANTITY, error));
+            }
+
         }
         return new ArrayList<>();
     }
@@ -92,15 +97,19 @@ public class MedicationPrescriptionValidator implements Validator<AtomEntry<? ex
 
     private List<ValidationMessage> validateMedication(AtomEntry<? extends Resource> atomEntry) {
         Property medication = atomEntry.getResource().getChildByName(MEDICATION);
-        if ((medication == null) || (!medication.hasValues()))
+        if ((medication == null) || (!medication.hasValues())) {
+            logger.debug(String.format("Medication-Prescription:Encounter failed for %s", UNSPECIFIED_MEDICATION));
             return validationMessages(new ValidationMessage(null, ResourceValidator.INVALID, atomEntry.getId(),
                     UNSPECIFIED_MEDICATION,
                     error));
+        }
         String medicationRefUrl = getReferenceUrl(medication);
         if ((medicationRefUrl == null)) return new ArrayList<>();
-        if (!urlValidator.isValid(medicationRefUrl))
+        if (!urlValidator.isValid(medicationRefUrl)) {
+            logger.debug(String.format("Medication-Prescription:Encounter failed for %s", INVALID_MEDICATION_REFERENCE_URL));
             return validationMessages(new ValidationMessage(null, ResourceValidator.INVALID, atomEntry.getId(),
                     INVALID_MEDICATION_REFERENCE_URL, error));
+        }
         if (!isValidCodeableConceptUrl(medicationRefUrl, ""))
             return validationMessages(new ValidationMessage(null, ResourceValidator.INVALID, atomEntry.getId(),
                     INVALID_MEDICATION_REFERENCE_URL, error));

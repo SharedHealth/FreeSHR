@@ -77,7 +77,7 @@ public class SHRSecurityConfig extends WebSecurityConfigurerAdapter {
             @Override
             public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException
                     authException) throws IOException, ServletException {
-                logger.error(authException.getMessage());
+                logger.debug(authException.getMessage());
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
             }
         };
@@ -88,7 +88,7 @@ public class SHRSecurityConfig extends WebSecurityConfigurerAdapter {
             @Override
             public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException)
                     throws IOException, ServletException {
-                logger.error(accessDeniedException.getMessage());
+                logger.debug(accessDeniedException.getMessage());
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, accessDeniedException.getMessage());
             }
         };

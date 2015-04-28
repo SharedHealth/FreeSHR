@@ -14,8 +14,8 @@ import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity;
 
 @Component
 public class ConditionValidator implements Validator<AtomEntry<? extends Resource>> {
-    private static final Logger LOG = LoggerFactory.getLogger(ImmunizationValidator.class);
 
+    private static final Logger logger = LoggerFactory.getLogger(ConditionValidator.class);
     private static final String CODEABLE_CONCEPT = "CodeableConcept";
     public static final String DIAGNOSIS = "Diagnosis";
     public static final String CATEGORY = "category";
@@ -44,9 +44,10 @@ public class ConditionValidator implements Validator<AtomEntry<? extends Resourc
 
             validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, id,
                     UNKNOWN_CONDITION_RELATION_CODE, IssueSeverity.error));
+            logger.debug(String.format("Condition: Encounter failed for %s", UNKNOWN_CONDITION_RELATION_CODE));
             return true;
         } catch (Exception e) {
-            LOG.error(e.getMessage());
+            logger.debug(e.getMessage());
         }
         return true;
     }

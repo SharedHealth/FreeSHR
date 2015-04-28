@@ -17,6 +17,8 @@ import static org.freeshr.utils.DateUtil.isValidPeriod;
 @Component
 public class ProcedureValidator implements Validator<AtomEntry<? extends Resource>> {
 
+    private static final Logger logger = LoggerFactory.getLogger(ProcedureValidator.class);
+
     @Override
     public List<ValidationMessage> validate(ValidationSubject<AtomEntry<? extends Resource>> subject) {
         AtomEntry<? extends Resource> atomEntry = subject.extract();
@@ -36,6 +38,7 @@ public class ProcedureValidator implements Validator<AtomEntry<? extends Resourc
             if (!(reportElement instanceof ResourceReference)) continue;
             ResourceReference reference = (ResourceReference) reportElement;
             if (reference.getReferenceSimple() == null || reference.getReferenceSimple().isEmpty()) {
+                logger.debug(String.format("Procedure:Encounter failed for %s", ValidationMessages.INVALID_DIAGNOSTIC_REPORT_REFERENCE));
                 return validationMessages(new ValidationMessage(null, ResourceValidator.INVALID, atomEntry.getId(), ValidationMessages
                         .INVALID_DIAGNOSTIC_REPORT_REFERENCE, OperationOutcome.IssueSeverity.error));
             }
@@ -50,9 +53,11 @@ public class ProcedureValidator implements Validator<AtomEntry<? extends Resourc
             if (!(element instanceof Period)) continue;
 
             Period period = (Period) element;
-            if (!isValidPeriod(period.getStartSimple(), period.getEndSimple()))
+            if (!isValidPeriod(period.getStartSimple(), period.getEndSimple())) {
+                logger.debug(String.format("Procedure:Encounter failed for %s", ValidationMessages.INVALID_PERIOD));
                 return validationMessages(new ValidationMessage(null, ResourceValidator.INVALID, atomEntry.getId(), ValidationMessages
                         .INVALID_PERIOD, OperationOutcome.IssueSeverity.error));
+            }
         }
 
         return new ArrayList<>();

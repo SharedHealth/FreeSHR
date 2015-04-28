@@ -4,6 +4,8 @@ import org.freeshr.application.fhir.TRConceptLocator;
 import org.freeshr.config.SHRProperties;
 import org.hl7.fhir.instance.validation.InstanceValidator;
 import org.hl7.fhir.instance.validation.ValidationMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
@@ -19,6 +21,7 @@ import java.util.List;
 @Component
 public class FhirSchemaValidator implements Validator<String> {
 
+    private final static Logger logger = LoggerFactory.getLogger(FhirSchemaValidator.class);
     private final InstanceValidator instanceValidator;
 
     @Autowired
@@ -41,6 +44,7 @@ public class FhirSchemaValidator implements Validator<String> {
         try {
             return instanceValidator.validateInstance(document(sourceXml).getDocumentElement());
         } catch (Exception e) {
+            logger.debug(String.format("Error in validating schema.Cause: %s", e.getMessage()));
             throw new RuntimeException(e);
         }
     }

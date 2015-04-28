@@ -49,14 +49,14 @@ public class PatientEncounterController extends ShrController {
         final DeferredResult<EncounterResponse> deferredResult = new DeferredResult<>();
 
         try {
-            logger.debug("Create encounter. " + encounterBundle.getContent());
+            logger.debug(String.format("Create encounter for patient (healthId) %s (encounter-content) %s", healthId, encounterBundle.getContent()));
             encounterBundle.setHealthId(healthId);
             Observable<EncounterResponse> encounterResponse = patientEncounterService.ensureCreated(encounterBundle,
                     userInfo);
 
             encounterResponse.subscribe(encounterSaveSuccessCallback(deferredResult), errorCallback(deferredResult));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.debug(e.getMessage());
             deferredResult.setErrorResult(e);
         }
         return deferredResult;
@@ -81,7 +81,7 @@ public class PatientEncounterController extends ShrController {
             encounterResponseObservable.subscribe(encounterSaveSuccessCallback(deferredResult), errorCallback(deferredResult));
 
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.debug(e.getMessage());
             deferredResult.setErrorResult(e);
         }
         return deferredResult;
@@ -94,7 +94,7 @@ public class PatientEncounterController extends ShrController {
             final HttpServletRequest request,
             @PathVariable final String healthId,
             @RequestParam(value = "updatedSince", required = false) String updatedSince) {
-        logger.debug("Find all encounters by health id: " + healthId);
+        logger.debug(String.format("Find all encounters by health id: %s", healthId));
         final UserInfo userInfo = getUserInfo();
         logAccessDetails(userInfo, String.format("Find all encounters of patient (healthId) %s", healthId));
         final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<>();
@@ -133,7 +133,7 @@ public class PatientEncounterController extends ShrController {
                 }
             });
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.debug(e.getMessage());
             deferredResult.setErrorResult(e);
         }
         return deferredResult;
@@ -157,7 +157,7 @@ public class PatientEncounterController extends ShrController {
                  @Override
                  public void call(EncounterBundle encounterBundle) {
                      if (encounterBundle != null) {
-                         logger.debug(encounterBundle.toString());
+                         logger.debug(String.format("Encounter bundles: %s", encounterBundle.toString()));
                          if ((isRestrictedAccess == null || isRestrictedAccess) && isConfidentialEncounter(encounterBundle)) {
                              deferredResult.setErrorResult(new Forbidden(format("Access is denied to user %s for encounter %s",
                                      userInfo.getProperties().getId(), encounterId)));
@@ -176,7 +176,7 @@ public class PatientEncounterController extends ShrController {
                 }
             });
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.debug(e.getMessage());
             deferredResult.setErrorResult(e);
         }
         return deferredResult;

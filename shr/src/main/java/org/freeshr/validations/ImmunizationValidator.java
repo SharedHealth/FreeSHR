@@ -16,7 +16,8 @@ import static org.freeshr.validations.ValidationMessages.INVALID_DOSAGE_QUANTITY
 
 @Component
 public class ImmunizationValidator implements Validator<AtomEntry<? extends Resource>> {
-    private static final Logger LOG = LoggerFactory.getLogger(ImmunizationValidator.class);
+
+    private static final Logger logger = LoggerFactory.getLogger(ImmunizationValidator.class);
     public static final String DOSE_QUANTITY = "doseQuantity";
     private DoseQuantityValidator doseQuantityValidator;
     private UrlValidator urlValidator;
@@ -47,7 +48,7 @@ public class ImmunizationValidator implements Validator<AtomEntry<? extends Reso
         ConceptLocator.ValidationResult validationResult = doseQuantityValidator.validate(doseQuantity);
         if (null == validationResult) return validationMessages;
 
-        LOG.info("Medication-Prescription DosageQuantity Code is invalid.");
+        logger.debug("Medication-Prescription DosageQuantity Code is invalid.");
 
         validationMessages.add(new ValidationMessage(null,
                 ResourceValidator.INVALID, atomEntry.getId(),

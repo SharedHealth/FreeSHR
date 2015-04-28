@@ -17,7 +17,7 @@ public class ClientAuthentication {
                 isInvalidToken(userInfo, token) ||
                 isInvalidClient(userInfo, userAuthInfo) ||
                 isInvalidEmail(userInfo, userAuthInfo)) {
-            logger.error(String.format("Token %s doesn't belong to client %s with email %s", token, userAuthInfo.getClientId(), userAuthInfo.getEmail()));
+            logger.debug(String.format("Token %s doesn't belong to client %s with email %s", token, userAuthInfo.getClientId(), userAuthInfo.getEmail()));
             throw new AuthenticationException(exceptionMessage);
         }
         return true;

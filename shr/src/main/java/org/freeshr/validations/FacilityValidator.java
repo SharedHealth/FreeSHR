@@ -40,14 +40,14 @@ public class FacilityValidator implements Validator<AtomFeed> {
         AtomEntry encounterEntry = identifyEncounterEntry(feed);
         ResourceReference serviceProvider = getServiceProviderRef(encounterEntry);
         if (serviceProvider == null) {
-            logger.info("Validating encounter as facility is not provided");
+            logger.debug("Validating encounter as facility is not provided");
             return validationMessages;
         }
         String facilityUrl = serviceProvider.getReferenceSimple();
         if (facilityUrl.isEmpty() || !isValidFacilityUrl(facilityUrl)) {
             validationMessages.add(buildValidationMessage(ResourceValidator.INVALID, encounterEntry.getId(),
                     INVALID_SERVICE_PROVIDER_URL, IssueSeverity.error));
-            logger.info("Encounter failed for invalid facility URL");
+            logger.debug("Encounter failed for invalid facility URL");
             return validationMessages;
         }
 
@@ -58,7 +58,7 @@ public class FacilityValidator implements Validator<AtomFeed> {
             return validationMessages;
         }
 
-        logger.info(String.format("Encounter validated for valid facility %s", facility.getFacilityId()));
+        logger.debug(String.format("Encounter validated for valid facility %s", facility.getFacilityId()));
         return validationMessages;
     }
 
@@ -91,6 +91,7 @@ public class FacilityValidator implements Validator<AtomFeed> {
                 new Func1<Throwable, Observable<Facility>>() {
                     @Override
                     public Observable<Facility> call(Throwable throwable) {
+                        logger.debug("Facility not found");
                         return Observable.just(null);
                     }
                 },
