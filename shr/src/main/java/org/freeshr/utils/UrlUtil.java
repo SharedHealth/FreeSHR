@@ -16,7 +16,7 @@ public class UrlUtil {
             uriBuilder.queryParam("updatedSince", URLEncoder.encode(DateUtil.toISOString(lastUpdateDate), "UTF-8"));
         }
         if (!org.apache.commons.lang3.StringUtils.isBlank(lastMarker)) {
-            uriBuilder.queryParam("lastMarker", lastMarker);
+            uriBuilder.queryParam("lastMarker", URLEncoder.encode(lastMarker, "UTF-8"));
         }
         return uriBuilder.build().toString();
     }

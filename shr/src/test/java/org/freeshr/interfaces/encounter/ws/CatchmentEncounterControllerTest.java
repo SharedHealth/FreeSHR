@@ -15,6 +15,7 @@ import org.freeshr.interfaces.encounter.ws.exceptions.BadRequest;
 import org.freeshr.interfaces.encounter.ws.exceptions.ErrorInfo;
 import org.freeshr.utils.Confidentiality;
 import org.freeshr.utils.DateUtil;
+import org.freeshr.utils.TimeUuidUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -66,7 +67,8 @@ public class CatchmentEncounterControllerTest {
     @Test
     public void shouldGetPagedEncountersForCatchment() throws Exception {
         int encounterFetchLimit = CatchmentEncounterService.getEncounterFetchLimit();
-        List<EncounterBundle> dummyEncounters = createEncounterBundles("hid01", 50, DateUtil.parseDate("2014-10-10"));
+        List<Date> encounterDates = getTimeInstances(DateUtil.parseDate("2014-10-10"), 50);
+        List<EncounterBundle> dummyEncounters = createEncounterBundles("hid01", 50, encounterDates);
 
         ArrayList<String> datasenseFacilityCodes = new ArrayList<>();
         datasenseFacilityCodes.add("1232");
@@ -87,11 +89,14 @@ public class CatchmentEncounterControllerTest {
         assertEquals(encounterFetchLimit, entries.size());
         String expectedNextUrl = response.getNextUrl();
         List<NameValuePair> params = URLEncodedUtils.parse(new URI(expectedNextUrl), "UTF-8");
-        assertEquals("e-20", params.get(1).getValue());
+        //generated time uuid for entry at the fetch limit.
+        String timeUUidFor20thEntry = TimeUuidUtil.uuidForDate(encounterDates.get(19)).toString();
+        assertEquals(timeUUidFor20thEntry, params.get(1).getValue());
 
+        String timeUUidFor22ndEntry = TimeUuidUtil.uuidForDate(encounterDates.get(21)).toString();
 
         encountersForCatchment = controller.findEncountersForCatchment(mockHttpServletRequest, "3026",
-                "2014-10-10", "e-22");
+                "2014-10-10", timeUUidFor22ndEntry);
         response = (EncounterSearchResponse) encountersForCatchment.getResult();
         entries = response.getEntries();
         assertEquals(18, entries.size());
@@ -100,7 +105,8 @@ public class CatchmentEncounterControllerTest {
     @Test
     public void shouldGetAtomFeed() throws Exception {
         int encounterFetchLimit = CatchmentEncounterService.getEncounterFetchLimit();
-        List<EncounterBundle> dummyEncounters = createEncounterBundles("hid01", 50, DateUtil.parseDate("2014-10-10"));
+        List<Date> encounterDates = getTimeInstances(DateUtil.parseDate("2014-10-10"), 50);
+        List<EncounterBundle> dummyEncounters = createEncounterBundles("hid01", 50, encounterDates);
 
         TokenAuthentication tokenAuthentication = tokenAuthentication();
         SecurityContextHolder.setContext(securityContext);
@@ -180,26 +186,35 @@ public class CatchmentEncounterControllerTest {
     }
 
 
-    private List<EncounterBundle> createEncounterBundles(String healthId, int size, Date startingFrom) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(startingFrom);
-        calendar.set(Calendar.HOUR, 0);
-        calendar.set(Calendar.MINUTE, 0);
+    private List<EncounterBundle> createEncounterBundles(String healthId, int size, List<Date> dates) {
 
         List<EncounterBundle> encounters = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             EncounterBundle encounter = new EncounterBundle();
             encounter.setEncounterId("e-" + (i + 1));
             encounter.setHealthId(healthId);
-            calendar.set(Calendar.SECOND, i);
-            encounter.setReceivedAt(calendar.getTime());
-            encounter.setUpdatedAt(calendar.getTime());
+            encounter.setReceivedAt(dates.get(i));
+            encounter.setUpdatedAt(dates.get(i));
             encounter.setEncounterContent("content-" + (i + 1));
             encounter.setPatientConfidentiality(Confidentiality.Normal);
             encounter.setEncounterConfidentiality(Confidentiality.Normal);
             encounters.add(encounter);
         }
         return encounters;
+    }
+
+    private List<Date> getTimeInstances(Date startingFrom, int size) {
+        List<Date> dates = new ArrayList<>();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(startingFrom);
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+
+        for (int i = 0; i < size; i++) {
+            calendar.set(Calendar.SECOND, i);
+            dates.add(calendar.getTime());
+        }
+        return dates;
     }
 
     @Test

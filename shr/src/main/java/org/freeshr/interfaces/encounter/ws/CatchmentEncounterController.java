@@ -150,7 +150,7 @@ public class CatchmentEncounterController extends ShrController {
         }
 
         EncounterBundle lastEncounter = requestResults.get(size - 1);
-        return UrlUtil.addLastUpdatedQueryParams(request, lastEncounter.getReceivedAt(), lastEncounter.getEncounterId());
+        return UrlUtil.addLastUpdatedQueryParams(request, lastEncounter.getReceivedAt(), lastEncounter.getEventId());
     }
 
     private String rollingFeedUrl(HttpServletRequest request, Date forDate) throws UnsupportedEncodingException {
@@ -211,7 +211,7 @@ public class CatchmentEncounterController extends ShrController {
     private int identifyLastMarker(String lastMarker, final List<EncounterBundle> encountersByCatchment) {
         int idx = 0;
         for (EncounterBundle encounterBundle : encountersByCatchment) {
-            if (encounterBundle.getEncounterId().equals(lastMarker)) {
+            if (encounterBundle.getEventId().equals(lastMarker)) {
                 return idx;
             }
             idx++;

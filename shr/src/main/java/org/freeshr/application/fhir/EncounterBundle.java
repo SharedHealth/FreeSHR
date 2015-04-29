@@ -7,6 +7,7 @@ import org.eclipse.persistence.oxm.annotations.XmlCDATA;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.utils.Confidentiality;
 import org.freeshr.utils.DateUtil;
+import org.freeshr.utils.TimeUuidUtil;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -85,6 +86,12 @@ public class EncounterBundle {
 
     public Date getReceivedAt() {
         return receivedAt;
+    }
+
+    @JsonIgnore
+    @XmlTransient
+    public String getEventId(){
+        return TimeUuidUtil.uuidForDate(updatedAt).toString();
     }
 
     @XmlTransient

@@ -53,7 +53,7 @@ public class EncounterFeedHelper {
         List<Entry> entryList = new ArrayList<Entry>();
         for (EncounterBundle encounter : encounters) {
             final Entry entry = new Entry();
-            entry.setId(encounter.getEncounterId());
+            entry.setId(encounter.getEventId());
             entry.setTitle("Encounter:" + encounter.getEncounterId());
 
             Link encLink = new Link();
