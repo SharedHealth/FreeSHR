@@ -1,6 +1,7 @@
 package org.freeshr.domain.service;
 
 import org.freeshr.application.fhir.EncounterBundle;
+import org.freeshr.events.EncounterEvent;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.domain.model.Requester;
@@ -71,6 +72,12 @@ public class PatientEncounterService {
                                                                       int limit) throws ExecutionException,
             InterruptedException {
         return encounterRepository.findEncountersForPatient(healthId, sinceDate, limit);
+    }
+
+    public Observable<List<EncounterEvent>> findEncounterFeedForPatient(String healthId, Date sinceDate,
+                                                                        int limit) throws ExecutionException,
+            InterruptedException {
+        return encounterRepository.findEncounterFeedForPatient(healthId, sinceDate, limit);
     }
 
     public Observable<EncounterResponse> ensureUpdated(final EncounterBundle encounterBundle, final UserInfo userInfo) throws ExecutionException, InterruptedException {

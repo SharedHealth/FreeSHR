@@ -1,7 +1,7 @@
 package org.freeshr.interfaces.encounter.ws;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.freeshr.application.fhir.EncounterBundle;
+import org.freeshr.events.EncounterEvent;
 
 import java.util.List;
 
@@ -12,9 +12,9 @@ public class EncounterSearchResponse {
     private String title = "Encounters";
     private String nextUrl;
     private String prevUrl;
-    private List<EncounterBundle> entries;
+    private List<EncounterEvent> entries;
 
-    public EncounterSearchResponse(String requestUrl, List<EncounterBundle> entries) {
+    public EncounterSearchResponse(String requestUrl, List<EncounterEvent> entries) {
         this.requestUrl = requestUrl;
         this.entries = entries;
     }
@@ -27,7 +27,7 @@ public class EncounterSearchResponse {
         return prevUrl;
     }
 
-    public List<EncounterBundle> getEntries() {
+    public List<EncounterEvent> getEntries() {
         return entries;
     }
 

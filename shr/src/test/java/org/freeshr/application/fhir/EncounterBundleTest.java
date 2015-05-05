@@ -1,9 +1,7 @@
 package org.freeshr.application.fhir;
 
-import org.joda.time.DateTime;
+import org.freeshr.utils.Confidentiality;
 import org.junit.Test;
-
-import java.util.Date;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -11,25 +9,50 @@ import static org.junit.Assert.assertTrue;
 public class EncounterBundleTest {
 
     @Test
-    public void encounterBundleIsEditedIfUpdatedAfterReceived() throws Exception {
+    public void shouldReturnEncounterConfidentiality() throws Exception {
         EncounterBundle encounterBundle = new EncounterBundle();
-        DateTime now= DateTime.now();
-        Date fiveSecondsLater = now.plusSeconds(5).toDate();
-        encounterBundle.setReceivedAt(now.toDate());
-        encounterBundle.setUpdatedAt(fiveSecondsLater);
+        encounterBundle.setPatientConfidentiality(Confidentiality.Normal);
 
-        assertTrue(encounterBundle.isEdited());
+        encounterBundle.setEncounterConfidentiality(Confidentiality.Unrestricted);
+        assertFalse(encounterBundle.isConfidentialEncounter());
 
+        encounterBundle.setEncounterConfidentiality(Confidentiality.Low);
+        assertFalse(encounterBundle.isConfidentialEncounter());
+
+        encounterBundle.setEncounterConfidentiality(Confidentiality.Moderate);
+        assertFalse(encounterBundle.isConfidentialEncounter());
+
+        encounterBundle.setEncounterConfidentiality(Confidentiality.Normal);
+        assertFalse(encounterBundle.isConfidentialEncounter());
+
+        encounterBundle.setEncounterConfidentiality(Confidentiality.Restricted);
+        assertTrue(encounterBundle.isConfidentialEncounter());
+
+        encounterBundle.setEncounterConfidentiality(Confidentiality.VeryRestricted);
+        assertTrue(encounterBundle.isConfidentialEncounter());
     }
 
     @Test
-    public void encounterBundleIsNotIfJustReceived() throws Exception {
+    public void shouldReturnEncounterConfidentialityConsideringPatientConfidentiality() throws Exception {
         EncounterBundle encounterBundle = new EncounterBundle();
-        Date now= DateTime.now().toDate();
-        encounterBundle.setReceivedAt(now);
-        encounterBundle.setUpdatedAt(now);
+        encounterBundle.setEncounterConfidentiality(Confidentiality.Normal);
 
-        assertFalse(encounterBundle.isEdited());
+        encounterBundle.setPatientConfidentiality(Confidentiality.Unrestricted);
+        assertFalse(encounterBundle.isConfidentialEncounter());
 
+        encounterBundle.setPatientConfidentiality(Confidentiality.Low);
+        assertFalse(encounterBundle.isConfidentialEncounter());
+
+        encounterBundle.setPatientConfidentiality(Confidentiality.Moderate);
+        assertFalse(encounterBundle.isConfidentialEncounter());
+
+        encounterBundle.setPatientConfidentiality(Confidentiality.Normal);
+        assertFalse(encounterBundle.isConfidentialEncounter());
+
+        encounterBundle.setPatientConfidentiality(Confidentiality.Restricted);
+        assertTrue(encounterBundle.isConfidentialEncounter());
+
+        encounterBundle.setPatientConfidentiality(Confidentiality.VeryRestricted);
+        assertTrue(encounterBundle.isConfidentialEncounter());
     }
 }

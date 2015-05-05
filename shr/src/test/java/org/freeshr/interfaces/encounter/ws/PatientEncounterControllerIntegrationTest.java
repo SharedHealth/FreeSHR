@@ -1,12 +1,12 @@
 package org.freeshr.interfaces.encounter.ws;
 
 import com.google.common.base.Charsets;
-import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
+import org.freeshr.events.EncounterEvent;
 import org.freeshr.interfaces.encounter.ws.exceptions.PreconditionFailed;
 import org.freeshr.interfaces.encounter.ws.exceptions.UnProcessableEntity;
 import org.freeshr.utils.Confidentiality;
@@ -249,9 +249,9 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_ATOM_XML))
                 .andExpect(status().isOk())
-                .andExpect(request().asyncResult(hasEncountersOfSize(3)));
+                .andExpect(request().asyncResult(hasEncounterEventsOfSize(3)));
     }
 
     @Test
@@ -260,7 +260,6 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
                 .content(asString("xmls/encounters/encounter_normal_with_normal_patient.xml")))
@@ -272,8 +271,8 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(request().asyncResult(hasEncountersOfSize(1)))
+                .accept(MediaType.APPLICATION_ATOM_XML))
+                .andExpect(request().asyncResult(hasEncounterEventsOfSize(1)))
                 .andExpect(request().asyncResult(assertConfidentiality(Normal, Normal)));
     }
 
@@ -283,7 +282,7 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_ATOM_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
                 .content(asString("xmls/encounters/encounter_confidentiality_not_specified_with_normal_patient.xml")))
@@ -295,9 +294,9 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_ATOM_XML))
                 .andExpect(status().isOk())
-                .andExpect(request().asyncResult(hasEncountersOfSize(1)))
+                .andExpect(request().asyncResult(hasEncounterEventsOfSize(1)))
                 .andExpect(request().asyncResult(assertConfidentiality(Normal, Normal)));
     }
 
@@ -315,9 +314,9 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_ATOM_XML))
                 .andExpect(status().isOk())
-                .andExpect(request().asyncResult(hasEncountersOfSize(0)));
+                .andExpect(request().asyncResult(hasEncounterEventsOfSize(0)));
     }
 
     private BaseMatcher<EncounterSearchResponse> assertConfidentiality(final Confidentiality encounterConfidentiality, final
@@ -329,9 +328,9 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
 
             @Override
             public boolean matches(Object item) {
-                EncounterBundle encounterBundle = ((EncounterSearchResponse) item).getEntries().get(0);
-                return encounterBundle.getEncounterConfidentiality().equals(encounterConfidentiality) &&
-                        encounterBundle.getPatientConfidentiality().equals(patientConfidentiality);
+                EncounterEvent encounterEvent = ((EncounterSearchResponse) item).getEntries().get(0);
+                return encounterEvent.getEncounterBundle().getEncounterConfidentiality().equals(encounterConfidentiality) &&
+                        encounterEvent.getEncounterBundle().getPatientConfidentiality().equals(patientConfidentiality);
             }
         };
     }

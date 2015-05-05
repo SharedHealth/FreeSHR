@@ -67,7 +67,7 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_ATOM_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
                 .content(asString("xmls/encounters/encounter_to_save.xml")))
@@ -91,7 +91,7 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_ATOM_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
                 .content(asString("xmls/encounters/encounter_to_save.xml")))
@@ -115,7 +115,7 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_ATOM_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
                 .content(asString("xmls/encounters/encounter_to_save.xml")))
@@ -138,7 +138,7 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_ATOM_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
                 .content(asString("xmls/encounters/encounter_to_save.xml")))
@@ -163,9 +163,9 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_ATOM_XML))
                 .andExpect(status().isOk())
-                .andExpect(request().asyncResult(hasEncountersOfSize(1)));
+                .andExpect(request().asyncResult(hasEncounterEventsOfSize(1)));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/patients/" + VALID_HEALTH_ID + "/encounters/" + ENCOUNTER_ID)
                 .header(AUTH_TOKEN_KEY, validAccessToken)
@@ -193,9 +193,9 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_ATOM_XML))
                 .andExpect(status().isOk())
-                .andExpect(request().asyncResult(hasEncountersOfSize(0)));
+                .andExpect(request().asyncResult(hasEncounterEventsOfSize(0)));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/patients/" + VALID_HEALTH_ID + "/encounters/" + ENCOUNTER_ID)
                 .header(AUTH_TOKEN_KEY, validAccessToken)
@@ -223,9 +223,9 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_ATOM_XML))
                 .andExpect(status().isOk())
-                .andExpect(request().asyncResult(hasEncountersOfSize(1)));
+                .andExpect(request().asyncResult(hasEncounterEventsOfSize(1)));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/patients/" + VALID_HEALTH_ID + "/encounters/" + ENCOUNTER_ID)
                 .header(AUTH_TOKEN_KEY, validAccessToken)
@@ -253,9 +253,9 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_ATOM_XML))
                 .andExpect(status().isOk())
-                .andExpect(request().asyncResult(hasEncountersOfSize(0)));
+                .andExpect(request().asyncResult(hasEncounterEventsOfSize(0)));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/patients/" + VALID_HEALTH_ID + "/encounters/" + ENCOUNTER_ID)
                 .header(AUTH_TOKEN_KEY, validAccessToken)
@@ -283,9 +283,9 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_ATOM_XML))
                 .andExpect(status().isOk())
-                .andExpect(request().asyncResult(hasEncountersOfSize(1)));
+                .andExpect(request().asyncResult(hasEncounterEventsOfSize(1)));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/patients/" + VALID_HEALTH_ID + "/encounters/" + ENCOUNTER_ID)
                 .header(AUTH_TOKEN_KEY, validAccessToken)
@@ -313,9 +313,9 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_ATOM_XML))
                 .andExpect(status().isOk())
-                .andExpect(request().asyncResult(hasEncountersOfSize(1)));
+                .andExpect(request().asyncResult(hasEncounterEventsOfSize(1)));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/patients/" + VALID_HEALTH_ID + "/encounters/" + ENCOUNTER_ID)
                 .header(AUTH_TOKEN_KEY, validAccessToken)
@@ -343,9 +343,9 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_ATOM_XML))
                 .andExpect(status().isOk())
-                .andExpect(request().asyncResult(hasEncountersOfSize(1)));
+                .andExpect(request().asyncResult(hasEncounterEventsOfSize(1)));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/patients/" + VALID_HEALTH_ID + "/encounters/" + ENCOUNTER_ID)
                 .header(AUTH_TOKEN_KEY, validAccessToken)
@@ -373,9 +373,9 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_ATOM_XML))
                 .andExpect(status().isOk())
-                .andExpect(request().asyncResult(hasEncountersOfSize(1)));
+                .andExpect(request().asyncResult(hasEncounterEventsOfSize(1)));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/patients/" + VALID_HEALTH_ID + "/encounters/" + ENCOUNTER_ID)
                 .header(AUTH_TOKEN_KEY, validAccessToken)
@@ -404,7 +404,7 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_ATOM_XML))
                 .andExpect(request().asyncResult(isForbidden()));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/patients/" + otherHealthId + "/encounters/" + ENCOUNTER_ID)
@@ -433,9 +433,9 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_ATOM_XML))
                 .andExpect(status().isOk())
-                .andExpect(request().asyncResult(hasEncountersOfSize(1)));
+                .andExpect(request().asyncResult(hasEncounterEventsOfSize(1)));
     }
 
     @Test
@@ -457,7 +457,7 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_ATOM_XML))
                 .andExpect(status().isOk())
                 .andExpect(request().asyncResult(isForbidden()));
     }

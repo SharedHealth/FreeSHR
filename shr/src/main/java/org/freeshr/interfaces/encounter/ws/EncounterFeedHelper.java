@@ -3,7 +3,7 @@ package org.freeshr.interfaces.encounter.ws;
 
 import com.sun.syndication.feed.atom.*;
 import org.apache.commons.lang3.StringUtils;
-import org.freeshr.application.fhir.EncounterBundle;
+import org.freeshr.events.EncounterEvent;
 import org.freeshr.utils.DateUtil;
 import org.freeshr.utils.atomfeed.FeedBuilder;
 
@@ -45,35 +45,34 @@ public class EncounterFeedHelper {
         return getLink(requestUrl, LINK_TYPE_SELF, ATOM_MEDIA_TYPE);
     }
 
-    private Date newestEventDate(List<EncounterBundle> encounters) {
-        return (encounters.size() > 0) ? DateUtil.parseDate(encounters.get(0).getUpdatedDateISOString()) : null;
+    private Date newestEventDate(List<EncounterEvent> encounterEvents) {
+        return (encounterEvents.size() > 0) ? DateUtil.parseDate(encounterEvents.get(0).getUpdatedDateISOString()) : null;
     }
 
-    private List<Entry> getEntries(List<EncounterBundle> encounters) {
+    private List<Entry> getEntries(List<EncounterEvent> encounterEvents) {
         List<Entry> entryList = new ArrayList<Entry>();
-        for (EncounterBundle encounter : encounters) {
+        for (EncounterEvent encounterEvent : encounterEvents) {
             final Entry entry = new Entry();
-            entry.setId(encounter.getEventId());
-            entry.setTitle("Encounter:" + encounter.getEncounterId());
+            entry.setId(encounterEvent.getEventId());
+            entry.setTitle("Encounter:" + encounterEvent.getEncounterId());
 
             Link encLink = new Link();
             encLink.setRel(LINK_TYPE_VIA);
             encLink.setType(APPLICATION_XML);
-            encLink.setHref(encounter.getLink());
+            encLink.setHref(encounterEvent.getLink());
             entry.setAlternateLinks(Arrays.asList(encLink));
 
-
-            entry.setUpdated(encounter.getUpdatedAt());
-            entry.setContents(generateContents(encounter));
-            entry.setCategories(getCategories(encounter));
+            entry.setUpdated(encounterEvent.getUpdatedAt());
+            entry.setContents(generateContents(encounterEvent));
+            entry.setCategories(getCategories(encounterEvent));
             entryList.add(entry);
         }
         return entryList;
     }
 
-    private List<Category> getCategories(EncounterBundle encounter) {
+    private List<Category> getCategories(EncounterEvent encounterEvent) {
         List<Category> categories = new ArrayList<>();
-        for (String categoryTerm : encounter.getCategories()) {
+        for (String categoryTerm : encounterEvent.getCategories()) {
             Category category = new Category();
             category.setTerm(categoryTerm);
             categories.add(category);
@@ -141,10 +140,10 @@ public class EncounterFeedHelper {
         return links;
     }
 
-    private List<Content> generateContents(EncounterBundle encounter) {
+    private List<Content> generateContents(EncounterEvent encounterEvent) {
         Content content = new Content();
         content.setType(ATOMFEED_MEDIA_TYPE);
-        content.setValue(wrapInCDATA(encounter.getContent()));
+        content.setValue(wrapInCDATA(encounterEvent.getContent()));
         return Arrays.asList(content);
     }
 

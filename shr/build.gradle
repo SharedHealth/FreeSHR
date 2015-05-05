@@ -59,7 +59,7 @@ dependencies {
             libraries.rome, libraries.rome_tools, libraries.time_uuid,
             libraries.spring_security, libraries.spring_web, libraries.eclipse_moxy,
             libraries.spring_context_support, libraries.ehcache_core, libraries.commons_lang,
-            libraries.joda_time, libraries.lz4
+            libraries.lambdaj, libraries.joda_time, libraries.lz4
 
     compile(libraries.spring_boot_security) {
         exclude group: 'ch.qos.logback', module: "logback-classic"

@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.domain.service.PatientEncounterService;
+import org.freeshr.events.EncounterEvent;
 import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
 import org.freeshr.interfaces.encounter.ws.exceptions.ResourceNotFound;
@@ -24,6 +25,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import static ch.lambdaj.Lambda.extract;
+import static ch.lambdaj.Lambda.on;
 import static java.lang.String.format;
 import static org.freeshr.infrastructure.security.AccessFilter.*;
 
@@ -89,8 +92,54 @@ public class PatientEncounterController extends ShrController {
 
     @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER', 'ROLE_SHR_PATIENT', 'ROLE_SHR System Admin')")
     @RequestMapping(value = "/{healthId}/encounters", method = RequestMethod.GET,
-            produces = {"application/json", "application/atom+xml"})
-    public DeferredResult<EncounterSearchResponse> findEncountersForPatient(
+            produces = {"application/json"})
+    public DeferredResult<List<EncounterBundle>> findEncountersForPatient(
+            final HttpServletRequest request,
+            @PathVariable final String healthId,
+            @RequestParam(value = "updatedSince", required = false) String updatedSince) {
+        logger.debug(String.format("Find all encounters by health id: %s", healthId));
+        final UserInfo userInfo = getUserInfo();
+        logAccessDetails(userInfo, String.format("Find all encounters of patient (healthId) %s", healthId));
+        final DeferredResult<List<EncounterBundle>> deferredResult = new DeferredResult<>();
+
+        try {
+            final Boolean isRestrictedAccess = isAccessRestrictedToEncounterFetchForPatient(healthId, userInfo);
+            if (isRestrictedAccess == null) {
+                deferredResult.setErrorResult(new Forbidden(String.format("Access is denied to user %s for patient %s", userInfo.getProperties().getId(), healthId)));
+                return deferredResult;
+            }
+            final Date requestedDate = getRequestedDate(updatedSince);
+            Observable<List<EncounterBundle>> encountersForPatient =
+                    patientEncounterService.findEncountersForPatient(healthId, requestedDate, 200);
+            encountersForPatient.subscribe(new Action1<List<EncounterBundle>>() {
+                @Override
+                public void call(List<EncounterBundle> encounterBundles) {
+                    if (isRestrictedAccess && isConfidentialPatient(encounterBundles)) {
+                        deferredResult.setErrorResult(new Forbidden(format("Access is denied to user %s for patient %s", userInfo.getProperties().getId(), healthId)));
+                    } else {
+                        encounterBundles = filterEncounterBundles(isRestrictedAccess, encounterBundles);
+                        logger.debug(encounterBundles.toString());
+                        deferredResult.setResult(encounterBundles);
+                    }
+
+                }
+            }, new Action1<Throwable>() {
+                @Override
+                public void call(Throwable throwable) {
+                    deferredResult.setErrorResult(throwable);
+                }
+            });
+        } catch (Exception e) {
+            logger.debug(e.getMessage());
+            deferredResult.setErrorResult(e);
+        }
+        return deferredResult;
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER', 'ROLE_SHR_PATIENT', 'ROLE_SHR System Admin')")
+    @RequestMapping(value = "/{healthId}/encounters", method = RequestMethod.GET,
+            produces = {"application/atom+xml"})
+    public DeferredResult<EncounterSearchResponse> findEncounterFeedForPatient(
             final HttpServletRequest request,
             @PathVariable final String healthId,
             @RequestParam(value = "updatedSince", required = false) String updatedSince) {
@@ -106,18 +155,20 @@ public class PatientEncounterController extends ShrController {
                 return deferredResult;
             }
             final Date requestedDate = getRequestedDate(updatedSince);
-            Observable<List<EncounterBundle>> encountersForPatient =
-                    patientEncounterService.findEncountersForPatient(healthId, requestedDate, 200);
-            encountersForPatient.subscribe(new Action1<List<EncounterBundle>>() {
+            Observable<List<EncounterEvent>> encounterEventsForPatient =
+                    patientEncounterService.findEncounterFeedForPatient(healthId, requestedDate, 200);
+            encounterEventsForPatient.subscribe(new Action1<List<EncounterEvent>>() {
                 @Override
-                public void call(List<EncounterBundle> encounterBundles) {
+                public void call(List<EncounterEvent> encounterEvents) {
                     try {
+
+                        List<EncounterBundle> encounterBundles = extract(encounterEvents, on(EncounterEvent.class).getEncounterBundle());
                         if (isRestrictedAccess && isConfidentialPatient(encounterBundles)) {
                             deferredResult.setErrorResult(new Forbidden(format("Access is denied to user %s for patient %s", userInfo.getProperties().getId(), healthId)));
                         } else {
-                            encounterBundles = filterEncounters(isRestrictedAccess, encounterBundles);
+                            encounterEvents = filterEncounterEvents(isRestrictedAccess, encounterEvents);
                             EncounterSearchResponse searchResponse = new EncounterSearchResponse(
-                                    UrlUtil.addLastUpdatedQueryParams(request, requestedDate, null), encounterBundles);
+                                    UrlUtil.addLastUpdatedQueryParams(request, requestedDate, null), encounterEvents);
                             logger.debug(searchResponse.toString());
                             deferredResult.setResult(searchResponse);
                         }
@@ -158,7 +209,7 @@ public class PatientEncounterController extends ShrController {
                  public void call(EncounterBundle encounterBundle) {
                      if (encounterBundle != null) {
                          logger.debug(String.format("Encounter bundles: %s", encounterBundle.toString()));
-                         if ((isRestrictedAccess == null || isRestrictedAccess) && isConfidentialEncounter(encounterBundle)) {
+                         if ((isRestrictedAccess == null || isRestrictedAccess) && encounterBundle.isConfidentialEncounter()) {
                              deferredResult.setErrorResult(new Forbidden(format("Access is denied to user %s for encounter %s",
                                      userInfo.getProperties().getId(), encounterId)));
                          } else {

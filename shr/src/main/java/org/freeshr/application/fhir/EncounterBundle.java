@@ -7,12 +7,10 @@ import org.eclipse.persistence.oxm.annotations.XmlCDATA;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.utils.Confidentiality;
 import org.freeshr.utils.DateUtil;
-import org.freeshr.utils.TimeUuidUtil;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.ArrayList;
 import java.util.Date;
 
 @XmlRootElement(name = "encounter")
@@ -28,10 +26,6 @@ public class EncounterBundle {
     @XmlTransient
     private EncounterContent encounterContent;
 
-    private ArrayList<String> categories = new ArrayList<String>(){{ add("encounter"); }};
-
-    private String title = "Encounter";
-
     @JsonIgnore
     @XmlTransient
     private Confidentiality encounterConfidentiality;
@@ -40,7 +34,6 @@ public class EncounterBundle {
     @XmlTransient
     private Confidentiality patientConfidentiality;
 
-    //TODO : change on encounter update.
     @JsonIgnore
     @XmlTransient
     private int contentVersion = 1;
@@ -88,12 +81,6 @@ public class EncounterBundle {
         return receivedAt;
     }
 
-    @JsonIgnore
-    @XmlTransient
-    public String getEventId(){
-        return TimeUuidUtil.uuidForDate(updatedAt).toString();
-    }
-
     @XmlTransient
     public EncounterContent getEncounterContent() {
         return encounterContent;
@@ -114,22 +101,6 @@ public class EncounterBundle {
     @XmlElement(name = "link")
     public String getLink() {
         return String.format("/patients/%s/encounters/%s", getHealthId(), getEncounterId());
-    }
-
-    @JsonProperty("title")
-    public String getTitle() {
-        return title + ":" + getEncounterId();
-    }
-
-    public ArrayList<String> getCategories() {
-        if(isEdited()){
-            categories.add(String.format("Updated since : %s", DateUtil.toISOString(receivedAt) ));
-        };
-        return categories;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public Confidentiality getEncounterConfidentiality() {
@@ -180,8 +151,11 @@ public class EncounterBundle {
         this.updatedAt = updatedDate;
     }
 
-    public boolean isEdited(){
-        return updatedAt.after(receivedAt);
+    @JsonIgnore
+    @XmlTransient
+    public boolean isConfidentialEncounter() {
+        return this.getEncounterConfidentiality().ordinal() > Confidentiality.Normal.ordinal()
+                || this.getPatientConfidentiality().ordinal() > Confidentiality.Normal.ordinal();
     }
 
     @Override
@@ -190,9 +164,8 @@ public class EncounterBundle {
                 "encounterId='" + encounterId + '\'' +
                 ", healthId='" + healthId + '\'' +
                 ", receivedAt='" + receivedAt + '\'' +
+                ", updatedAt='" + updatedAt + '\'' +
                 ", encounterContent=" + encounterContent +
-                ", categories=" + categories.toString() +
-                ", title='" + title + '\'' +
                 '}';
     }
 

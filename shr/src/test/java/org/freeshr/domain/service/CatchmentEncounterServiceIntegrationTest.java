@@ -1,12 +1,12 @@
 package org.freeshr.domain.service;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Address;
+import org.freeshr.events.EncounterEvent;
 import org.freeshr.infrastructure.persistence.FacilityRepository;
 import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.infrastructure.security.UserProfile;
@@ -26,6 +26,8 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
+import static ch.lambdaj.Lambda.extract;
+import static ch.lambdaj.Lambda.on;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.util.Arrays.asList;
 import static org.freeshr.data.EncounterBundleData.withNewEncounterForPatient;
@@ -111,10 +113,10 @@ public class CatchmentEncounterServiceIntegrationTest {
         facilityRepository.save(facility).toBlocking().first();
         patientEncounterService.ensureCreated(withValidEncounter(), getUserInfo(clientId, email, securityToken)).toBlocking().first();
 
-        List<EncounterBundle> encounterBundles = catchmentEncounterService.findEncountersForFacilityCatchment("305610",
+        List<EncounterEvent> encounterEvents = catchmentEncounterService.findEncounterFeedForFacilityCatchment("305610",
                 date, 20).toBlocking().first();
-        assertEquals(1, encounterBundles.size());
-        assertEquals(VALID_HEALTH_ID, encounterBundles.iterator().next().getHealthId());
+        assertEquals(1, encounterEvents.size());
+        assertEquals(VALID_HEALTH_ID, encounterEvents.iterator().next().getHealthId());
     }
 
     @Test
@@ -135,27 +137,19 @@ public class CatchmentEncounterServiceIntegrationTest {
         assertTrue(patientEncounterService.ensureCreated(withNewEncounterForPatient(VALID_HEALTH_ID_NEW), getUserInfo(clientId, email, securityToken)).toBlocking().first()
                 .isSuccessful());
 
-        assertEquals(1, patientEncounterService.findEncountersForPatient(VALID_HEALTH_ID, null,
+        assertEquals(1, patientEncounterService.findEncounterFeedForPatient(VALID_HEALTH_ID, null,
                 200).toBlocking().first().size());
 
-        List<EncounterBundle> encounterBundles = catchmentEncounterService.findEncountersForFacilityCatchment(
+        List<EncounterEvent> encounterEvents = catchmentEncounterService.findEncounterFeedForFacilityCatchment(
                 "3056", date, 10).toBlocking().first();
-        assertEquals(2, encounterBundles.size());
+        assertEquals(2, encounterEvents.size());
 
-        ArrayList<String> healthIds = extractListOfHealthIds(encounterBundles);
+        List<String> healthIds = extract(encounterEvents, on(EncounterEvent.class).getHealthId());
         assertEquals(2, healthIds.size());
         assertTrue(healthIds.containsAll(Arrays.asList(VALID_HEALTH_ID, VALID_HEALTH_ID)));
     }
 
-    private ArrayList<String> extractListOfHealthIds(List<EncounterBundle> encounterBundles) {
-        ArrayList<String> healthIds = new ArrayList<>();
-        for (EncounterBundle encounterBundle : encounterBundles) {
-            healthIds.add(encounterBundle.getHealthId());
-        }
-        return healthIds;
-    }
-
-    private UserInfo getUserInfo(String clientId, String email, String securityToken) {
+       private UserInfo getUserInfo(String clientId, String email, String securityToken) {
         return new UserInfo(clientId, "foo", email, 1, true,
                 securityToken, new ArrayList<String>(), asList(new UserProfile("facility", "10000069", asList("3026"))));
     }
@@ -164,6 +158,8 @@ public class CatchmentEncounterServiceIntegrationTest {
     public void teardown() {
         cqlOperations.execute("truncate encounter;");
         cqlOperations.execute("truncate patient;");
+        cqlOperations.execute("truncate enc_by_catchment;");
+        cqlOperations.execute("truncate enc_by_patient;");
         cqlOperations.execute("truncate FACILITIES;");
     }
 }

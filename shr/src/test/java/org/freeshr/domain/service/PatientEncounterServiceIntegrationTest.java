@@ -9,6 +9,7 @@ import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
+import org.freeshr.events.EncounterEvent;
 import org.freeshr.infrastructure.persistence.FacilityRepository;
 import org.freeshr.infrastructure.persistence.PatientRepository;
 import org.freeshr.infrastructure.security.UserInfo;
@@ -187,14 +188,14 @@ public class PatientEncounterServiceIntegrationTest {
         patientTestSubscriber.awaitTerminalEvent();
         assertValidPatient(patientTestSubscriber.getOnNextEvents().get(0));
 
-        Observable<List<EncounterBundle>> encountersForPatientObservable = patientEncounterService.findEncountersForPatient(VALID_HEALTH_ID, null, 200);
-        TestSubscriber<List<EncounterBundle>> encounterBundleTestSubscriber = new TestSubscriber<>();
-        encountersForPatientObservable.subscribe(encounterBundleTestSubscriber);
+        Observable<List<EncounterEvent>> encounterEventsForPatientObservable = patientEncounterService.findEncounterFeedForPatient(VALID_HEALTH_ID, null, 200);
+        TestSubscriber<List<EncounterEvent>> encounterBundleTestSubscriber = new TestSubscriber<>();
+        encounterEventsForPatientObservable.subscribe(encounterBundleTestSubscriber);
         encounterBundleTestSubscriber.awaitTerminalEvent();
 
-        List<EncounterBundle> encounterBundles = encounterBundleTestSubscriber.getOnNextEvents().get(0);
-        assertThat(encounterBundles.size(), is(1));
-        assertThat(encounterBundles.get(0).getHealthId(), is(VALID_HEALTH_ID));
+        List<EncounterEvent> encounterEvents = encounterBundleTestSubscriber.getOnNextEvents().get(0);
+        assertThat(encounterEvents.size(), is(1));
+        assertThat(encounterEvents.get(0).getHealthId(), is(VALID_HEALTH_ID));
     }
 
     @Test
@@ -255,6 +256,8 @@ public class PatientEncounterServiceIntegrationTest {
     public void teardown() {
         cqlOperations.execute("truncate encounter;");
         cqlOperations.execute("truncate patient;");
+        cqlOperations.execute("truncate enc_by_catchment;");
+        cqlOperations.execute("truncate enc_by_patient;");
         cqlOperations.execute("truncate FACILITIES;");
     }
 }

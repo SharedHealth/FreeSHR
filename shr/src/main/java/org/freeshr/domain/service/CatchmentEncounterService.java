@@ -3,6 +3,7 @@ package org.freeshr.domain.service;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.domain.model.Catchment;
+import org.freeshr.events.EncounterEvent;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,11 @@ public class CatchmentEncounterService {
     public Observable<List<EncounterBundle>> findEncountersForFacilityCatchment(final String catchment,
                                                                                 final Date sinceDate, final int limit) {
         return encounterRepository.findEncountersForCatchment(new Catchment(catchment), sinceDate, limit);
+    }
+
+    public Observable<List<EncounterEvent>> findEncounterFeedForFacilityCatchment(final String catchment,
+                                                                                  final Date sinceDate, final int limit) {
+        return encounterRepository.findEncounterFeedForCatchment(new Catchment(catchment), sinceDate, limit);
     }
 
     public static int getEncounterFetchLimit() {

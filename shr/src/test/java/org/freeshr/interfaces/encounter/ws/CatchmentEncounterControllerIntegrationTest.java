@@ -65,13 +65,13 @@ public class CatchmentEncounterControllerIntegrationTest extends APIIntegrationT
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
                 .accept(MediaType.APPLICATION_ATOM_XML))
-                .andExpect(request().asyncResult(hasEncountersOfSize(6)));
+                .andExpect(request().asyncResult(hasEncounterEventsOfSize(6)));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/catchments/" + "30261801" + "/encounters?updatedSince=" + today)
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(request().asyncResult(hasEncountersOfSize(3)));
+                .accept(MediaType.APPLICATION_ATOM_XML))
+                .andExpect(request().asyncResult(hasEncounterEventsOfSize(3)));
     }
 }

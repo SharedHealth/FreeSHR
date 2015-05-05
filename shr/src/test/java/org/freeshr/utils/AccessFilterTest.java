@@ -2,6 +2,7 @@ package org.freeshr.utils;
 
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.config.SHRProperties;
+import org.freeshr.events.EncounterEvent;
 import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.infrastructure.security.UserProfile;
 import org.junit.Before;
@@ -161,51 +162,22 @@ public class AccessFilterTest {
     }
 
     @Test
-    public void shouldRestrictAccessToEncounterBundleWithEncounterConfidentiality() throws Exception {
-        EncounterBundle encounterBundle = new EncounterBundle();
-        encounterBundle.setPatientConfidentiality(Confidentiality.Normal);
+    public void shouldFilterListOfEncounters() throws Exception {
+        EncounterEvent encounterEvent1 = getEncounterEvent(Confidentiality.Normal, Confidentiality.Normal);
+        EncounterEvent encounterEvent2 = getEncounterEvent(Confidentiality.Restricted, Confidentiality.Normal);
+        EncounterEvent encounterEvent3 = getEncounterEvent(Confidentiality.Normal, Confidentiality.Restricted);
 
-        encounterBundle.setEncounterConfidentiality(Confidentiality.Unrestricted);
-        assertFalse(isConfidentialEncounter(encounterBundle));
-
-        encounterBundle.setEncounterConfidentiality(Confidentiality.Low);
-        assertFalse(isConfidentialEncounter(encounterBundle));
-
-        encounterBundle.setEncounterConfidentiality(Confidentiality.Moderate);
-        assertFalse(isConfidentialEncounter(encounterBundle));
-
-        encounterBundle.setEncounterConfidentiality(Confidentiality.Normal);
-        assertFalse(isConfidentialEncounter(encounterBundle));
-
-        encounterBundle.setEncounterConfidentiality(Confidentiality.Restricted);
-        assertTrue(isConfidentialEncounter(encounterBundle));
-
-        encounterBundle.setEncounterConfidentiality(Confidentiality.VeryRestricted);
-        assertTrue(isConfidentialEncounter(encounterBundle));
+        assertEquals(3, filterEncounterEvents(false, asList(encounterEvent1, encounterEvent2, encounterEvent3)).size());
+        assertEquals(1, filterEncounterEvents(true, asList(encounterEvent1, encounterEvent2, encounterEvent3)).size());
     }
 
-    @Test
-    public void shouldRestrictAccessToEncounterBundleWithPatientConfidentiality() throws Exception {
+    private EncounterEvent getEncounterEvent(Confidentiality patientConfidentiality, Confidentiality encounterConfigentiality) {
         EncounterBundle encounterBundle = new EncounterBundle();
-        encounterBundle.setEncounterConfidentiality(Confidentiality.Normal);
-
-        encounterBundle.setPatientConfidentiality(Confidentiality.Unrestricted);
-        assertFalse(isConfidentialEncounter(encounterBundle));
-
-        encounterBundle.setPatientConfidentiality(Confidentiality.Low);
-        assertFalse(isConfidentialEncounter(encounterBundle));
-
-        encounterBundle.setPatientConfidentiality(Confidentiality.Moderate);
-        assertFalse(isConfidentialEncounter(encounterBundle));
-
-        encounterBundle.setPatientConfidentiality(Confidentiality.Normal);
-        assertFalse(isConfidentialEncounter(encounterBundle));
-
-        encounterBundle.setPatientConfidentiality(Confidentiality.Restricted);
-        assertTrue(isConfidentialEncounter(encounterBundle));
-
-        encounterBundle.setPatientConfidentiality(Confidentiality.VeryRestricted);
-        assertTrue(isConfidentialEncounter(encounterBundle));
+        EncounterEvent encounterEvent = new EncounterEvent();
+        encounterBundle.setPatientConfidentiality(patientConfidentiality);
+        encounterBundle.setEncounterConfidentiality(encounterConfigentiality);
+        encounterEvent.setEncounterBundle(encounterBundle);
+        return encounterEvent;
     }
 
     @Test
@@ -230,24 +202,5 @@ public class AccessFilterTest {
 
         encounterBundle.setPatientConfidentiality(Confidentiality.VeryRestricted);
         assertTrue(isConfidentialPatient(asList(encounterBundle)));
-    }
-
-    @Test
-    public void shouldFilterListOfEncounters() throws Exception {
-        EncounterBundle encounterBundle1 = new EncounterBundle();
-        encounterBundle1.setPatientConfidentiality(Confidentiality.Normal);
-        encounterBundle1.setEncounterConfidentiality(Confidentiality.Normal);
-
-        EncounterBundle encounterBundle2 = new EncounterBundle();
-        encounterBundle2.setPatientConfidentiality(Confidentiality.Restricted);
-        encounterBundle2.setEncounterConfidentiality(Confidentiality.Normal);
-
-        EncounterBundle encounterBundle3 = new EncounterBundle();
-        encounterBundle3.setPatientConfidentiality(Confidentiality.Normal);
-        encounterBundle3.setEncounterConfidentiality(Confidentiality.Restricted);
-
-        assertEquals(3, filterEncounters(false, asList(encounterBundle1, encounterBundle2, encounterBundle3)).size());
-
-        assertEquals(1, filterEncounters(true, asList(encounterBundle1, encounterBundle2, encounterBundle3)).size());
     }
 }

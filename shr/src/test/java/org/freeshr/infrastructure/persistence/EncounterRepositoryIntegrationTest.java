@@ -10,11 +10,12 @@ import org.freeshr.domain.model.Catchment;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
+import org.freeshr.events.EncounterEvent;
 import org.freeshr.interfaces.encounter.ws.APIIntegrationTestBase;
-import org.freeshr.utils.CollectionUtils;
 import org.freeshr.utils.Confidentiality;
 import org.freeshr.utils.DateUtil;
 import org.freeshr.utils.TimeUuidUtil;
+import org.hamcrest.Matchers;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Test;
@@ -27,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import static ch.lambdaj.Lambda.*;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static org.freeshr.utils.FileUtil.asString;
 import static org.hamcrest.core.Is.is;
@@ -55,7 +57,7 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         encounterRepository.save(createEncounterBundle("e-2", healthId, Confidentiality.Normal, Confidentiality.Normal, asString("jsons/encounters/valid.json"),  new Requester("facilityId", null), monthAfter), patient).toBlocking().first();
         encounterRepository.save(createEncounterBundle("e-3", healthId, Confidentiality.Normal, Confidentiality.Normal, asString("jsons/encounters/valid.json"),  new Requester("facilityId", null), twoMonthsAfter), patient).toBlocking().first();
 
-        List<EncounterBundle> encounterBundles = encounterRepository.findEncountersForPatient(healthId,
+        List<EncounterEvent> encounterBundles = encounterRepository.findEncounterFeedForPatient(healthId,
                 updatedSinceYesterday, 200).toBlocking().single();
         assertEquals(3, encounterBundles.size());
 
@@ -64,7 +66,7 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         assertEncounter(encounterBundles, "e-3", twoMonthsAfter);
 
         Date updatedAfterThreeMonths = today.plusMonths(3).toDate();
-        encounterBundles = encounterRepository.findEncountersForPatient(healthId, updatedAfterThreeMonths,
+        encounterBundles = encounterRepository.findEncounterFeedForPatient(healthId, updatedAfterThreeMonths,
                 200).toBlocking().single();
         assertEquals("Should not have returned any encounter as updatedSince is after existing encounter dates", 0,
                 encounterBundles.size());
@@ -83,8 +85,8 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         encounterRepository.save(createEncounterBundle("e-11", healthId, Confidentiality.Normal, Confidentiality.Normal,  asString("jsons/encounters/valid.json"), new Requester("facilityId", null), e1ReceivedDate), patient).toBlocking().first();
         encounterRepository.save(createEncounterBundle("e-12", healthId, Confidentiality.Normal, Confidentiality.Normal,  asString("jsons/encounters/valid.json"), new Requester("facilityId", null), e2ReceivedDate), patient).toBlocking().first();
 
-        List<EncounterBundle> encountersForCatchment = encounterRepository.
-                findEncountersForCatchment(new Catchment("0102"), today.toDate(), 10).toBlocking().first();
+        List<EncounterEvent> encountersForCatchment = encounterRepository.
+                findEncounterFeedForCatchment(new Catchment("0102"), today.toDate(), 10).toBlocking().first();
         assertEquals(2, encountersForCatchment.size());
         assertEncounter(encountersForCatchment, "e-11", e1ReceivedDate);
         assertEncounter(encountersForCatchment, "e-12", e2ReceivedDate);
@@ -232,7 +234,7 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
     }
 
     @Test
-    public void shouldFetchUniqueEncountersForPatientInTheOrderOfEvents() throws Exception {
+    public void shouldFetchEncountersForPatientInTheOrderOfEvents() throws Exception {
         String encounterOne = "e-1";
         String encounterTwo = "e-2";
         Patient patient = new Patient();
@@ -240,25 +242,35 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         patient.setHealthId(healthId);
         patient.setAddress(new Address("01", "02", "03", "04", "05"));
 
+        Date jan1st0930 = new DateTime(2015,01,01,9,30).toDate();
+        Date jan1st0940 = new DateTime(2015,01,01,9,40).toDate();
+        Date jan1st0945 = new DateTime(2015,02,01,9,45).toDate();
+
         Requester createdBy = new Requester("facilityId", null);
         EncounterBundle existingEncounterBundle = createEncounterBundle(encounterOne, healthId, Confidentiality.Normal,
-                Confidentiality.Normal, asString("jsons/encounters/valid.json"), createdBy, new Date());
+                Confidentiality.Normal, asString("jsons/encounters/valid.json"), createdBy, jan1st0930);
         encounterRepository.save(existingEncounterBundle, patient).toBlocking().first();
 
         EncounterBundle secondEncounter = createEncounterBundle(encounterTwo, healthId, Confidentiality.Normal,
-                Confidentiality.Normal, asString("jsons/encounters/valid.json"), createdBy, new Date());
+                Confidentiality.Normal, asString("jsons/encounters/valid.json"), createdBy, jan1st0940);
         encounterRepository.save(secondEncounter, patient).toBlocking().first();
 
-        Date updatedAt = new Date();
         Requester updatedBy = new Requester("facilityId1", null);
         encounterRepository.updateEncounter(createUpdateEncounterBundle(encounterOne, healthId, Confidentiality.Normal,
-                        asString("jsons/encounters/valid.json"), updatedBy, updatedAt),
+                        asString("jsons/encounters/valid.json"), updatedBy, jan1st0945),
                 existingEncounterBundle, patient).toBlocking().first();
 
-        List<EncounterBundle> encountersForPatient = encounterRepository.findEncountersForPatient(healthId, null, 5).toBlocking().first();
+        List<EncounterEvent> encounterEventsForPatient = encounterRepository.findEncounterFeedForPatient(healthId, null, 5).toBlocking().first();
 
-        assertEquals(encounterTwo,encountersForPatient.get(0).getEncounterId());
-        assertEquals(encounterOne,encountersForPatient.get(1).getEncounterId());
+        assertEquals(3, encounterEventsForPatient.size());
+        assertEquals("e-1", encounterEventsForPatient.get(0).getEncounterId());
+        assertEquals(jan1st0930,encounterEventsForPatient.get(0).getUpdatedAt());
+
+        assertEquals("e-2", encounterEventsForPatient.get(1).getEncounterId());
+        assertEquals(jan1st0940,encounterEventsForPatient.get(1).getUpdatedAt());
+
+        assertEquals("e-1", encounterEventsForPatient.get(2).getEncounterId());
+        assertEquals(jan1st0945,encounterEventsForPatient.get(2).getUpdatedAt());
 
 
     }
@@ -271,19 +283,10 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         cqlOperations.execute("truncate enc_history");
     }
 
-    private void assertEncounter(List<EncounterBundle> encounterBundles, String encounterId, Date receivedDate) {
-        EncounterBundle encounter1 = getEncounterById(encounterBundles, encounterId);
-        assertThat(encounter1.getReceivedAt(), is(receivedDate));
-        assertThat(encounter1.getEncounterContent().toString(), is(content()));
-    }
-
-    private EncounterBundle getEncounterById(List<EncounterBundle> encounterBundles, final String encounterId) {
-        return CollectionUtils.find(encounterBundles, new CollectionUtils.Fn<EncounterBundle, Boolean>() {
-            @Override
-            public Boolean call(EncounterBundle encounterBundle) {
-                return encounterBundle.getEncounterId().equals(encounterId);
-            }
-        });
+    private void assertEncounter(List<EncounterEvent> encounterEvents, String encounterId, Date receivedDate) {
+        EncounterEvent encounterEvent = selectFirst(encounterEvents, having(on(EncounterEvent.class).getEncounterId(), Matchers.equalTo(encounterId)));
+        assertThat(encounterEvent.getReceivedAt(), is(receivedDate));
+        assertThat(encounterEvent.getContent(), is(content()));
     }
 
     private String content() {

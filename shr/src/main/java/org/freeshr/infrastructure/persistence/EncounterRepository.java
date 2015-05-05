@@ -9,13 +9,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
+import org.freeshr.events.EncounterEvent;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Catchment;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
+import org.freeshr.events.EncounterEventLog;
 import org.freeshr.utils.DateUtil;
 import org.freeshr.utils.TimeUuidUtil;
+import org.hamcrest.Matchers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
+import static ch.lambdaj.Lambda.*;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static java.lang.String.format;
 import static org.freeshr.infrastructure.persistence.RxMaps.completeResponds;
@@ -73,6 +77,15 @@ public class EncounterRepository {
         Observable<ResultSet> encounterIdsObservable = Observable.from(
                 cqlOperations.queryAsynchronously(identifyEncounterIdsQuery), Schedulers.io());
 
+        return encounterIdsObservable.concatMap(findEncounters());
+    }
+
+    public Observable<List<EncounterEvent>> findEncounterFeedForCatchment(Catchment catchment, Date updatedSince,
+                                                                          int limit) {
+        String identifyEncounterIdsQuery = buildCatchmentSearchQuery(catchment, updatedSince, limit);
+        Observable<ResultSet> encounterIdsObservable = Observable.from(
+                cqlOperations.queryAsynchronously(identifyEncounterIdsQuery), Schedulers.io());
+
         return encounterIdsObservable.concatMap(findEncountersOrderedByEvents());
     }
 
@@ -103,10 +116,20 @@ public class EncounterRepository {
                                                                       int limit) throws ExecutionException,
             InterruptedException {
         StringBuilder queryBuilder = buildQuery(healthId, updatedSince, limit);
-        Observable<ResultSet> encounterIdsObservable = Observable.from(cqlOperations.queryAsynchronously
+        Observable<ResultSet> encounterIdsWithCreatedTimeObservable = Observable.from(cqlOperations.queryAsynchronously
                 (queryBuilder.toString()), Schedulers.io());
 
-        return encounterIdsObservable.concatMap(findEncountersOrderedByEvents());
+        return encounterIdsWithCreatedTimeObservable.concatMap(findEncounters());
+    }
+
+    public Observable<List<EncounterEvent>> findEncounterFeedForPatient(String healthId, Date updatedSince,
+                                                                        int limit) throws ExecutionException,
+            InterruptedException {
+        StringBuilder queryBuilder = buildQuery(healthId, updatedSince, limit);
+        Observable<ResultSet> encounterIdsWithCreatedTimeObservable = Observable.from(cqlOperations.queryAsynchronously
+                (queryBuilder.toString()), Schedulers.io());
+
+        return encounterIdsWithCreatedTimeObservable.concatMap(findEncountersOrderedByEvents());
     }
 
     public Observable<Boolean> updateEncounter(EncounterBundle encounterBundle, EncounterBundle existingEncounterBundle, Patient patient) {
@@ -128,7 +151,7 @@ public class EncounterRepository {
 
     }
 
-    private Func1<ResultSet, Observable<List<EncounterBundle>>> findEncountersOrderedByEvents() {
+    private Func1<ResultSet, Observable<List<EncounterBundle>>> findEncounters() {
         return new Func1<ResultSet, Observable<List<EncounterBundle>>>() {
             @Override
             public Observable<List<EncounterBundle>> call(ResultSet rows) {
@@ -143,6 +166,49 @@ public class EncounterRepository {
                 }
                 return findEncounters(encounterIds);
             }
+        };
+    }
+
+    private Func1<ResultSet, Observable<List<EncounterEvent>>> findEncountersOrderedByEvents() {
+        return new Func1<ResultSet, Observable<List<EncounterEvent>>>() {
+            @Override
+            public Observable<List<EncounterEvent>> call(ResultSet rows) {
+                List<Row> encounterEventLogRecords = rows.all();
+                List<EncounterEventLog> encounterEventLogs = new ArrayList<>();
+                EncounterEventLog encounterEventLog;
+                for (Row result : encounterEventLogRecords) {
+                    encounterEventLog = new EncounterEventLog();
+                    encounterEventLog.setEncounterId(result.getString("encounter_id"));
+                    encounterEventLog.setCreatedAt(result.getUUID("created_at"));
+
+                    encounterEventLogs.add(encounterEventLog);
+                }
+                LinkedHashSet<String> encounterIds = new LinkedHashSet<>(extract(encounterEventLogs, on(EncounterEventLog.class).getEncounterId()));
+                Observable<List<EncounterBundle>> encounterBundleObservable = findEncounters(encounterIds);
+
+                return encounterBundleObservable.concatMap(generateEncounterEvents(encounterEventLogs));
+            }
+        };
+    }
+
+    private Func1<List<EncounterBundle>, Observable<List<EncounterEvent>>> generateEncounterEvents(final List<EncounterEventLog> encounterInstances) {
+        return new Func1<List<EncounterBundle>, Observable<List<EncounterEvent>>>() {
+            @Override
+            public Observable<List<EncounterEvent>> call(List<EncounterBundle> encounterBundles) {
+            List<EncounterEvent> encounterEvents = new ArrayList<>();
+                EncounterEvent encounterEvent;
+                for (EncounterEventLog encounterInstance : encounterInstances) {
+                    encounterEvent = new EncounterEvent();
+                    EncounterBundle savedEncounterBundle = selectFirst(encounterBundles, having(on(EncounterBundle.class).getEncounterId(),
+                            Matchers.equalTo(encounterInstance.getEncounterId())));
+
+                    encounterEvent.setUpdatedAt(TimeUuidUtil.getDateFromUUID(encounterInstance.getCreatedAt()));
+                    encounterEvent.setEncounterBundle(savedEncounterBundle);
+                    encounterEvents.add(encounterEvent);
+                }
+                return Observable.just(encounterEvents);
+            }
+
         };
     }
 
@@ -230,7 +296,7 @@ public class EncounterRepository {
         int yearOfDate = DateUtil.getYearOf(updatedSince);
         String lastUpdateTime = DateUtil.toDateString(updatedSince, DateUtil.UTC_DATE_IN_MILLIS_FORMAT);
         //TODO test. condition should be >=
-        return format("SELECT encounter_id FROM enc_by_catchment " +
+        return format("SELECT encounter_id, created_at FROM enc_by_catchment " +
                         " WHERE year = %s and created_at >= minTimeUuid('%s') and %s LIMIT %s ALLOW FILTERING;",
                 yearOfDate, lastUpdateTime, buildClauseForCatchment(catchment), limit);
     }
@@ -320,7 +386,7 @@ public class EncounterRepository {
     }
 
     private StringBuilder buildQuery(String healthId, Date updatedSince, int limit) {
-        StringBuilder queryBuilder = new StringBuilder(format("SELECT encounter_id FROM enc_by_patient where " +
+        StringBuilder queryBuilder = new StringBuilder(format("SELECT encounter_id, created_at FROM enc_by_patient where " +
                 "health_id='%s'", healthId));
         if (updatedSince != null) {
             String lastUpdateTime = DateUtil.toDateString(updatedSince, DateUtil.UTC_DATE_IN_MILLIS_FORMAT);
@@ -329,4 +395,5 @@ public class EncounterRepository {
         queryBuilder.append(format(" LIMIT %d;", limit));
         return queryBuilder;
     }
+
 }

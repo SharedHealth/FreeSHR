@@ -89,7 +89,7 @@ public abstract class APIIntegrationTestBase {
         facilityRepository.save(facility).toBlocking().first();
     }
 
-    protected BaseMatcher<EncounterSearchResponse> hasEncountersOfSize(final int expectedSize) {
+    protected BaseMatcher<EncounterSearchResponse> hasEncounterEventsOfSize(final int expectedSize) {
         return new BaseMatcher<EncounterSearchResponse>() {
 
             @Override
