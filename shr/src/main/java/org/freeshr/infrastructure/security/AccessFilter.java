@@ -31,18 +31,6 @@ public class AccessFilter {
         return null;
     }
 
-    public static List<EncounterBundle> filterEncounterBundles(boolean isRestrictedAccess, List<EncounterBundle> encounterBundles) {
-        if (!isRestrictedAccess) return encounterBundles;
-        List<EncounterBundle> filteredEncounterBundle = new ArrayList<>();
-        for (EncounterBundle encounterBundle : encounterBundles) {
-            if (encounterBundle.isConfidentialEncounter()) {
-                continue;
-            }
-            filteredEncounterBundle.add(encounterBundle);
-        }
-        return filteredEncounterBundle;
-    }
-
     public static List<EncounterEvent> filterEncounterEvents(boolean isRestrictedAccess, List<EncounterEvent> encounterEvents) {
         if (!isRestrictedAccess) return encounterEvents;
         List<EncounterEvent> filteredEncounterEvents = new ArrayList<>();

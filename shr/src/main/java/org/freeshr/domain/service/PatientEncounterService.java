@@ -1,11 +1,11 @@
 package org.freeshr.domain.service;
 
 import org.freeshr.application.fhir.EncounterBundle;
-import org.freeshr.events.EncounterEvent;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Patient;
+import org.freeshr.events.EncounterEvent;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
 import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.utils.Confidentiality;
@@ -66,12 +66,6 @@ public class PatientEncounterService {
                 return encounterBundle.getHealthId().equals(healthId);
             }
         });
-    }
-
-    public Observable<List<EncounterBundle>> findEncountersForPatient(String healthId, Date sinceDate,
-                                                                      int limit) throws ExecutionException,
-            InterruptedException {
-        return encounterRepository.findEncountersForPatient(healthId, sinceDate, limit);
     }
 
     public Observable<List<EncounterEvent>> findEncounterFeedForPatient(String healthId, Date sinceDate,

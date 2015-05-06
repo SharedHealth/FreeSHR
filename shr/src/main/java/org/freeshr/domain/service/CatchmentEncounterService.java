@@ -1,7 +1,6 @@
 package org.freeshr.domain.service;
 
 import org.apache.commons.lang3.StringUtils;
-import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.domain.model.Catchment;
 import org.freeshr.events.EncounterEvent;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
@@ -22,11 +21,6 @@ public class CatchmentEncounterService {
     @Autowired
     public CatchmentEncounterService(EncounterRepository encounterRepository) {
         this.encounterRepository = encounterRepository;
-    }
-
-    public Observable<List<EncounterBundle>> findEncountersForFacilityCatchment(final String catchment,
-                                                                                final Date sinceDate, final int limit) {
-        return encounterRepository.findEncountersForCatchment(new Catchment(catchment), sinceDate, limit);
     }
 
     public Observable<List<EncounterEvent>> findEncounterFeedForFacilityCatchment(final String catchment,

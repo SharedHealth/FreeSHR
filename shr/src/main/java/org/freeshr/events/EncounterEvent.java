@@ -1,7 +1,8 @@
 package org.freeshr.events;
 
 
-import org.eclipse.persistence.oxm.annotations.XmlCDATA;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.utils.DateUtil;
 import org.freeshr.utils.TimeUuidUtil;
@@ -13,23 +14,19 @@ public class EncounterEvent {
 
     private Date updatedAt;
     private EncounterBundle encounterBundle;
-
     private ArrayList<String> categories = new ArrayList<String>(){{ add("encounter"); }};
     private String title = "Encounter";
 
-    public String getEncounterId() {
-        return this.encounterBundle.getEncounterId();
-    }
-
+    @JsonProperty("publishedDate")
     public String getUpdatedDateISOString() {
         return DateUtil.toISOString(updatedAt);
     }
 
+    @JsonProperty("id")
     public String getEventId(){
         return TimeUuidUtil.uuidForDate(updatedAt).toString();
     }
 
-    @XmlCDATA
     public String getContent() {
         return this.encounterBundle.getContent();
     }
@@ -44,14 +41,45 @@ public class EncounterEvent {
 
 
     public ArrayList<String> getCategories() {
-            if(isUpdateEvent()){
-                categories.add(String.format("Updated since : %s", DateUtil.toISOString(getReceivedAt()) ));
-            };
-            return categories;
-        }
+        if(isUpdateEvent()){
+            categories.add(String.format("Updated since : %s", DateUtil.toISOString(getReceivedAt()) ));
+        };
+        return categories;
+    }
 
+    @JsonIgnore
+    public String getEncounterId() {
+        return this.encounterBundle.getEncounterId();
+    }
+
+    @JsonIgnore
     public boolean isUpdateEvent(){
         return updatedAt.after(getReceivedAt());
+    }
+
+    @JsonIgnore
+    public String getHealthId() {
+        return this.encounterBundle.getHealthId();
+    }
+
+    @JsonIgnore
+    public Date getReceivedAt() {
+        return this.encounterBundle.getReceivedAt();
+    }
+
+    @JsonIgnore
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    @JsonIgnore
+    public boolean isConfidentialEncounter() {
+        return this.encounterBundle.isConfidentialEncounter();
+    }
+
+    @JsonIgnore
+    public EncounterBundle getEncounterBundle() {
+        return encounterBundle;
     }
 
     public void setUpdatedAt(Date updatedAt) {
@@ -60,25 +88,5 @@ public class EncounterEvent {
 
     public void setEncounterBundle(EncounterBundle encounterBundle) {
         this.encounterBundle = encounterBundle;
-    }
-
-    public String getHealthId() {
-        return this.encounterBundle.getHealthId();
-    }
-
-    public Date getReceivedAt() {
-        return this.encounterBundle.getReceivedAt();
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public boolean isConfidentialEncounter() {
-        return this.encounterBundle.isConfidentialEncounter();
-    }
-
-    public EncounterBundle getEncounterBundle() {
-        return encounterBundle;
     }
 }

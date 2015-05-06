@@ -15,96 +15,103 @@ import java.util.Date;
 
 @XmlRootElement(name = "encounter")
 public class EncounterBundle {
-    @JsonProperty("id")
     private String encounterId;
     private String healthId;
-    @JsonIgnore
-    @XmlTransient
     private Date receivedAt;
-
-    @JsonIgnore
-    @XmlTransient
     private EncounterContent encounterContent;
-
-    @JsonIgnore
-    @XmlTransient
     private Confidentiality encounterConfidentiality;
-
-    @JsonIgnore
-    @XmlTransient
     private Confidentiality patientConfidentiality;
-
-    @JsonIgnore
-    @XmlTransient
     private int contentVersion = 1;
-
-    @JsonIgnore
-    @XmlTransient
     private Requester createdBy;
-
-    @JsonIgnore
-    @XmlTransient
     private Requester updatedBy;
-
-    @JsonIgnore
-    @XmlTransient
     private Date updatedAt;
 
+    @JsonProperty("id")
     @XmlElement(name = "id")
     public String getEncounterId() {
         return encounterId;
     }
 
-    @JsonProperty("publishedDate")
-    @XmlElement(name = "updated")
-    public String getUpdatedDateISOString() {
-        return DateUtil.toISOString(updatedAt);
-    }
-
-    public void setEncounterId(String encounterId) {
-        this.encounterId = encounterId;
-    }
-
+    @XmlElement(name = "healthId")
     public String getHealthId() {
         return healthId;
     }
 
-    public void setHealthId(String healthId) {
-        this.healthId = healthId;
+    @JsonProperty("updatedAt")
+    @XmlElement(name = "updatedAt")
+    public String getUpdatedDateISOString() {
+        return DateUtil.toISOString(updatedAt);
     }
 
-    public void setReceivedAt(Date date) {
-        this.receivedAt = date;
+    @JsonProperty("receivedAt")
+    @XmlElement(name = "receivedAt")
+    public String getReceivedDateISOString() {
+        return DateUtil.toISOString(receivedAt);
     }
 
-    public Date getReceivedAt() {
-        return receivedAt;
-    }
-
-    @XmlTransient
-    public EncounterContent getEncounterContent() {
-        return encounterContent;
-    }
-
-    public void setEncounterContent(String content) {
-        this.encounterContent = new EncounterContent(content);
-    }
-
-    @JsonProperty("content")
     @XmlElement(name = "content")
     @XmlCDATA
     public String getContent() {
         return this.encounterContent.toString();
     }
 
-    @JsonProperty("link")
-    @XmlElement(name = "link")
-    public String getLink() {
-        return String.format("/patients/%s/encounters/%s", getHealthId(), getEncounterId());
+    @JsonIgnore
+    @XmlTransient
+    public Date getReceivedAt() {
+        return receivedAt;
     }
 
+    @JsonIgnore
+    @XmlTransient
+    public EncounterContent getEncounterContent() {
+        return encounterContent;
+    }
+
+    @JsonIgnore
+    @XmlTransient
     public Confidentiality getEncounterConfidentiality() {
         return encounterConfidentiality;
+    }
+
+    @JsonIgnore
+    @XmlTransient
+    public Confidentiality getPatientConfidentiality() {
+        return patientConfidentiality;
+    }
+
+    @JsonIgnore
+    @XmlTransient
+    public int getContentVersion() {
+        return contentVersion;
+    }
+
+    @JsonIgnore
+    @XmlTransient
+    public Requester getCreatedBy() {
+        return createdBy;
+    }
+
+    @JsonIgnore
+    @XmlTransient
+    public Requester getUpdatedBy() {
+        return updatedBy;
+    }
+
+    @JsonIgnore
+    @XmlTransient
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    @JsonIgnore
+    @XmlTransient
+    public boolean isConfidentialEncounter() {
+        return this.getEncounterConfidentiality().ordinal() > Confidentiality.Normal.ordinal()
+                || this.getPatientConfidentiality().ordinal() > Confidentiality.Normal.ordinal();
+    }
+
+    public void setContentVersion(int contentVersion) {
+        this.contentVersion = contentVersion;
     }
 
     public void setEncounterConfidentiality(Confidentiality encounterConfidentiality) {
@@ -115,47 +122,32 @@ public class EncounterBundle {
         this.patientConfidentiality = patientConfidentiality;
     }
 
-    public Confidentiality getPatientConfidentiality() {
-        return patientConfidentiality;
+    public void setEncounterContent(String content) {
+        this.encounterContent = new EncounterContent(content);
     }
 
-    public int getContentVersion() {
-        return contentVersion;
+    public void setReceivedAt(Date date) {
+        this.receivedAt = date;
     }
 
-    public void setContentVersion(int contentVersion) {
-        this.contentVersion = contentVersion;
+    public void setEncounterId(String encounterId) {
+        this.encounterId = encounterId;
     }
 
-    public Requester getCreatedBy() {
-        return createdBy;
+    public void setHealthId(String healthId) {
+        this.healthId = healthId;
     }
 
     public void setCreatedBy(Requester createdBy) {
         this.createdBy = createdBy;
     }
 
-    public Requester getUpdatedBy() {
-        return updatedBy;
-    }
-
     public void setUpdatedBy(Requester updatedBy) {
         this.updatedBy = updatedBy;
     }
 
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
     public void setUpdatedAt(Date updatedDate) {
         this.updatedAt = updatedDate;
-    }
-
-    @JsonIgnore
-    @XmlTransient
-    public boolean isConfidentialEncounter() {
-        return this.getEncounterConfidentiality().ordinal() > Confidentiality.Normal.ordinal()
-                || this.getPatientConfidentiality().ordinal() > Confidentiality.Normal.ordinal();
     }
 
     @Override

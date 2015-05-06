@@ -71,15 +71,6 @@ public class EncounterRepository {
                 completeResponds(true));
     }
 
-    public Observable<List<EncounterBundle>> findEncountersForCatchment(Catchment catchment, Date updatedSince,
-                                                                        int limit) {
-        String identifyEncounterIdsQuery = buildCatchmentSearchQuery(catchment, updatedSince, limit);
-        Observable<ResultSet> encounterIdsObservable = Observable.from(
-                cqlOperations.queryAsynchronously(identifyEncounterIdsQuery), Schedulers.io());
-
-        return encounterIdsObservable.concatMap(findEncounters());
-    }
-
     public Observable<List<EncounterEvent>> findEncounterFeedForCatchment(Catchment catchment, Date updatedSince,
                                                                           int limit) {
         String identifyEncounterIdsQuery = buildCatchmentSearchQuery(catchment, updatedSince, limit);
@@ -112,16 +103,6 @@ public class EncounterRepository {
                 });
     }
 
-    public Observable<List<EncounterBundle>> findEncountersForPatient(String healthId, Date updatedSince,
-                                                                      int limit) throws ExecutionException,
-            InterruptedException {
-        StringBuilder queryBuilder = buildQuery(healthId, updatedSince, limit);
-        Observable<ResultSet> encounterIdsWithCreatedTimeObservable = Observable.from(cqlOperations.queryAsynchronously
-                (queryBuilder.toString()), Schedulers.io());
-
-        return encounterIdsWithCreatedTimeObservable.concatMap(findEncounters());
-    }
-
     public Observable<List<EncounterEvent>> findEncounterFeedForPatient(String healthId, Date updatedSince,
                                                                         int limit) throws ExecutionException,
             InterruptedException {
@@ -149,24 +130,6 @@ public class EncounterRepository {
         return saveObservable.flatMap(respondOnNext(true), RxMaps.<Boolean>logAndForwardError(logger),
                 completeResponds(true));
 
-    }
-
-    private Func1<ResultSet, Observable<List<EncounterBundle>>> findEncounters() {
-        return new Func1<ResultSet, Observable<List<EncounterBundle>>>() {
-            @Override
-            public Observable<List<EncounterBundle>> call(ResultSet rows) {
-                List<Row> encounterBundles = rows.all();
-                LinkedHashSet<String> encounterIds = new LinkedHashSet<>();
-                for (Row result : encounterBundles) {
-                    String encounterId = result.getString("encounter_id");
-                    if(encounterIds.contains(encounterId)){
-                        encounterIds.remove(encounterId);
-                    }
-                    encounterIds.add(encounterId);
-                }
-                return findEncounters(encounterIds);
-            }
-        };
     }
 
     private Func1<ResultSet, Observable<List<EncounterEvent>>> findEncountersOrderedByEvents() {

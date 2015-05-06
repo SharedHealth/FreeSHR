@@ -1,7 +1,6 @@
 package org.freeshr.interfaces.encounter.ws;
 
 import org.apache.commons.lang3.StringUtils;
-import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.domain.service.CatchmentEncounterService;
 import org.freeshr.events.EncounterEvent;
 import org.freeshr.infrastructure.security.UserInfo;
@@ -32,7 +31,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static java.lang.String.format;
-import static org.freeshr.infrastructure.security.AccessFilter.filterEncounterBundles;
 import static org.freeshr.infrastructure.security.AccessFilter.filterEncounterEvents;
 import static org.freeshr.infrastructure.security.AccessFilter.isAccessRestrictedToEncounterFetchForCatchment;
 
@@ -49,60 +47,7 @@ public class CatchmentEncounterController extends ShrController {
 
     @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER', 'ROLE_SHR System Admin')")
     @RequestMapping(value = "/catchments/{catchment}/encounters", method = RequestMethod.GET,
-            produces = {"application/json"})
-    public DeferredResult<List<EncounterBundle>> findEncountersForCatchment(
-            final HttpServletRequest request,
-            @PathVariable String catchment,
-            @RequestParam(value = "updatedSince", required = false) String updatedSince,
-            @RequestParam(value = "lastMarker", required = false) final String lastMarker)
-            throws ExecutionException, InterruptedException, ParseException, UnsupportedEncodingException {
-        final DeferredResult<List<EncounterBundle>> deferredResult = new DeferredResult<>();
-        final UserInfo userInfo = getUserInfo();
-        logger.debug(format("Find all encounters for facility %s in catchment %s", userInfo.getProperties().getFacilityId(), catchment));
-        logAccessDetails(userInfo, format("Find all encounters for facility %s in catchment %s", userInfo.getProperties().getFacilityId(), catchment));
-        try {
-            if (catchment.length() < 4) {
-                deferredResult.setErrorResult(new BadRequest("Catchment should have division and district"));
-                return deferredResult;
-            }
-            final Date requestedDate = getRequestedDateForCatchment(updatedSince);
-            final Boolean isRestrictedAccess = isAccessRestrictedToEncounterFetchForCatchment(catchment, userInfo);
-            if (isRestrictedAccess == null) {
-                deferredResult.setErrorResult(new Forbidden(String.format("Access is denied to user %s for catchment %s", userInfo.getProperties().getId(), catchment)));
-                return deferredResult;
-            }
-            final Observable<List<EncounterBundle>> catchmentEncounters =
-                    findFacilityCatchmentEncounters(catchment, lastMarker, requestedDate);
-            catchmentEncounters.subscribe(new Action1<List<EncounterBundle>>() {
-                @Override
-                public void call(List<EncounterBundle> encounterBundles) {
-                    try {
-                        encounterBundles = filterEncounterBundles(isRestrictedAccess, encounterBundles);
-
-                        logger.debug(encounterBundles.toString());
-                        deferredResult.setResult(encounterBundles);
-                    } catch (Throwable throwable) {
-                        logger.debug(throwable.getMessage());
-                        deferredResult.setErrorResult(throwable);
-                    }
-                }
-            }, new Action1<Throwable>() {
-                @Override
-                public void call(Throwable throwable) {
-                    logger.debug(throwable.getMessage());
-                    deferredResult.setErrorResult(throwable);
-                }
-            });
-        } catch (Exception e) {
-            logger.debug(e.getMessage());
-            deferredResult.setErrorResult(e);
-        }
-        return deferredResult;
-    }
-
-    @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER', 'ROLE_SHR System Admin')")
-    @RequestMapping(value = "/catchments/{catchment}/encounters", method = RequestMethod.GET,
-            produces = {"application/atom+xml"})
+            produces = {"application/json", "application/atom+xml"})
     public DeferredResult<EncounterSearchResponse> findEncounterFeedForCatchment(
             final HttpServletRequest request,
             @PathVariable String catchment,
@@ -153,16 +98,6 @@ public class CatchmentEncounterController extends ShrController {
             deferredResult.setErrorResult(e);
         }
         return deferredResult;
-    }
-
-    private Observable<List<EncounterBundle>> findFacilityCatchmentEncounters(String catchment,
-                                                                              String lastMarker, Date lastUpdateDate) {
-        int encounterFetchLimit = catchmentEncounterService.getEncounterFetchLimit();
-        Observable<List<EncounterBundle>> facilityCatchmentEncounters =
-                catchmentEncounterService.findEncountersForFacilityCatchment(catchment, lastUpdateDate,
-                        encounterFetchLimit * 2);
-
-        return facilityCatchmentEncounters;
     }
 
     private Observable<List<EncounterEvent>> findFacilityCatchmentEncounterFeed(String catchment,
