@@ -22,8 +22,7 @@ public class EncounterEvent {
         return DateUtil.toISOString(updatedAt);
     }
 
-    @JsonProperty("id")
-    public String getEventId(){
+    public String getId() {
         return TimeUuidUtil.uuidForDate(updatedAt).toString();
     }
 
@@ -39,11 +38,10 @@ public class EncounterEvent {
         return title + ":" + getEncounterId();
     }
 
-
     public ArrayList<String> getCategories() {
-        if(isUpdateEvent()){
-            categories.add(String.format("Updated since : %s", DateUtil.toISOString(getReceivedAt()) ));
-        };
+        if (isEncounterFurtherEdited()) {
+            categories.add(String.format("latest_update_event_id : %s", TimeUuidUtil.uuidForDate(getEncounterLastUpdatedAt())));
+        }
         return categories;
     }
 
@@ -53,8 +51,8 @@ public class EncounterEvent {
     }
 
     @JsonIgnore
-    public boolean isUpdateEvent(){
-        return updatedAt.after(getReceivedAt());
+    public boolean isEncounterFurtherEdited() {
+        return getEncounterLastUpdatedAt().after(getUpdatedAt());
     }
 
     @JsonIgnore
@@ -63,8 +61,13 @@ public class EncounterEvent {
     }
 
     @JsonIgnore
-    public Date getReceivedAt() {
+    public Date getEncounterReceivedAt() {
         return this.encounterBundle.getReceivedAt();
+    }
+
+    @JsonIgnore
+    public Date getEncounterLastUpdatedAt() {
+        return this.encounterBundle.getUpdatedAt();
     }
 
     @JsonIgnore
@@ -82,11 +85,9 @@ public class EncounterEvent {
         return encounterBundle;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public EncounterEvent(Date updatedAt, EncounterBundle encounterBundle) {
         this.updatedAt = updatedAt;
-    }
-
-    public void setEncounterBundle(EncounterBundle encounterBundle) {
         this.encounterBundle = encounterBundle;
     }
+
 }

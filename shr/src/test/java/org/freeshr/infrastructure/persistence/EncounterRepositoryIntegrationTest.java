@@ -285,7 +285,7 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
 
     private void assertEncounter(List<EncounterEvent> encounterEvents, String encounterId, Date receivedDate) {
         EncounterEvent encounterEvent = selectFirst(encounterEvents, having(on(EncounterEvent.class).getEncounterId(), Matchers.equalTo(encounterId)));
-        assertThat(encounterEvent.getReceivedAt(), is(receivedDate));
+        assertThat(encounterEvent.getEncounterReceivedAt(), is(receivedDate));
         assertThat(encounterEvent.getContent(), is(content()));
     }
 

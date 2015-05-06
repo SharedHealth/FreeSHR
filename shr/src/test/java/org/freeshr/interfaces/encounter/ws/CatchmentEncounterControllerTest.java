@@ -191,7 +191,6 @@ public class CatchmentEncounterControllerTest {
 
         List<EncounterEvent> encounterEvents = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            EncounterEvent event = new EncounterEvent();
             EncounterBundle encounter = new EncounterBundle();
             encounter.setEncounterId("e-" + (i + 1));
             encounter.setHealthId(healthId);
@@ -201,8 +200,7 @@ public class CatchmentEncounterControllerTest {
             encounter.setPatientConfidentiality(Confidentiality.Normal);
             encounter.setEncounterConfidentiality(Confidentiality.Normal);
 
-            event.setEncounterBundle(encounter);
-            event.setUpdatedAt(dates.get(i));
+            EncounterEvent event = new EncounterEvent(dates.get(i), encounter);
             encounterEvents.add(event);
         }
         return encounterEvents;

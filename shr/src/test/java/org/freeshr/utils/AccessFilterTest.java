@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import static java.util.Arrays.asList;
 import static org.freeshr.infrastructure.security.AccessFilter.*;
@@ -173,10 +174,9 @@ public class AccessFilterTest {
 
     private EncounterEvent getEncounterEvent(Confidentiality patientConfidentiality, Confidentiality encounterConfigentiality) {
         EncounterBundle encounterBundle = new EncounterBundle();
-        EncounterEvent encounterEvent = new EncounterEvent();
         encounterBundle.setPatientConfidentiality(patientConfidentiality);
         encounterBundle.setEncounterConfidentiality(encounterConfigentiality);
-        encounterEvent.setEncounterBundle(encounterBundle);
+        EncounterEvent encounterEvent = new EncounterEvent(new Date(), encounterBundle);
         return encounterEvent;
     }
 

@@ -161,12 +161,10 @@ public class EncounterRepository {
             List<EncounterEvent> encounterEvents = new ArrayList<>();
                 EncounterEvent encounterEvent;
                 for (EncounterEventLog encounterInstance : encounterInstances) {
-                    encounterEvent = new EncounterEvent();
                     EncounterBundle savedEncounterBundle = selectFirst(encounterBundles, having(on(EncounterBundle.class).getEncounterId(),
                             Matchers.equalTo(encounterInstance.getEncounterId())));
 
-                    encounterEvent.setUpdatedAt(TimeUuidUtil.getDateFromUUID(encounterInstance.getCreatedAt()));
-                    encounterEvent.setEncounterBundle(savedEncounterBundle);
+                    encounterEvent = new EncounterEvent(TimeUuidUtil.getDateFromUUID(encounterInstance.getCreatedAt()), savedEncounterBundle);
                     encounterEvents.add(encounterEvent);
                 }
                 return Observable.just(encounterEvents);
