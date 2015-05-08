@@ -53,7 +53,7 @@ public class EncounterEventTest {
 
         ArrayList<String> categories = encounterCreateEvent.getCategories();
         assertEquals(2, categories.size());
-        Assert.assertEquals(String.format("latest_update_event_id : %s", TimeUuidUtil.uuidForDate(encounterEditEventDate)), categories.get(1));
+        Assert.assertEquals(String.format("latest_update_event_id:%s", TimeUuidUtil.uuidForDate(encounterEditEventDate)), categories.get(1));
 
     }
 

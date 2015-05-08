@@ -40,7 +40,7 @@ public class EncounterEvent {
 
     public ArrayList<String> getCategories() {
         if (isEncounterFurtherEdited()) {
-            categories.add(String.format("latest_update_event_id : %s", TimeUuidUtil.uuidForDate(getEncounterLastUpdatedAt())));
+            categories.add(String.format("latest_update_event_id:%s", TimeUuidUtil.uuidForDate(getEncounterLastUpdatedAt())));
         }
         return categories;
     }
