@@ -66,3 +66,7 @@ vagrant provision runs scripts/provision-local.sh, which updates cassandra confi
 
 - if running SHR from host machine and connecting to the cassandra on vagrant, then in guest's /etc/cassandra/conf/cassandra.yml file, ensure "listen_address", "seeds", "rpc_address" are set property to refer to the IP address instead of localhost.
 
+
+
+  #+ATTR_HTML: title="Join the chat at https://gitter.im/SharedHealth/FreeSHR"
+  [[https://gitter.im/SharedHealth/FreeSHR?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge][file:https://badges.gitter.im/Join%20Chat.svg]]
