@@ -9,7 +9,6 @@ import com.toddfast.mutagen.cassandra.CassandraSubject;
 import com.toddfast.mutagen.cassandra.impl.CassandraMutagenImpl;
 
 import java.io.IOException;
-import java.net.PasswordAuthentication;
 import java.util.Map;
 
 import static java.lang.System.getenv;
@@ -80,17 +79,6 @@ public class Migrations {
 
     protected Session createSession(Cluster cluster) {
         String keyspace = env.get("CASSANDRA_KEYSPACE");
-        String replicationStrategy = env.get("CASSANDRA_REPLICATION_STRATEGY");
-        String replicationFactor = env.get("CASSANDRA_REPLICATION_FACTOR");
-
-        Session session = cluster.connect();
-        session.execute(
-                String.format(
-                        "CREATE KEYSPACE IF NOT EXISTS %s " +
-                                "WITH replication = {'class':'%s', 'replication_factor':%s}; ",
-                        keyspace, replicationStrategy, replicationFactor)
-        );
-        session.close();
         return cluster.connect(keyspace);
     }
 
