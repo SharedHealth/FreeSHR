@@ -1,5 +1,7 @@
 package org.freeshr.config;
 
+import com.datastax.driver.core.AuthProvider;
+import com.datastax.driver.core.PlainTextAuthProvider;
 import com.datastax.driver.core.SocketOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cassandra.core.CqlOperations;
@@ -29,6 +31,11 @@ public class SHRCassandraConfig extends AbstractCassandraConfiguration {
     @Override
     protected int getPort() {
         return shrProperties.getCassandraPort();
+    }
+
+    @Override
+    protected AuthProvider getAuthProvider() {
+        return new PlainTextAuthProvider(shrProperties.getCassandraUser(), shrProperties.getCassandraPassword());
     }
 
     @Override

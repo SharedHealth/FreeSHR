@@ -25,7 +25,6 @@ public class SHRProperties {
     @Value("${TR_PASSWORD}")
     private String trPassword;
 
-
     @Value("${CASSANDRA_USER}")
     private String cassandraUser;
     @Value("${CASSANDRA_PASSWORD}")
