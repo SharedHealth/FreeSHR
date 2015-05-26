@@ -4,6 +4,7 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -85,6 +86,7 @@ public class TerminologyServerIntegrationTest {
     }
 
     @Test
+    @Ignore
     public void shouldFetchValueSetWithCaseInSensitivity() throws Exception {
         givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/encounter-type"))
                 .willReturn(aResponse()
