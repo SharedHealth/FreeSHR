@@ -38,7 +38,7 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
 
     @Before
     public void setUp() throws Exception {
-        givenThat(get(urlEqualTo("/api/v1/patients/" + VALID_HEALTH_ID))
+        givenThat(get(urlEqualTo("/api/default/patients/" + VALID_HEALTH_ID))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")

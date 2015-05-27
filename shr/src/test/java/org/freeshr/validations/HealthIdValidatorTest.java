@@ -41,7 +41,7 @@ public class HealthIdValidatorTest {
     public void shouldAcceptEncounterIfHealthIdInTheXmlMatchesTheGivenHealthId() {
         final String xml = FileUtil.asString("xmls/encounters/diagnostic_order_valid.xml");
         AtomFeed feed = resourceOrFeedDeserializer.deserialize(xml);
-        when(shrProperties.getPatientReferencePath()).thenReturn("http://localhost:9997/api/v1/patients");
+        when(shrProperties.getPatientReferencePath()).thenReturn("http://localhost:9997/api/default/patients");
         List<ValidationMessage> response = healthIdValidator.validate(getEncounterContext(xml, "5893922485019082753"));
         assertThat(EncounterValidationResponse.fromValidationMessages(response, fhirMessageFilter).isSuccessful(),
                 is(true));
@@ -60,7 +60,7 @@ public class HealthIdValidatorTest {
 
     @Test
     public void shouldRejectEncounterIfHealthIdInTheXmlDoesNotMatchTheGivenHealthId() {
-        when(shrProperties.getPatientReferencePath()).thenReturn("http://172.18.46.56:8081/api/v1/patients");
+        when(shrProperties.getPatientReferencePath()).thenReturn("http://172.18.46.56:8081/api/default/patients");
         String xml = FileUtil.asString("xmls/encounters/encounter.xml");
         AtomFeed feed = resourceOrFeedDeserializer.deserialize(xml);
         EncounterValidationResponse response = EncounterValidationResponse.fromValidationMessages(
@@ -72,7 +72,7 @@ public class HealthIdValidatorTest {
 
     @Test
     public void shouldRejectEncounterIfThereIsNoHealthIdInTheComposition() {
-        when(shrProperties.getPatientReferencePath()).thenReturn("http://172.18.46.56:8081/api/v1/patients");
+        when(shrProperties.getPatientReferencePath()).thenReturn("http://172.18.46.56:8081/api/default/patients");
         String xml = FileUtil.asString("xmls/encounters/encounter.xml");
         AtomFeed feed = resourceOrFeedDeserializer.deserialize(xml);
         EncounterValidationResponse response = EncounterValidationResponse.fromValidationMessages(

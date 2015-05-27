@@ -48,17 +48,17 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
 
     @Before
     public void setUp() throws Exception {
-        givenThat(get(urlEqualTo("/api/v1/patients/" + VALID_HEALTH_ID_CONFIDENTIAL))
+        givenThat(get(urlEqualTo("/api/default/patients/" + VALID_HEALTH_ID_CONFIDENTIAL))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/patient.json"))));
 
-        givenThat(get(urlEqualTo("/api/v1/patients/" + INVALID_HEALTH_ID))
+        givenThat(get(urlEqualTo("/api/default/patients/" + INVALID_HEALTH_ID))
                 .willReturn(aResponse()
                         .withStatus(404)));
 
-        givenThat(get(urlEqualTo("/api/v1/patients/" + VALID_HEALTH_ID_NOT_CONFIDENTIAL))
+        givenThat(get(urlEqualTo("/api/default/patients/" + VALID_HEALTH_ID_NOT_CONFIDENTIAL))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")

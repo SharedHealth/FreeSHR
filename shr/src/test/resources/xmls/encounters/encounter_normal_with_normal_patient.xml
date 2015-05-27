@@ -25,7 +25,7 @@
                 </confidentiality>
                 <status value="final"/>
                 <subject>
-                    <reference value="http://localhost:9997/api/v1/patients/5893922485019081234"/>
+                    <reference value="http://localhost:9997/api/default/patients/5893922485019081234"/>
                 </subject>
                 <encounter>
                     <reference value="c41cabed-3c47-4260-bd70-ac4893b97ee8"/>
@@ -64,7 +64,7 @@
                     <text value="LAB_RESULT"/>
                 </type>
                 <subject>
-                    <reference value="http://localhost:9997/api/v1/patients/5893922485019081234"/>
+                    <reference value="http://localhost:9997/api/default/patients/5893922485019081234"/>
                 </subject>
                 <participant>
                     <individual>
@@ -91,7 +91,7 @@
                     <value value="5f982a33-4454-4b74-9236-b8157aa8effd"/>
                 </identifier>
                 <subject>
-                    <reference value="http://localhost:9997/api/v1/patients/5893922485019081234"/>
+                    <reference value="http://localhost:9997/api/default/patients/5893922485019081234"/>
                 </subject>
                 <!-- TODO: This is actually an invalid reference. Validations have to be added for references like these -->
                 <encounter>

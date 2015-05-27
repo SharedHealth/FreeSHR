@@ -19,7 +19,7 @@
                 <date value="2014-12-04T16:28:33+05:30"/>
                 <status value="final"/>
                 <subject>
-                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <encounter>
@@ -65,7 +65,7 @@
                     <text value="INVESTIGATION"/>
                 </type>
                 <subject>
-                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <participant>
@@ -90,7 +90,7 @@
         <content type="text/xml">
             <DiagnosticOrder xmlns="http://hl7.org/fhir">
                 <subject>
-                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <orderer>
@@ -154,7 +154,7 @@
                     </coding>
                 </type>
                 <subject>
-                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <accessionIdentifier>

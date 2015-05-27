@@ -19,7 +19,7 @@
                 <date value="2014-09-22T13:48:18+05:30"/>
                 <status value="final"/>
                 <subject>
-                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                 </subject>
                 <encounter>
                     <reference value="urn:c41cabed-3c47-4260-bd70-ac4893b97ee8"/>
@@ -88,7 +88,7 @@
                     <text value="LAB_RESULT"/>
                 </type>
                 <subject>
-                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                 </subject>
                 <participant>
                     <individual>
@@ -115,7 +115,7 @@
                     <value value="urn:5f982a33-4454-4b74-9236-b8157aa8effd"/>
                 </identifier>
                 <subject>
-                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                 </subject>
                 <encounter>
                     <reference value="dfbc9b30-ceef-473e-9q22-4ee31qfceqdd"/>
@@ -154,7 +154,7 @@
                     <value value="urn:5f982a33-4454-4b74-9236-b8157aa8e123"/>
                 </identifier>
                 <subject>
-                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                 </subject>
                 <encounter>
                     <reference value="599ef7ae-ac5c-4ca5-a3e5-6161c60ea6a0"/>
@@ -195,7 +195,7 @@
                     <value value="urn:5f982a33-4454-4b74-9236-b8157aa8e678"/>
                 </identifier>
                 <subject>
-                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                 </subject>
                 <encounter>
                     <reference value="599ef7ae-ac5c-4ca5-a3e5-6161c60ea6a0"/>
@@ -235,7 +235,7 @@
                     <value value="urn:9826cf0c-66d6-4e33-bed1-91381ab200b5"/>
                 </identifier>
                 <subject>
-                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                 </subject>
                 <encounter>
                     <reference value="599ef7ae-ac5c-4ca5-a3e5-6161c60ea6a0"/>
@@ -309,7 +309,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <encounter>
@@ -355,7 +355,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <encounter>

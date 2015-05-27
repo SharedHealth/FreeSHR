@@ -75,13 +75,13 @@ public class PatientEncounterServiceIntegrationTest {
 
     @Before
     public void setUp() throws Exception {
-        givenThat(get(urlEqualTo("/api/v1/patients/" + VALID_HEALTH_ID))
+        givenThat(get(urlEqualTo("/api/default/patients/" + VALID_HEALTH_ID))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/patient.json"))));
 
-        givenThat(get(urlEqualTo("/api/v1/patients/" + VALID_HEALTH_ID_NEW))
+        givenThat(get(urlEqualTo("/api/default/patients/" + VALID_HEALTH_ID_NEW))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
@@ -95,7 +95,7 @@ public class PatientEncounterServiceIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/Facility.json"))));
 
-        givenThat(get(urlEqualTo("/api/v1/patients/" + INVALID_HEALTH_ID))
+        givenThat(get(urlEqualTo("/api/default/patients/" + INVALID_HEALTH_ID))
                 .willReturn(aResponse()
                         .withStatus(404)));
 

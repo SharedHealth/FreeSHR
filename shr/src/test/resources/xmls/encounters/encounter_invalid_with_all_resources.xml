@@ -1289,7 +1289,7 @@
                 <status value="final"/>
                 <issued value="2015-01-21T17:39:37+05:30"/>
                 <subject>
-                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <performer>
@@ -1323,7 +1323,7 @@
                     <value value="urn:b9b8da08-1d9a-4968-b5be-0d47e518b2ec"/>
                 </identifier>
                 <subject>
-                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <type>

@@ -21,7 +21,7 @@
                 <status value="final"/>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <encounter>
@@ -231,7 +231,7 @@
                 </type>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <participant>
@@ -273,7 +273,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -303,7 +303,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -334,7 +334,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -369,7 +369,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <related>
@@ -419,7 +419,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -440,7 +440,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <encounter>
@@ -486,7 +486,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <relation>
@@ -535,7 +535,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -566,7 +566,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -596,7 +596,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <related>
@@ -641,7 +641,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -672,7 +672,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -702,7 +702,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <related>
@@ -744,7 +744,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <encounter>
@@ -797,7 +797,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -830,7 +830,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -858,7 +858,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <related>
@@ -903,7 +903,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -934,7 +934,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -965,7 +965,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -996,7 +996,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
             </Observation>
@@ -1016,7 +1016,7 @@
                 </identifier>
                 <dateWritten value="2014-12-17T18:26:46+05:30"/>
                 <patient>
-                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </patient>
                 <prescriber>
@@ -1112,7 +1112,7 @@
                 </identifier>
                 <subject>
                     <reference
-                            value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                            value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
                 <related>
@@ -1156,7 +1156,7 @@
         <content type="text/xml">
             <DiagnosticOrder xmlns="http://hl7.org/fhir">
                 <subject>
-                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                 </subject>
                 <orderer>
                     <reference value="http://127.0.0.1:9997/providers/18.json"/>
@@ -1213,7 +1213,7 @@
                 <status value="final"/>
                 <issued value="2014-10-13T15:04:30+05:30"/>
                 <subject>
-                    <reference value="http://localhost:9997/api/v1/patients/5893922485019082753"/>
+                    <reference value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                 </subject>
                 <performer>
                     <reference value="http://127.0.0.1:9997/providers/18.json"/>

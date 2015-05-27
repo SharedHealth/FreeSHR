@@ -54,7 +54,7 @@ public class MCIClientIntegrationTest {
     public void setUp() {
         initMocks(this);
         mci = new MCIClient(shrRestTemplate, shrProperties);
-        when(shrProperties.getMCIPatientLocationPath()).thenReturn("http://localhost:9997/api/v1/patients");
+        when(shrProperties.getMCIPatientLocationPath()).thenReturn("http://localhost:9997/api/default/patients");
     }
 
     @Test
@@ -64,7 +64,7 @@ public class MCIClientIntegrationTest {
         String clientId = "123";
         String userEmail = "email@gmail.com";
 
-        givenThat(get(urlEqualTo("/api/v1/patients/" + heathId))
+        givenThat(get(urlEqualTo("/api/default/patients/" + heathId))
                 .withHeader(AUTH_TOKEN_KEY, equalTo(accessToken))
                 .withHeader(CLIENT_ID_KEY, equalTo(clientId))
                 .withHeader(FROM_KEY, equalTo(userEmail))
