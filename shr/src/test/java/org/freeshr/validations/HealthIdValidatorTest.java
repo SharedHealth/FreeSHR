@@ -47,6 +47,17 @@ public class HealthIdValidatorTest {
                 is(true));
     }
 
+
+    @Test
+    public void shouldAcceptEncounterIfHealthIdInTheXmlMatchesTheGivenHealthIdAllVersions() {
+        final String xml = FileUtil.asString("xmls/encounters/diagnostic_order_valid.xml");
+        AtomFeed feed = resourceOrFeedDeserializer.deserialize(xml);
+        when(shrProperties.getPatientReferencePath()).thenReturn("http://localhost:9997/api/v1/patients");
+        List<ValidationMessage> response = healthIdValidator.validate(getEncounterContext(xml, "5893922485019082753"));
+        assertThat(EncounterValidationResponse.fromValidationMessages(response, fhirMessageFilter).isSuccessful(),
+                is(true));
+    }
+
     @Test
     public void shouldNotAcceptEncounterIfNoHealthIdIsPresentInComposition() {
         String xml = FileUtil.asString("xmls/encounters/invalid_composition.xml");

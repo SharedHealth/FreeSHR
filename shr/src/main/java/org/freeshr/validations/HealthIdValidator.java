@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.freeshr.validations.ValidationMessages.HEALTH_ID_NOT_MATCH;
 import static org.freeshr.validations.ValidationMessages.HEALTH_ID_NOT_PRESENT_IN_COMPOSITION;
@@ -21,6 +23,8 @@ public class HealthIdValidator implements Validator<EncounterValidationContext> 
 
     private static final Logger logger = LoggerFactory.getLogger(HealthIdValidator.class);
     private SHRProperties shrProperties;
+    //match all urls that have /api/*/patients, 2nd groups contains the variable
+    private Pattern healthIdReferencePattern = Pattern.compile("(.+\\/api\\/)(\\w+)(\\/patients\\/.+)");
 
     @Autowired
     public HealthIdValidator(SHRProperties shrProperties) {
@@ -65,9 +69,12 @@ public class HealthIdValidator implements Validator<EncounterValidationContext> 
 
     private String validateAndIdentifyPatientId(String patientUrl, String healthId) {
         String expectedUrl = StringUtils.ensureSuffix(shrProperties.getPatientReferencePath(), "/") + healthId;
-        if (expectedUrl.trim().equalsIgnoreCase(patientUrl.trim())) {
-            return getHealthIdFromUrl(patientUrl);
-        }
+        Matcher actual = healthIdReferencePattern.matcher(patientUrl);
+        Matcher expected = healthIdReferencePattern.matcher(expectedUrl);
+
+        if (actual.find() && expected.find() && actual.groupCount() != 3) return null;
+        if (expected.group(1).equalsIgnoreCase(actual.group(1)) && expected.group(3).equalsIgnoreCase(actual.group(3)))
+            return actual.group(3);
         return null;
     }
 
