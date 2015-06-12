@@ -72,7 +72,7 @@ public class HealthIdValidator implements Validator<EncounterValidationContext> 
         Matcher actual = healthIdReferencePattern.matcher(patientUrl);
         Matcher expected = healthIdReferencePattern.matcher(expectedUrl);
 
-        if (actual.find() && expected.find() && actual.groupCount() != 3) return null;
+        if (!actual.find() || !expected.find() || actual.groupCount() != 3) return null;
         if (expected.group(1).equalsIgnoreCase(actual.group(1)) && expected.group(3).equalsIgnoreCase(actual.group(3)))
             return actual.group(3);
         return null;
