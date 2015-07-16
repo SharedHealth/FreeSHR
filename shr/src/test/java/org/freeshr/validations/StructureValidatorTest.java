@@ -2,7 +2,7 @@ package org.freeshr.validations;
 
 
 import org.freeshr.utils.FileUtil;
-import org.freeshr.utils.ResourceOrFeedDeserializer;
+import org.freeshr.utils.FhirFeedUtil;
 import org.hl7.fhir.instance.model.AtomFeed;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.junit.Before;
@@ -15,12 +15,12 @@ import static org.hamcrest.core.Is.is;
 
 public class StructureValidatorTest {
 
-    private ResourceOrFeedDeserializer resourceOrFeedDeserializer;
+    private FhirFeedUtil fhirFeedUtil;
     private StructureValidator structureValidator;
 
     @Before
     public void setup() {
-        resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
+        fhirFeedUtil = new FhirFeedUtil();
         structureValidator = new StructureValidator();
     }
 
@@ -31,7 +31,7 @@ public class StructureValidatorTest {
         List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<AtomFeed>() {
             @Override
             public AtomFeed extract() {
-                return resourceOrFeedDeserializer.deserialize(xml);
+                return fhirFeedUtil.deserialize(xml);
             }
         });
         assertThat(validationMessages.isEmpty(), is(true));
@@ -43,7 +43,7 @@ public class StructureValidatorTest {
         List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<AtomFeed>() {
             @Override
             public AtomFeed extract() {
-                return resourceOrFeedDeserializer.deserialize(xml);
+                return fhirFeedUtil.deserialize(xml);
             }
         });
         assertThat(validationMessages.isEmpty(), is(false));
@@ -57,7 +57,7 @@ public class StructureValidatorTest {
         List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<AtomFeed>() {
             @Override
             public AtomFeed extract() {
-                return resourceOrFeedDeserializer.deserialize(xml);
+                return fhirFeedUtil.deserialize(xml);
             }
         });
         assertThat(validationMessages.isEmpty(), is(false));
@@ -79,7 +79,7 @@ public class StructureValidatorTest {
         List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<AtomFeed>() {
             @Override
             public AtomFeed extract() {
-                return resourceOrFeedDeserializer.deserialize(xml);
+                return fhirFeedUtil.deserialize(xml);
             }
         });
         assertThat(validationMessages.isEmpty(), is(false));

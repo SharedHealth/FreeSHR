@@ -1,7 +1,7 @@
 package org.freeshr.application.fhir;
 
 import org.freeshr.utils.FileUtil;
-import org.freeshr.utils.ResourceOrFeedDeserializer;
+import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.validations.*;
 import org.hl7.fhir.instance.model.AtomFeed;
 import org.hl7.fhir.instance.model.OperationOutcome;
@@ -19,7 +19,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class ResourceValidatorTest {
 
     private ResourceValidator resourceValidator;
-    ResourceOrFeedDeserializer resourceOrFeedDeserializer;
+    FhirFeedUtil fhirFeedUtil;
 
     @Mock
     MedicationPrescriptionValidator medicationPrescriptionValidator;
@@ -33,7 +33,7 @@ public class ResourceValidatorTest {
         initMocks(this);
         resourceValidator = new ResourceValidator(new ConditionValidator(), medicationPrescriptionValidator, immunizationValidator,
                 procedureValidator);
-        resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
+        fhirFeedUtil = new FhirFeedUtil();
     }
 
     @Test
@@ -48,7 +48,7 @@ public class ResourceValidatorTest {
         List<ValidationMessage> messages = resourceValidator.validate(new ValidationSubject<AtomFeed>() {
             @Override
             public AtomFeed extract() {
-                return resourceOrFeedDeserializer.deserialize(xml);
+                return fhirFeedUtil.deserialize(xml);
             }
         });
         assertThat(messages.size(), is(3));
@@ -69,7 +69,7 @@ public class ResourceValidatorTest {
         List<ValidationMessage> messages = resourceValidator.validate(new ValidationSubject<AtomFeed>() {
             @Override
             public AtomFeed extract() {
-                return resourceOrFeedDeserializer.deserialize(xml);
+                return fhirFeedUtil.deserialize(xml);
             }
         });
 
@@ -82,7 +82,7 @@ public class ResourceValidatorTest {
         List<ValidationMessage> messages = resourceValidator.validate(new ValidationSubject<AtomFeed>() {
             @Override
             public AtomFeed extract() {
-                return resourceOrFeedDeserializer.deserialize(xml);
+                return fhirFeedUtil.deserialize(xml);
             }
         });
         assertThat(messages.isEmpty(), is(true));
@@ -94,7 +94,7 @@ public class ResourceValidatorTest {
         List<ValidationMessage> messages = resourceValidator.validate(new ValidationSubject<AtomFeed>() {
             @Override
             public AtomFeed extract() {
-                return resourceOrFeedDeserializer.deserialize(xml);
+                return fhirFeedUtil.deserialize(xml);
             }
         });
         assertThat(messages.isEmpty(), is(true));

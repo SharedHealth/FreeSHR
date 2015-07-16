@@ -5,6 +5,8 @@ import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.domain.service.PatientEncounterService;
 import org.freeshr.events.EncounterEvent;
+import org.freeshr.infrastructure.security.AccessFilter;
+import org.freeshr.infrastructure.security.ConfidentialEncounterHandler;
 import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
 import org.freeshr.interfaces.encounter.ws.exceptions.ResourceNotFound;
@@ -28,7 +30,6 @@ import java.util.concurrent.ExecutionException;
 import static ch.lambdaj.Lambda.extract;
 import static ch.lambdaj.Lambda.on;
 import static java.lang.String.format;
-import static org.freeshr.infrastructure.security.AccessFilter.*;
 
 @RestController
 @RequestMapping(value = "/patients")
@@ -37,9 +38,14 @@ public class PatientEncounterController extends ShrController {
 
     private PatientEncounterService patientEncounterService;
 
+    private AccessFilter accessFilter;
+    private ConfidentialEncounterHandler confidentialEncounterHandler;
+
     @Autowired
     public PatientEncounterController(PatientEncounterService patientEncounterService) {
         this.patientEncounterService = patientEncounterService;
+        this.accessFilter = new AccessFilter();
+        this.confidentialEncounterHandler = new ConfidentialEncounterHandler();
     }
 
     @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER')")
@@ -103,8 +109,8 @@ public class PatientEncounterController extends ShrController {
         final DeferredResult<EncounterSearchResponse> deferredResult = new DeferredResult<>();
 
         try {
-            final Boolean isRestrictedAccess = isAccessRestrictedToEncounterFetchForPatient(healthId, userInfo);
-            if (isRestrictedAccess == null) {
+            final Boolean isUserAccessRestrictedForConfidentialData = accessFilter.isAccessRestrictedToEncounterFetchForPatient(healthId, userInfo);
+            if (isUserAccessRestrictedForConfidentialData == null) {
                 deferredResult.setErrorResult(new Forbidden(String.format("Access is denied to user %s for patient %s", userInfo.getProperties().getId(), healthId)));
                 return deferredResult;
             }
@@ -115,12 +121,13 @@ public class PatientEncounterController extends ShrController {
                 @Override
                 public void call(List<EncounterEvent> encounterEvents) {
                     try {
-
                         List<EncounterBundle> encounterBundles = extract(encounterEvents, on(EncounterEvent.class).getEncounterBundle());
-                        if (isRestrictedAccess && isConfidentialPatient(encounterBundles)) {
+                        if (isUserAccessRestrictedForConfidentialData && accessFilter.isConfidentialPatient(encounterBundles)) {
                             deferredResult.setErrorResult(new Forbidden(format("Access is denied to user %s for patient %s", userInfo.getProperties().getId(), healthId)));
                         } else {
-                            encounterEvents = filterEncounterEvents(isRestrictedAccess, encounterEvents);
+                            if (isUserAccessRestrictedForConfidentialData) {
+                                encounterEvents = confidentialEncounterHandler.replaceConfidentialEncounterEvents(encounterEvents);
+                            }
                             EncounterSearchResponse searchResponse = new EncounterSearchResponse(
                                     UrlUtil.addLastUpdatedQueryParams(request, requestedDate, null), encounterEvents);
                             logger.debug(searchResponse.toString());
@@ -155,7 +162,7 @@ public class PatientEncounterController extends ShrController {
         logAccessDetails(userInfo, format("Find encounter %s for patient %s", encounterId, healthId));
 
         try {
-            final Boolean isRestrictedAccess = isAccessRestrictedToEncounterFetchForPatient(healthId, userInfo);
+            final Boolean isRestrictedAccess = accessFilter.isAccessRestrictedToEncounterFetchForPatient(healthId, userInfo);
             Observable<EncounterBundle> observable = patientEncounterService.findEncounter(healthId,
                     encounterId).firstOrDefault(null);
             observable.subscribe(new Action1<EncounterBundle>() {
@@ -163,7 +170,7 @@ public class PatientEncounterController extends ShrController {
                  public void call(EncounterBundle encounterBundle) {
                      if (encounterBundle != null) {
                          logger.debug(String.format("Encounter bundles: %s", encounterBundle.toString()));
-                         if ((isRestrictedAccess == null || isRestrictedAccess) && encounterBundle.isConfidentialEncounter()) {
+                         if ((isRestrictedAccess == null || isRestrictedAccess) && encounterBundle.isConfidential()) {
                              deferredResult.setErrorResult(new Forbidden(format("Access is denied to user %s for encounter %s",
                                      userInfo.getProperties().getId(), encounterId)));
                          } else {

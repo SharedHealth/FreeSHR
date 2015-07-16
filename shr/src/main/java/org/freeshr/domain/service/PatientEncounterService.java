@@ -9,7 +9,7 @@ import org.freeshr.events.EncounterEvent;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
 import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.utils.Confidentiality;
-import org.freeshr.utils.ResourceOrFeedDeserializer;
+import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.validations.EncounterValidationContext;
 import org.freeshr.validations.EncounterValidator;
 import org.hl7.fhir.instance.model.*;
@@ -203,7 +203,7 @@ public class PatientEncounterService {
     }
 
     private EncounterValidationResponse validate(EncounterBundle encounterBundle) {
-        EncounterValidationContext validationContext = new EncounterValidationContext(encounterBundle, new ResourceOrFeedDeserializer());
+        EncounterValidationContext validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         return encounterValidator.validate(validationContext);
     }
 

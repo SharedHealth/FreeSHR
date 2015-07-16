@@ -5,7 +5,7 @@ import org.freeshr.application.fhir.FhirMessageFilter;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.utils.FileUtil;
-import org.freeshr.utils.ResourceOrFeedDeserializer;
+import org.freeshr.utils.FhirFeedUtil;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,12 +25,12 @@ public class ProviderValidatorTest {
 
     @Autowired
     ProviderValidator providerValidator;
-    ResourceOrFeedDeserializer resourceOrFeedDeserializer;
+    FhirFeedUtil fhirFeedUtil;
     FhirMessageFilter fhirMessageFilter;
 
     @Before
     public void setup() {
-        resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
+        fhirFeedUtil = new FhirFeedUtil();
         fhirMessageFilter = new FhirMessageFilter();
     }
 
@@ -68,7 +68,7 @@ public class ProviderValidatorTest {
                 EncounterBundle encounterBundle = new EncounterBundle();
                 encounterBundle.setEncounterContent(xml);
                 encounterBundle.setHealthId(healthId);
-                return new EncounterValidationContext(encounterBundle, resourceOrFeedDeserializer);
+                return new EncounterValidationContext(encounterBundle, fhirFeedUtil);
 
             }
         };

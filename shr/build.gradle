@@ -68,8 +68,6 @@ dependencies {
         exclude group: 'ch.qos.logback', module: "logback-classic"
     }
 
-    compile project(":fhir")
-
     testCompile(testLibraries.netty) {
         force = 'true'
     }

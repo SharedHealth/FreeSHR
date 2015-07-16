@@ -105,9 +105,22 @@ public class EncounterBundle {
 
     @JsonIgnore
     @XmlTransient
-    public boolean isConfidentialEncounter() {
-        return this.getEncounterConfidentiality().ordinal() > Confidentiality.Normal.ordinal()
-                || this.getPatientConfidentiality().ordinal() > Confidentiality.Normal.ordinal();
+    public boolean isConfidential() {
+        return getConfidentialityLevel().ordinal() > Confidentiality.Normal.ordinal();
+    }
+
+    @JsonIgnore
+    @XmlTransient
+    public boolean isConfidentialPatient() {
+        return getPatientConfidentiality().ordinal() > Confidentiality.Normal.ordinal();
+    }
+
+    @JsonIgnore
+    @XmlTransient
+    public Confidentiality getConfidentialityLevel() {
+        if(this.getPatientConfidentiality().ordinal() > Confidentiality.Normal.ordinal())
+            return this.getPatientConfidentiality();
+        return this.getEncounterConfidentiality();
     }
 
     public void setContentVersion(int contentVersion) {

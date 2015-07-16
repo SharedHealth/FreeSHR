@@ -189,14 +189,6 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/userDetailForFacility.json"))));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/patients/" + VALID_HEALTH_ID + "/encounters")
-                .header(AUTH_TOKEN_KEY, validAccessToken)
-                .header(FROM_KEY, validEmail)
-                .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_ATOM_XML))
-                .andExpect(status().isOk())
-                .andExpect(request().asyncResult(hasEncounterEventsOfSize(0)));
-
         mockMvc.perform(MockMvcRequestBuilders.get("/patients/" + VALID_HEALTH_ID + "/encounters/" + ENCOUNTER_ID)
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
@@ -248,14 +240,6 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/userDetailForProvider.json"))));
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/patients/" + VALID_HEALTH_ID + "/encounters")
-                .header(AUTH_TOKEN_KEY, validAccessToken)
-                .header(FROM_KEY, validEmail)
-                .header(CLIENT_ID_KEY, validClientId)
-                .accept(MediaType.APPLICATION_ATOM_XML))
-                .andExpect(status().isOk())
-                .andExpect(request().asyncResult(hasEncounterEventsOfSize(0)));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/patients/" + VALID_HEALTH_ID + "/encounters/" + ENCOUNTER_ID)
                 .header(AUTH_TOKEN_KEY, validAccessToken)
@@ -466,14 +450,14 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
         Patient patient = createPatient(healthId, division, district);
 
         final Requester createdBy = new Requester("facilityId", "providerId");
-        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, new Date()), patient);
+        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, Normal, Normal, asString("xmls/encounters/encounter_valid.xml"), createdBy, new Date()), patient);
     }
 
     private void createConfidentialEncounter(String healthId) throws Exception {
         Patient patient = createPatient(healthId, DATASENSE_REGISTERED_DIVISION, DATASENSE_REGISTERED_DISTRICT);
 
         final Requester createdBy = new Requester("facilityId", "providerId");
-        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, VeryRestricted, Normal, asString("jsons/encounters/valid.json"), createdBy, new Date()), patient);
+        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, VeryRestricted, Normal, asString("xmls/encounters/encounter_valid.xml"), createdBy, new Date()), patient);
     }
 
     private Patient createPatient(String healthId, String division, String district) {

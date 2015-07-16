@@ -1,5 +1,6 @@
 package org.freeshr.validations;
 
+import org.freeshr.utils.FhirFeedUtil;
 import org.hl7.fhir.instance.model.*;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.springframework.stereotype.Component;
@@ -76,15 +77,9 @@ public class StructureValidator implements Validator<AtomFeed> {
 
     private AtomEntry<? extends Resource> hasCompositionWithEncounter(List<AtomEntry<? extends Resource>> entryList) {
         AtomEntry<? extends Resource> compositionEntry = null;
-        for (AtomEntry<? extends Resource> atomEntry : entryList) {
-            Resource resource = atomEntry.getResource();
-            if (resource.getResourceType().equals(ResourceType.Composition)) {
-                compositionEntry = resource.getChildByName("encounter").hasValues() ? atomEntry : null;
-                break;
-            }
-        }
-        return compositionEntry;
+        compositionEntry = new FhirFeedUtil().getAtomEntryOfResourceType(entryList, ResourceType.Composition);
+        if(compositionEntry == null) return null;
+        return compositionEntry.getResource().getChildByName("encounter").hasValues() ? compositionEntry : null;
     }
-
 }
 

@@ -1,24 +1,24 @@
 package org.freeshr.validations;
 
 import org.freeshr.application.fhir.EncounterBundle;
-import org.freeshr.utils.ResourceOrFeedDeserializer;
+import org.freeshr.utils.FhirFeedUtil;
 import org.hl7.fhir.instance.model.AtomFeed;
 
 public class EncounterValidationContext {
     private EncounterBundle encounterBundle;
-    private ResourceOrFeedDeserializer resourceOrFeedDeserializer;
+    private FhirFeedUtil fhirFeedUtil;
     private AtomFeed feed;
 
     public EncounterValidationContext(EncounterBundle encounterBundle,
-                                      ResourceOrFeedDeserializer resourceOrFeedDeserializer) {
+                                      FhirFeedUtil fhirFeedUtil) {
         this.encounterBundle = encounterBundle;
-        this.resourceOrFeedDeserializer = resourceOrFeedDeserializer;
+        this.fhirFeedUtil = fhirFeedUtil;
     }
 
     public AtomFeed getFeed() {
         //deserialize only once
         if (feed != null) return feed;
-        feed = resourceOrFeedDeserializer.deserialize(encounterBundle.getContent());
+        feed = fhirFeedUtil.deserialize(encounterBundle.getContent());
         return feed;
     }
 

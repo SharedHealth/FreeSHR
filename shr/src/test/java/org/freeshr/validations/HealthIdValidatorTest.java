@@ -5,7 +5,7 @@ import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.application.fhir.FhirMessageFilter;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.utils.FileUtil;
-import org.freeshr.utils.ResourceOrFeedDeserializer;
+import org.freeshr.utils.FhirFeedUtil;
 import org.hl7.fhir.instance.model.AtomFeed;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.junit.Before;
@@ -22,7 +22,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class HealthIdValidatorTest {
 
     private HealthIdValidator healthIdValidator;
-    ResourceOrFeedDeserializer resourceOrFeedDeserializer;
+    FhirFeedUtil fhirFeedUtil;
     FhirMessageFilter fhirMessageFilter;
 
     @Mock
@@ -33,14 +33,14 @@ public class HealthIdValidatorTest {
         initMocks(this);
 
         healthIdValidator = new HealthIdValidator(shrProperties);
-        resourceOrFeedDeserializer = new ResourceOrFeedDeserializer();
+        fhirFeedUtil = new FhirFeedUtil();
         fhirMessageFilter = new FhirMessageFilter();
     }
 
     @Test
     public void shouldAcceptEncounterIfHealthIdInTheXmlMatchesTheGivenHealthId() {
         final String xml = FileUtil.asString("xmls/encounters/diagnostic_order_valid.xml");
-        AtomFeed feed = resourceOrFeedDeserializer.deserialize(xml);
+        AtomFeed feed = fhirFeedUtil.deserialize(xml);
         when(shrProperties.getPatientReferencePath()).thenReturn("http://localhost:9997/api/default/patients");
         List<ValidationMessage> response = healthIdValidator.validate(getEncounterContext(xml, "5893922485019082753"));
         assertThat(EncounterValidationResponse.fromValidationMessages(response, fhirMessageFilter).isSuccessful(),
@@ -51,7 +51,7 @@ public class HealthIdValidatorTest {
     @Test
     public void shouldAcceptEncounterIfHealthIdInTheXmlMatchesTheGivenHealthIdAllVersions() {
         final String xml = FileUtil.asString("xmls/encounters/diagnostic_order_valid.xml");
-        AtomFeed feed = resourceOrFeedDeserializer.deserialize(xml);
+        AtomFeed feed = fhirFeedUtil.deserialize(xml);
         when(shrProperties.getPatientReferencePath()).thenReturn("http://localhost:9997/api/v1/patients");
         List<ValidationMessage> response = healthIdValidator.validate(getEncounterContext(xml, "5893922485019082753"));
         assertThat(EncounterValidationResponse.fromValidationMessages(response, fhirMessageFilter).isSuccessful(),
@@ -61,7 +61,7 @@ public class HealthIdValidatorTest {
     @Test
     public void shouldNotAcceptEncounterIfNoHealthIdIsPresentInComposition() {
         String xml = FileUtil.asString("xmls/encounters/invalid_composition.xml");
-        AtomFeed feed = resourceOrFeedDeserializer.deserialize(xml);
+        AtomFeed feed = fhirFeedUtil.deserialize(xml);
         EncounterValidationResponse response = EncounterValidationResponse.fromValidationMessages(
                 healthIdValidator.validate(getEncounterContext(xml, "5893922485019082753")), fhirMessageFilter);
         assertThat(response.isSuccessful(), is(false));
@@ -72,8 +72,8 @@ public class HealthIdValidatorTest {
     @Test
     public void shouldRejectEncounterIfHealthIdInTheXmlDoesNotMatchTheGivenHealthId() {
         when(shrProperties.getPatientReferencePath()).thenReturn("http://172.18.46.56:8081/api/default/patients");
-        String xml = FileUtil.asString("xmls/encounters/encounter.xml");
-        AtomFeed feed = resourceOrFeedDeserializer.deserialize(xml);
+        String xml = FileUtil.asString("xmls/encounters/encounterWithDiagnosis.xml");
+        AtomFeed feed = fhirFeedUtil.deserialize(xml);
         EncounterValidationResponse response = EncounterValidationResponse.fromValidationMessages(
                 healthIdValidator.validate(getEncounterContext(xml, "11112222233333")), fhirMessageFilter);
         assertThat(response.isSuccessful(), is(false));
@@ -84,8 +84,8 @@ public class HealthIdValidatorTest {
     @Test
     public void shouldRejectEncounterIfThereIsNoHealthIdInTheComposition() {
         when(shrProperties.getPatientReferencePath()).thenReturn("http://172.18.46.56:8081/api/default/patients");
-        String xml = FileUtil.asString("xmls/encounters/encounter.xml");
-        AtomFeed feed = resourceOrFeedDeserializer.deserialize(xml);
+        String xml = FileUtil.asString("xmls/encounters/encounterWithDiagnosis.xml");
+        AtomFeed feed = fhirFeedUtil.deserialize(xml);
         EncounterValidationResponse response = EncounterValidationResponse.fromValidationMessages(
                 healthIdValidator.validate(getEncounterContext(xml, "11112222233333")), fhirMessageFilter);
         assertThat(response.isSuccessful(), is(false));
@@ -100,7 +100,7 @@ public class HealthIdValidatorTest {
                 EncounterBundle encounterBundle = new EncounterBundle();
                 encounterBundle.setEncounterContent(xml);
                 encounterBundle.setHealthId(healthId);
-                return new EncounterValidationContext(encounterBundle, resourceOrFeedDeserializer);
+                return new EncounterValidationContext(encounterBundle, fhirFeedUtil);
 
             }
         };

@@ -17,7 +17,7 @@ public class AtomFeedHelper {
         EncounterBundle encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString(feedFile));
         final EncounterValidationContext validationContext = new EncounterValidationContext(encounterBundle,
-                new ResourceOrFeedDeserializer());
+                new FhirFeedUtil());
 
         AtomFeed feed = validationContext.feedFragment().extract();
         List<AtomEntry<? extends Resource>> feedEntryList = feed.getEntryList();

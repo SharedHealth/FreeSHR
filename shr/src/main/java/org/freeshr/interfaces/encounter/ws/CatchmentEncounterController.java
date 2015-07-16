@@ -3,6 +3,8 @@ package org.freeshr.interfaces.encounter.ws;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.domain.service.CatchmentEncounterService;
 import org.freeshr.events.EncounterEvent;
+import org.freeshr.infrastructure.security.AccessFilter;
+import org.freeshr.infrastructure.security.ConfidentialEncounterHandler;
 import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.interfaces.encounter.ws.exceptions.BadRequest;
 import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
@@ -12,7 +14,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.util.UriComponentsBuilder;
 import rx.Observable;
@@ -31,18 +37,20 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static java.lang.String.format;
-import static org.freeshr.infrastructure.security.AccessFilter.filterEncounterEvents;
-import static org.freeshr.infrastructure.security.AccessFilter.isAccessRestrictedToEncounterFetchForCatchment;
 
 @RestController
 public class CatchmentEncounterController extends ShrController {
     private static final Logger logger = LoggerFactory.getLogger(CatchmentEncounterController.class);
 
     private CatchmentEncounterService catchmentEncounterService;
+    private AccessFilter accessFilter;
+    private ConfidentialEncounterHandler confidentialEncounterHandler;
 
     @Autowired
     public CatchmentEncounterController(CatchmentEncounterService catchmentEncounterService) {
         this.catchmentEncounterService = catchmentEncounterService;
+        this.accessFilter = new AccessFilter();
+        this.confidentialEncounterHandler = new ConfidentialEncounterHandler();
     }
 
     @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER', 'ROLE_SHR System Admin')")
@@ -64,8 +72,8 @@ public class CatchmentEncounterController extends ShrController {
                 return deferredResult;
             }
             final Date requestedDate = getRequestedDateForCatchment(updatedSince);
-            final Boolean isRestrictedAccess = isAccessRestrictedToEncounterFetchForCatchment(catchment, userInfo);
-            if (isRestrictedAccess == null) {
+            final Boolean isUserAccessRestrictedForConfidentialData = accessFilter.isAccessRestrictedToEncounterFetchForCatchment(catchment, userInfo);
+            if (isUserAccessRestrictedForConfidentialData == null) {
                 deferredResult.setErrorResult(new Forbidden(String.format("Access is denied to user %s for catchment %s", userInfo.getProperties().getId(), catchment)));
                 return deferredResult;
             }
@@ -75,7 +83,9 @@ public class CatchmentEncounterController extends ShrController {
                 @Override
                 public void call(List<EncounterEvent> encounterEvents) {
                     try {
-                        encounterEvents = filterEncounterEvents(isRestrictedAccess, encounterEvents);
+                        if (isUserAccessRestrictedForConfidentialData) {
+                            encounterEvents = confidentialEncounterHandler.replaceConfidentialEncounterEvents(encounterEvents);
+                        }
                         EncounterSearchResponse searchResponse = new EncounterSearchResponse(
                                 UrlUtil.addLastUpdatedQueryParams(request, requestedDate, lastMarker), encounterEvents);
                         searchResponse.setNavLinks(null, getNextResultURL(request, encounterEvents, requestedDate));
@@ -169,7 +179,7 @@ public class CatchmentEncounterController extends ShrController {
     }
 
     private Observable<List<EncounterEvent>> filterAfterMarker(final Observable<List<EncounterEvent>> encounterEventsObservable,
-                                                                final String lastMarker, final int limit) {
+                                                               final String lastMarker, final int limit) {
 
         return encounterEventsObservable.flatMap(new Func1<List<EncounterEvent>, Observable<? extends List<EncounterEvent>>>() {
             @Override
