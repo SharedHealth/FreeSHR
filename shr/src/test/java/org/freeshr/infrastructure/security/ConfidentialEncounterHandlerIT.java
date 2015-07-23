@@ -7,6 +7,7 @@ import org.freeshr.utils.Confidentiality;
 import org.freeshr.utils.FhirFeedUtil;
 import org.hl7.fhir.instance.model.AtomEntry;
 import org.hl7.fhir.instance.model.AtomFeed;
+import org.hl7.fhir.instance.model.Coding;
 import org.hl7.fhir.instance.model.Composition;
 import org.hl7.fhir.instance.model.ResourceType;
 import org.junit.Test;
@@ -46,6 +47,12 @@ public class ConfidentialEncounterHandlerIT extends APIIntegrationTestBase {
 
         assertEquals(originalComposition.getStatus().getValue(), replacedComposition.getStatus().getValue());
         assertEquals(originalComposition.getDateSimple().toString(), replacedComposition.getDateSimple().toString());
+        assertEquals(originalComposition.getAuthor().get(0).getReferenceSimple(), replacedComposition.getAuthor().get(0).getReferenceSimple());
+        Coding replaceCompositionType = replacedComposition.getType().getCoding().get(0);
+        Coding originalCompositionType = originalComposition.getType().getCoding().get(0);
+        assertEquals(originalCompositionType.getCodeSimple(), replaceCompositionType.getCodeSimple());
+        assertEquals(originalCompositionType.getSystemSimple(), replaceCompositionType.getSystemSimple());
+        assertEquals(originalCompositionType.getDisplaySimple(), replaceCompositionType.getDisplaySimple());
         assertEquals(Confidentiality.Restricted.getLevel(), replacedComposition.getConfidentiality().getCodeSimple());
 
         assertEquals(1, replacedFeed.getEntryList().size());

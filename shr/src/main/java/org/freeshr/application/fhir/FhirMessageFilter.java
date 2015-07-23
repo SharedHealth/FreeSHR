@@ -15,6 +15,7 @@ public class FhirMessageFilter {
 
     public FhirMessageFilter() {
         ignoreList = new ArrayList<>();
+        ignoreList.add("f:Composition/f:Composition/f:type");
         ignoreList.add("f:DiagnosticOrder/f:item");
         ignoreList.add("f:DiagnosticReport/f:name");
     }

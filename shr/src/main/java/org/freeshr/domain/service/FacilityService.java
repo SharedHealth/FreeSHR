@@ -25,7 +25,17 @@ public class FacilityService {
 
     public Observable<Facility> ensurePresent(final String facilityId) {
         Observable<Facility> facility = facilityRepository.find(facilityId);
-        return facility.flatMap(findRemoteIfNotFound(facilityId));
+        return facility.flatMap(findRemoteIfNotFound(facilityId), new Func1<Throwable, Observable<? extends Facility>>() {
+            @Override
+            public Observable<? extends Facility> call(Throwable throwable) {
+                return Observable.error(throwable);
+            }
+        }, new Func0<Observable<? extends Facility>>() {
+            @Override
+            public Observable<? extends Facility> call() {
+                return null;
+            }
+        });
     }
 
     private Func1<Facility, Observable<Facility>> findRemoteIfNotFound(final String facilityId) {

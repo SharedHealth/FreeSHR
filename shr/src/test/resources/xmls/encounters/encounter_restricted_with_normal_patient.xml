@@ -24,9 +24,19 @@
                     <display value="very restricted"/>
                 </confidentiality>
                 <status value="final"/>
+                <type>
+                    <coding>
+                        <system value="http://loinc.org"/>
+                        <code value="51899-3"/>
+                        <display value="Details Document"/>
+                    </coding>
+                </type>
                 <subject>
                     <reference value="http://localhost:9997/api/default/patients/5893922485019081234"/>
                 </subject>
+                <author>
+                    <reference value="http://hrmtest.dghs.gov.bd/api/1.0/facilities/10019841.json"/>
+                </author>
                 <encounter>
                     <reference value="c41cabed-3c47-4260-bd70-ac4893b97ee8"/>
                     <display value="encounter"/>
@@ -66,15 +76,6 @@
                 <subject>
                     <reference value="http://localhost:9997/api/default/patients/5893922485019081234"/>
                 </subject>
-                <participant>
-                    <individual>
-                        <reference value="http://127.0.0.1:9997/providers/18.json"/>
-                    </individual>
-                </participant>
-                <indication>
-                    <reference value="d3cc23c3-1f12-4b89-a415-356feeba0690"/>
-                    <display value="encounter"/>
-                </indication>
             </Encounter>
         </content>
     </entry>

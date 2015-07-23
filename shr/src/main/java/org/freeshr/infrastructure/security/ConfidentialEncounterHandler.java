@@ -8,6 +8,7 @@ import org.hl7.fhir.instance.model.AtomFeed;
 import org.hl7.fhir.instance.model.Coding;
 import org.hl7.fhir.instance.model.Composition;
 import org.hl7.fhir.instance.model.Resource;
+import org.hl7.fhir.instance.model.ResourceReference;
 import org.hl7.fhir.instance.model.ResourceType;
 
 import java.util.ArrayList;
@@ -43,6 +44,11 @@ public class ConfidentialEncounterHandler {
         composition.setConfidentiality(confidentiality);
         composition.setStatus(originalComposition.getStatus());
         composition.setDate(originalComposition.getDate());
+        for (ResourceReference resourceReference : originalComposition.getAuthor()) {
+            ResourceReference authorReference = composition.addAuthor();
+            authorReference.setReferenceSimple(resourceReference.getReferenceSimple());
+        }
+        composition.setType(originalComposition.getType());
 
         AtomFeed feed = new AtomFeed();
         AtomEntry atomEntry = new AtomEntry();
