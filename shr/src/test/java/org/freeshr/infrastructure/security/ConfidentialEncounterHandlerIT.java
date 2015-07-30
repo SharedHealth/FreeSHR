@@ -10,6 +10,7 @@ import org.hl7.fhir.instance.model.AtomFeed;
 import org.hl7.fhir.instance.model.Coding;
 import org.hl7.fhir.instance.model.Composition;
 import org.hl7.fhir.instance.model.ResourceType;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
@@ -22,8 +23,14 @@ import static org.junit.Assert.assertEquals;
 public class ConfidentialEncounterHandlerIT extends APIIntegrationTestBase {
     private static final String VALID_HEALTH_ID = "5893922485019082753";
 
-    private ConfidentialEncounterHandler confidentialEncounterHandler = new ConfidentialEncounterHandler();
-    private FhirFeedUtil fhirFeedUtil = new FhirFeedUtil();
+    private ConfidentialEncounterHandler confidentialEncounterHandler;
+    private FhirFeedUtil fhirFeedUtil;
+
+    @Before
+    public void setUp() throws Exception {
+        fhirFeedUtil = new FhirFeedUtil();
+        confidentialEncounterHandler = new ConfidentialEncounterHandler(fhirFeedUtil);
+    }
 
     @Test
     public void shouldReplaceConfidentialEncounters() throws Exception {

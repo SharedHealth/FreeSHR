@@ -6,15 +6,14 @@ import org.hl7.fhir.instance.model.AtomEntry;
 import org.hl7.fhir.instance.model.AtomFeed;
 import org.hl7.fhir.instance.model.Resource;
 import org.hl7.fhir.instance.model.ResourceType;
+import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
+@Component
 public class FhirFeedUtil {
-
-    public FhirFeedUtil() {
-    }
 
     public AtomFeed deserialize(String xml) {
         try {

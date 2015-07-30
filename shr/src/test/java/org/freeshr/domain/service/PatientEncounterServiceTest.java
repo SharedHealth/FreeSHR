@@ -42,7 +42,7 @@ public class PatientEncounterServiceTest {
         mockEncounterValidator = mock(EncounterValidator.class);
         mockPatientService = mock(PatientService.class);
         patientEncounterService = new PatientEncounterService(mockEncounterRepository, mockPatientService,
-                mockEncounterValidator);
+                mockEncounterValidator, new FhirFeedUtil());
     }
 
 

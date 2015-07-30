@@ -9,6 +9,7 @@ import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.service.CatchmentEncounterService;
 import org.freeshr.events.EncounterEvent;
+import org.freeshr.infrastructure.security.ConfidentialEncounterHandler;
 import org.freeshr.infrastructure.security.TokenAuthentication;
 import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.infrastructure.security.UserProfile;
@@ -16,6 +17,7 @@ import org.freeshr.interfaces.encounter.ws.exceptions.BadRequest;
 import org.freeshr.interfaces.encounter.ws.exceptions.ErrorInfo;
 import org.freeshr.utils.Confidentiality;
 import org.freeshr.utils.DateUtil;
+import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.utils.TimeUuidUtil;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,7 +64,9 @@ public class CatchmentEncounterControllerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        controller = new CatchmentEncounterController(mockCatchmentEncounterService);
+        FhirFeedUtil fhirFeedUtil = new FhirFeedUtil();
+        ConfidentialEncounterHandler confidentialEncounterHandler = new ConfidentialEncounterHandler(fhirFeedUtil);
+        controller = new CatchmentEncounterController(mockCatchmentEncounterService, confidentialEncounterHandler);
     }
 
     @Test

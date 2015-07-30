@@ -47,10 +47,10 @@ public class CatchmentEncounterController extends ShrController {
     private ConfidentialEncounterHandler confidentialEncounterHandler;
 
     @Autowired
-    public CatchmentEncounterController(CatchmentEncounterService catchmentEncounterService) {
+    public CatchmentEncounterController(CatchmentEncounterService catchmentEncounterService, ConfidentialEncounterHandler confidentialEncounterHandler) {
         this.catchmentEncounterService = catchmentEncounterService;
         this.accessFilter = new AccessFilter();
-        this.confidentialEncounterHandler = new ConfidentialEncounterHandler();
+        this.confidentialEncounterHandler = confidentialEncounterHandler;
     }
 
     @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER', 'ROLE_SHR System Admin')")

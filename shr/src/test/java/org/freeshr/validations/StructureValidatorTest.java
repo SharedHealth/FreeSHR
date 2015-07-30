@@ -21,9 +21,8 @@ public class StructureValidatorTest {
     @Before
     public void setup() {
         fhirFeedUtil = new FhirFeedUtil();
-        structureValidator = new StructureValidator();
+        structureValidator = new StructureValidator(fhirFeedUtil);
     }
-
 
     @Test
     public void shouldAcceptAValidXmlWithOneEntryForEachSectionPresentInComposition() {

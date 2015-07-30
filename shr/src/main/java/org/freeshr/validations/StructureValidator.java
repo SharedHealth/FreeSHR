@@ -1,8 +1,17 @@
 package org.freeshr.validations;
 
 import org.freeshr.utils.FhirFeedUtil;
-import org.hl7.fhir.instance.model.*;
+import org.hl7.fhir.instance.model.AtomEntry;
+import org.hl7.fhir.instance.model.AtomFeed;
+import org.hl7.fhir.instance.model.Composition;
+import org.hl7.fhir.instance.model.Element;
+import org.hl7.fhir.instance.model.Identifier;
+import org.hl7.fhir.instance.model.OperationOutcome;
+import org.hl7.fhir.instance.model.Resource;
+import org.hl7.fhir.instance.model.ResourceReference;
+import org.hl7.fhir.instance.model.ResourceType;
 import org.hl7.fhir.instance.validation.ValidationMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -12,6 +21,13 @@ import static org.freeshr.validations.ValidationMessages.FEED_MUST_HAVE_COMPOSIT
 
 @Component
 public class StructureValidator implements Validator<AtomFeed> {
+    private FhirFeedUtil fhirFeedUtil;
+
+    @Autowired
+    public StructureValidator(FhirFeedUtil fhirFeedUtil) {
+        this.fhirFeedUtil = fhirFeedUtil;
+    }
+
     @Override
     public List<ValidationMessage> validate(ValidationSubject<AtomFeed> subject) {
         AtomFeed feed = subject.extract();
@@ -77,7 +93,7 @@ public class StructureValidator implements Validator<AtomFeed> {
 
     private AtomEntry<? extends Resource> hasCompositionWithEncounter(List<AtomEntry<? extends Resource>> entryList) {
         AtomEntry<? extends Resource> compositionEntry = null;
-        compositionEntry = new FhirFeedUtil().getAtomEntryOfResourceType(entryList, ResourceType.Composition);
+        compositionEntry = fhirFeedUtil.getAtomEntryOfResourceType(entryList, ResourceType.Composition);
         if(compositionEntry == null) return null;
         return compositionEntry.getResource().getChildByName("encounter").hasValues() ? compositionEntry : null;
     }

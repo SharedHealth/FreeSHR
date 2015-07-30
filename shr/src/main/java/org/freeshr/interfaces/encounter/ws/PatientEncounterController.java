@@ -42,10 +42,10 @@ public class PatientEncounterController extends ShrController {
     private ConfidentialEncounterHandler confidentialEncounterHandler;
 
     @Autowired
-    public PatientEncounterController(PatientEncounterService patientEncounterService) {
+    public PatientEncounterController(PatientEncounterService patientEncounterService, ConfidentialEncounterHandler confidentialEncounterHandler) {
         this.patientEncounterService = patientEncounterService;
         this.accessFilter = new AccessFilter();
-        this.confidentialEncounterHandler = new ConfidentialEncounterHandler();
+        this.confidentialEncounterHandler = confidentialEncounterHandler;
     }
 
     @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER')")

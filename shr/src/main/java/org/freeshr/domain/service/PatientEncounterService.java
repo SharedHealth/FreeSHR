@@ -34,15 +34,17 @@ public class PatientEncounterService {
     private EncounterRepository encounterRepository;
     private PatientService patientService;
     private EncounterValidator encounterValidator;
+    private FhirFeedUtil fhirFeedUtil;
 
     private static final Logger logger = LoggerFactory.getLogger(PatientEncounterService.class);
 
     @Autowired
     public PatientEncounterService(EncounterRepository encounterRepository, PatientService patientService,
-                                   EncounterValidator encounterValidator) {
+                                   EncounterValidator encounterValidator, FhirFeedUtil fhirFeedUtil) {
         this.encounterRepository = encounterRepository;
         this.patientService = patientService;
         this.encounterValidator = encounterValidator;
+        this.fhirFeedUtil = fhirFeedUtil;
     }
 
     public Observable<EncounterResponse> ensureCreated(final EncounterBundle encounterBundle, UserInfo userInfo)
@@ -203,7 +205,7 @@ public class PatientEncounterService {
     }
 
     private EncounterValidationResponse validate(EncounterBundle encounterBundle) {
-        EncounterValidationContext validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
+        EncounterValidationContext validationContext = new EncounterValidationContext(encounterBundle, fhirFeedUtil);
         return encounterValidator.validate(validationContext);
     }
 

@@ -10,15 +10,19 @@ import org.hl7.fhir.instance.model.Composition;
 import org.hl7.fhir.instance.model.Resource;
 import org.hl7.fhir.instance.model.ResourceReference;
 import org.hl7.fhir.instance.model.ResourceType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class ConfidentialEncounterHandler {
     private FhirFeedUtil fhirFeedUtil;
 
-    public ConfidentialEncounterHandler() {
-        fhirFeedUtil = new FhirFeedUtil();
+    @Autowired
+    public ConfidentialEncounterHandler(FhirFeedUtil fhirFeedUtil) {
+        this.fhirFeedUtil = fhirFeedUtil;
     }
 
     public List<EncounterEvent> replaceConfidentialEncounterEvents(List<EncounterEvent> encounterEvents) {
