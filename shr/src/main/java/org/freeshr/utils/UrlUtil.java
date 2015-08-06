@@ -20,4 +20,9 @@ public class UrlUtil {
         }
         return uriBuilder.build().toString();
     }
+
+    public static String extractFacilityId(String facilityUrl){
+        return facilityUrl.substring(facilityUrl.lastIndexOf('/') + 1, facilityUrl.lastIndexOf('.')).trim();
+
+    }
 }

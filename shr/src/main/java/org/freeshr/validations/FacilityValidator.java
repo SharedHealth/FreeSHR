@@ -1,7 +1,6 @@
 package org.freeshr.validations;
 
 import org.freeshr.config.SHRProperties;
-import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.service.FacilityService;
 import org.hl7.fhir.instance.model.*;
 import org.hl7.fhir.instance.validation.ValidationMessage;
@@ -9,13 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import rx.Observable;
-import rx.functions.Func0;
-import rx.functions.Func1;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.freeshr.utils.UrlUtil.extractFacilityId;
 import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity;
 
 @Component
@@ -24,13 +21,11 @@ public class FacilityValidator implements Validator<AtomFeed> {
     public static final String INVALID_SERVICE_PROVIDER = "Invalid Service Provider";
     public static final String INVALID_SERVICE_PROVIDER_URL = "Invalid Service Provider URL";
     private final static Logger logger = LoggerFactory.getLogger(FacilityValidator.class);
-    private SHRProperties shrProperties;
-    private FacilityService facilityService;
+    private final HIEFacilityValidator hieFacilityValidator;
 
     @Autowired
     public FacilityValidator(SHRProperties shrProperties, FacilityService facilityService) {
-        this.shrProperties = shrProperties;
-        this.facilityService = facilityService;
+        this.hieFacilityValidator = new HIEFacilityValidator(shrProperties, facilityService);
     }
 
     @Override
@@ -44,21 +39,14 @@ public class FacilityValidator implements Validator<AtomFeed> {
             return validationMessages;
         }
         String facilityUrl = serviceProvider.getReferenceSimple();
-        if (facilityUrl.isEmpty() || !isValidFacilityUrl(facilityUrl)) {
-            validationMessages.add(buildValidationMessage(ResourceValidator.INVALID, encounterEntry.getId(),
-                    INVALID_SERVICE_PROVIDER_URL, IssueSeverity.error));
+        if (!hieFacilityValidator.validate(facilityUrl)) {
             logger.debug("Encounter failed for invalid facility URL");
-            return validationMessages;
-        }
-
-        Facility facility = checkForFacility(facilityUrl).toBlocking().first();
-        if (facility == null) {
             validationMessages.add(buildValidationMessage(ResourceValidator.INVALID, encounterEntry.getId(), INVALID_SERVICE_PROVIDER,
                     IssueSeverity.error));
             return validationMessages;
         }
 
-        logger.debug(String.format("Encounter validated for valid facility %s", facility.getFacilityId()));
+        logger.debug(String.format("Encounter validated for valid facility %s", extractFacilityId(facilityUrl)));
         return validationMessages;
     }
 
@@ -80,35 +68,5 @@ public class FacilityValidator implements Validator<AtomFeed> {
         return new ValidationMessage(ValidationMessage.Source.ResourceValidator, type, path, message, error);
     }
 
-    private Observable<Facility> checkForFacility(String facilityUrl) {
-        Observable<Facility> facilityObservable = facilityService.ensurePresent(extractFacilityId(facilityUrl));
-        return facilityObservable.flatMap(new Func1<Facility, Observable<Facility>>() {
-                                              @Override
-                                              public Observable<Facility> call(Facility facility) {
-                                                  return Observable.just(facility);
-                                              }
-                                          },
-                new Func1<Throwable, Observable<Facility>>() {
-                    @Override
-                    public Observable<Facility> call(Throwable throwable) {
-                        logger.debug("Facility not found");
-                        return Observable.just(null);
-                    }
-                },
-                new Func0<Observable<Facility>>() {
-                    @Override
-                    public Observable<Facility> call() {
-                        return null;
-                    }
-                });
-    }
 
-    private String extractFacilityId(String referenceSimple) {
-        return referenceSimple.substring(referenceSimple.lastIndexOf('/') + 1, referenceSimple.lastIndexOf('.')).trim();
-    }
-
-    private boolean isValidFacilityUrl(String referenceSimple) {
-        String facilityRegistryUrl = shrProperties.getFacilityReferencePath();
-        return referenceSimple.contains(facilityRegistryUrl);
-    }
 }

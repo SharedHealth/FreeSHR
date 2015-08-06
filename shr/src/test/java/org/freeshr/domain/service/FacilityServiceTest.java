@@ -13,6 +13,7 @@ import rx.Observable;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -50,5 +51,14 @@ public class FacilityServiceTest {
         Mockito.when(facilityRegistryClient.getFacility(facility.getFacilityId())).thenReturn(Observable.just
                 (facility));
         assertNotNull(facilityService.ensurePresent(facility.getFacilityId()));
+    }
+
+    @Test
+    public void shouldReturnNullIfFacilityNotFoundOnFacilityRegistry() throws Exception {
+        Facility facility = new Facility("1", "foo", "bar", "123", new Address());
+
+        Mockito.when(facilityRepository.find(facility.getFacilityId())).thenReturn(Observable.<Facility>just(null));
+        Mockito.when(facilityRegistryClient.getFacility(facility.getFacilityId())).thenReturn(Observable.<Facility>error(new RuntimeException()));
+        assertNull(facilityService.checkForFacility(facility.getFacilityId()).toBlocking().first());
     }
 }

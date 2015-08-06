@@ -23,6 +23,29 @@ public class FacilityService {
         this.facilityRegistryClient = facilityRegistryClient;
     }
 
+    public Observable<Facility> checkForFacility(String facilityId) {
+        Observable<Facility> facilityObservable = ensurePresent(facilityId);
+        return facilityObservable.flatMap(new Func1<Facility, Observable<Facility>>() {
+                                              @Override
+                                              public Observable<Facility> call(Facility facility) {
+                                                  return Observable.just(facility);
+                                              }
+                                          },
+                new Func1<Throwable, Observable<Facility>>() {
+                    @Override
+                    public Observable<Facility> call(Throwable throwable) {
+                        logger.debug("Facility not found");
+                        return Observable.just(null);
+                    }
+                },
+                new Func0<Observable<Facility>>() {
+                    @Override
+                    public Observable<Facility> call() {
+                        return null;
+                    }
+                });
+    }
+
     public Observable<Facility> ensurePresent(final String facilityId) {
         Observable<Facility> facility = facilityRepository.find(facilityId);
         return facility.flatMap(findRemoteIfNotFound(facilityId), new Func1<Throwable, Observable<? extends Facility>>() {
