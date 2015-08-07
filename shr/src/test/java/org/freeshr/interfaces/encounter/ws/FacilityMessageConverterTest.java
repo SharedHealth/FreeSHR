@@ -33,14 +33,14 @@ public class FacilityMessageConverterTest {
 
     @Test
     public void shouldCreateFacilityFromHttpMessage() throws IOException {
-        mockMessageToReturn("jsons/Facility.json");
+        mockMessageToReturn("jsons/F10000069.json");
         Facility facility = new FacilityMessageConverter().createFacility(inputMessage);
         assertNotNull(facility);
-        assertEquals("Dhaka Divisional Health Office", facility.getFacilityName());
+        assertEquals("Dohar Upazila Health Complex", facility.getFacilityName());
         assertEquals(1, facility.getCatchments().size());
-        assertEquals("10000001", facility.getFacilityId());
-        assertEquals("Divisional Level Office", facility.getFacilityType());
-        assertEquals(new Address("30", "26", "01", "", ""), facility.getFacilityLocation());
+        assertEquals("10000069", facility.getFacilityId());
+        assertEquals("Upazila Health Complex", facility.getFacilityType());
+        assertEquals(new Address("30", "26", "18", "", ""), facility.getFacilityLocation());
 
 
     }

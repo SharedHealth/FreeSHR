@@ -18,6 +18,9 @@
                 </identifier>
                 <date value="2014-09-22T13:48:18+05:30"/>
                 <status value="final"/>
+                <author>
+                    <reference value="http://127.0.0.1:9997/facilities/10000069.json"/>
+                </author>
                 <encounter>
                     <reference value="333344445555666677778889999"/>
                     <display value="encounter"/>

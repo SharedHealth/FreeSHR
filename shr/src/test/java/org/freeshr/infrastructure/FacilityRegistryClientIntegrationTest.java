@@ -3,6 +3,7 @@ package org.freeshr.infrastructure;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
+import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Facility;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,22 +30,26 @@ public class FacilityRegistryClientIntegrationTest {
     @Autowired
     private FacilityRegistryClient hrm;
 
+    @Autowired
+    private SHRProperties shrProperties;
+
     @Test
     public void shouldFetchFacility() throws ExecutionException, InterruptedException {
-        givenThat(get(urlEqualTo("/facilities/10000001.json"))
-                .withHeader("client_id", matching("18550"))
-                .withHeader("X-Auth-Token", matching("c6e6fd3a26313eb250e1019519af33e743808f5bb50428ae5423b8ee278e6fa5"))
+        givenThat(get(urlEqualTo("/facilities/10000069.json"))
+                .withHeader("client_id", matching(shrProperties.getIdPClientId()))
+                .withHeader("X-Auth-Token", matching(shrProperties.getIdPAuthToken()))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody(asString("jsons/Facility.json"))));
+                        .withBody(asString("jsons/facility10000069.json"))));
 
-        Facility facility = hrm.getFacility("10000001").toBlocking().first();
+
+        Facility facility = hrm.getFacility("10000069").toBlocking().first();
 
         assertThat(facility, is(notNullValue()));
-        assertThat(facility.getFacilityId(), is("10000001"));
+        assertThat(facility.getFacilityId(), is("10000069"));
         assertEquals(1, facility.getCatchments().size());
-        assertEquals("302601", facility.getCatchments().get(0));
+        assertEquals("302618", facility.getCatchments().get(0));
 
     }
 

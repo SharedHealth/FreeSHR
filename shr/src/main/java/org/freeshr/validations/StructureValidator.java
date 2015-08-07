@@ -22,10 +22,12 @@ import static org.freeshr.validations.ValidationMessages.FEED_MUST_HAVE_COMPOSIT
 @Component
 public class StructureValidator implements Validator<AtomFeed> {
     private FhirFeedUtil fhirFeedUtil;
+    private HIEFacilityValidator hieFacilityValidator;
 
     @Autowired
-    public StructureValidator(FhirFeedUtil fhirFeedUtil) {
+    public StructureValidator(FhirFeedUtil fhirFeedUtil, HIEFacilityValidator hieFacilityValidator) {
         this.fhirFeedUtil = fhirFeedUtil;
+        this.hieFacilityValidator = hieFacilityValidator;
     }
 
     @Override
@@ -36,12 +38,24 @@ public class StructureValidator implements Validator<AtomFeed> {
         AtomEntry<? extends Resource> compositionEntry = hasCompositionWithEncounter(feed.getEntryList());
 
         if (compositionEntry == null) {
-
             validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, "Feed",
                     FEED_MUST_HAVE_COMPOSITION, OperationOutcome.IssueSeverity.error));
             return validationMessages;
         }
 
+        List<ResourceReference> author = ((Composition) compositionEntry.getResource()).getAuthor();
+        if(author.isEmpty() || !hieFacilityValidator.validate(author.get(0).getReferenceSimple())){
+            validationMessages.add(new ValidationMessage(null, ResourceValidator.INVALID, "Feed",
+                    ValidationMessages.INVALID_AUTHOR, OperationOutcome.IssueSeverity.error));
+            return validationMessages;
+        }
+
+        validateStructure(feed, validationMessages, compositionEntry);
+
+        return validationMessages;
+    }
+
+    private void validateStructure(AtomFeed feed, List<ValidationMessage> validationMessages, AtomEntry<? extends Resource> compositionEntry) {
         List<String> compositionSectionIds = identifySectionIdsFromComposition(compositionEntry);
         List<String> entryReferenceIds = verifyEntryReferenceIds(feed.getEntryList(), compositionSectionIds, validationMessages);
         compositionSectionIds.removeAll(entryReferenceIds);
@@ -54,8 +68,6 @@ public class StructureValidator implements Validator<AtomFeed> {
                             ("No entry present" +
                                     " for the section with id %s", entryReferenceId), OperationOutcome.IssueSeverity.error));
         }
-
-        return validationMessages;
     }
 
     private List<String> verifyEntryReferenceIds(List<AtomEntry<? extends Resource>> entryList,

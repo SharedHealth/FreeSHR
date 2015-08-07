@@ -33,7 +33,6 @@ import static java.util.Arrays.asList;
 import static org.freeshr.data.EncounterBundleData.withNewEncounterForPatient;
 import static org.freeshr.data.EncounterBundleData.withValidEncounter;
 import static org.freeshr.utils.FileUtil.asString;
-import static org.freeshr.utils.StringUtils.ensureSuffix;
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -41,7 +40,7 @@ import static org.junit.Assert.*;
 @TestPropertySource(properties = "MCI_SERVER_URL=http://localhost:9997")
 public class CatchmentEncounterServiceIntegrationTest {
 
-    private static final String VALID_FACILITY_ID = "10000001";
+    private static final String VALID_FACILITY_ID = "10000069";
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(9997);
 
@@ -78,13 +77,13 @@ public class CatchmentEncounterServiceIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/patient_not_confidential.json"))));
 
-        givenThat(get(urlEqualTo(ensureSuffix(shrProperties.getFRLocationPath(), "/") + VALID_FACILITY_ID + ".json"))
-                .withHeader("X-Auth-Token", matching(shrProperties.getIdPAuthToken()))
+        givenThat(get(urlEqualTo("/facilities/" + VALID_FACILITY_ID + ".json"))
                 .withHeader("client_id", matching(shrProperties.getIdPClientId()))
+                .withHeader("X-Auth-Token", matching(shrProperties.getIdPAuthToken()))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody(asString("jsons/Facility.json"))));
+                        .withBody(asString("jsons/facility10000069.json"))));
 
         givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/referenceterms/fa460ea6-04c7-45af-a6fa-5072e7caed40"))
                 .willReturn(aResponse()
@@ -149,7 +148,7 @@ public class CatchmentEncounterServiceIntegrationTest {
         assertTrue(healthIds.containsAll(Arrays.asList(VALID_HEALTH_ID, VALID_HEALTH_ID)));
     }
 
-       private UserInfo getUserInfo(String clientId, String email, String securityToken) {
+    private UserInfo getUserInfo(String clientId, String email, String securityToken) {
         return new UserInfo(clientId, "foo", email, 1, true,
                 securityToken, new ArrayList<String>(), asList(new UserProfile("facility", "10000069", asList("3026"))));
     }

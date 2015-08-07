@@ -10,10 +10,10 @@ import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.events.EncounterEvent;
-import org.freeshr.infrastructure.persistence.FacilityRepository;
 import org.freeshr.infrastructure.persistence.PatientRepository;
 import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.infrastructure.security.UserProfile;
+import org.freeshr.interfaces.encounter.ws.APIIntegrationTestBase;
 import org.freeshr.util.ValidationFailures;
 import org.junit.After;
 import org.junit.Before;
@@ -31,14 +31,12 @@ import rx.observers.TestSubscriber;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.util.Arrays.asList;
 import static org.freeshr.data.EncounterBundleData.*;
 import static org.freeshr.utils.FileUtil.asString;
-import static org.freeshr.utils.StringUtils.ensureSuffix;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.*;
@@ -46,9 +44,9 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
 @TestPropertySource(properties = "MCI_SERVER_URL=http://localhost:9997")
-public class PatientEncounterServiceIntegrationTest {
+public class PatientEncounterServiceIntegrationTest extends APIIntegrationTestBase{
 
-    private static final String VALID_FACILITY_ID = "10000001";
+    private static final String VALID_FACILITY_ID = "10000069";
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(9997);
 
@@ -57,9 +55,6 @@ public class PatientEncounterServiceIntegrationTest {
 
     @Autowired
     private PatientRepository patientRepository;
-
-    @Autowired
-    private FacilityRepository facilityRepository;
 
     @Autowired
     private SHRProperties shrProperties;
@@ -87,14 +82,6 @@ public class PatientEncounterServiceIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/patient_not_confidential.json"))));
 
-        givenThat(get(urlEqualTo(ensureSuffix(shrProperties.getFRLocationPath(), "/") + VALID_FACILITY_ID + ".json"))
-                .withHeader("X-Auth-Token", matching(shrProperties.getIdPAuthToken()))
-                .withHeader("client_id", matching(shrProperties.getIdPClientId()))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(asString("jsons/Facility.json"))));
-
         givenThat(get(urlEqualTo("/api/default/patients/" + INVALID_HEALTH_ID))
                 .willReturn(aResponse()
                         .withStatus(404)));
@@ -111,13 +98,17 @@ public class PatientEncounterServiceIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/concept.json"))));
 
+        Facility facility = new Facility(VALID_FACILITY_ID, "facility1", "Main hospital", "3026, 30261801",
+                new Address("30", "26", "18", null, null));
+        createFacility(facility);
+
     }
 
     @Test
     public void shouldRejectEncounterWithInvalidReferenceCode() throws Exception {
-        String clientId = "123";
+        String clientId = shrProperties.getIdPClientId();
         String email = "email@gmail.com";
-        String securityToken = UUID.randomUUID().toString();
+        String securityToken = shrProperties.getIdPAuthToken();
 
         EncounterResponse response = patientEncounterService.ensureCreated(withInvalidReferenceTerm(), getUserInfo(clientId, email, securityToken))
                 .toBlocking().first();
@@ -127,9 +118,9 @@ public class PatientEncounterServiceIntegrationTest {
 
     @Test
     public void shouldRejectEncounterWithInvalidConceptCode() throws Exception {
-        String clientId = "123";
+        String clientId = shrProperties.getIdPClientId();
         String email = "email@gmail.com";
-        String securityToken = UUID.randomUUID().toString();
+        String securityToken = shrProperties.getIdPAuthToken();
 
         EncounterResponse response = patientEncounterService.ensureCreated(withInvalidConcept(), getUserInfo(clientId, email, securityToken)).toBlocking()
                 .first();
@@ -140,9 +131,9 @@ public class PatientEncounterServiceIntegrationTest {
 
     @Test
     public void shouldRejectEncounterUpdateWithInvalidConceptCode() throws Exception {
-        String clientId = "123";
+        String clientId = shrProperties.getIdPClientId();
         String email = "email@gmail.com";
-        String securityToken = UUID.randomUUID().toString();
+        String securityToken = shrProperties.getIdPAuthToken();
         UserInfo userInfo = getUserInfo(clientId, email, securityToken);
         EncounterBundle existingEncounterBundle = withValidEncounter();
         EncounterResponse encounterCreateResponse = patientEncounterService.ensureCreated(existingEncounterBundle, userInfo).toBlocking().first();
@@ -158,9 +149,9 @@ public class PatientEncounterServiceIntegrationTest {
 
     @Test
     public void shouldRejectEncountersForUnknownPatients() throws ExecutionException, InterruptedException {
-        String clientId = "123";
+        String clientId = shrProperties.getIdPClientId();
         String email = "email@gmail.com";
-        String securityToken = UUID.randomUUID().toString();
+        String securityToken = shrProperties.getIdPAuthToken();
 
         Observable<EncounterResponse> encounterResponseObservable = patientEncounterService.ensureCreated
                 (encounterForUnknownPatient(), getUserInfo(clientId, email, securityToken));
@@ -170,9 +161,9 @@ public class PatientEncounterServiceIntegrationTest {
 
     @Test
     public void shouldCaptureAnEncounterAlongWithPatientDetails() throws Exception {
-        String clientId = "123";
+        String clientId = shrProperties.getIdPClientId();
         String email = "email@gmail.com";
-        String securityToken = UUID.randomUUID().toString();
+        String securityToken = shrProperties.getIdPAuthToken();
 
         Observable<EncounterResponse> response = patientEncounterService.ensureCreated(withValidEncounter(), getUserInfo(clientId, email, securityToken));
         TestSubscriber<EncounterResponse> encounterResponseSubscriber = new TestSubscriber<>();
@@ -200,13 +191,9 @@ public class PatientEncounterServiceIntegrationTest {
 
     @Test
     public void shouldReturnEncounterIfPresentForHealthId() throws ExecutionException, InterruptedException {
-        String clientId = "123";
+        String clientId = shrProperties.getIdPClientId();
         String email = "email@gmail.com";
-        String securityToken = UUID.randomUUID().toString();
-
-        Facility facility = new Facility("3", "facility", "Main hospital", "305610,3056", new Address("1", "2", "3",
-                null, null));
-        facilityRepository.save(facility).toBlocking().first();
+        String securityToken = shrProperties.getIdPAuthToken();
 
         EncounterResponse first = patientEncounterService.ensureCreated(withNewEncounterForPatient(VALID_HEALTH_ID), getUserInfo(clientId, email, securityToken))
                 .toBlocking().first();
@@ -218,13 +205,9 @@ public class PatientEncounterServiceIntegrationTest {
 
     @Test
     public void shouldReturnEmptyIfNotPresentForHealthId() throws ExecutionException, InterruptedException {
-        String clientId = "123";
+        String clientId = shrProperties.getIdPClientId();
         String email = "email@gmail.com";
-        String securityToken = UUID.randomUUID().toString();
-        Facility facility = new Facility("3", "facility", "Main hospital", "305610,3056", new Address("1", "2", "3",
-                null, null));
-
-        facilityRepository.save(facility).toBlocking().first();
+        String securityToken = shrProperties.getIdPAuthToken();
 
         EncounterResponse first = patientEncounterService.ensureCreated(withNewEncounterForPatient(VALID_HEALTH_ID_NEW), getUserInfo(clientId, email, securityToken))
                 .toBlocking().first();
@@ -249,7 +232,7 @@ public class PatientEncounterServiceIntegrationTest {
 
     private UserInfo getUserInfo(String clientId, String email, String securityToken) {
         return new UserInfo(clientId, "foo", email, 1, true,
-                securityToken, new ArrayList<String>(), asList(new UserProfile("facility", "10000069", asList("3026"))));
+                securityToken, new ArrayList<String>(), asList(new UserProfile("facility", "10000069", asList("302618"))));
     }
 
     @After

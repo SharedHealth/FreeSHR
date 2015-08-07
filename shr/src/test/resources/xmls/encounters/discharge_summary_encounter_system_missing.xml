@@ -24,6 +24,9 @@
                             value="http://172.18.46.56:8081/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
+                <author>
+                    <reference value="http://127.0.0.1:9997/facilities/10000069.json"/>
+                </author>
                 <encounter>
                     <reference
                             value="urn:07f02524-7647-43c1-a579-0c2c80f285ed"/>

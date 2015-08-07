@@ -1,7 +1,5 @@
 package org.freeshr.validations;
 
-import org.freeshr.config.SHRProperties;
-import org.freeshr.domain.service.FacilityService;
 import org.hl7.fhir.instance.model.*;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.slf4j.Logger;
@@ -19,13 +17,12 @@ import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity;
 public class FacilityValidator implements Validator<AtomFeed> {
 
     public static final String INVALID_SERVICE_PROVIDER = "Invalid Service Provider";
-    public static final String INVALID_SERVICE_PROVIDER_URL = "Invalid Service Provider URL";
     private final static Logger logger = LoggerFactory.getLogger(FacilityValidator.class);
     private final HIEFacilityValidator hieFacilityValidator;
 
     @Autowired
-    public FacilityValidator(SHRProperties shrProperties, FacilityService facilityService) {
-        this.hieFacilityValidator = new HIEFacilityValidator(shrProperties, facilityService);
+    public FacilityValidator(HIEFacilityValidator hieFacilityValidator) {
+        this.hieFacilityValidator = hieFacilityValidator;
     }
 
     @Override

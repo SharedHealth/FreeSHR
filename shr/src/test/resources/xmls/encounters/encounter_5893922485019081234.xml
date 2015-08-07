@@ -21,6 +21,9 @@
                 <subject>
                     <reference value="http://localhost:9997/api/default/patients/5893922485019081234"/>
                 </subject>
+                <author>
+                    <reference value="http://127.0.0.1:9997/facilities/10000069.json"/>
+                </author>
                 <encounter>
                     <reference value="c41cabed-3c47-4260-bd70-ac4893b97ee8"/>
                     <display value="encounter"/>

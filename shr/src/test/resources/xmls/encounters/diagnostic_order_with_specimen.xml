@@ -22,6 +22,9 @@
                     <reference value="http://localhost:9997/api/default/patients/5893922485019082753"/>
                     <display value="5893922485019082753"/>
                 </subject>
+                <author>
+                    <reference value="http://127.0.0.1:9997/facilities/10000069.json"/>
+                </author>
                 <encounter>
                     <reference value="urn:087d7afd-3dc5-4f4a-b576-617c47ce54b2"/>
                     <display value="Encounter"/>

@@ -49,6 +49,14 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/concept.json"))));
+
+        givenThat(get(urlEqualTo("/facilities/10000069.json"))
+                .withHeader("client_id", matching("18550"))
+                .withHeader("X-Auth-Token", matching("c6e6fd3a26313eb250e1019519af33e743808f5bb50428ae5423b8ee278e6fa5"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/facility10000069.json"))));
     }
 
     @Test

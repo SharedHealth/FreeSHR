@@ -129,7 +129,7 @@ public class EncounterValidatorIntegrationTest {
                 FileUtil.asString("xmls/encounters/encounterWithInvalidFacilityUrl.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
-        assertFailureFromResponseErrors("urn:d3cc23c3-1f12-4b89-a415-356feeba0690", FacilityValidator.INVALID_SERVICE_PROVIDER_URL,
+        assertFailureFromResponseErrors("urn:d3cc23c3-1f12-4b89-a415-356feeba0690", FacilityValidator.INVALID_SERVICE_PROVIDER,
                 response.getErrors());
         assertEquals(1, response.getErrors().size());
     }
