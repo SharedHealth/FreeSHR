@@ -1,4 +1,4 @@
-create table encounter (
+create table if not exists encounter (
  encounter_id varchar,
  health_id varchar,
  received_at timeuuid,

@@ -1,4 +1,4 @@
-CREATE TABLE FACILITIES (
+CREATE TABLE if not exists FACILITIES (
     facility_id varchar primary key,
     facility_name varchar,
     facility_type varchar,

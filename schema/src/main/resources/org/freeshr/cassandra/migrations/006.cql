@@ -1,4 +1,4 @@
-CREATE TABLE enc_history (
+CREATE TABLE if not exists enc_history (
 encounter_id varchar,
 encounter_updated_at timeuuid,
 content_version int,

@@ -1,4 +1,4 @@
-create table patient (health_id varchar,
+create table if not exists patient (health_id varchar,
  gender varchar,
  address_line varchar,
  division_id varchar,
