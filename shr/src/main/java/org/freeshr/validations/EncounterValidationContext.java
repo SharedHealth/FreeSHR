@@ -1,5 +1,6 @@
 package org.freeshr.validations;
 
+import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.utils.FhirFeedUtil;
 import org.hl7.fhir.instance.model.AtomFeed;
@@ -8,6 +9,7 @@ public class EncounterValidationContext {
     private EncounterBundle encounterBundle;
     private FhirFeedUtil fhirFeedUtil;
     private AtomFeed feed;
+    private Bundle bundle;
 
     public EncounterValidationContext(EncounterBundle encounterBundle,
                                       FhirFeedUtil fhirFeedUtil) {
@@ -52,5 +54,11 @@ public class EncounterValidationContext {
                 return encounterBundle.getContent();
             }
         };
+    }
+
+    public Bundle getBundle() {
+        if (bundle != null) return bundle;
+        bundle = fhirFeedUtil.parseBundle(encounterBundle.getContent(), "xml");
+        return bundle;
     }
 }

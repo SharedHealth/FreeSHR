@@ -45,6 +45,8 @@ public enum Confidentiality {
                 break;
             case "V":
                 confidentiality = Confidentiality.VeryRestricted;
+                break;
+            default: confidentiality = Confidentiality.Normal;
         }
         return confidentiality;
     }

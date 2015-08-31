@@ -4,6 +4,7 @@ package org.freeshr.domain.service;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.application.fhir.EncounterValidationResponse;
+import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
@@ -35,14 +36,16 @@ public class PatientEncounterServiceTest {
     private EncounterRepository mockEncounterRepository;
     private EncounterValidator mockEncounterValidator;
     private PatientService mockPatientService;
+    private SHRProperties mockShrProperties;
 
     @Before
     public void setup() {
         mockEncounterRepository = mock(EncounterRepository.class);
         mockEncounterValidator = mock(EncounterValidator.class);
         mockPatientService = mock(PatientService.class);
+        mockShrProperties = mock(SHRProperties.class);
         patientEncounterService = new PatientEncounterService(mockEncounterRepository, mockPatientService,
-                mockEncounterValidator, new FhirFeedUtil());
+                mockEncounterValidator, null, new FhirFeedUtil(), mockShrProperties);
     }
 
 

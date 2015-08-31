@@ -65,7 +65,7 @@ public class CatchmentEncounterControllerTest {
     public void setUp() {
         initMocks(this);
         FhirFeedUtil fhirFeedUtil = new FhirFeedUtil();
-        ConfidentialEncounterHandler confidentialEncounterHandler = new ConfidentialEncounterHandler(fhirFeedUtil);
+        ConfidentialEncounterHandler confidentialEncounterHandler = new ConfidentialEncounterHandler(fhirFeedUtil, shrProperties);
         controller = new CatchmentEncounterController(mockCatchmentEncounterService, confidentialEncounterHandler);
     }
 

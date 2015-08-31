@@ -1,5 +1,6 @@
 package org.freeshr.infrastructure.security;
 
+import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.events.EncounterEvent;
 import org.freeshr.interfaces.encounter.ws.APIIntegrationTestBase;
@@ -29,7 +30,7 @@ public class ConfidentialEncounterHandlerIT extends APIIntegrationTestBase {
     @Before
     public void setUp() throws Exception {
         fhirFeedUtil = new FhirFeedUtil();
-        confidentialEncounterHandler = new ConfidentialEncounterHandler(fhirFeedUtil);
+        confidentialEncounterHandler = new ConfidentialEncounterHandler(fhirFeedUtil, shrProperties);
     }
 
     @Test

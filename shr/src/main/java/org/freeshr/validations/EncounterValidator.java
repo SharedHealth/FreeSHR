@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 import static org.freeshr.application.fhir.EncounterValidationResponse.createErrorResponse;
 import static org.freeshr.application.fhir.EncounterValidationResponse.fromValidationMessages;
 
-@Component
-public class EncounterValidator {
+@Component("refImplEncounterValidator")
+public class EncounterValidator implements ShrEncounterValidator {
 
     private FhirMessageFilter fhirMessageFilter;
     private FhirSchemaValidator fhirSchemaValidator;

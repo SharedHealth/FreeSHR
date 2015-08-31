@@ -1,8 +1,10 @@
 package org.freeshr.domain.service;
 
+import ca.uhn.fhir.model.dstu2.resource.*;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.application.fhir.EncounterValidationResponse;
+import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.events.EncounterEvent;
@@ -12,7 +14,10 @@ import org.freeshr.utils.Confidentiality;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.validations.EncounterValidationContext;
 import org.freeshr.validations.EncounterValidator;
+import org.freeshr.validations.HapiEncounterValidator;
+import org.freeshr.validations.ShrEncounterValidator;
 import org.hl7.fhir.instance.model.*;
+import org.hl7.fhir.instance.model.Composition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,18 +38,27 @@ import static org.freeshr.utils.Confidentiality.getConfidentiality;
 public class PatientEncounterService {
     private EncounterRepository encounterRepository;
     private PatientService patientService;
-    private EncounterValidator encounterValidator;
+    private ShrEncounterValidator shrEncounterValidator;
     private FhirFeedUtil fhirFeedUtil;
+    private SHRProperties shrProperties;
 
     private static final Logger logger = LoggerFactory.getLogger(PatientEncounterService.class);
 
     @Autowired
     public PatientEncounterService(EncounterRepository encounterRepository, PatientService patientService,
-                                   EncounterValidator encounterValidator, FhirFeedUtil fhirFeedUtil) {
+                                   EncounterValidator refImplEncounterValidator,
+                                   HapiEncounterValidator hapiEncounterValidator,
+                                   FhirFeedUtil fhirFeedUtil, SHRProperties shrProperties) {
         this.encounterRepository = encounterRepository;
         this.patientService = patientService;
-        this.encounterValidator = encounterValidator;
         this.fhirFeedUtil = fhirFeedUtil;
+        this.shrProperties = shrProperties;
+
+        if ("v1".equals(shrProperties.getFhirDocumentSchemaVersion())) {
+            this.shrEncounterValidator = refImplEncounterValidator;
+        } else {
+            this.shrEncounterValidator = hapiEncounterValidator;
+        }
     }
 
     public Observable<EncounterResponse> ensureCreated(final EncounterBundle encounterBundle, UserInfo userInfo)
@@ -52,12 +66,21 @@ public class PatientEncounterService {
             ExecutionException, InterruptedException {
         EncounterValidationResponse validationResult = validate(encounterBundle);
         if (validationResult.isSuccessful()) {
+            Confidentiality confidentiality = determineEncounterConfidentiality(validationResult);
             Observable<Patient> patientObservable = patientService.ensurePresent(encounterBundle.getHealthId(),
                     userInfo);
-            return patientObservable.flatMap(success(encounterBundle, validationResult.getFeed(), userInfo), error(), complete());
+            return patientObservable.flatMap(success(encounterBundle, confidentiality, userInfo), error(), complete());
 
         } else {
             return Observable.just(new EncounterResponse().setValidationFailure(validationResult));
+        }
+    }
+
+    private Confidentiality determineEncounterConfidentiality(EncounterValidationResponse validationResult) {
+        if ("v2".equals(shrProperties.getFhirDocumentSchemaVersion())) {
+            return getEncounterConfidentiality(validationResult.getBundle());
+        } else {
+            return getEncounterConfidentiality(validationResult.getFeed());
         }
     }
 
@@ -79,6 +102,7 @@ public class PatientEncounterService {
     public Observable<EncounterResponse> ensureUpdated(final EncounterBundle encounterBundle, final UserInfo userInfo) throws ExecutionException, InterruptedException {
         final EncounterValidationResponse validationResult = validate(encounterBundle);
         if (validationResult.isSuccessful()) {
+            final Confidentiality confidentiality = determineEncounterConfidentiality(validationResult);
             Observable<Patient> patientObservable = patientService.ensurePresent(encounterBundle.getHealthId(),
                     userInfo);
             Func1<? super Patient, ? extends Observable<? extends EncounterResponse>> patientFetchSuccessCallBack = new Func1<Patient, Observable<? extends EncounterResponse>>() {
@@ -86,7 +110,7 @@ public class PatientEncounterService {
                 public Observable<? extends EncounterResponse> call(Patient patient) {
                     if (patient != null) {
                         Observable<EncounterBundle> encounterFetchObservable = findEncounter(encounterBundle.getHealthId(), encounterBundle.getEncounterId()).firstOrDefault(null);
-                        return encounterFetchObservable.flatMap(encounterFetchSuccessCallbackForUpdate(encounterBundle, patient, validationResult.getFeed(), userInfo), error(), complete());
+                        return encounterFetchObservable.flatMap(encounterFetchSuccessCallbackForUpdate(encounterBundle, patient, confidentiality, userInfo), error(), complete());
                     } else {
                         return Observable.just(new EncounterResponse().preconditionFailure("healthId", "invalid",
                                 "Patient not available in patient registry"));
@@ -101,13 +125,13 @@ public class PatientEncounterService {
     }
 
     private Func1<? super EncounterBundle, ? extends Observable<? extends EncounterResponse>> encounterFetchSuccessCallbackForUpdate(
-            final EncounterBundle encounterBundle, final Patient patient, final AtomFeed feed, final UserInfo userInfo) {
+            final EncounterBundle encounterBundle, final Patient patient, final Confidentiality confidentiality, final UserInfo userInfo) {
         return new Func1<EncounterBundle, Observable<EncounterResponse>>() {
             @Override
             public Observable<EncounterResponse> call(EncounterBundle existingEncounterBundle) {
-                if(existingEncounterBundle != null){
-                    return updateEncounter(existingEncounterBundle, userInfo, encounterBundle, feed, patient);
-                } else{
+                if (existingEncounterBundle != null) {
+                    return updateEncounter(existingEncounterBundle, userInfo, encounterBundle, confidentiality, patient);
+                } else {
                     return Observable.just(new EncounterResponse().preconditionFailure("encounterId", "invalid",
                             String.format("Encounter (%s) not available.", encounterBundle.getEncounterId())));
                 }
@@ -115,14 +139,14 @@ public class PatientEncounterService {
         };
     }
 
-    private Observable<EncounterResponse> updateEncounter(EncounterBundle existingEncounterBundle, UserInfo userInfo, final EncounterBundle encounterBundle, AtomFeed feed, Patient patient) {
+    private Observable<EncounterResponse> updateEncounter(EncounterBundle existingEncounterBundle, UserInfo userInfo, final EncounterBundle encounterBundle, Confidentiality confidentiality, Patient patient) {
         Requester updatedBy = new Requester(userInfo.getProperties().getFacilityId(), userInfo.getProperties().getProviderId());
-        if(isEncounterEditAllowed(existingEncounterBundle, updatedBy)){
+        if (isEncounterEditAllowed(existingEncounterBundle, updatedBy)) {
             final EncounterResponse response = new EncounterResponse();
-            encounterBundle.setEncounterConfidentiality(getEncounterConfidentiality(feed));
+            encounterBundle.setEncounterConfidentiality(confidentiality);
             encounterBundle.setUpdatedAt(new Date());
             encounterBundle.setUpdatedBy(updatedBy);
-            encounterBundle.setContentVersion(existingEncounterBundle.getContentVersion() +1);
+            encounterBundle.setContentVersion(existingEncounterBundle.getContentVersion() + 1);
             encounterBundle.setReceivedAt(existingEncounterBundle.getReceivedAt());
 
             Observable<Boolean> update = encounterRepository.updateEncounter(encounterBundle, existingEncounterBundle, patient);
@@ -135,7 +159,7 @@ public class PatientEncounterService {
                     return Observable.just(response);
                 }
             }, error(), complete());
-        }else {
+        } else {
             return Observable.just(new EncounterResponse().forbidden("updatedBy", "not authorized",
                     String.format("Access is denied to requester (%s) to edit the encounter", updatedBy)));
         }
@@ -164,13 +188,13 @@ public class PatientEncounterService {
         };
     }
 
-    private Func1<Patient, Observable<EncounterResponse>> success(final EncounterBundle encounterBundle, final AtomFeed feed, final UserInfo userInfo) {
+    private Func1<Patient, Observable<EncounterResponse>> success(final EncounterBundle encounterBundle, final Confidentiality bundleConfidentiality, final UserInfo userInfo) {
         return new Func1<Patient, Observable<EncounterResponse>>() {
             @Override
             public Observable<EncounterResponse> call(Patient patient) {
                 final EncounterResponse response = new EncounterResponse();
                 if (patient != null) {
-                    populateEncounterBundleFields(patient, encounterBundle, feed, userInfo);
+                    populateEncounterBundleFields(patient, encounterBundle, bundleConfidentiality, userInfo);
 
                     Observable<Boolean> save = encounterRepository.save(encounterBundle, patient);
 
@@ -191,10 +215,10 @@ public class PatientEncounterService {
         };
     }
 
-    private void populateEncounterBundleFields(Patient patient, EncounterBundle encounterBundle, AtomFeed feed, UserInfo userInfo) {
+    private void populateEncounterBundleFields(Patient patient, EncounterBundle encounterBundle, Confidentiality confidentiality, UserInfo userInfo) {
         encounterBundle.setEncounterId(UUID.randomUUID().toString());
         encounterBundle.setPatientConfidentiality(patient.getConfidentiality());
-        encounterBundle.setEncounterConfidentiality(getEncounterConfidentiality(feed));
+        encounterBundle.setEncounterConfidentiality(confidentiality);
         Date currentTimestamp = new Date();
         encounterBundle.setReceivedAt(currentTimestamp);
         encounterBundle.setUpdatedAt(currentTimestamp);
@@ -206,7 +230,7 @@ public class PatientEncounterService {
 
     private EncounterValidationResponse validate(EncounterBundle encounterBundle) {
         EncounterValidationContext validationContext = new EncounterValidationContext(encounterBundle, fhirFeedUtil);
-        return encounterValidator.validate(validationContext);
+        return shrEncounterValidator.validate(validationContext);
     }
 
 
@@ -225,5 +249,10 @@ public class PatientEncounterService {
             }
         }
         return encounterConfidentiality;
+    }
+
+    private Confidentiality getEncounterConfidentiality(Bundle bundle) {
+        ca.uhn.fhir.model.dstu2.resource.Composition composition = bundle.getAllPopulatedChildElementsOfType(ca.uhn.fhir.model.dstu2.resource.Composition.class).get(0);
+        return getConfidentiality(composition.getConfidentiality());
     }
 }
