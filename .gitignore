@@ -2,7 +2,7 @@
 .vagrant/
 
 #Gradle dirs
-.gradle/
+#.gradle/
 
 #Idea dirs
 .idea/

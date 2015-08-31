@@ -30,6 +30,10 @@ subprojects {
     jar.dependsOn 'checkStyle'
 }
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.6'
+}
+
 ext.libraries = [
         spring_framework     : "org.springframework:spring-core:4.1.0.RELEASE",
         spring_boot_logging  : "org.springframework.boot:spring-boot-starter-log4j:1.2.0.RELEASE",
