@@ -14,6 +14,7 @@ import org.freeshr.utils.Confidentiality;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.validations.EncounterValidationContext;
 import org.freeshr.validations.EncounterValidator;
+import org.freeshr.validations.HapiEncounterValidator;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -35,6 +36,7 @@ public class PatientEncounterServiceTest {
     private PatientEncounterService patientEncounterService;
     private EncounterRepository mockEncounterRepository;
     private EncounterValidator mockEncounterValidator;
+    private HapiEncounterValidator mockHapiEncounterValidator;
     private PatientService mockPatientService;
     private SHRProperties mockShrProperties;
 
@@ -44,8 +46,10 @@ public class PatientEncounterServiceTest {
         mockEncounterValidator = mock(EncounterValidator.class);
         mockPatientService = mock(PatientService.class);
         mockShrProperties = mock(SHRProperties.class);
+        mockHapiEncounterValidator = mock(HapiEncounterValidator.class);
+        when(mockShrProperties.getFhirDocumentSchemaVersion()).thenReturn("v1");
         patientEncounterService = new PatientEncounterService(mockEncounterRepository, mockPatientService,
-                mockEncounterValidator, null, new FhirFeedUtil(), mockShrProperties);
+                mockEncounterValidator, mockHapiEncounterValidator, new FhirFeedUtil(), mockShrProperties);
     }
 
 
