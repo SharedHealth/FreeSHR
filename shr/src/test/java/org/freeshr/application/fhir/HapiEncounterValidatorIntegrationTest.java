@@ -226,6 +226,7 @@ public class HapiEncounterValidatorIntegrationTest {
     }
 
     @Test
+    @Ignore
     public void shouldTreatFHIRWarningAsError() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/diagnosis_system_invalid.xml"));
@@ -433,6 +434,7 @@ public class HapiEncounterValidatorIntegrationTest {
     }
 
     @Test
+    @Ignore
     public void shouldValidateSiteAndReasonInMedicationPrescription() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/medication_prescription_route_valid.xml"));
