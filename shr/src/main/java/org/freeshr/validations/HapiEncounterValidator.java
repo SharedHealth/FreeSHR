@@ -1,6 +1,7 @@
 package org.freeshr.validations;
 
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
+import ca.uhn.fhir.validation.FhirValidator;
 import ca.uhn.fhir.validation.SingleValidationMessage;
 import ca.uhn.fhir.validation.ValidationResult;
 import org.freeshr.application.fhir.*;
@@ -12,17 +13,19 @@ import org.springframework.stereotype.Component;
 @Component("hapiEncounterValidator")
 public class HapiEncounterValidator implements ShrEncounterValidator {
 
+    private final FhirValidator fhirValidator;
     private FhirFeedUtil feedUtil;
 
     @Autowired
     public HapiEncounterValidator(FhirFeedUtil feedUtil) {
         this.feedUtil = feedUtil;
+        fhirValidator = getFhirValidator();
     }
     @Override
     public EncounterValidationResponse validate(EncounterValidationContext validationContext) {
         EncounterValidationResponse validationResponse = new EncounterValidationResponse();
         Bundle bundle = validationContext.getBundle();
-        ValidationResult validationResult = feedUtil.getFhirContext().newValidator().validateWithResult(bundle);
+        ValidationResult validationResult = fhirValidator.validateWithResult(bundle);
 
         if (!validationResult.isSuccessful()) {
             for (SingleValidationMessage validationMessage : validationResult.getMessages()) {
@@ -32,5 +35,9 @@ public class HapiEncounterValidator implements ShrEncounterValidator {
         }
         validationResponse.setBundle(bundle);
         return validationResponse;
+    }
+
+    private FhirValidator getFhirValidator() {
+        return feedUtil.getFhirContext().newValidator();
     }
 }

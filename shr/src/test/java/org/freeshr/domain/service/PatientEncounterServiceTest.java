@@ -13,7 +13,7 @@ import org.freeshr.infrastructure.security.UserProfile;
 import org.freeshr.utils.Confidentiality;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.validations.EncounterValidationContext;
-import org.freeshr.validations.EncounterValidator;
+import org.freeshr.validations.RIEncounterValidator;
 import org.freeshr.validations.HapiEncounterValidator;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class PatientEncounterServiceTest {
 
     private PatientEncounterService patientEncounterService;
     private EncounterRepository mockEncounterRepository;
-    private EncounterValidator mockEncounterValidator;
+    private RIEncounterValidator mockRIEncounterValidator;
     private HapiEncounterValidator mockHapiEncounterValidator;
     private PatientService mockPatientService;
     private SHRProperties mockShrProperties;
@@ -43,13 +43,13 @@ public class PatientEncounterServiceTest {
     @Before
     public void setup() {
         mockEncounterRepository = mock(EncounterRepository.class);
-        mockEncounterValidator = mock(EncounterValidator.class);
+        mockRIEncounterValidator = mock(RIEncounterValidator.class);
         mockPatientService = mock(PatientService.class);
         mockShrProperties = mock(SHRProperties.class);
         mockHapiEncounterValidator = mock(HapiEncounterValidator.class);
         when(mockShrProperties.getFhirDocumentSchemaVersion()).thenReturn("v1");
         patientEncounterService = new PatientEncounterService(mockEncounterRepository, mockPatientService,
-                mockEncounterValidator, mockHapiEncounterValidator, new FhirFeedUtil(), mockShrProperties);
+                mockRIEncounterValidator, mockHapiEncounterValidator, new FhirFeedUtil(), mockShrProperties);
     }
 
 
@@ -65,7 +65,7 @@ public class PatientEncounterServiceTest {
 
         EncounterValidationResponse encounterValidationResponse = new EncounterValidationResponse();
         encounterValidationResponse.setFeed(new FhirFeedUtil().deserialize(bundle.getContent()));
-        when(mockEncounterValidator.validate(any(EncounterValidationContext.class))).thenReturn(encounterValidationResponse);
+        when(mockRIEncounterValidator.validate(any(EncounterValidationContext.class))).thenReturn(encounterValidationResponse);
         when(mockPatientService.ensurePresent(any(String.class), eq(userInfo))).thenReturn(Observable.just(confidentialPatient));
         when(mockEncounterRepository.save(bundle, confidentialPatient)).thenReturn(Observable.just(true));
 
@@ -99,7 +99,7 @@ public class PatientEncounterServiceTest {
 
         EncounterValidationResponse encounterValidationResponse = new EncounterValidationResponse();
         encounterValidationResponse.setFeed(new FhirFeedUtil().deserialize(bundle.getContent()));
-        when(mockEncounterValidator.validate(any(EncounterValidationContext.class))).thenReturn(encounterValidationResponse);
+        when(mockRIEncounterValidator.validate(any(EncounterValidationContext.class))).thenReturn(encounterValidationResponse);
         when(mockPatientService.ensurePresent(eq(healthId), eq(userInfo))).thenReturn(Observable.just(confidentialPatient));
         when(mockEncounterRepository.findEncounterById("encounter_id1")).thenReturn(Observable.just(existingEncounterBundle));
         when(mockEncounterRepository.updateEncounter(bundle, existingEncounterBundle, confidentialPatient)).thenReturn(Observable.just(true));
@@ -135,7 +135,7 @@ public class PatientEncounterServiceTest {
 
         EncounterValidationResponse encounterValidationResponse = new EncounterValidationResponse();
         encounterValidationResponse.setFeed(new FhirFeedUtil().deserialize(bundle.getContent()));
-        when(mockEncounterValidator.validate(any(EncounterValidationContext.class))).thenReturn(encounterValidationResponse);
+        when(mockRIEncounterValidator.validate(any(EncounterValidationContext.class))).thenReturn(encounterValidationResponse);
         when(mockPatientService.ensurePresent(eq(healthId), eq(userInfoOfFacilityThatUpdatedEncounter))).thenReturn(Observable.just(patient));
         when(mockEncounterRepository.findEncounterById("encounter_id1")).thenReturn(Observable.just(existingEncounterBundle));
 
@@ -161,7 +161,7 @@ public class PatientEncounterServiceTest {
 
         EncounterValidationResponse encounterValidationResponse = new EncounterValidationResponse();
         encounterValidationResponse.setFeed(new FhirFeedUtil().deserialize(bundle.getContent()));
-        when(mockEncounterValidator.validate(any(EncounterValidationContext.class))).thenReturn(encounterValidationResponse);
+        when(mockRIEncounterValidator.validate(any(EncounterValidationContext.class))).thenReturn(encounterValidationResponse);
         when(mockPatientService.ensurePresent(eq(healthId), eq(userInfoOfProviderWhoUpdatedEncounter))).thenReturn(Observable.just(patient));
         when(mockEncounterRepository.findEncounterById("encounter_id1")).thenReturn(Observable.just(existingEncounterBundle));
 
@@ -187,7 +187,7 @@ public class PatientEncounterServiceTest {
 
         EncounterValidationResponse encounterValidationResponse = new EncounterValidationResponse();
         encounterValidationResponse.setFeed(new FhirFeedUtil().deserialize(bundle.getContent()));
-        when(mockEncounterValidator.validate(any(EncounterValidationContext.class))).thenReturn(encounterValidationResponse);
+        when(mockRIEncounterValidator.validate(any(EncounterValidationContext.class))).thenReturn(encounterValidationResponse);
         when(mockPatientService.ensurePresent(eq(healthId), eq(userInfo))).thenReturn(Observable.just(patient));
         when(mockEncounterRepository.findEncounterById("encounter_id1")).thenReturn(Observable.just(existingEncounterBundle));
         when(mockEncounterRepository.updateEncounter(bundle, existingEncounterBundle, patient)).thenReturn(Observable.just(true));
@@ -213,7 +213,7 @@ public class PatientEncounterServiceTest {
 
         EncounterValidationResponse encounterValidationResponse = new EncounterValidationResponse();
         encounterValidationResponse.setFeed(new FhirFeedUtil().deserialize(bundle.getContent()));
-        when(mockEncounterValidator.validate(any(EncounterValidationContext.class))).thenReturn(encounterValidationResponse);
+        when(mockRIEncounterValidator.validate(any(EncounterValidationContext.class))).thenReturn(encounterValidationResponse);
         when(mockPatientService.ensurePresent(eq(healthId), eq(userInfo))).thenReturn(Observable.just(patient));
         when(mockEncounterRepository.findEncounterById("encounter_id1")).thenReturn(Observable.just(existingEncounterBundle));
         when(mockEncounterRepository.updateEncounter(bundle, existingEncounterBundle, patient)).thenReturn(Observable.just(true));

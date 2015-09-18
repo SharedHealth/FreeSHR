@@ -1,0 +1,120 @@
+<Bundle xmlns="http://hl7.org/fhir">
+    <id value="703c26bb-7ae0-4f19-bdcf-9c555f823b05"/>
+    <meta>
+        <lastUpdated value="2015-09-01T18:27:31.000+05:30"/>
+    </meta>
+    <type value="document"/>
+    <entry>
+        <base value="urn:uuid:"/>
+        <resource>
+            <Composition xmlns="http://hl7.org/fhir">
+                <id value="1fd4adaf-7c1f-4df1-a0cc-eb2f36e71940"/>
+                <identifier>
+                    <value value="urn:uuid:1fd4adaf-7c1f-4df1-a0cc-eb2f36e71940"/>
+                </identifier>
+                <date value="2015-09-01T18:27:31.000+05:30"/>
+                <type>
+                    <coding>
+                        <system value="http://hl7.org/fhir/vs/doc-typecodes"/>
+                        <code value="51899-3"/>
+                        <display value="Details Document"/>
+                    </coding>
+                </type>
+                <status value="final"/>
+                <confidentiality value="N"/>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001008823"/>
+                    <display value="98001008823"/>
+                </subject>
+                <author>
+                    <reference value="http://172.18.46.199:8080/api/1.0/facilities/10019842.json"/>
+                </author>
+                <encounter>
+                    <reference value="urn:uuid:4651f790-e61f-488e-a143-19db13178c0e"/>
+                </encounter>
+                <section>
+                    <content>
+                        <reference value="urn:uuid:4651f790-e61f-488e-a143-19db13178c0e"/>
+                        <display value="Encounter"/>
+                    </content>
+                </section>
+                <section>
+                    <content>
+                        <reference value="urn:uuid:52753140-3330-4ac3-bdbe-b0e2ac4bc4db"/>
+                        <display value="Diagnosis"/>
+                    </content>
+                </section>
+            </Composition>
+        </resource>
+    </entry>
+    <entry>
+        <base value="urn:uuid:"/>
+        <resource>
+            <Encounter xmlns="http://hl7.org/fhir">
+                <id value="4651f790-e61f-488e-a143-19db13178c0e"/>
+                <identifier>
+                    <value value="urn:uuid:4651f790-e61f-488e-a143-19db13178c0e"/>
+                </identifier>
+                <status value="finished"/>
+                <class value="outpatient"/>
+                <type>
+                    <text value="OPD"/>
+                </type>
+                <patient>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001008823"/>
+                    <display value="98001008823"/>
+                </patient>
+                <participant>
+                    <individual>
+                        <reference value="http://172.18.46.199:8080/api/1.0/providers/18.json"/>
+                    </individual>
+                </participant>
+                <serviceProvider>
+                    <reference value="http://172.18.46.199:8080/api/1.0/facilities/10019842.json"/>
+                </serviceProvider>
+            </Encounter>
+        </resource>
+    </entry>
+    <entry>
+        <base value="urn:uuid:"/>
+        <resource>
+            <Condition xmlns="http://hl7.org/fhir">
+                <id value="52753140-3330-4ac3-bdbe-b0e2ac4bc4db"/>
+                <identifier>
+                    <value value="urn:uuid:52753140-3330-4ac3-bdbe-b0e2ac4bc4db"/>
+                </identifier>
+                <patient>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001008823"/>
+                    <display value="98001008823"/>
+                </patient>
+                <encounter>
+                    <reference value="urn:uuid:4651f790-e61f-488e-a143-19db13178c0e"/>
+                </encounter>
+                <asserter>
+                    <reference value="http://172.18.46.199:8080/api/1.0/providers/18.json"/>
+                </asserter>
+                <dateAsserted value="2015-09-01"/>
+                <code>
+                    <coding>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/referenceterms/0d8cc2bd-cbbf-4bb1-8ac7-90f610b8934d"/>
+                        <code value="A00.0"/>
+                        <display value="Cholera"/>
+                    </coding>
+                    <coding>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/bb384772-8544-4c09-bc19-95c0afbfeaed"/>
+                        <code value="bb384772-8544-4c09-bc19-95c0afbfeaed"/>
+                        <display value="Cholera"/>
+                    </coding>
+                </code>
+                <category>
+                    <coding>
+                        <system value="http://hl7.org/fhir/condition-category"/>
+                        <code value="diagnosis"/>
+                        <display value="Diagnosis"/>
+                    </coding>
+                </category>
+                <clinicalStatus value="confirmed"/>
+            </Condition>
+        </resource>
+    </entry>
+</Bundle>

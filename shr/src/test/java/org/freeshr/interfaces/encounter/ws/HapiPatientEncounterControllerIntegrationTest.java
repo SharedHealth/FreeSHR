@@ -1,7 +1,8 @@
 package org.freeshr.interfaces.encounter.ws;
 
 import com.google.common.base.Charsets;
-import org.freeshr.application.fhir.EncounterResponse;
+import org.freeshr.application.fhir.*;
+import org.freeshr.application.fhir.Error;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Address;
@@ -36,8 +37,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @TestPropertySource(properties = {"MCI_SERVER_URL=http://localhost:9997", "FHIR_DOCUMENT_SCHEMA_VERSION=v2"})
 public class HapiPatientEncounterControllerIntegrationTest extends APIIntegrationTestBase {
-    private static final String VALID_HEALTH_ID_CONFIDENTIAL = "5893922485019082753";
-    private static final String VALID_HEALTH_ID_NOT_CONFIDENTIAL = "5893922485019081234";
+    private static final String VALID_HEALTH_ID_CONFIDENTIAL = "98001046534";
+    private static final String VALID_HEALTH_ID_NOT_CONFIDENTIAL = "98001046534";
 
     private static final String INVALID_HEALTH_ID = "1234";
     private final String validClientId = "6";
@@ -121,9 +122,9 @@ public class HapiPatientEncounterControllerIntegrationTest extends APIIntegratio
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/dstu2/encounter_with_condition.xml")))
+                .content(asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml")))
                 .andExpect(status().isOk())
-                .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
+                .andExpect(request().asyncResult(debugEncounterSaveResponse()));
     }
 
     @Test
@@ -365,6 +366,32 @@ public class HapiPatientEncounterControllerIntegrationTest extends APIIntegratio
             @Override
             public boolean matches(Object item) {
                 return ((EncounterResponse) item).getEncounterId().equals(encounterId);
+            }
+        };
+    }
+
+    private BaseMatcher<EncounterResponse> debugEncounterSaveResponse() {
+        return new BaseMatcher<EncounterResponse>() {
+            @Override
+            public void describeTo(Description description) {
+            }
+
+            @Override
+            public boolean matches(Object item) {
+                if (item instanceof EncounterResponse) {
+                    EncounterResponse response = (EncounterResponse) item;
+                    for (Error error : response.getErrors()) {
+                        System.out.println(error.getReason());
+                    }
+                    return true;
+                } else if (item instanceof UnProcessableEntity) {
+                    UnProcessableEntity response = (UnProcessableEntity) item;
+                    for (Error error : response.getResult().getErrors()) {
+                        System.out.println(error.toString());
+                    }
+                    return true;
+                }
+                return false;
             }
         };
     }

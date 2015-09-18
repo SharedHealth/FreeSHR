@@ -10,7 +10,7 @@ import static org.freeshr.application.fhir.EncounterValidationResponse.createErr
 import static org.freeshr.application.fhir.EncounterValidationResponse.fromValidationMessages;
 
 @Component("refImplEncounterValidator")
-public class EncounterValidator implements ShrEncounterValidator {
+public class RIEncounterValidator implements ShrEncounterValidator {
 
     private FhirMessageFilter fhirMessageFilter;
     private FhirSchemaValidator fhirSchemaValidator;
@@ -21,13 +21,13 @@ public class EncounterValidator implements ShrEncounterValidator {
     private ProviderValidator providerValidator;
 
     @Autowired
-    public EncounterValidator(FhirMessageFilter fhirMessageFilter,
-                              FhirSchemaValidator fhirSchemaValidator,
-                              ResourceValidator resourceValidator,
-                              HealthIdValidator healthIdValidator,
-                              StructureValidator structureValidator,
-                              ProviderValidator providerValidator,
-                              FacilityValidator facilityValidator) {
+    public RIEncounterValidator(FhirMessageFilter fhirMessageFilter,
+                                FhirSchemaValidator fhirSchemaValidator,
+                                ResourceValidator resourceValidator,
+                                HealthIdValidator healthIdValidator,
+                                StructureValidator structureValidator,
+                                ProviderValidator providerValidator,
+                                FacilityValidator facilityValidator) {
         this.fhirMessageFilter = fhirMessageFilter;
         this.fhirSchemaValidator = fhirSchemaValidator;
         this.resourceValidator = resourceValidator;

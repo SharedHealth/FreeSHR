@@ -13,7 +13,7 @@ import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.utils.Confidentiality;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.validations.EncounterValidationContext;
-import org.freeshr.validations.EncounterValidator;
+import org.freeshr.validations.RIEncounterValidator;
 import org.freeshr.validations.HapiEncounterValidator;
 import org.freeshr.validations.ShrEncounterValidator;
 import org.hl7.fhir.instance.model.*;
@@ -46,7 +46,7 @@ public class PatientEncounterService {
 
     @Autowired
     public PatientEncounterService(EncounterRepository encounterRepository, PatientService patientService,
-                                   EncounterValidator refImplEncounterValidator,
+                                   RIEncounterValidator refImplRIEncounterValidator,
                                    HapiEncounterValidator hapiEncounterValidator,
                                    FhirFeedUtil fhirFeedUtil, SHRProperties shrProperties) {
         this.encounterRepository = encounterRepository;
@@ -55,7 +55,7 @@ public class PatientEncounterService {
         this.shrProperties = shrProperties;
 
         if ("v1".equals(shrProperties.getFhirDocumentSchemaVersion())) {
-            this.shrEncounterValidator = refImplEncounterValidator;
+            this.shrEncounterValidator = refImplRIEncounterValidator;
         } else {
             this.shrEncounterValidator = hapiEncounterValidator;
         }

@@ -36,14 +36,14 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
-public class EncounterValidatorIntegrationTest {
+public class RIEncounterValidatorIntegrationTest {
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(9997);
     @Autowired
     ValueSetCodeValidator valueSetCodeValidator;
     EncounterBundle encounterBundle;
-    private EncounterValidator validator;
+    private RIEncounterValidator validator;
     @Mock
     private TRConceptLocator trConceptLocator;
     @Autowired
@@ -68,7 +68,7 @@ public class EncounterValidatorIntegrationTest {
     public void setup() throws Exception {
         initMocks(this);
         FhirSchemaValidator fhirSchemaValidator = new FhirSchemaValidator(trConceptLocator, shrProperties);
-        validator = new EncounterValidator(fhirMessageFilter, fhirSchemaValidator, resourceValidator,
+        validator = new RIEncounterValidator(fhirMessageFilter, fhirSchemaValidator, resourceValidator,
                 healthIdValidator, structureValidator, providerValidator, facilityValidator);
         encounterBundle = EncounterBundleData.withValidEncounter();
 
