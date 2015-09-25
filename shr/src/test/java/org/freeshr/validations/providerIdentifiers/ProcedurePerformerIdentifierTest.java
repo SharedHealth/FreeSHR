@@ -1,20 +1,24 @@
 package org.freeshr.validations.providerIdentifiers;
 
-import org.freeshr.utils.AtomFeedHelper;
-import org.freeshr.validations.ValidationSubject;
-import org.hl7.fhir.instance.model.AtomEntry;
-import org.hl7.fhir.instance.model.Resource;
-import org.hl7.fhir.instance.model.ResourceType;
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
+import ca.uhn.fhir.model.dstu2.resource.Bundle;
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.dstu2.resource.Procedure;
+import org.freeshr.utils.FhirResourceHelper;
+import org.freeshr.utils.FileUtil;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 
+import static org.freeshr.utils.BundleHelper.parseBundle;
 import static org.junit.Assert.*;
 
 public class ProcedurePerformerIdentifierTest {
 
     private ProcedurePerformerIdentifier procedurePerformerIdentifier;
+    private final FhirContext fhirContext = FhirContext.forDstu2();
 
     @Before
     public void setUp() {
@@ -23,28 +27,25 @@ public class ProcedurePerformerIdentifierTest {
 
     @Test
     public void shouldValidateResourceOfTypeProcedure() {
-        assertTrue(procedurePerformerIdentifier.validates(getResource("xmls/encounters/providers_identifiers/procedure.xml", ResourceType
-                .Procedure)));
+        Procedure procedure = new Procedure();
+        assertTrue(procedurePerformerIdentifier.validates(procedure));
     }
 
     @Test
     public void shouldExtractProperProcedurePerformerReferences() {
-        List<String> references = procedurePerformerIdentifier.extractUrls(getResource("xmls/encounters/providers_identifiers/procedure" +
-                ".xml", ResourceType.Procedure));
-        assertEquals(1, references.size());
-        assertEquals("http://127.0.0.1:9997/providers/18.json", references.get(0));
+        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_procedure.xml"), fhirContext);
+        List<Procedure> procedures = FhirResourceHelper.findBundleResourcesOfType(bundle, Procedure.class);
+        List<ResourceReferenceDt> providerReferences = procedurePerformerIdentifier.getProviderReferences(procedures.get(0));
+        assertEquals(1, providerReferences.size());
+        assertEquals("http://172.18.46.199:8080/api/1.0/providers/19.json", providerReferences.get(0).getReference().getValue());
     }
 
     @Test
     public void shouldNotValidateResourceOfOtherType() {
-        assertFalse(procedurePerformerIdentifier.validates(getResource
-                ("xmls/encounters/providers_identifiers/encounter_with_valid_participant.xml", ResourceType.Encounter)));
+        Encounter enc = new Encounter();
+        assertFalse(procedurePerformerIdentifier.validates(enc));
     }
 
-    private Resource getResource(String file, ResourceType resType) {
-        ValidationSubject<AtomEntry<? extends Resource>> validationSubject = AtomFeedHelper.getAtomFeed(file, resType);
-        return validationSubject.extract().getResource();
-    }
 
 
 }

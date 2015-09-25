@@ -22,11 +22,11 @@ import java.util.List;
 public class FhirSchemaValidator implements Validator<String> {
 
     private final static Logger logger = LoggerFactory.getLogger(FhirSchemaValidator.class);
-    private final InstanceValidator instanceValidator;
+    private InstanceValidator instanceValidator;
 
     @Autowired
     public FhirSchemaValidator(TRConceptLocator trConceptLocator, SHRProperties shrProperties) throws Exception {
-        this.instanceValidator = new InstanceValidator(shrProperties.getValidationFilePath(), null, trConceptLocator);
+        //this.instanceValidator = new InstanceValidator(shrProperties.getValidationFilePath(), null, trConceptLocator);
     }
 
     private Document document(String sourceXml) throws ParserConfigurationException, SAXException, IOException {
@@ -42,10 +42,11 @@ public class FhirSchemaValidator implements Validator<String> {
     public List<ValidationMessage> validate(ValidationSubject<String> subject) {
         String sourceXml = subject.extract();
         try {
-            return instanceValidator.validateInstance(document(sourceXml).getDocumentElement());
+            //return instanceValidator.validateInstance(document(sourceXml).getDocumentElement());
         } catch (Exception e) {
             logger.debug(String.format("Error in validating schema.Cause: %s", e.getMessage()));
             throw new RuntimeException(e);
         }
+        return null;
     }
 }

@@ -7,13 +7,7 @@ import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.events.EncounterEvent;
 import org.freeshr.utils.FhirFeedUtil;
-import org.hl7.fhir.instance.model.AtomEntry;
-import org.hl7.fhir.instance.model.AtomFeed;
-import org.hl7.fhir.instance.model.Coding;
-import org.hl7.fhir.instance.model.Composition;
-import org.hl7.fhir.instance.model.Resource;
-import org.hl7.fhir.instance.model.ResourceReference;
-import org.hl7.fhir.instance.model.ResourceType;
+import org.hl7.fhir.instance.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -75,30 +69,30 @@ public class ConfidentialEncounterHandler {
     }
 
     private String replacedContentWithDstu1(EncounterEvent encounterEvent) {
-        AtomFeed originalFeed = fhirFeedUtil.deserialize(encounterEvent.getContent());
+        org.hl7.fhir.instance.model.Bundle originalFeed = fhirFeedUtil.deserialize(encounterEvent.getContent());
 
-        AtomEntry<? extends Resource> originalCompositionEntry = fhirFeedUtil.getAtomEntryOfResourceType(originalFeed.getEntryList(), ResourceType.Composition);
+        org.hl7.fhir.instance.model.Bundle.BundleEntryComponent originalCompositionEntry = fhirFeedUtil.getAtomEntryOfResourceType(originalFeed.getEntry(), ResourceType.Composition);
         Composition originalComposition = (Composition) originalCompositionEntry.getResource();
         Composition composition = new Composition();
         composition.setSubject(originalComposition.getSubject());
         Coding confidentiality = new Coding();
-        confidentiality.setCodeSimple(encounterEvent.getConfidentialityLevel().getLevel());
-        composition.setConfidentiality(confidentiality);
+        confidentiality.setCode(encounterEvent.getConfidentialityLevel().getLevel());
+        composition.setConfidentiality(confidentiality.getCode());
         composition.setStatus(originalComposition.getStatus());
         composition.setDate(originalComposition.getDate());
-        for (ResourceReference resourceReference : originalComposition.getAuthor()) {
-            ResourceReference authorReference = composition.addAuthor();
-            authorReference.setReferenceSimple(resourceReference.getReferenceSimple());
+        for (Reference resourceReference : originalComposition.getAuthor()) {
+            Reference authorReference = composition.addAuthor();
+            authorReference.setReference(resourceReference.getReference());
+
         }
         composition.setType(originalComposition.getType());
 
-        AtomFeed feed = new AtomFeed();
-        AtomEntry atomEntry = new AtomEntry();
+        org.hl7.fhir.instance.model.Bundle feed = new org.hl7.fhir.instance.model.Bundle();
+        org.hl7.fhir.instance.model.Bundle.BundleEntryComponent atomEntry = new org.hl7.fhir.instance.model.Bundle.BundleEntryComponent();
         atomEntry.setResource(composition);
         atomEntry.setId(originalCompositionEntry.getId());
-        atomEntry.setAuthorName(originalCompositionEntry.getAuthorName());
-        atomEntry.setAuthorUri(originalCompositionEntry.getAuthorUri());
-        feed.getEntryList().add(atomEntry);
+        atomEntry.setFullUrl("urn:uuid:" + originalCompositionEntry.getId());
+        feed.getEntry().add(atomEntry);
 
         return fhirFeedUtil.serialize(feed);
     }

@@ -114,7 +114,7 @@
                         <display value="Diagnosis"/>
                     </coding>
                 </category>
-                <clinicalStatus value="confirmed"/>
+                <clinicalStatus value="active"/>
                 <verificationStatus value="provisional"/>
             </Condition>
         </resource>

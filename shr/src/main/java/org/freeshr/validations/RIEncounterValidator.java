@@ -2,11 +2,11 @@ package org.freeshr.validations;
 
 
 import org.freeshr.application.fhir.EncounterValidationResponse;
-import org.freeshr.application.fhir.FhirMessageFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static org.freeshr.application.fhir.EncounterValidationResponse.createErrorResponse;
+import static org.freeshr.application.fhir.EncounterValidationResponse.fromShrValidationMessages;
 import static org.freeshr.application.fhir.EncounterValidationResponse.fromValidationMessages;
 
 @Component("refImplEncounterValidator")
@@ -47,19 +47,19 @@ public class RIEncounterValidator implements ShrEncounterValidator {
                     structureValidator.validate(validationContext.feedFragment()), fhirMessageFilter);
             if (validationResponse.isNotSuccessful()) return validationResponse;
 
-            validationResponse.mergeErrors(fromValidationMessages(
-                    healthIdValidator.validate(validationContext.context()), fhirMessageFilter));
+            validationResponse.mergeErrors(fromShrValidationMessages(
+                    healthIdValidator.validate(validationContext.context())));
 
-            validationResponse.mergeErrors(fromValidationMessages(
-                    facilityValidator.validate(validationContext.feedFragment()), fhirMessageFilter));
+            validationResponse.mergeErrors(fromShrValidationMessages(
+                    facilityValidator.validate(validationContext.bundleFragment())));
             //if (validationResponse.isNotSuccessful()) return validationResponse;
 
-            validationResponse.mergeErrors(fromValidationMessages(
-                    providerValidator.validate(validationContext.feedFragment()), fhirMessageFilter));
+            validationResponse.mergeErrors(fromShrValidationMessages(
+                    providerValidator.validate(validationContext.bundleFragment())));
             //if (validationResponse.isNotSuccessful()) return validationResponse;
 
-            validationResponse.mergeErrors(fromValidationMessages(
-                    resourceValidator.validate(validationContext.feedFragment()), fhirMessageFilter));
+//            validationResponse.mergeErrors(fromValidationMessages(
+//                    resourceValidator.validate(validationContext.feedFragment()), fhirMessageFilter));
 
             if(validationResponse.isSuccessful()) {
                 validationResponse.setFeed(validationContext.getFeed());

@@ -45,20 +45,20 @@ public class ValueSetCodeValidator implements CodeValidator {
             @Override
             public Boolean call(ResponseEntity<String> stringResponseEntity) {
                 try {
-                    Resource resource = new JsonParser().parse(IOUtils.toInputStream(stringResponseEntity.getBody(),
-                            "UTF-8"));
-                    ValueSet valueSet = (ValueSet) resource;
-                    ValueSet.ValueSetDefineComponent definition = valueSet.getDefine();
-                    Boolean isCaseSensitive = definition.getCaseSensitive().getValue();
-
-                    ConceptMatcher conceptMatcher = getConceptMatcher(isCaseSensitive);
-
-                    List<ValueSet.ValueSetDefineConceptComponent> concepts = definition.getConcept();
-                    for (ValueSet.ValueSetDefineConceptComponent concept : concepts) {
-                        if (conceptMatcher.isMatching(concept.getCode().getValue(), code)) {
-                            return true;
-                        }
-                    }
+//                    Resource resource = new JsonParser().parse(IOUtils.toInputStream(stringResponseEntity.getBody(),
+//                            "UTF-8"));
+//                    ValueSet valueSet = (ValueSet) resource;
+//                    ValueSet.ValueSetDefineComponent definition = valueSet.getDefine();
+//                    Boolean isCaseSensitive = definition.getCaseSensitive().getValue();
+//
+//                    ConceptMatcher conceptMatcher = getConceptMatcher(isCaseSensitive);
+//
+//                    List<ValueSet.ValueSetDefineConceptComponent> concepts = definition.getConcept();
+//                    for (ValueSet.ValueSetDefineConceptComponent concept : concepts) {
+//                        if (conceptMatcher.isMatching(concept.getCode().getValue(), code)) {
+//                            return true;
+//                        }
+//                    }
                     return false;
 
 

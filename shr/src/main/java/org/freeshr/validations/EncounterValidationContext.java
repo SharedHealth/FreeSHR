@@ -3,12 +3,11 @@ package org.freeshr.validations;
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.utils.FhirFeedUtil;
-import org.hl7.fhir.instance.model.AtomFeed;
 
 public class EncounterValidationContext {
     private EncounterBundle encounterBundle;
     private FhirFeedUtil fhirFeedUtil;
-    private AtomFeed feed;
+    private org.hl7.fhir.instance.model.Bundle feed;
     private Bundle bundle;
 
     public EncounterValidationContext(EncounterBundle encounterBundle,
@@ -17,7 +16,7 @@ public class EncounterValidationContext {
         this.fhirFeedUtil = fhirFeedUtil;
     }
 
-    public AtomFeed getFeed() {
+    public org.hl7.fhir.instance.model.Bundle getFeed() {
         //deserialize only once
         if (feed != null) return feed;
         feed = fhirFeedUtil.deserialize(encounterBundle.getContent());
@@ -29,11 +28,20 @@ public class EncounterValidationContext {
     }
 
 
-    public ValidationSubject<AtomFeed> feedFragment() {
-        return new ValidationSubject<AtomFeed>() {
+    public ValidationSubject<org.hl7.fhir.instance.model.Bundle> feedFragment() {
+        return new ValidationSubject<org.hl7.fhir.instance.model.Bundle>() {
             @Override
-            public AtomFeed extract() {
+            public org.hl7.fhir.instance.model.Bundle extract() {
                 return getFeed();
+            }
+        };
+    }
+
+    public ValidationSubject<Bundle> bundleFragment() {
+        return new ValidationSubject<Bundle>() {
+            @Override
+            public Bundle extract() {
+                return getBundle();
             }
         };
     }

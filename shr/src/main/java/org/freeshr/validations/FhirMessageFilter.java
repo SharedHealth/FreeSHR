@@ -1,5 +1,7 @@
-package org.freeshr.application.fhir;
+package org.freeshr.validations;
 
+import org.freeshr.application.fhir.EncounterValidationResponse;
+import org.freeshr.application.fhir.Error;
 import org.freeshr.utils.CollectionUtils;
 import org.hl7.fhir.instance.model.OperationOutcome;
 import org.hl7.fhir.instance.validation.ValidationMessage;
@@ -42,6 +44,51 @@ public class FhirMessageFilter {
                 EncounterValidationResponse>() {
             @Override
             public EncounterValidationResponse call(ValidationMessage input, EncounterValidationResponse acc) {
+                org.freeshr.application.fhir.Error error = new Error();
+                error.setField(input.getLocation());
+                error.setType(input.getType().getDisplay());
+                error.setReason(input.getMessage());
+                acc.addError(error);
+                return acc;
+            }
+        });
+    }
+
+    private boolean shouldFilterMessagesOfType(ValidationMessage input) {
+        if (input.getLevel().equals(OperationOutcome.IssueSeverity.ERROR))
+            return false;
+        if (input.getType().toCode().equalsIgnoreCase("unknown")) {
+            for (String ignoreString : ignoreList) {
+                if (input.getLocation().contains(ignoreString)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static EncounterValidationResponse createResponse(List<ShrValidationMessage> outputs,
+                                                      final Severity severity) {
+        return CollectionUtils.reduce(CollectionUtils.filter(outputs,
+                new CollectionUtils.Fn<ShrValidationMessage, Boolean>() {
+            @Override
+            public Boolean call(ShrValidationMessage input) {
+                //For SHR: We treat FHIR warning level as error?
+                boolean possibleError = severity.compareTo(input.getSeverity()) >= 0;
+                // TODO :  remove the following if condition once the validation mechanism is finalised for
+                // DiagnosticOrder
+                if (possibleError) {
+                    if (shouldFilterMessagesOfType(input)) {
+                        possibleError = false;
+                    }
+                }
+                return possibleError;
+
+            }
+        }), new EncounterValidationResponse(), new CollectionUtils.ReduceFn<ShrValidationMessage,
+                EncounterValidationResponse>() {
+            @Override
+            public EncounterValidationResponse call(ShrValidationMessage input, EncounterValidationResponse acc) {
                 Error error = new Error();
                 error.setField(input.getLocation());
                 error.setType(input.getType());
@@ -52,16 +99,10 @@ public class FhirMessageFilter {
         });
     }
 
-    private boolean shouldFilterMessagesOfType(ValidationMessage input) {
-        if (input.getLevel().equals(OperationOutcome.IssueSeverity.error))
+    public static boolean shouldFilterMessagesOfType(ShrValidationMessage input) {
+        if (input.getSeverity().equals(Severity.ERROR))
             return false;
-        if (input.getType().equalsIgnoreCase("code-unknown")) {
-            for (String ignoreString : ignoreList) {
-                if (input.getLocation().contains(ignoreString)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        else
+            return false;
     }
 }

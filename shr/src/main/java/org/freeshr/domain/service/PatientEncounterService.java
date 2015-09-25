@@ -1,6 +1,5 @@
 package org.freeshr.domain.service;
 
-import ca.uhn.fhir.model.dstu2.resource.*;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.application.fhir.EncounterValidationResponse;
@@ -16,8 +15,10 @@ import org.freeshr.validations.EncounterValidationContext;
 import org.freeshr.validations.RIEncounterValidator;
 import org.freeshr.validations.HapiEncounterValidator;
 import org.freeshr.validations.ShrEncounterValidator;
-import org.hl7.fhir.instance.model.*;
+import org.hl7.fhir.instance.model.Bundle;
+import org.hl7.fhir.instance.model.Coding;
 import org.hl7.fhir.instance.model.Composition;
+import org.hl7.fhir.instance.model.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -234,24 +235,20 @@ public class PatientEncounterService {
     }
 
 
-    private Confidentiality getEncounterConfidentiality(AtomFeed feed) {
+    private Confidentiality getEncounterConfidentiality(Bundle feed) {
         Confidentiality encounterConfidentiality = Confidentiality.Normal;
-        for (AtomEntry<? extends Resource> entry : feed.getEntryList()) {
+        for (Bundle.BundleEntryComponent entry : feed.getEntry()) {
             if (entry.getResource().getResourceType().equals(ResourceType.Composition)) {
                 Composition composition = (Composition) entry.getResource();
-                Coding confidentiality = composition.getConfidentiality();
-                if (null == confidentiality) {
-                    break;
-                }
-                String code = confidentiality.getCodeSimple();
-                encounterConfidentiality = getConfidentiality(code);
+                String confidentiality = composition.getConfidentiality();
+                encounterConfidentiality = getConfidentiality(confidentiality);
                 break;
             }
         }
         return encounterConfidentiality;
     }
 
-    private Confidentiality getEncounterConfidentiality(Bundle bundle) {
+    private Confidentiality getEncounterConfidentiality(ca.uhn.fhir.model.dstu2.resource.Bundle bundle) {
         ca.uhn.fhir.model.dstu2.resource.Composition composition = bundle.getAllPopulatedChildElementsOfType(ca.uhn.fhir.model.dstu2.resource.Composition.class).get(0);
         return getConfidentiality(composition.getConfidentiality());
     }

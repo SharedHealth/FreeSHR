@@ -1,55 +1,50 @@
 package org.freeshr.validations.providerIdentifiers;
 
-import org.freeshr.utils.AtomFeedHelper;
-import org.freeshr.validations.ValidationSubject;
-import org.hl7.fhir.instance.model.AtomEntry;
-import org.hl7.fhir.instance.model.Resource;
-import org.hl7.fhir.instance.model.ResourceType;
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.dstu2.resource.Immunization;
+import org.freeshr.utils.FhirResourceHelper;
+import org.freeshr.utils.FileUtil;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 
+import static org.freeshr.utils.BundleHelper.parseBundle;
 import static org.junit.Assert.*;
 
 public class ImmunizationProviderIdentifierTest {
 
     private ImmunizationProviderIdentifier immunizationProviderIdentifier;
+    private final FhirContext fhirContext = FhirContext.forDstu2();
+    private ca.uhn.fhir.model.dstu2.resource.Bundle bundle;
 
     @Before
     public void setUp() {
         immunizationProviderIdentifier = new ImmunizationProviderIdentifier();
+        bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_immunization.xml"), fhirContext);
     }
 
     @Test
     public void shouldValidateResourceOfTypeImmunization() {
-        assertTrue(immunizationProviderIdentifier.validates(getResource("xmls/encounters/providers_identifiers/immunization.xml",
-                ResourceType.Immunization)));
+        List<Immunization> immunizations = FhirResourceHelper.findBundleResourcesOfType(bundle, Immunization.class);
+        assertTrue(immunizationProviderIdentifier.validates(immunizations.get(0)));
     }
 
     @Test
     public void shouldExtractProperImmunizationParticipantReferences() {
-        List<String> references = immunizationProviderIdentifier.extractUrls(getResource
-                ("xmls/encounters/providers_identifiers/immunization.xml", ResourceType.Immunization));
-        assertEquals(2, references.size());
-        assertEquals("http://127.0.0.1:9997/providers/18.json", references.get(0));
-        assertEquals("http://127.0.0.1:9997/providers/48.json", references.get(1));
+        List<Immunization> immunizations = FhirResourceHelper.findBundleResourcesOfType(bundle, Immunization.class);
 
-        references = immunizationProviderIdentifier.extractUrls(getResource
-                ("xmls/encounters/providers_identifiers/immunization_with_performer_only.xml", ResourceType.Immunization));
-        assertEquals(1, references.size());
-        assertEquals("http://127.0.0.1:9997/providers/48.json", references.get(0));
+        List<ResourceReferenceDt> references = immunizationProviderIdentifier.getProviderReferences(immunizations.get(0));
+        assertEquals(2, references.size());
+        assertEquals("http://172.18.46.199:8080/api/1.0/providers/18.json", references.get(0).getReference().getValue());
+        assertEquals("http://172.18.46.199:8080/api/1.0/providers/19.json", references.get(1).getReference().getValue());
     }
 
     @Test
     public void shouldNotValidateResourceOfOtherType() {
-        assertFalse(immunizationProviderIdentifier.validates(getResource
-                ("xmls/encounters/providers_identifiers/encounter_with_valid_participant.xml", ResourceType.Encounter)));
-    }
-
-    private Resource getResource(String file, ResourceType resType) {
-        ValidationSubject<AtomEntry<? extends Resource>> validationSubject = AtomFeedHelper.getAtomFeed(file, resType);
-        return validationSubject.extract().getResource();
+        assertFalse(immunizationProviderIdentifier.validates(new Encounter()));
     }
 
 }

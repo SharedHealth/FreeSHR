@@ -3,7 +3,7 @@ package org.freeshr.validations;
 
 import org.freeshr.application.fhir.TRConceptLocator;
 import org.hl7.fhir.instance.model.Quantity;
-import org.hl7.fhir.instance.utils.ConceptLocator;
+import org.hl7.fhir.instance.terminologies.ITerminologyServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,11 +20,11 @@ public class DoseQuantityValidator {
     }
 
     public boolean isReferenceUrlNotFound(Quantity doseQuantity) {
-        return doseQuantity == null || isEmpty(doseQuantity.getSystemSimple());
+        return doseQuantity == null || isEmpty(doseQuantity.getSystem());
     }
 
-    public ConceptLocator.ValidationResult validate(Quantity doseQuantity) {
-        return trConceptLocator.validate(doseQuantity.getSystemSimple(),
-                doseQuantity.getCodeSimple(), DOSE_QUANTITY);
+    public Object validate(Quantity doseQuantity) {
+        return trConceptLocator.validate(doseQuantity.getSystem(),
+                doseQuantity.getCode(), DOSE_QUANTITY);
     }
 }

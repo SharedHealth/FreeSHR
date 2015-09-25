@@ -1,20 +1,25 @@
 package org.freeshr.validations.providerIdentifiers;
 
-import org.freeshr.utils.AtomFeedHelper;
-import org.freeshr.validations.ValidationSubject;
-import org.hl7.fhir.instance.model.AtomEntry;
-import org.hl7.fhir.instance.model.Resource;
-import org.hl7.fhir.instance.model.ResourceType;
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
+import ca.uhn.fhir.model.dstu2.resource.Bundle;
+import ca.uhn.fhir.model.dstu2.resource.DiagnosticOrder;
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import org.freeshr.utils.FhirResourceHelper;
+import org.freeshr.utils.FileUtil;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 
+import static org.freeshr.utils.BundleHelper.parseBundle;
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class DiagnosticOrdererIdentifierTest {
 
     private DiagnosticOrdererIdentifier diagnosticOrdererIdentifier;
+    private final FhirContext fhirContext = FhirContext.forDstu2();
 
     @Before
     public void setUp() {
@@ -23,32 +28,25 @@ public class DiagnosticOrdererIdentifierTest {
 
     @Test
     public void shouldValidateResourceOfTypeDiagnosticOrder() {
-        assertTrue(diagnosticOrdererIdentifier.validates(getResource("xmls/encounters/providers_identifiers/diagnostic_order.xml",
-                ResourceType.DiagnosticOrder)));
+        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnosticOrder.xml"), fhirContext);
+        List<DiagnosticOrder> orders = FhirResourceHelper.findBundleResourcesOfType(bundle, DiagnosticOrder.class);
+        assertTrue(diagnosticOrdererIdentifier.validates(orders.get(0)));
     }
 
     @Test
     public void shouldExtractProperDiagnosticOrdererReference() {
-        List<String> references = diagnosticOrdererIdentifier.extractUrls(getResource
-                ("xmls/encounters/providers_identifiers/diagnostic_order.xml", ResourceType.DiagnosticOrder));
-        assertEquals(1, references.size());
-        assertEquals("http://127.0.0.1:9997/providers/18.json", references.get(0));
-
-        references = diagnosticOrdererIdentifier.extractUrls(getResource
-                ("xmls/encounters/providers_identifiers/diagnostic_order_no_orderer.xml", ResourceType.DiagnosticOrder));
-        assertNull(references);
-
+        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnosticOrder.xml"), fhirContext);
+        List<DiagnosticOrder> orders = FhirResourceHelper.findBundleResourcesOfType(bundle, DiagnosticOrder.class);
+        List<ResourceReferenceDt> providerReferences = diagnosticOrdererIdentifier.getProviderReferences(orders.get(0));
+        assertEquals(1, providerReferences.size());
+        assertEquals("http://172.18.46.199:8080/api/1.0/providers/18.json", providerReferences.get(0).getReference().getValue());
     }
 
     @Test
     public void shouldNotValidateResourceOfOtherType() {
-        assertFalse(diagnosticOrdererIdentifier.validates(getResource
-                ("xmls/encounters/providers_identifiers/encounter_with_valid_participant.xml", ResourceType.Encounter)));
-    }
-
-    private Resource getResource(String file, ResourceType resType) {
-        ValidationSubject<AtomEntry<? extends Resource>> validationSubject = AtomFeedHelper.getAtomFeed(file, resType);
-        return validationSubject.extract().getResource();
+        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnosticOrder.xml"), fhirContext);
+        List<Encounter> encounters = FhirResourceHelper.findBundleResourcesOfType(bundle, Encounter.class);
+        assertFalse(diagnosticOrdererIdentifier.validates(encounters.get(0)));
     }
 
 }

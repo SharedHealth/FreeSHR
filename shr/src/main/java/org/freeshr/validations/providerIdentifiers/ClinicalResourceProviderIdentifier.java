@@ -1,8 +1,10 @@
 package org.freeshr.validations.providerIdentifiers;
 
+import ca.uhn.fhir.model.api.IResource;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
+import org.apache.commons.lang3.StringUtils;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.utils.CollectionUtils;
-import org.hl7.fhir.instance.model.Resource;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -16,29 +18,31 @@ public abstract class ClinicalResourceProviderIdentifier {
     private static final String PROVIDER_ID_MATCHER = "([0-9]+)";
     private static final String JSON = ".json";
 
-    protected abstract boolean validates(Resource resource);
+    protected abstract boolean validates(IResource resource);
 
-    protected abstract List<String> extractUrls(Resource resource);
+    protected abstract List<ResourceReferenceDt> getProviderReferences(IResource resource);
 
-    public final boolean isValid(Resource resource, SHRProperties shrProperties) {
+    public final boolean isValid(IResource resource, SHRProperties shrProperties) {
         if (!validates(resource)) return true;
-        List<String> urls = extractUrls(resource);
-        return validateUrlPattern(urls, shrProperties);
+        List<ResourceReferenceDt> refs = getProviderReferences(resource);
+        return validateUrlPattern(refs, shrProperties);
     }
 
-    private boolean validateUrlPattern(List<String> urls, SHRProperties shrProperties) {
+    private boolean validateUrlPattern(List<ResourceReferenceDt> urls, SHRProperties shrProperties) {
         if (CollectionUtils.isEmpty(urls)) return true;
 
-        for (String url : urls) {
-            if (!isUrlPatternMatched(url, shrProperties)) return false;
+        for (ResourceReferenceDt ref : urls) {
+            String refUrl = ref.getReference().getValue();
+            if (StringUtils.isBlank(refUrl)) continue;
+            if (!isUrlPatternMatched(refUrl, shrProperties)) return false;
         }
         return true;
     }
 
-    private boolean isUrlPatternMatched(String url, SHRProperties shrProperties) {
+    private boolean isUrlPatternMatched(String refUrl, SHRProperties shrProperties) {
         String providerReferencePath = shrProperties.getProviderReferencePath();
         String regex = START_MARKER + ensureSuffix(providerReferencePath, "/") + PROVIDER_ID_MATCHER + JSON + END_MARKER;
-        Matcher matcher = Pattern.compile(regex).matcher(url);
+        Matcher matcher = Pattern.compile(regex).matcher(refUrl);
         return matcher.matches();
     }
 }

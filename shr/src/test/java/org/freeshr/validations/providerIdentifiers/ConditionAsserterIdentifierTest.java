@@ -1,21 +1,25 @@
 package org.freeshr.validations.providerIdentifiers;
 
 
-import org.freeshr.utils.AtomFeedHelper;
-import org.freeshr.validations.ValidationSubject;
-import org.hl7.fhir.instance.model.AtomEntry;
-import org.hl7.fhir.instance.model.Resource;
-import org.hl7.fhir.instance.model.ResourceType;
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
+import ca.uhn.fhir.model.dstu2.resource.Bundle;
+import ca.uhn.fhir.model.dstu2.resource.Condition;
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import org.freeshr.utils.FhirResourceHelper;
+import org.freeshr.utils.FileUtil;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 
+import static org.freeshr.utils.BundleHelper.parseBundle;
 import static org.junit.Assert.*;
 
 public class ConditionAsserterIdentifierTest {
 
     private ConditionAsserterIdentifier conditionAsserterIdentifier;
+    private final FhirContext fhirContext = FhirContext.forDstu2();
 
     @Before
     public void setUp() {
@@ -24,34 +28,32 @@ public class ConditionAsserterIdentifierTest {
 
     @Test
     public void shouldValidateResourceOfTypeCondition() {
-        assertTrue(conditionAsserterIdentifier.validates(getResource("xmls/encounters/providers_identifiers/condition.xml", ResourceType
-                .Condition)));
+        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml"), fhirContext);
+        List<Condition> conditions = FhirResourceHelper.findBundleResourcesOfType(bundle, Condition.class);
+        assertTrue(conditionAsserterIdentifier.validates(conditions.get(0)));
     }
 
     @Test
     public void shouldExtractProperConditionAsserterReferences() {
-        List<String> references = conditionAsserterIdentifier.extractUrls(getResource("xmls/encounters/providers_identifiers/condition.xml",
-                ResourceType.Condition));
-        assertEquals(1, references.size());
-        assertEquals("http://127.0.0.1:9997/providers/18.json", references.get(0));
+        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml"), fhirContext);
+        List<Condition> conditions = FhirResourceHelper.findBundleResourcesOfType(bundle, Condition.class);
+        List<ResourceReferenceDt> providerReferences = conditionAsserterIdentifier.getProviderReferences(conditions.get(0));
+        assertEquals(1, providerReferences.size());
+        assertEquals("http://172.18.46.199:8080/api/1.0/providers/19.json", providerReferences.get(0).getReference().getValue());
 
-        references = conditionAsserterIdentifier.extractUrls(getResource("xmls/encounters/providers_identifiers/condition_no_asserter" +
-                ".xml", ResourceType.Condition));
-        assertNull(references);
+//        references = conditionAsserterIdentifier.getProviderReferences(getResource("xmls/encounters/providers_identifiers/condition_no_asserter" +
+//                ".xml", ResourceType.Condition));
+//        assertNull(references);
 
     }
 
     @Test
     public void shouldNotValidateResourceOfOtherType() {
-        assertFalse(conditionAsserterIdentifier.validates(getResource
-                ("xmls/encounters/providers_identifiers/encounter_with_valid_participant.xml",
-                ResourceType.Encounter)));
+        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml"), fhirContext);
+        List<Encounter> encounters = FhirResourceHelper.findBundleResourcesOfType(bundle, Encounter.class);
+        assertFalse(conditionAsserterIdentifier.validates(encounters.get(0)));
     }
 
-    private Resource getResource(String file, ResourceType resType) {
-        ValidationSubject<AtomEntry<? extends Resource>> validationSubject = AtomFeedHelper.getAtomFeed(file, resType);
-        return validationSubject.extract().getResource();
-    }
 
 
 }

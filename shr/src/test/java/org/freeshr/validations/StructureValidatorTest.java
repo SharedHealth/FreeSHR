@@ -3,7 +3,7 @@ package org.freeshr.validations;
 
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.utils.FileUtil;
-import org.hl7.fhir.instance.model.AtomFeed;
+import org.hl7.fhir.instance.model.Bundle;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,9 +35,9 @@ public class StructureValidatorTest {
     @Test
     public void shouldAcceptAValidXmlWithOneEntryForEachSectionPresentInComposition() {
         final String xml = FileUtil.asString("xmls/encounters/diagnostic_order_valid.xml");
-        List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<AtomFeed>() {
+        List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<Bundle>() {
             @Override
-            public AtomFeed extract() {
+            public Bundle extract() {
                 return fhirFeedUtil.deserialize(xml);
             }
         });
@@ -48,9 +48,9 @@ public class StructureValidatorTest {
     public void shouldAcceptIfAuthorInCompositionIsAValidFacility() {
         final String xml = FileUtil.asString("xmls/encounters/diagnostic_order_valid.xml");
         when(hieFacilityValidator.validate(anyString())).thenReturn(true);
-        List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<AtomFeed>() {
+        List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<Bundle>() {
             @Override
-            public AtomFeed extract() {
+            public Bundle extract() {
                 return fhirFeedUtil.deserialize(xml);
             }
         });
@@ -61,9 +61,9 @@ public class StructureValidatorTest {
     public void shouldRejectIfCompositionHasInvalidAuthor() throws Exception {
         final String xml = FileUtil.asString("xmls/encounters/diagnostic_order_valid.xml");
         when(hieFacilityValidator.validate(anyString())).thenReturn(false);
-        List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<AtomFeed>() {
+        List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<Bundle>() {
             @Override
-            public AtomFeed extract() {
+            public Bundle extract() {
                 return fhirFeedUtil.deserialize(xml);
             }
         });
@@ -76,9 +76,9 @@ public class StructureValidatorTest {
     @Test
     public void shouldRejectIfCompositionIsNotPresent() {
         final String xml = FileUtil.asString("xmls/encounters/no_composition.xml");
-        List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<AtomFeed>() {
+        List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<Bundle>() {
             @Override
-            public AtomFeed extract() {
+            public Bundle extract() {
                 return fhirFeedUtil.deserialize(xml);
             }
         });
@@ -90,9 +90,9 @@ public class StructureValidatorTest {
     @Test
     public void shouldRejectIfCompositionDoesNotContainASectionCalledEncounter() {
         final String xml = FileUtil.asString("xmls/encounters/invalid_composition.xml");
-        List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<AtomFeed>() {
+        List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<Bundle>() {
             @Override
-            public AtomFeed extract() {
+            public Bundle extract() {
                 return fhirFeedUtil.deserialize(xml);
             }
         });
@@ -112,9 +112,9 @@ public class StructureValidatorTest {
 
          */
         final String xml = FileUtil.asString("xmls/encounters/invalid_composition_sections.xml");
-        List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<AtomFeed>() {
+        List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<Bundle>() {
             @Override
-            public AtomFeed extract() {
+            public Bundle extract() {
                 return fhirFeedUtil.deserialize(xml);
             }
         });

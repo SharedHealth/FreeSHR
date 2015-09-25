@@ -1,6 +1,5 @@
 package org.freeshr.utils;
 
-import org.hl7.fhir.instance.model.DateAndTime;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -90,21 +89,9 @@ public class DateUtil {
         return dateFormat.format(date);
     }
 
-    public static boolean isValidPeriod(DateAndTime startDate, DateAndTime endDate) {
-        Date parsedStartDate = null;
-        Date parsedEndDate = null;
-        try {
-            if (startDate != null) {
-                parsedStartDate = parseDate(startDate.toString(), DATE_FORMATS);
-            }
-            if (endDate != null) {
-                parsedEndDate = parseDate(endDate.toString(), DATE_FORMATS);
-            }
-        } catch (ParseException e) {
-            return false;
-        }
-        if(parsedStartDate != null && parsedEndDate != null) {
-            return isValidRangeOfDates(parsedStartDate, parsedEndDate);
+    public static boolean isValidPeriod(Date startDate, Date endDate) {
+        if(startDate != null && endDate != null) {
+            return isValidRangeOfDates(startDate, endDate);
         }
         return true;
     }

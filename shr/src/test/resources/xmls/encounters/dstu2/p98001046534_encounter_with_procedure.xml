@@ -1,0 +1,184 @@
+<Bundle xmlns="http://hl7.org/fhir">
+    <id value="47f9333a-83c3-4cba-8126-01e48749a0f2"/>
+    <meta>
+        <lastUpdated value="2015-09-04T15:09:13.000+05:30"/>
+    </meta>
+    <type value="collection"/>
+    <entry>
+        <fullUrl value="urn:uuid:fe9d5fd7-3e46-4725-926f-6deabb346ead"/>
+        <resource>
+            <Composition xmlns="http://hl7.org/fhir">
+                <id value="fe9d5fd7-3e46-4725-926f-6deabb346ead"/>
+                <identifier>
+                    <value value="urn:uuid:fe9d5fd7-3e46-4725-926f-6deabb346ead"/>
+                </identifier>
+                <date value="2015-09-04T15:09:13.000+05:30"/>
+                <type>
+                    <coding>
+                        <system value="http://hl7.org/fhir/vs/doc-typecodes"/>
+                        <code value="51899-3"/>
+                        <display value="Details Document"/>
+                    </coding>
+                </type>
+                <title value="encounter composition for patient 98001046534"/>
+                <status value="final"/>
+                <confidentiality value="N"/>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <author>
+                    <reference value="http://172.18.46.199:8080/api/1.0/facilities/10019841.json"/>
+                </author>
+                <encounter>
+                    <reference value="urn:uuid:9aed7616-8226-48a1-b581-aed955bdbe97"/>
+                </encounter>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:9aed7616-8226-48a1-b581-aed955bdbe97"/>
+                        <display value="Encounter"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:5c44d7a6-ed3b-4304-9917-dbd9c1074062"/>
+                        <display value="Diagnostic Report"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:4db65ed8-4cc4-428b-895d-da81d20b82fb"/>
+                        <display value="Procedure"/>
+                    </entry>
+                </section>
+            </Composition>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:9aed7616-8226-48a1-b581-aed955bdbe97"/>
+        <resource>
+            <Encounter xmlns="http://hl7.org/fhir">
+                <id value="9aed7616-8226-48a1-b581-aed955bdbe97"/>
+                <identifier>
+                    <value value="urn:uuid:9aed7616-8226-48a1-b581-aed955bdbe97"/>
+                </identifier>
+                <status value="finished"/>
+                <class value="outpatient"/>
+                <type>
+                    <text value="OPD"/>
+                </type>
+                <patient>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </patient>
+                <participant>
+                    <individual>
+                        <reference value="http://172.18.46.199:8080/api/1.0/providers/19.json"/>
+                    </individual>
+                </participant>
+                <serviceProvider>
+                    <reference value="http://172.18.46.199:8080/api/1.0/facilities/10019841.json"/>
+                </serviceProvider>
+            </Encounter>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:5c44d7a6-ed3b-4304-9917-dbd9c1074062"/>
+        <resource>
+            <DiagnosticReport xmlns="http://hl7.org/fhir">
+                <id value="5c44d7a6-ed3b-4304-9917-dbd9c1074062"/>
+                <code>
+                    <coding>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/referenceterms/07adc374-5206-11e5-ae6d-0050568225ca"/>
+                        <code value="2162-6"/>
+                        <display value="Creatinine [Mass/time] in 24 hour Urine"/>
+                    </coding>
+                    <coding>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/07accf29-5206-11e5-ae6d-0050568225ca"/>
+                        <code value="07accf29-5206-11e5-ae6d-0050568225ca"/>
+                        <display value="Creatinine [Mass/time] in 24 hour Urine"/>
+                    </coding>
+                </code>
+                <status value="final"/>
+                <issued value="2015-09-04T15:09:13.000+05:30"/>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <performer>
+                    <reference value="http://172.18.46.199:8080/api/1.0/providers/19.json"/>
+                </performer>
+                <encounter>
+                    <reference value="urn:uuid:9aed7616-8226-48a1-b581-aed955bdbe97"/>
+                </encounter>
+                <identifier>
+                    <value value="urn:uuid:5c44d7a6-ed3b-4304-9917-dbd9c1074062"/>
+                </identifier>
+                <effectiveDateTime value="2015-09-04T15:09:13.000+05:30"/>
+                <result>
+                    <display value="100"/>
+                </result>
+                <codedDiagnosis>
+                    <coding>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/referenceterms/0d8cc2bd-cbbf-4bb1-8ac7-90f610b8934d"/>
+                        <code value="A00.0"/>
+                        <display value="Vibrio Cholera"/>
+                    </coding>
+                    <coding>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/067c248c-5206-11e5-ae6d-0050568225ca"/>
+                        <code value="067c248c-5206-11e5-ae6d-0050568225ca"/>
+                        <display value="Vibrio Cholera"/>
+                    </coding>
+                </codedDiagnosis>
+            </DiagnosticReport>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:4db65ed8-4cc4-428b-895d-da81d20b82fb"/>
+        <resource>
+            <Procedure xmlns="http://hl7.org/fhir">
+                <id value="4db65ed8-4cc4-428b-895d-da81d20b82fb"/>
+                <identifier>
+                    <value value="urn:uuid:4db65ed8-4cc4-428b-895d-da81d20b82fb"/>
+                </identifier>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <status value="completed"/>
+                <code>
+                    <coding>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/referenceterms/079ffd65-5206-11e5-ae6d-0050568225ca"/>
+                        <code value="392003006"/>
+                        <display value="Colposcopy"/>
+                    </coding>
+                    <coding>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/079f6b0e-5206-11e5-ae6d-0050568225ca"/>
+                        <code value="079f6b0e-5206-11e5-ae6d-0050568225ca"/>
+                        <display value="Colposcopy"/>
+                    </coding>
+                </code>
+                <performedPeriod>
+                    <start value="2015-08-31T00:00:00.000+05:30"/>
+                    <end value="2015-09-02T00:00:00.000+05:30"/>
+                </performedPeriod>
+                <encounter>
+                    <reference value="urn:uuid:9aed7616-8226-48a1-b581-aed955bdbe97"/>
+                </encounter>
+                <report>
+                    <reference value="urn:uuid:5c44d7a6-ed3b-4304-9917-dbd9c1074062"/>
+                    <display value="Diagnostic Report"/>
+                </report>
+                <performer>
+                    <actor>
+                        <reference value="http://172.18.46.199:8080/api/1.0/providers/19.json"/>
+                       <display value="Dr Cecil Surgeon"/>
+                    </actor>
+                </performer>
+                <followUp>
+                    <text value="described in care plan"/>
+                </followUp>
+            </Procedure>
+        </resource>
+    </entry>
+</Bundle>

@@ -1,9 +1,9 @@
 package org.freeshr.validations.providerIdentifiers;
 
+import ca.uhn.fhir.model.api.IResource;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
+import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.instance.model.MedicationPrescription;
-import org.hl7.fhir.instance.model.Resource;
-import org.hl7.fhir.instance.model.ResourceReference;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -13,18 +13,13 @@ import java.util.List;
 public class MedicationPrescriberIdentifier extends ClinicalResourceProviderIdentifier {
 
     @Override
-    protected boolean validates(Resource resource) {
-        return (resource instanceof MedicationPrescription);
+    protected boolean validates(IResource resource) {
+        return (resource instanceof MedicationOrder);
     }
 
     @Override
-    protected List<String> extractUrls(Resource resource) {
-        ResourceReference prescriber = ((MedicationPrescription) resource).getPrescriber();
-        String url = null;
-        if (prescriber != null) {
-            url = prescriber.getReferenceSimple() == null ? StringUtils.EMPTY : prescriber.getReferenceSimple();
-        }
-        return url == null ? null : Arrays.asList(url);
+    protected List<ResourceReferenceDt> getProviderReferences(IResource resource) {
+        return Arrays.asList(((MedicationOrder) resource).getPrescriber() );
     }
 }
 

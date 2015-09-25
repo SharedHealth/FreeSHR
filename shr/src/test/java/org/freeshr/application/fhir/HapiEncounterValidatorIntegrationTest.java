@@ -1,19 +1,17 @@
 package org.freeshr.application.fhir;
 
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.api.IResource;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.data.EncounterBundleData;
 import org.freeshr.infrastructure.tr.ValueSetCodeValidator;
-import org.freeshr.interfaces.encounter.ws.exceptions.UnProcessableEntity;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.utils.FileUtil;
 import org.freeshr.validations.*;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.hl7.fhir.instance.model.OperationOutcome;
-import org.hl7.fhir.instance.utils.ConceptLocator;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -167,35 +165,35 @@ public class HapiEncounterValidatorIntegrationTest {
     @Test
     @Ignore
     public void shouldRejectEncounterWithInvalidConcept() {
-        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        when(trConceptLocator.validate(anyString(), eq("invalid-eddb01eb-61fc-4f9e-aca5"),
-                anyString())).thenReturn(new ConceptLocator.ValidationResult(OperationOutcome.IssueSeverity.error,
-                "Invalid code invalid-eddb01eb-61fc-4f9e-aca5"));
-
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/invalid_concept.xml"));
-        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
-        EncounterValidationResponse response = validator.validate(validationContext);
-        assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "Invalid code " +
-                "invalid-eddb01eb-61fc-4f9e-aca5", response.getErrors());
-        assertEquals(1, response.getErrors().size());
+//        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+//        when(trConceptLocator.validate(anyString(), eq("invalid-eddb01eb-61fc-4f9e-aca5"),
+//                anyString())).thenReturn(new ConceptLocator.ValidationResult(OperationOutcome.IssueSeverity.error,
+//                "Invalid code invalid-eddb01eb-61fc-4f9e-aca5"));
+//
+//        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+//                FileUtil.asString("xmls/encounters/invalid_concept.xml"));
+//        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
+//        EncounterValidationResponse response = validator.validate(validationContext);
+//        assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "Invalid code " +
+//                "invalid-eddb01eb-61fc-4f9e-aca5", response.getErrors());
+//        assertEquals(1, response.getErrors().size());
     }
 
     @Test
     @Ignore
     public void shouldRejectEncounterWithInvalidConceptReferenceTerms() {
-        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        when(trConceptLocator.validate(anyString(), eq("INVALID_REFERENCE_TERM"),
-                anyString())).thenReturn(new ConceptLocator.ValidationResult(OperationOutcome.IssueSeverity.error,
-                "INVALID_REFERENCE_TERM"));
-
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/invalid_ref.xml"));
-        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
-        EncounterValidationResponse response = validator.validate(validationContext);
-        assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "INVALID_REFERENCE_TERM", response
-                .getErrors());
-        assertEquals(1, response.getErrors().size());
+//        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+//        when(trConceptLocator.validate(anyString(), eq("INVALID_REFERENCE_TERM"),
+//                anyString())).thenReturn(new ConceptLocator.ValidationResult(OperationOutcome.IssueSeverity.error,
+//                "INVALID_REFERENCE_TERM"));
+//
+//        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+//                FileUtil.asString("xmls/encounters/invalid_ref.xml"));
+//        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
+//        EncounterValidationResponse response = validator.validate(validationContext);
+//        assertFailureFromResponseErrors("/f:entry/f:content/f:Condition/f:Condition/f:code/f:coding", "INVALID_REFERENCE_TERM", response
+//                .getErrors());
+//        assertEquals(1, response.getErrors().size());
     }
 
     @Test
@@ -328,18 +326,17 @@ public class HapiEncounterValidatorIntegrationTest {
     @Test
     @Ignore
     public void shouldInvalidateWrongCodesInObservations() {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/encounter_with_obs_invalid.xml"));
-        when(trConceptLocator.validate(anyString(), eq("77405a73-b915-4a93-87a7-f29fe6697fb4-INVALID"),
-                anyString())).thenReturn(new ConceptLocator.ValidationResult(OperationOutcome.IssueSeverity.error,
-                "Invalid code 77405a73-b915-4a93-87a7-f29fe6697fb4-INVALID"));
-        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
-        EncounterValidationResponse response = validator.validate(validationContext);
-        assertFailureFromResponseErrors("/f:entry[3]/f:content/f:Observation/f:Observation/f:name/f:coding",
-                "Invalid code 77405a73-b915-4a93-87a7-f29fe6697fb4-INVALID", response.getErrors());
-        assertEquals(1, response.getErrors().size());
-
+//        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+//                FileUtil.asString("xmls/encounters/encounter_with_obs_invalid.xml"));
+//        when(trConceptLocator.validate(anyString(), eq("77405a73-b915-4a93-87a7-f29fe6697fb4-INVALID"),
+//                anyString())).thenReturn(new ConceptLocator.ValidationResult(OperationOutcome.IssueSeverity.error,
+//                "Invalid code 77405a73-b915-4a93-87a7-f29fe6697fb4-INVALID"));
+//        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+//        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
+//        EncounterValidationResponse response = validator.validate(validationContext);
+//        assertFailureFromResponseErrors("/f:entry[3]/f:content/f:Observation/f:Observation/f:name/f:coding",
+//                "Invalid code 77405a73-b915-4a93-87a7-f29fe6697fb4-INVALID", response.getErrors());
+//        assertEquals(1, response.getErrors().size());
     }
 
     @Test
@@ -584,19 +581,19 @@ public class HapiEncounterValidatorIntegrationTest {
     @Test
     @Ignore
     public void shouldValidateInvalidCodeInDischargeSummaryEncounter() {
-        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        when(trConceptLocator.validate(anyString(), eq("a6e20fe1-4044-4ce7-8440-577f7f814765-invalid"),
-                anyString())).thenReturn(new ConceptLocator.ValidationResult(OperationOutcome.IssueSeverity.error,
-                "Invalid code a6e20fe1-4044-4ce7-8440-577f7f814765-invalid"));
-
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/discharge_summary_encounter_code_invalid.xml"));
-        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
-        EncounterValidationResponse response = validator.validate(validationContext);
-        assertFailureFromResponseErrors("/f:entry[2]/f:content/f:Observation/f:Observation/f:name/f:coding",
-                "Invalid code a6e20fe1-4044-4ce7-8440-577f7f814765-invalid", response.getErrors());
-        verify(trConceptLocator, times(5)).validate(anyString(), eq("a6e20fe1-4044-4ce7-8440-577f7f814765-invalid"), anyString());
-        assertEquals(5, response.getErrors().size());
+//        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
+//        when(trConceptLocator.validate(anyString(), eq("a6e20fe1-4044-4ce7-8440-577f7f814765-invalid"),
+//                anyString())).thenReturn(new ConceptLocator.ValidationResult(OperationOutcome.IssueSeverity.error,
+//                "Invalid code a6e20fe1-4044-4ce7-8440-577f7f814765-invalid"));
+//
+//        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+//                FileUtil.asString("xmls/encounters/discharge_summary_encounter_code_invalid.xml"));
+//        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
+//        EncounterValidationResponse response = validator.validate(validationContext);
+//        assertFailureFromResponseErrors("/f:entry[2]/f:content/f:Observation/f:Observation/f:name/f:coding",
+//                "Invalid code a6e20fe1-4044-4ce7-8440-577f7f814765-invalid", response.getErrors());
+//        verify(trConceptLocator, times(5)).validate(anyString(), eq("a6e20fe1-4044-4ce7-8440-577f7f814765-invalid"), anyString());
+//        assertEquals(5, response.getErrors().size());
     }
 
     @Test
@@ -650,6 +647,24 @@ public class HapiEncounterValidatorIntegrationTest {
         EncounterValidationResponse response = validator.validate(validationContext);
         debugEncounterValidationResponse(response);
         assertTrue(response.isSuccessful());
+    }
+
+    @Test
+    public void shouldFindAllPatientReferencesWithinBundle() {
+        String content = FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_all_resources.xml");
+        FhirContext fhirContext = FhirContext.forDstu2();
+        IResource bundle = (IResource) fhirContext.newXmlParser().parseResource(content);
+        List<ResourceReferenceDt> resourceReferences = bundle.getAllPopulatedChildElementsOfType(ResourceReferenceDt.class);
+        int refCount = 0;
+        for (ResourceReferenceDt resourceReference : resourceReferences) {
+            String resourceType = resourceReference.getReference().getResourceType();
+            if (resourceType != null && resourceType.equals("patients")) {
+                System.out.println(resourceReference.getReference().getValue());
+                refCount++;
+            }
+        }
+
+        System.out.println("patient ref count:" + refCount);
     }
 
     private void assertFailureFromResponseErrors(String fieldName, String reason, List<Error> errors) {

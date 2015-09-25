@@ -16,7 +16,7 @@ public class DoseQuantityValidatorTest {
         assertTrue(doseQuantityValidator.isReferenceUrlNotFound(new Quantity()));
 
         Quantity quantityWithReference = new Quantity();
-        quantityWithReference.setSystemSimple("some url");
+        quantityWithReference.setSystem("some url");
         assertFalse(doseQuantityValidator.isReferenceUrlNotFound(quantityWithReference));
     }
 

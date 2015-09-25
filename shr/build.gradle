@@ -54,13 +54,13 @@ dependencies {
         exclude group: 'ch.qos.logback', module: "logback-classic"
     }
     compile libraries.snappy, libraries.spring_data_cassandra, libraries.spring_boot_logging,
-            libraries.apache_commons_io, libraries.spring_framework, libraries.fhir_validator,
+            libraries.apache_commons_io, libraries.spring_framework,
             libraries.jackson, libraries.saxon, libraries.rxjava,
             libraries.rome, libraries.rome_tools, libraries.time_uuid,
             libraries.spring_security, libraries.spring_web, libraries.eclipse_moxy,
             libraries.spring_context_support, libraries.ehcache_core, libraries.commons_lang,
             libraries.lambdaj, libraries.joda_time, libraries.lz4,
-            libraries.hapi_fhir_base, libraries.hapi_fhir_structures, libraries.hapi_fhir_validation_resources,
+            libraries.hapi_fhir_base, libraries.hapi_fhir_structures, libraries.hapi_fhir_validation_resources, libraries.hapi_fhir_structures_hl7,
             libraries.phloc_schematron, libraries.phloc_commons, libraries.thymeleaf
 
     compile(libraries.spring_boot_security) {

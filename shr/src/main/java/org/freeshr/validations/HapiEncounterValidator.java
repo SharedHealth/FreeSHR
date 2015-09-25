@@ -1,43 +1,60 @@
 package org.freeshr.validations;
 
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
-import ca.uhn.fhir.validation.FhirValidator;
-import ca.uhn.fhir.validation.SingleValidationMessage;
-import ca.uhn.fhir.validation.ValidationResult;
-import org.freeshr.application.fhir.*;
+import ca.uhn.fhir.validation.*;
+import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.application.fhir.Error;
 import org.freeshr.utils.FhirFeedUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static org.freeshr.application.fhir.EncounterValidationResponse.fromShrValidationMessages;
+
 @Component("hapiEncounterValidator")
 public class HapiEncounterValidator implements ShrEncounterValidator {
 
-    private final FhirValidator fhirValidator;
-    private FhirFeedUtil feedUtil;
+    private FhirResourceValidator fhirResourceValidator;
+    private HealthIdValidator healthIdValidator;
+    private FacilityValidator facilityValidator;
+    private ProviderValidator providerValidator;
 
     @Autowired
-    public HapiEncounterValidator(FhirFeedUtil feedUtil) {
-        this.feedUtil = feedUtil;
-        fhirValidator = getFhirValidator();
+    public HapiEncounterValidator(FhirResourceValidator fhirResourceValidator,
+                                  HealthIdValidator healthIdValidator,
+                                  FacilityValidator facilityValidator,
+                                  ProviderValidator providerValidator) {
+        this.fhirResourceValidator = fhirResourceValidator;
+        this.healthIdValidator = healthIdValidator;
+        this.facilityValidator = facilityValidator;
+        this.providerValidator = providerValidator;
     }
     @Override
     public EncounterValidationResponse validate(EncounterValidationContext validationContext) {
         EncounterValidationResponse validationResponse = new EncounterValidationResponse();
         Bundle bundle = validationContext.getBundle();
-        ValidationResult validationResult = fhirValidator.validateWithResult(bundle);
-
+        ValidationResult validationResult = fhirResourceValidator.validateWithResult(bundle);
         if (!validationResult.isSuccessful()) {
             for (SingleValidationMessage validationMessage : validationResult.getMessages()) {
                 Error error = new Error(validationMessage.getLocationString(), validationMessage.getSeverity().getCode(), validationMessage.getMessage());
                 validationResponse.addError(error);
             }
+            return validationResponse;
         }
-        validationResponse.setBundle(bundle);
+
+        validationResponse.mergeErrors(fromShrValidationMessages(
+                healthIdValidator.validate(validationContext.context())));
+
+        validationResponse.mergeErrors(fromShrValidationMessages(
+                facilityValidator.validate(validationContext.bundleFragment())));
+
+        validationResponse.mergeErrors(fromShrValidationMessages(
+                providerValidator.validate(validationContext.bundleFragment())));
+
+        if(validationResponse.isSuccessful()) {
+            validationResponse.setBundle(bundle);
+        }
         return validationResponse;
     }
 
-    private FhirValidator getFhirValidator() {
-        return feedUtil.getFhirContext().newValidator();
-    }
+
 }

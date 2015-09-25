@@ -1,7 +1,10 @@
 package org.freeshr.validations;
 
-import org.hl7.fhir.instance.model.*;
-import org.hl7.fhir.instance.validation.ValidationMessage;
+import ca.uhn.fhir.model.dstu2.resource.Bundle;
+import ca.uhn.fhir.model.dstu2.resource.Composition;
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import org.apache.commons.lang3.StringUtils;
+import org.freeshr.utils.FhirResourceHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.freeshr.utils.UrlUtil.extractFacilityId;
-import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity;
 
 @Component
-public class FacilityValidator implements Validator<AtomFeed> {
+public class FacilityValidator implements ShrValidator<Bundle> {
 
     public static final String INVALID_SERVICE_PROVIDER = "Invalid Service Provider";
     private final static Logger logger = LoggerFactory.getLogger(FacilityValidator.class);
@@ -26,44 +28,36 @@ public class FacilityValidator implements Validator<AtomFeed> {
     }
 
     @Override
-    public List<ValidationMessage> validate(ValidationSubject<AtomFeed> subject) {
-        AtomFeed feed = subject.extract();
-        List<ValidationMessage> validationMessages = new ArrayList<>();
-        AtomEntry encounterEntry = identifyEncounterEntry(feed);
-        ResourceReference serviceProvider = getServiceProviderRef(encounterEntry);
-        if (serviceProvider == null) {
-            logger.debug("Validating encounter as facility is not provided");
+    public List<ShrValidationMessage> validate(ValidationSubject<Bundle> subject) {
+        Bundle bundle = subject.extract();
+        List<ShrValidationMessage> validationMessages = new ArrayList<>();
+        Encounter encounter = identifyEncounter(bundle);
+        String serviceProviderUrl = getServiceProviderRefUrl(encounter);
+        if (StringUtils.isBlank(serviceProviderUrl)) {
+            logger.debug("Encounter.serviceProvider (facility) is not specified");
+            validationMessages.add(new ShrValidationMessage(Severity.INFORMATION, "Encounter", "notfound", INVALID_SERVICE_PROVIDER));
+            //We can't throw error as the serviceProvider may be just a provider
             return validationMessages;
         }
-        String facilityUrl = serviceProvider.getReferenceSimple();
-        if (!hieFacilityValidator.validate(facilityUrl)) {
+        if (!hieFacilityValidator.validate(serviceProviderUrl)) {
             logger.debug("Encounter failed for invalid facility URL");
-            validationMessages.add(buildValidationMessage(ResourceValidator.INVALID, encounterEntry.getId(), INVALID_SERVICE_PROVIDER,
-                    IssueSeverity.error));
+            validationMessages.add(new ShrValidationMessage(Severity.ERROR, "Encounter", "invalid", INVALID_SERVICE_PROVIDER + ":" + serviceProviderUrl));
             return validationMessages;
         }
 
-        logger.debug(String.format("Encounter validated for valid facility %s", extractFacilityId(facilityUrl)));
+        logger.debug(String.format("Encounter validated for valid facility %s", extractFacilityId(serviceProviderUrl)));
         return validationMessages;
     }
 
-    private ResourceReference getServiceProviderRef(AtomEntry encounterEntry) {
-        return (encounterEntry != null) ? ((Encounter) encounterEntry.getResource()).getServiceProvider() : null;
+    private Encounter identifyEncounter(Bundle bundle) {
+        List<Composition> compositions = FhirResourceHelper.findBundleResourcesOfType(bundle, Composition.class);
+        return (Encounter) FhirResourceHelper.findBundleResourceByRef(bundle, compositions.get(0).getEncounter());
     }
 
-    private AtomEntry<? extends Resource> identifyEncounterEntry(AtomFeed feed) {
-        for (AtomEntry<? extends Resource> atomEntry : feed.getEntryList()) {
-            Resource resource = atomEntry.getResource();
-            if (resource instanceof Encounter) {
-                return atomEntry;
-            }
-        }
-        return null;
+    private String getServiceProviderRefUrl(Encounter encounter) {
+        return (encounter != null) ? encounter.getServiceProvider().getReference().getValue() : null;
     }
 
-    private ValidationMessage buildValidationMessage(String type, String path, String message, IssueSeverity error) {
-        return new ValidationMessage(ValidationMessage.Source.ResourceValidator, type, path, message, error);
-    }
 
 
 }

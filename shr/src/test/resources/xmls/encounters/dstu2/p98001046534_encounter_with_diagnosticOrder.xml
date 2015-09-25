@@ -1,0 +1,163 @@
+<Bundle xmlns="http://hl7.org/fhir">
+    <id value="53562c57-62d3-42d7-93be-31176977e984"/>
+    <meta>
+        <lastUpdated value="2015-09-04T15:15:16.000+05:30"/>
+    </meta>
+    <type value="collection"/>
+    <entry>
+        <fullUrl value="urn:uuid:4c075fc0-5d0f-4ace-b801-3f6d75476c69"/>
+        <resource>
+            <Composition xmlns="http://hl7.org/fhir">
+                <id value="4c075fc0-5d0f-4ace-b801-3f6d75476c69"/>
+                <identifier>
+                    <value value="urn:uuid:4c075fc0-5d0f-4ace-b801-3f6d75476c69"/>
+                </identifier>
+                <date value="2015-09-04T15:15:16.000+05:30"/>
+                <type>
+                    <coding>
+                        <system value="http://hl7.org/fhir/vs/doc-typecodes"/>
+                        <code value="51899-3"/>
+                        <display value="Details Document"/>
+                    </coding>
+                </type>
+                <title value="encounter composition for patient 98001046534"/>
+                <status value="final"/>
+                <confidentiality value="N"/>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <author>
+                    <reference value="http://172.18.46.199:8080/api/1.0/facilities/10019842.json"/>
+                </author>
+                <encounter>
+                    <reference value="urn:uuid:9026f815-cb5d-4668-9e23-f6e775a620ff"/>
+                </encounter>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:9026f815-cb5d-4668-9e23-f6e775a620ff"/>
+                        <display value="Encounter"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:42a6d58c-4da6-4656-ac0a-172a928da9e5"/>
+                        <display value="Diagnostic Order"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:06472534-b4a2-4893-9c2f-a44bebfca5cb"/>
+                        <display value="Specimen"/>
+                    </entry>
+                </section>
+            </Composition>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:9026f815-cb5d-4668-9e23-f6e775a620ff"/>
+        <resource>
+            <Encounter xmlns="http://hl7.org/fhir">
+                <id value="9026f815-cb5d-4668-9e23-f6e775a620ff"/>
+                <identifier>
+                    <value value="urn:uuid:9026f815-cb5d-4668-9e23-f6e775a620ff"/>
+                </identifier>
+                <status value="finished"/>
+                <class value="outpatient"/>
+                <type>
+                    <text value="OPD"/>
+                </type>
+                <patient>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </patient>
+                <participant>
+                    <individual>
+                        <reference value="http://172.18.46.199:8080/api/1.0/providers/18.json"/>
+                    </individual>
+                </participant>
+                <serviceProvider>
+                    <reference value="http://172.18.46.199:8080/api/1.0/facilities/10019842.json"/>
+                </serviceProvider>
+            </Encounter>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:42a6d58c-4da6-4656-ac0a-172a928da9e5"/>
+        <resource>
+            <DiagnosticOrder xmlns="http://hl7.org/fhir">
+                <id value="42a6d58c-4da6-4656-ac0a-172a928da9e5"/>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <orderer>
+                    <reference value="http://172.18.46.199:8080/api/1.0/providers/18.json"/>
+                </orderer>
+                <identifier>
+                    <value value="urn:uuid:42a6d58c-4da6-4656-ac0a-172a928da9e5"/>
+                </identifier>
+                <encounter>
+                    <reference value="urn:uuid:9026f815-cb5d-4668-9e23-f6e775a620ff"/>
+                </encounter>
+                <specimen>
+                    <reference value="urn:uuid:06472534-b4a2-4893-9c2f-a44bebfca5cb"/>
+                </specimen>
+                <status value="requested"/>
+                <item>
+                    <code>
+                        <coding>
+                            <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/referenceterms/07af84be-5206-11e5-ae6d-0050568225ca"/>
+                            <code value="2161-8"/>
+                            <display value="Creatinine [Mass/volume] in Urine"/>
+                        </coding>
+                        <coding>
+                            <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/07ae6c22-5206-11e5-ae6d-0050568225ca"/>
+                            <code value="07ae6c22-5206-11e5-ae6d-0050568225ca"/>
+                            <display value="Creatinine [Mass/volume] in Urine"/>
+                        </coding>
+                    </code>
+                    <specimen>
+                        <reference value="urn:uuid:06472534-b4a2-4893-9c2f-a44bebfca5cb"/>
+                    </specimen>
+                    <status value="requested"/>
+                </item>
+                <item>
+                    <code>
+                        <coding>
+                            <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/referenceterms/07a55e47-5206-11e5-ae6d-0050568225ca"/>
+                            <code value="58410-2"/>
+                            <display value="Complete blood count (hemogram) panel"/>
+                        </coding>
+                        <coding>
+                            <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/07a4671e-5206-11e5-ae6d-0050568225ca"/>
+                            <code value="07a4671e-5206-11e5-ae6d-0050568225ca"/>
+                            <display value="Complete blood count (hemogram) panel"/>
+                        </coding>
+                    </code>
+                    <status value="requested"/>
+                </item>
+            </DiagnosticOrder>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:06472534-b4a2-4893-9c2f-a44bebfca5cb"/>
+        <resource>
+            <Specimen xmlns="http://hl7.org/fhir">
+                <id value="06472534-b4a2-4893-9c2f-a44bebfca5cb"/>
+                <identifier>
+                    <value value="urn:uuid:06472534-b4a2-4893-9c2f-a44bebfca5cb"/>
+                </identifier>
+                <type>
+                    <coding>
+                        <display value="Urine"/>
+                    </coding>
+                </type>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+            </Specimen>
+        </resource>
+    </entry>
+</Bundle>
