@@ -1,76 +1,82 @@
 package org.freeshr.validations;
 
 
+import ca.uhn.fhir.model.api.IDatatype;
+import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
+import ca.uhn.fhir.model.dstu2.resource.Procedure;
+import ca.uhn.fhir.model.primitive.DateTimeDt;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.Base;
 import org.hl7.fhir.instance.model.BaseReference;
 import org.hl7.fhir.instance.model.Bundle;
-import org.hl7.fhir.instance.model.Element;
 import org.hl7.fhir.instance.model.OperationOutcome;
 import org.hl7.fhir.instance.model.Period;
 import org.hl7.fhir.instance.model.Property;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.freeshr.utils.DateUtil.isValidPeriod;
 
 @Component
-public class ProcedureValidator implements Validator<Bundle.BundleEntryComponent> {
+public class ProcedureValidator implements SubResourceValidator {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcedureValidator.class);
+    public static final String PROCEDURE_PERIOD_LOCATION = "f:Procedure/f:performed";
+
 
     @Override
-    public List<ValidationMessage> validate(ValidationSubject<Bundle.BundleEntryComponent> subject) {
-        Bundle.BundleEntryComponent atomEntry = subject.extract();
-        List<ValidationMessage> validationMessages = new ArrayList<>();
+    public boolean validates(Object resource) {
+        return (resource instanceof Procedure);
+    }
 
-        validationMessages.addAll(validateDate(atomEntry));
+    @Override
+    public List<ShrValidationMessage> validate(Object resource) {
+        List<ShrValidationMessage> validationMessages = new ArrayList<>();
+        Procedure procedure = (Procedure) resource;
+        validationMessages.addAll(validateProcedureDates(procedure));
         if (validationMessages.size() > 0) return validationMessages;
 
-        validationMessages.addAll(validateDiagnosticReport(atomEntry));
+        validationMessages.addAll(validateDiagnosticReport(procedure.getReport()));
+
         return validationMessages;
     }
 
-    private List<ValidationMessage> validateDiagnosticReport(Bundle.BundleEntryComponent atomEntry) {
-        Property report = atomEntry.getResource().getChildByName("report");
-        List<Base> reportElements = report.getValues();
-        for (Base reportElement : reportElements) {
-            if (!(reportElement instanceof BaseReference)) continue;
-            BaseReference reference = (BaseReference) reportElement;
-            if (reference.getReferenceElement() == null || reference.getReferenceElement().isEmpty()) {
-                logger.debug(String.format("Procedure:Encounter failed for %s", ValidationMessages.INVALID_DIAGNOSTIC_REPORT_REFERENCE));
-                return validationMessages(new ValidationMessage(null, OperationOutcome.IssueType.INVALID, atomEntry.getId(), ValidationMessages
-                        .INVALID_DIAGNOSTIC_REPORT_REFERENCE, OperationOutcome.IssueSeverity.ERROR));
+    private Collection<? extends ShrValidationMessage> validateDiagnosticReport(List<ResourceReferenceDt> reports) {
+        //TODO Shouldn't we be validating diagnosticReport separately
+        List<ShrValidationMessage> validationMessages = new ArrayList<>();
+
+        for (ResourceReferenceDt report : reports) {
+            if (report.isEmpty()) continue; //procedure can be without report
+            if (StringUtils.isBlank(report.getReference().getValue())) {
+                 validationMessages.add(new ShrValidationMessage(Severity.ERROR, "f:Procedure/f:report", "invalid", ValidationMessages
+                         .INVALID_DIAGNOSTIC_REPORT_REFERENCE));
             }
         }
-        return new ArrayList<>();
-
+        return validationMessages;
     }
 
-    private List<ValidationMessage> validateDate(Bundle.BundleEntryComponent atomEntry) {
-        Property date = atomEntry.getResource().getChildByName("date");
-        for (Base element : date.getValues()) {
-            if (!(element instanceof Period)) continue;
+    private Collection<? extends ShrValidationMessage> validateProcedureDates(Procedure procedure) {
+        IDatatype performed = procedure.getPerformed();
 
-            Period period = (Period) element;
-            if (!isValidPeriod(period.getStart(), period.getEnd())) {
+        if (performed instanceof PeriodDt) {
+            PeriodDt procedurePeriod = (PeriodDt) performed;
+            if (!isValidPeriod(procedurePeriod.getStart(), procedurePeriod.getEnd())) {
                 logger.debug(String.format("Procedure:Encounter failed for %s", ValidationMessages.INVALID_PERIOD));
-                return validationMessages(new ValidationMessage(null, OperationOutcome.IssueType.INVALID, atomEntry.getId(), ValidationMessages
-                        .INVALID_PERIOD, OperationOutcome.IssueSeverity.ERROR));
+                return Arrays.asList(new ShrValidationMessage(Severity.ERROR, PROCEDURE_PERIOD_LOCATION,
+                        "invalid", ValidationMessages.INVALID_PERIOD  + ":Procedure:" + procedure.getId().getValue() ));
+            }
+        } else if (performed instanceof DateTimeDt) {
+            Date value = ((DateTimeDt) performed).getValue();
+            if (value == null) {
+                return Arrays.asList(new ShrValidationMessage(Severity.ERROR, PROCEDURE_PERIOD_LOCATION,
+                        "invalid", "Invalid Procedure perform date:" + procedure.getId().getValue() ));
             }
         }
-
         return new ArrayList<>();
-    }
-
-    private List<ValidationMessage> validationMessages(ValidationMessage message) {
-        List<ValidationMessage> validationMessages = new ArrayList<>();
-        validationMessages.add(message);
-        return validationMessages;
     }
 }

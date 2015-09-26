@@ -26,10 +26,10 @@ public class ResourceValidator implements Validator<Bundle> {
                              ImmunizationValidator immunizationValidator,
                              ProcedureValidator procedureValidator) {
         assignDefaultValidatorToAllResourceTypes();
-        resourceTypeValidatorMap.put(ResourceType.Condition, conditionValidator);
-        resourceTypeValidatorMap.put(ResourceType.MedicationOrder, medicationPrescriptionValidator);
-        resourceTypeValidatorMap.put(ResourceType.Immunization, immunizationValidator);
-        resourceTypeValidatorMap.put(ResourceType.Procedure, procedureValidator);
+//        resourceTypeValidatorMap.put(ResourceType.Condition, conditionValidator);
+        //resourceTypeValidatorMap.put(ResourceType.MedicationOrder, medicationPrescriptionValidator);
+        //resourceTypeValidatorMap.put(ResourceType.Immunization, immunizationValidator);
+        //resourceTypeValidatorMap.put(ResourceType.Procedure, procedureValidator);
 
     }
 

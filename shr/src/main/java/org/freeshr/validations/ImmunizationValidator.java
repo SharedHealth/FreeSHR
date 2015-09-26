@@ -1,8 +1,8 @@
 package org.freeshr.validations;
 
 
-import org.hl7.fhir.instance.model.*;
-import org.hl7.fhir.instance.validation.ValidationMessage;
+import ca.uhn.fhir.model.dstu2.composite.SimpleQuantityDt;
+import ca.uhn.fhir.model.dstu2.resource.Immunization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +14,12 @@ import java.util.List;
 import static org.freeshr.validations.ValidationMessages.INVALID_DOSAGE_QUANTITY;
 
 @Component
-public class ImmunizationValidator implements Validator<Bundle.BundleEntryComponent> {
+public class ImmunizationValidator implements SubResourceValidator {
 
+    public static final String IMMUNIZATION_DOSE_QUANTITY_LOCATION = "f:Immunization/f:doseQuantity";
     private static final Logger logger = LoggerFactory.getLogger(ImmunizationValidator.class);
-    public static final String DOSE_QUANTITY = "doseQuantity";
     private DoseQuantityValidator doseQuantityValidator;
     private UrlValidator urlValidator;
-
 
     @Autowired
     public ImmunizationValidator(DoseQuantityValidator doseQuantityValidator, UrlValidator urlValidator) {
@@ -28,34 +27,36 @@ public class ImmunizationValidator implements Validator<Bundle.BundleEntryCompon
         this.urlValidator = urlValidator;
     }
 
+
     @Override
-    public List<ValidationMessage> validate(ValidationSubject<Bundle.BundleEntryComponent> subject) {
-        Bundle.BundleEntryComponent atomEntry = subject.extract();
-        return validateDosageQuantity(atomEntry);
+    public boolean validates(Object resource) {
+        return resource instanceof ca.uhn.fhir.model.dstu2.resource.Immunization;
     }
 
-    private List<ValidationMessage> validateDosageQuantity(Bundle.BundleEntryComponent atomEntry) {
-        List<ValidationMessage> validationMessages = new ArrayList<>();
-        Property property = atomEntry.getResource().getChildByName(DOSE_QUANTITY);
-        if (!property.getName().equals(DOSE_QUANTITY) || !property.hasValues()) return validationMessages;
+    @Override
+    public List<ShrValidationMessage> validate(Object resource) {
+        Immunization immunization = (Immunization) resource;
+        return validateDosageQuantity(immunization);
+    }
 
-        Quantity doseQuantity = (Quantity) property.getValues().get(0);
-        if (doseQuantityValidator.isReferenceUrlNotFound(doseQuantity)
-                || !urlValidator.isValid(doseQuantity
-                .getSystem())) return validationMessages;
-
-        if (doseQuantityValidator.validate(doseQuantity) != null) {
+    private List<ShrValidationMessage> validateDosageQuantity(Immunization immunization) {
+        List<ShrValidationMessage> validationMessages = new ArrayList<>();
+        SimpleQuantityDt doseQuantity = immunization.getDoseQuantity();
+        if (doseQuantity.isEmpty()) {
             return validationMessages;
         }
 
-        logger.debug("Medication-Prescription DosageQuantity Code is invalid.");
+        if (doseQuantityValidator.isReferenceUrlNotFound(doseQuantity) || !urlValidator.isValid(doseQuantity.getSystem()))
+            return validationMessages;
 
-        validationMessages.add(new ValidationMessage(null,
-                OperationOutcome.IssueType.INVALID, atomEntry.getId(),
-                INVALID_DOSAGE_QUANTITY,
-                OperationOutcome.IssueSeverity.ERROR));
+        if (doseQuantityValidator.validate(doseQuantity) == null) {
+            return validationMessages;
+        }
+
+        logger.debug("Immunization DosageQuantity is invalid." + immunization.getId().getValue());
+
+        validationMessages.add(new ShrValidationMessage(Severity.ERROR, IMMUNIZATION_DOSE_QUANTITY_LOCATION, "invalid",
+                INVALID_DOSAGE_QUANTITY + ":Immunization:" + immunization.getId().getValue()));
         return validationMessages;
     }
-
-
 }

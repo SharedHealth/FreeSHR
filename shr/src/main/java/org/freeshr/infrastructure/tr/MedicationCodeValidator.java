@@ -1,7 +1,6 @@
 package org.freeshr.infrastructure.tr;
 
 import org.freeshr.config.SHRProperties;
-import org.freeshr.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -37,24 +36,25 @@ public class MedicationCodeValidator implements CodeValidator {
     @Override
     public Observable<Boolean> isValid(String system, String code) {
         if (isEmpty(code) || substringAfterLast(system, "/").equalsIgnoreCase(code)) {
-            Observable<Boolean> map = get(system).map(new Func1<ResponseEntity<String>, Boolean>() {
+            Observable<Boolean> map = fetch(system).map(new Func1<ResponseEntity<String>, Boolean>() {
                 @Override
                 public Boolean call(ResponseEntity<String> response) {
                     return !response.getBody().isEmpty();
                 }
 
             });
-            return map.onErrorReturn(new Func1<Throwable, Boolean>() {
+            map.onErrorReturn(new Func1<Throwable, Boolean>() {
                 @Override
                 public Boolean call(Throwable throwable) {
                     return false;
                 }
             });
+            return map;
         }
         return Observable.just(Boolean.FALSE);
     }
 
-    private Observable<ResponseEntity<String>> get(String uri) {
+    private Observable<ResponseEntity<String>> fetch(String uri) {
         return Observable.from(shrRestTemplate.exchange(uri,
                 HttpMethod.GET,
                 new HttpEntity(basicAuthHeaders(shrProperties.getTrUser(), shrProperties.getTrPassword())),

@@ -17,16 +17,19 @@ public class HapiEncounterValidator implements ShrEncounterValidator {
     private HealthIdValidator healthIdValidator;
     private FacilityValidator facilityValidator;
     private ProviderValidator providerValidator;
+    private BundleResourceValidator bundleResourceValidator;
 
     @Autowired
     public HapiEncounterValidator(FhirResourceValidator fhirResourceValidator,
                                   HealthIdValidator healthIdValidator,
                                   FacilityValidator facilityValidator,
-                                  ProviderValidator providerValidator) {
+                                  ProviderValidator providerValidator,
+                                  BundleResourceValidator bundleResourceValidator) {
         this.fhirResourceValidator = fhirResourceValidator;
         this.healthIdValidator = healthIdValidator;
         this.facilityValidator = facilityValidator;
         this.providerValidator = providerValidator;
+        this.bundleResourceValidator = bundleResourceValidator;
     }
     @Override
     public EncounterValidationResponse validate(EncounterValidationContext validationContext) {
@@ -49,6 +52,9 @@ public class HapiEncounterValidator implements ShrEncounterValidator {
 
         validationResponse.mergeErrors(fromShrValidationMessages(
                 providerValidator.validate(validationContext.bundleFragment())));
+
+        validationResponse.mergeErrors(fromShrValidationMessages(
+                bundleResourceValidator.validate(validationContext.bundleFragment())));
 
         if(validationResponse.isSuccessful()) {
             validationResponse.setBundle(bundle);

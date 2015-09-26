@@ -13,25 +13,32 @@ public class BundleResourceValidator implements ShrValidator<Bundle> {
     private List<SubResourceValidator> subResourceValidators;
 
     @Autowired
+    public BundleResourceValidator(List<SubResourceValidator> subResourceValidators) {
+        this.subResourceValidators = subResourceValidators;
+    }
+
     public List<ShrValidationMessage> validate(ValidationSubject<Bundle> subject) {
         Bundle bundle = subject.extract();
         List<ShrValidationMessage> validationMessages = new ArrayList<>();
         for (Bundle.Entry entry : bundle.getEntry()) {
             IResource resource = entry.getResource();
-            SubResourceValidator validator = findSubResourceValidator(resource);
-            if (validator != null) {
-                validationMessages.addAll(validator.validate(resource));
+            List<SubResourceValidator> validators = findSubResourceValidator(resource);
+            if (!validators.isEmpty()) {
+                for (SubResourceValidator validator : validators) {
+                    validationMessages.addAll(validator.validate(resource));
+                }
             }
         }
         return validationMessages;
     }
 
-    private SubResourceValidator findSubResourceValidator(IResource resource) {
+    private List<SubResourceValidator> findSubResourceValidator(IResource resource) {
+        List<SubResourceValidator> validators = new ArrayList<>();
         for (SubResourceValidator subResourceValidator : subResourceValidators) {
             if (subResourceValidator.validates(resource)) {
-                return subResourceValidator;
+                validators.add(subResourceValidator);
             }
         }
-        return null; //DefaultValidator?
+        return validators; //DefaultValidator?
     }
 }

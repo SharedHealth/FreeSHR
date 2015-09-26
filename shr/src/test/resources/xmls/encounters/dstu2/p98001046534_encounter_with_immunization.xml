@@ -109,6 +109,7 @@
                 </encounter>
                 <doseQuantity>
                     <value value="20.0"/>
+                    <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/invalid-code"/>
                 </doseQuantity>
                 <explanation>
                     <reason>

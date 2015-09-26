@@ -12,7 +12,7 @@ public class DoseQuantityValidatorTest {
     public void shouldCheckForReferenceUrlPresence() throws Exception {
 
         DoseQuantityValidator doseQuantityValidator = new DoseQuantityValidator(null);
-        assertTrue(doseQuantityValidator.isReferenceUrlNotFound(null));
+        assertTrue(doseQuantityValidator.isReferenceUrlNotFound((Quantity) null));
         assertTrue(doseQuantityValidator.isReferenceUrlNotFound(new Quantity()));
 
         Quantity quantityWithReference = new Quantity();

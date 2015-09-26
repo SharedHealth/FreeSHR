@@ -58,8 +58,8 @@ public class RIEncounterValidator implements ShrEncounterValidator {
                     providerValidator.validate(validationContext.bundleFragment())));
             //if (validationResponse.isNotSuccessful()) return validationResponse;
 
-//            validationResponse.mergeErrors(fromValidationMessages(
-//                    resourceValidator.validate(validationContext.feedFragment()), fhirMessageFilter));
+//            validationResponse.mergeErrors(fromShrValidationMessages(
+//                    resourceValidator.validate(validationContext.bundleFragment())));
 
             if(validationResponse.isSuccessful()) {
                 validationResponse.setFeed(validationContext.getFeed());

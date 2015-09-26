@@ -1,6 +1,7 @@
 package org.freeshr.validations.providerIdentifiers;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
@@ -34,6 +35,7 @@ public class MedicationPrescriberIdentifierTest {
     public void shouldExtractProperMedicationPrescriptionPerformerReference() {
         final FhirContext fhirContext = FhirContext.forDstu2();
         IBaseResource medicationOrder = parseResource(FileUtil.asString("xmls/encounters/dstu2/example_medication_order.xml"), fhirContext);
+        IDatatype medication = ((MedicationOrder) medicationOrder).getMedication();
         List<ResourceReferenceDt> providerReferences = medicationPrescriberIdentifier.getProviderReferences((IResource) medicationOrder);
         assertEquals(1, providerReferences.size());
         assertEquals("Practitioner/f006", providerReferences.get(0).getReference().getValue());

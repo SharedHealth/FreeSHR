@@ -1,6 +1,7 @@
 package org.freeshr.validations;
 
 
+import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import org.freeshr.application.fhir.TRConceptLocator;
 import org.hl7.fhir.instance.model.Quantity;
 import org.hl7.fhir.instance.terminologies.ITerminologyServices;
@@ -24,6 +25,15 @@ public class DoseQuantityValidator {
     }
 
     public Object validate(Quantity doseQuantity) {
+        return trConceptLocator.validate(doseQuantity.getSystem(),
+                doseQuantity.getCode(), DOSE_QUANTITY);
+    }
+
+    public boolean isReferenceUrlNotFound(QuantityDt doseQuantity) {
+        return doseQuantity == null || isEmpty(doseQuantity.getSystem());
+    }
+
+    public ITerminologyServices.ValidationResult validate(QuantityDt doseQuantity) {
         return trConceptLocator.validate(doseQuantity.getSystem(),
                 doseQuantity.getCode(), DOSE_QUANTITY);
     }
