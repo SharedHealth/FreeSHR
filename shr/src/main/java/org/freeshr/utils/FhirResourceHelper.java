@@ -45,4 +45,14 @@ public class FhirResourceHelper {
         //logger.warn("Could not determine resource for reference:" + resourceReference);
         return null;
     }
+
+    public static List<Bundle.Entry> getBundleEntriesForResource(Bundle bundle, String resourceName) {
+        List<Bundle.Entry> resourceEntries = new ArrayList<>();
+        for (Bundle.Entry entry : bundle.getEntry()) {
+            if (entry.getResource().getResourceName().equalsIgnoreCase(resourceName)) {
+                resourceEntries.add(entry);
+            }
+        }
+        return resourceEntries;
+    }
 }

@@ -2,6 +2,7 @@ package org.freeshr.validations;
 
 
 import org.freeshr.application.fhir.EncounterValidationResponse;
+import org.freeshr.validations.bundle.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

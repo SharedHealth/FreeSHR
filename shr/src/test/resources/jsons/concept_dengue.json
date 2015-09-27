@@ -1,0 +1,52 @@
+{
+  "version": "1.1",
+  "conceptClass": "Diagnosis",
+  "fullySpecifiedName": {
+    "conceptNameType": "FULLY_SPECIFIED",
+    "conceptName": "Viral pneumonia 785857",
+    "locale": "en"
+  },
+  "retireReason": null,
+  "retired": false,
+  "names": [
+    {
+      "conceptNameType": null,
+      "conceptName": "Viral pneumonia 785857 Syn Changed",
+      "locale": "en"
+    },
+    {
+      "conceptNameType": "SHORT",
+      "conceptName": "ViralPneumonia785857Changed",
+      "locale": "en"
+    },
+    {
+      "conceptNameType": "FULLY_SPECIFIED",
+      "conceptName": "Viral pneumonia 785857",
+      "locale": "en"
+    }
+  ],
+  "uuid": "07952dc2-5206-11e5-ae6d-0050568225ca",
+  "referenceTerms": [
+    {
+      "version": "1.0",
+      "code": "A90",
+      "retired": false,
+      "uuid": "2f6z9872-4df1-438e-9d72-0a8b161d409b",
+      "conceptSource": {
+        "uuid": "1fe5d49f-f3d2-44a5-8b01-30cb836ed747",
+        "hl7Code": "ICD10-BD-A",
+        "description": "ICD10-BD",
+        "name": "ICD10-BD"
+      },
+      "mapType": "SAME-AS",
+      "description": "Dengue Fever",
+      "name": "Dengue Fever"
+    }
+  ],
+  "datatypeName": "N/A",
+  "description": {
+    "locale": "en",
+    "description": "Viral pneumonia, unspecified \r\n 785857"
+  },
+  "set": false
+}

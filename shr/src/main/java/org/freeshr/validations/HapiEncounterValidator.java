@@ -4,7 +4,10 @@ import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.validation.*;
 import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.application.fhir.Error;
-import org.freeshr.utils.FhirFeedUtil;
+import org.freeshr.validations.bundle.BundleResourceValidator;
+import org.freeshr.validations.bundle.FacilityValidator;
+import org.freeshr.validations.bundle.HealthIdValidator;
+import org.freeshr.validations.bundle.ProviderValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,11 +40,7 @@ public class HapiEncounterValidator implements ShrEncounterValidator {
         Bundle bundle = validationContext.getBundle();
         ValidationResult validationResult = fhirResourceValidator.validateWithResult(bundle);
         if (!validationResult.isSuccessful()) {
-            for (SingleValidationMessage validationMessage : validationResult.getMessages()) {
-                Error error = new Error(validationMessage.getLocationString(), validationMessage.getSeverity().getCode(), validationMessage.getMessage());
-                validationResponse.addError(error);
-            }
-            return validationResponse;
+            return respondFromHapiValidationMessages(validationResult);
         }
 
         validationResponse.mergeErrors(fromShrValidationMessages(
@@ -60,6 +59,23 @@ public class HapiEncounterValidator implements ShrEncounterValidator {
             validationResponse.setBundle(bundle);
         }
         return validationResponse;
+    }
+
+    private EncounterValidationResponse respondFromHapiValidationMessages(ValidationResult validationResult) {
+        EncounterValidationResponse response = new EncounterValidationResponse();
+        for (SingleValidationMessage validationMessage : validationResult.getMessages()) {
+            boolean possibleError = validationMessage.getSeverity().compareTo(ResultSeverityEnum.ERROR) >= 0;
+            if (possibleError) {
+                response.addError(new Error(validationMessage.getLocationString(), validationMessage.getSeverity().getCode(), validationMessage.getMessage()));
+            }
+        }
+        return response;
+
+//        for (SingleValidationMessage validationMessage : validationResult.getMessages()) {
+//            Error error = new Error(validationMessage.getLocationString(), validationMessage.getSeverity().getCode(), validationMessage.getMessage());
+//            validationResponse.addError(error);
+//        }
+//        return validationResponse;
     }
 
 

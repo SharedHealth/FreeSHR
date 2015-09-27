@@ -168,14 +168,15 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         patient.setAddress(new Address("01", "02", "03", "04", "05"));
 
         Requester createdBy = new Requester("facilityId", null);
+        String encounterContent = asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_local_refs.xml");
         EncounterBundle existingEncounterBundle = createEncounterBundle(encounterId, healthId, Confidentiality.Normal,
-                Confidentiality.Normal, asString("jsons/encounters/valid.json"), createdBy, encounterRecievedAt);
+                Confidentiality.Normal, encounterContent, createdBy, encounterRecievedAt);
         encounterRepository.save(existingEncounterBundle, patient).toBlocking().first();
 
         Date updatedAt = new Date();
         Requester updatedBy = new Requester("facilityId1", null);
         encounterRepository.updateEncounter(createUpdateEncounterBundle(encounterId, healthId, Confidentiality.Normal,
-                asString("jsons/encounters/valid.json"), updatedBy, updatedAt),
+                        encounterContent, updatedBy, updatedAt),
         existingEncounterBundle, patient).toBlocking().first();
 
         Select selectEncounterQuery = QueryBuilder
@@ -191,7 +192,7 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         assertEquals(updatedAt.getTime(), TimeUuidUtil.getTimeFromUUID(updatedEncounterRow.getUUID("updated_at")));
         assertEquals(createdBy, new ObjectMapper().readValue(updatedEncounterRow.getString("created_by"), Requester.class));
         assertEquals(updatedBy, new ObjectMapper().readValue(updatedEncounterRow.getString("updated_by"), Requester.class));
-        assertEquals( asString("jsons/encounters/valid.json"), updatedEncounterRow.getString("content_v1"));
+        assertEquals(encounterContent, updatedEncounterRow.getString("content_v2"));
         assertTrue(resultSet.isExhausted());
 
         Select selectEncByPatientQuery = QueryBuilder
@@ -230,7 +231,7 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         assertEquals(1, encHistoryRows.size());
         Row encounterHistoryRow = encHistoryRows.get(0);
         assertEquals(encounterRecievedAt.getTime(), TimeUuidUtil.getTimeFromUUID(encounterHistoryRow.getUUID("encounter_updated_at")));
-        assertEquals("v1", encounterHistoryRow.getString("content_format"));
+        assertEquals("v2", encounterHistoryRow.getString("content_format"));
     }
 
     @Test

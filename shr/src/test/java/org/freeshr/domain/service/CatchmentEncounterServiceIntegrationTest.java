@@ -1,6 +1,7 @@
 package org.freeshr.domain.service;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.config.SHRProperties;
@@ -30,6 +31,7 @@ import static ch.lambdaj.Lambda.extract;
 import static ch.lambdaj.Lambda.on;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.util.Arrays.asList;
+import static org.freeshr.data.EncounterBundleData.withContentForHealthId;
 import static org.freeshr.data.EncounterBundleData.withNewEncounterForPatient;
 import static org.freeshr.data.EncounterBundleData.withValidEncounter;
 import static org.freeshr.utils.FileUtil.asString;
@@ -37,10 +39,10 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
-@TestPropertySource(properties = "MCI_SERVER_URL=http://localhost:9997")
+@TestPropertySource(properties = {"MCI_SERVER_URL=http://localhost:9997", "FACILITY_REGISTRY_URL=http://localhost:9997/facilities/", "PROVIDER_REGISTRY_URL=http://localhost:9997/providers/"})
 public class CatchmentEncounterServiceIntegrationTest {
 
-    private static final String VALID_FACILITY_ID = "10000069";
+    private static final String VALID_FACILITY_ID = "10019841";
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(9997);
 
@@ -60,8 +62,8 @@ public class CatchmentEncounterServiceIntegrationTest {
     @Qualifier("SHRCassandraTemplate")
     CqlOperations cqlOperations;
 
-    private static final String VALID_HEALTH_ID = "5893922485019082753";
-    private static final String VALID_HEALTH_ID_NEW = "5893922485019081234";
+    private static final String VALID_HEALTH_ID = "98001046534";
+    private static final String VALID_HEALTH_ID_NEW = "99001046345";
 
     @Before
     public void setUp() throws Exception {
@@ -85,17 +87,17 @@ public class CatchmentEncounterServiceIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/facility10000069.json"))));
 
-        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/referenceterms/fa460ea6-04c7-45af-a6fa-5072e7caed40"))
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/referenceterms/2f6z9872-4df1-438e-9d72-0a8b161d409b"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody(asString("jsons/refterm.json"))));
+                        .withBody(asString("jsons/ref_term_dengue.json"))));
 
-        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/concepts/eddb01eb-61fc-4f9e-aca5-e44193509f35"))
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody(asString("jsons/concept.json"))));
+                        .withBody(asString("jsons/concept_dengue.json"))));
 
     }
 
@@ -110,7 +112,9 @@ public class CatchmentEncounterServiceIntegrationTest {
                 null, null));
         Date date = new Date();
         facilityRepository.save(facility).toBlocking().first();
-        patientEncounterService.ensureCreated(withValidEncounter(), getUserInfo(clientId, email, securityToken)).toBlocking().first();
+        patientEncounterService.ensureCreated(
+                withContentForHealthId(VALID_HEALTH_ID, "xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_local_refs.xml"),
+                getUserInfo(clientId, email, securityToken)).toBlocking().first();
 
         List<EncounterEvent> encounterEvents = catchmentEncounterService.findEncounterFeedForFacilityCatchment("305610",
                 date, 20).toBlocking().first();
@@ -131,9 +135,14 @@ public class CatchmentEncounterServiceIntegrationTest {
         facilityRepository.save(facility).toBlocking().first();
 
         assertNotNull(facilityRepository.find("3").toBlocking().first());
-        assertTrue(patientEncounterService.ensureCreated(withValidEncounter(), getUserInfo(clientId, email, securityToken)).toBlocking()
-                .first().isSuccessful());
-        assertTrue(patientEncounterService.ensureCreated(withNewEncounterForPatient(VALID_HEALTH_ID_NEW), getUserInfo(clientId, email, securityToken)).toBlocking().first()
+        EncounterResponse response = patientEncounterService.ensureCreated(
+                withContentForHealthId(VALID_HEALTH_ID, "xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_local_refs.xml"),
+                getUserInfo(clientId, email, securityToken)).toBlocking()
+                .first();
+        assertTrue(response.isSuccessful());
+        assertTrue(patientEncounterService.ensureCreated(
+                withContentForHealthId(VALID_HEALTH_ID_NEW, "xmls/encounters/dstu2/p99001046345_encounter_with_diagnoses_with_local_refs.xml"),
+                getUserInfo(clientId, email, securityToken)).toBlocking().first()
                 .isSuccessful());
 
         assertEquals(1, patientEncounterService.findEncounterFeedForPatient(VALID_HEALTH_ID, null,

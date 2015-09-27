@@ -1,12 +1,8 @@
 package org.freeshr.validations;
 
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
-import ca.uhn.fhir.validation.DefaultProfileValidationSupport;
-import ca.uhn.fhir.validation.FhirInstanceValidator;
-import ca.uhn.fhir.validation.FhirValidator;
-import ca.uhn.fhir.validation.IValidatorModule;
-import ca.uhn.fhir.validation.ValidationResult;
-import ca.uhn.fhir.validation.ValidationSupportChain;
+import ca.uhn.fhir.validation.*;
+import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.TRValidationSupport;
 import org.freeshr.utils.FhirFeedUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +22,35 @@ public class FhirResourceValidator {
     }
 
     public ValidationResult validateWithResult(Bundle bundle) {
-        return validatorInstance().validateWithResult(bundle);
+        ValidationResult validationResult = validatorInstance().validateWithResult(bundle);
+        return checkForConceptValidationError(validationResult);
+    }
+
+    /**
+     * This is required since the InstanceValidator does not raise a severity.error on concept validation failure.
+     * InstanceValidator.checkCodeableConcept() line number 225
+     * @param validationResult
+     * @return
+     */
+    private ValidationResult checkForConceptValidationError(ValidationResult validationResult) {
+        for (SingleValidationMessage singleValidationMessage : validationResult.getMessages()) {
+            String message = singleValidationMessage.getMessage();
+            String terminologySystem = getTerminologySystem(message);
+            if (!StringUtils.isBlank(terminologySystem)) {
+                if (trValidationSupport.isCodeSystemSupported(terminologySystem)) {
+                    singleValidationMessage.setSeverity(ResultSeverityEnum.ERROR);
+                }
+            }
+        }
+        return new ValidationResult(fhirUtil.getFhirContext(),validationResult.getMessages());
+    }
+
+    private static String getTerminologySystem(String message) {
+        if (message.contains("Unable to validate code")) {
+            String substring = message.substring(message.indexOf("in code system"));
+            return StringUtils.remove(StringUtils.removeStart(substring, "in code system"),"\"");
+        }
+        return "";
     }
 
     private FhirValidator validatorInstance() {

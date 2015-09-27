@@ -7,8 +7,6 @@ import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.utils.FhirResourceHelper;
 import org.freeshr.utils.FileUtil;
-import org.freeshr.validations.DoseQuantityValidator;
-import org.freeshr.validations.resource.ImmunizationValidator;
 import org.freeshr.validations.ShrValidationMessage;
 import org.freeshr.validations.UrlValidator;
 import org.hl7.fhir.instance.model.OperationOutcome;

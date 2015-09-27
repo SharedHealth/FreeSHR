@@ -7,6 +7,7 @@ import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.events.EncounterEvent;
 import org.freeshr.utils.FhirFeedUtil;
+import org.freeshr.utils.FhirResourceHelper;
 import org.hl7.fhir.instance.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -52,7 +53,7 @@ public class ConfidentialEncounterHandler {
         ca.uhn.fhir.model.dstu2.resource.Composition originalComposition = originalBundle.getAllPopulatedChildElementsOfType(ca.uhn.fhir.model.dstu2.resource.Composition.class).get(0);
         ca.uhn.fhir.model.dstu2.resource.Composition composition = new ca.uhn.fhir.model.dstu2.resource.Composition();
         composition.setSubject(originalComposition.getSubject());
-        composition.setConfidentiality(originalComposition.getConfidentiality());
+        composition.setConfidentiality(encounterEvent.getConfidentialityLevel().getLevel());
         composition.setStatus(originalComposition.getStatusElement());
         composition.setDate(originalComposition.getDateElement());
         composition.setAuthor(originalComposition.getAuthor());
@@ -63,6 +64,8 @@ public class ConfidentialEncounterHandler {
         Bundle bundle = new Bundle();
         bundle.setType(originalBundle.getTypeElement());
         Bundle.Entry entry = bundle.addEntry();
+        Bundle.Entry compositionEntry = FhirResourceHelper.getBundleEntriesForResource(originalBundle, "Composition").get(0);
+        entry.setFullUrl(compositionEntry.getFullUrl());
         entry.setResource(composition);
 
         return fhirFeedUtil.encodeBundle(bundle, "xml");

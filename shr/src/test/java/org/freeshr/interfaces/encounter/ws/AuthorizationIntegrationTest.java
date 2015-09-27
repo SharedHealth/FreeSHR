@@ -1,11 +1,15 @@
 package org.freeshr.interfaces.encounter.ws;
 
 import com.google.common.base.Charsets;
-import org.freeshr.application.fhir.EncounterResponse;
+import org.freeshr.application.fhir.*;
+import org.freeshr.application.fhir.Error;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
+import org.freeshr.interfaces.encounter.ws.exceptions.UnProcessableEntity;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.internal.matchers.InstanceOf;
@@ -25,9 +29,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@TestPropertySource(properties = "MCI_SERVER_URL=http://localhost:9997")
+@TestPropertySource(properties = {"MCI_SERVER_URL=http://localhost:9997", "FACILITY_REGISTRY_URL=http://localhost:9997/facilities/", "PROVIDER_REGISTRY_URL=http://localhost:9997/providers/"})
 public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
-    private static final String VALID_HEALTH_ID = "5893922485019082753";
+    private static final String VALID_HEALTH_ID = "98001046534";
     private static final String ENCOUNTER_ID = "dfbc9b30-ceef-473e-9q22-4ee31qfceqdd";
     private static final String PATIENT_CATCHMENT = "0102";
     private static final String DATASENSE_REGISTERED_DIVISION = "01";
@@ -44,11 +48,17 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/patient_not_confidential.json"))));
 
-        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/concepts/eddb01eb-61fc-4f9e-aca5-e44193509f35"))
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/referenceterms/2f6z9872-4df1-438e-9d72-0a8b161d409b"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody(asString("jsons/concept.json"))));
+                        .withBody(asString("jsons/ref_term_dengue.json"))));
+
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/concept_dengue.json"))));
 
         givenThat(get(urlEqualTo("/facilities/10000069.json"))
                 .withHeader("client_id", matching("18550"))
@@ -57,6 +67,14 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/facility10000069.json"))));
+
+        givenThat(get(urlEqualTo("/facilities/10019841.json"))
+                .withHeader("client_id", matching("18550"))
+                .withHeader("X-Auth-Token", matching("c6e6fd3a26313eb250e1019519af33e743808f5bb50428ae5423b8ee278e6fa5"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/facility10019841.json"))));
     }
 
     @Test
@@ -78,9 +96,10 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .accept(MediaType.APPLICATION_ATOM_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/encounter_to_save.xml")))
+                .content(asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_local_refs.xml")))
                 .andExpect(status().isOk())
-                .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
+                .andExpect(request()
+                .asyncResult(new InstanceOf(EncounterResponse.class)));
     }
 
     @Test
@@ -102,7 +121,7 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .accept(MediaType.APPLICATION_ATOM_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/encounter_to_save.xml")))
+                .content(asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_local_refs.xml")))
                 .andExpect(status().isOk())
                 .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
     }
@@ -126,7 +145,7 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .accept(MediaType.APPLICATION_ATOM_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/encounter_to_save.xml")))
+                .content(asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml")))
                 .andExpect(status().isForbidden());
     }
 
@@ -140,7 +159,7 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody(asString("jsons/userDetailForPatient.json"))));
+                        .withBody(asString("jsons/userDetailForPatient98001046534.json"))));
 
         mockMvc.perform(post("/patients/" + VALID_HEALTH_ID + "/encounters")
                 .header(AUTH_TOKEN_KEY, validAccessToken)
@@ -149,7 +168,7 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .accept(MediaType.APPLICATION_ATOM_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/encounter_to_save.xml")))
+                .content(asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml")))
                 .andExpect(status().isForbidden());
     }
 
@@ -329,7 +348,7 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody(asString("jsons/userDetailForPatient.json"))));
+                        .withBody(asString("jsons/userDetailForPatient98001046534.json"))));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/patients/" + VALID_HEALTH_ID + "/encounters")
                 .header(AUTH_TOKEN_KEY, validAccessToken)
@@ -359,7 +378,7 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody(asString("jsons/userDetailForPatient.json"))));
+                        .withBody(asString("jsons/userDetailForPatient98001046534.json"))));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/patients/" + VALID_HEALTH_ID + "/encounters")
                 .header(AUTH_TOKEN_KEY, validAccessToken)
@@ -367,7 +386,8 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .header(CLIENT_ID_KEY, validClientId)
                 .accept(MediaType.APPLICATION_ATOM_XML))
                 .andExpect(status().isOk())
-                .andExpect(request().asyncResult(hasEncounterEventsOfSize(1)));
+                .andExpect(request()
+                .asyncResult(hasEncounterEventsOfSize(1)));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/patients/" + VALID_HEALTH_ID + "/encounters/" + ENCOUNTER_ID)
                 .header(AUTH_TOKEN_KEY, validAccessToken)
@@ -390,7 +410,7 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody(asString("jsons/userDetailForPatient.json"))));
+                        .withBody(asString("jsons/userDetailForPatient98001046534.json"))));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/patients/" + otherHealthId + "/encounters")
                 .header(AUTH_TOKEN_KEY, validAccessToken)
@@ -458,14 +478,14 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
         Patient patient = createPatient(healthId, division, district);
 
         final Requester createdBy = new Requester("facilityId", "providerId");
-        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, Normal, Normal, asString("xmls/encounters/encounter_valid.xml"), createdBy, new Date()), patient);
+        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, Normal, Normal, asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml"), createdBy, new Date()), patient);
     }
 
     private void createConfidentialEncounter(String healthId) throws Exception {
         Patient patient = createPatient(healthId, DATASENSE_REGISTERED_DIVISION, DATASENSE_REGISTERED_DISTRICT);
 
         final Requester createdBy = new Requester("facilityId", "providerId");
-        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, VeryRestricted, Normal, asString("xmls/encounters/encounter_valid.xml"), createdBy, new Date()), patient);
+        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, VeryRestricted, Normal, asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml"), createdBy, new Date()), patient);
     }
 
     private Patient createPatient(String healthId, String division, String district) {
@@ -473,5 +493,29 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
         patient.setHealthId(healthId);
         patient.setAddress(new Address(division, district, "03", "04", "05"));
         return patient;
+    }
+
+    private BaseMatcher<EncounterResponse> debugEncounterSaveResponse() {
+        return new BaseMatcher<EncounterResponse>() {
+            @Override
+            public void describeTo(Description description) {
+            }
+
+            @Override
+            public boolean matches(Object item) {
+                if (item instanceof EncounterResponse) {
+                    EncounterResponse response = (EncounterResponse) item;
+                    for (org.freeshr.application.fhir.Error error : response.getErrors()) {
+                        System.out.println(error.getReason());
+                    }
+                } else if (item instanceof UnProcessableEntity) {
+                    UnProcessableEntity response = (UnProcessableEntity) item;
+                    for (Error error : response.getResult().getErrors()) {
+                        System.out.println(error.toString());
+                    }
+                }
+                return false;
+            }
+        };
     }
 }

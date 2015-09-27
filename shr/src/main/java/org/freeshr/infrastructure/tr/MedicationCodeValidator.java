@@ -1,13 +1,17 @@
 package org.freeshr.infrastructure.tr;
 
+import com.google.common.util.concurrent.SettableFuture;
 import org.freeshr.config.SHRProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.web.client.AsyncRestTemplate;
 import rx.Observable;
+import rx.functions.Func0;
 import rx.functions.Func1;
 
 import static org.apache.commons.lang3.StringUtils.substringAfterLast;
@@ -36,20 +40,22 @@ public class MedicationCodeValidator implements CodeValidator {
     @Override
     public Observable<Boolean> isValid(String system, String code) {
         if (isEmpty(code) || substringAfterLast(system, "/").equalsIgnoreCase(code)) {
-            Observable<Boolean> map = fetch(system).map(new Func1<ResponseEntity<String>, Boolean>() {
+            return fetch(system).flatMap(new Func1<ResponseEntity<String>, Observable<Boolean>>() {
                 @Override
-                public Boolean call(ResponseEntity<String> response) {
-                    return !response.getBody().isEmpty();
+                public Observable<Boolean> call(ResponseEntity<String> stringResponseEntity) {
+                    return Observable.just(Boolean.TRUE);
                 }
-
-            });
-            map.onErrorReturn(new Func1<Throwable, Boolean>() {
+            }, new Func1<Throwable, Observable<? extends Boolean>>() {
                 @Override
-                public Boolean call(Throwable throwable) {
-                    return false;
+                public Observable<? extends Boolean> call(Throwable throwable) {
+                    return Observable.just(Boolean.FALSE);
+                }
+            }, new Func0<Observable<? extends Boolean>>() {
+                @Override
+                public Observable<? extends Boolean> call() {
+                    return null;
                 }
             });
-            return map;
         }
         return Observable.just(Boolean.FALSE);
     }

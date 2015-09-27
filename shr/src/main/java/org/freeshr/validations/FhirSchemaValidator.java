@@ -16,6 +16,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -47,6 +48,6 @@ public class FhirSchemaValidator implements Validator<String> {
             logger.debug(String.format("Error in validating schema.Cause: %s", e.getMessage()));
             throw new RuntimeException(e);
         }
-        return null;
+        return new ArrayList<>();
     }
 }
