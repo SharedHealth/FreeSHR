@@ -1,8 +1,11 @@
-package org.freeshr.validations;
+package org.freeshr.validations.bundle;
 
 
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.utils.FileUtil;
+import org.freeshr.validations.HIEFacilityValidator;
+import org.freeshr.validations.ValidationSubject;
+import org.freeshr.validations.bundle.StructureValidator;
 import org.hl7.fhir.instance.model.Bundle;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.junit.Before;

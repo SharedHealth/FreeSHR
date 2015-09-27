@@ -1,4 +1,4 @@
-package org.freeshr.validations;
+package org.freeshr.validations.bundle;
 
 
 import ca.uhn.fhir.model.api.IResource;
@@ -18,6 +18,7 @@ import ca.uhn.fhir.model.dstu2.resource.Procedure;
 import ca.uhn.fhir.model.dstu2.resource.Specimen;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.utils.StringUtils;
+import org.freeshr.validations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

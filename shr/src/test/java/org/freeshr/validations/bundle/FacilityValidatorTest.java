@@ -1,4 +1,4 @@
-package org.freeshr.validations;
+package org.freeshr.validations.bundle;
 
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import org.freeshr.application.fhir.EncounterValidationResponse;
@@ -7,6 +7,12 @@ import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.service.FacilityService;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.utils.FileUtil;
+import org.freeshr.validations.HIEFacilityValidator;
+import org.freeshr.validations.Severity;
+import org.freeshr.validations.ShrValidationMessage;
+import org.freeshr.validations.ValidationSubject;
+import org.freeshr.validations.bundle.FacilityValidator;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -74,7 +80,7 @@ public class FacilityValidatorTest {
         Mockito.when(facilityService.checkForFacility("10019841")).thenReturn(Observable.<Facility>just(null));
         List<ShrValidationMessage> response = facilityValidator.validate(getBundleFragment(xml));
         assertEquals(1, response.size());
-        assertEquals(Severity.INFORMATION, response.get(0).getSeverity());
+        Assert.assertEquals(Severity.INFORMATION, response.get(0).getSeverity());
         assertThat(EncounterValidationResponse.fromShrValidationMessages(response).isSuccessful(), is(true));
     }
 

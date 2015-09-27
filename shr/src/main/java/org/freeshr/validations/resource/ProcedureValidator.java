@@ -1,4 +1,4 @@
-package org.freeshr.validations;
+package org.freeshr.validations.resource;
 
 
 import ca.uhn.fhir.model.api.IDatatype;
@@ -7,13 +7,10 @@ import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Procedure;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.instance.model.Base;
-import org.hl7.fhir.instance.model.BaseReference;
-import org.hl7.fhir.instance.model.Bundle;
-import org.hl7.fhir.instance.model.OperationOutcome;
-import org.hl7.fhir.instance.model.Period;
-import org.hl7.fhir.instance.model.Property;
-import org.hl7.fhir.instance.validation.ValidationMessage;
+import org.freeshr.validations.Severity;
+import org.freeshr.validations.ShrValidationMessage;
+import org.freeshr.validations.SubResourceValidator;
+import org.freeshr.validations.ValidationMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

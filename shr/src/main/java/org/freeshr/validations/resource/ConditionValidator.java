@@ -1,16 +1,15 @@
-package org.freeshr.validations;
+package org.freeshr.validations.resource;
 
+import org.freeshr.validations.ShrValidationMessage;
+import org.freeshr.validations.SubResourceValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import static org.freeshr.validations.ValidationMessages.UNKNOWN_CONDITION_RELATION_CODE;
-import static org.hl7.fhir.instance.model.OperationOutcome.IssueSeverity;
-
 @Component
-public class ConditionValidator implements SubResourceValidator{
+public class ConditionValidator implements SubResourceValidator {
 
     private static final Logger logger = LoggerFactory.getLogger(ConditionValidator.class);
     private static final String CODEABLE_CONCEPT = "CodeableConcept";

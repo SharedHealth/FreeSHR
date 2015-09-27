@@ -1,4 +1,4 @@
-package org.freeshr.validations;
+package org.freeshr.validations.resource;
 
 
 import ca.uhn.fhir.model.dstu2.composite.QuantityDt;

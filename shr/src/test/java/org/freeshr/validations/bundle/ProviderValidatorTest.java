@@ -1,4 +1,4 @@
-package org.freeshr.validations;
+package org.freeshr.validations.bundle;
 
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import org.freeshr.config.SHRConfig;
@@ -6,6 +6,10 @@ import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.utils.FileUtil;
 import org.freeshr.utils.FhirFeedUtil;
+import org.freeshr.validations.FhirMessageFilter;
+import org.freeshr.validations.ShrValidationMessage;
+import org.freeshr.validations.ValidationSubject;
+import org.freeshr.validations.bundle.ProviderValidator;
 import org.freeshr.validations.providerIdentifiers.ClinicalResourceProviderIdentifier;
 import org.junit.Before;
 import org.junit.Test;

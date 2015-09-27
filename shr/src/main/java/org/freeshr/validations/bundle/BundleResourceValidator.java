@@ -1,7 +1,11 @@
-package org.freeshr.validations;
+package org.freeshr.validations.bundle;
 
 import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
+import org.freeshr.validations.ShrValidationMessage;
+import org.freeshr.validations.ShrValidator;
+import org.freeshr.validations.SubResourceValidator;
+import org.freeshr.validations.ValidationSubject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

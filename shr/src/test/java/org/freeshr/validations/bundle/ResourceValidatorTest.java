@@ -1,17 +1,19 @@
-package org.freeshr.application.fhir;
+package org.freeshr.validations.bundle;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.api.IResource;
-import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
-import ca.uhn.fhir.model.dstu2.resource.Condition;
 import ca.uhn.fhir.validation.*;
 import org.freeshr.utils.FileUtil;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.validations.*;
+import org.freeshr.validations.bundle.ResourceValidator;
+import org.freeshr.validations.resource.ConditionValidator;
+import org.freeshr.validations.resource.ImmunizationValidator;
+import org.freeshr.validations.resource.MedicationPrescriptionValidator;
+import org.freeshr.validations.resource.ProcedureValidator;
 import org.hl7.fhir.instance.model.Bundle;
 import org.hl7.fhir.instance.model.OperationOutcome;
 import org.hl7.fhir.instance.model.ValueSet;
-import org.hl7.fhir.instance.model.api.IBaseOperationOutcome;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.validation.IResourceValidator;
 import org.hl7.fhir.instance.validation.ValidationMessage;

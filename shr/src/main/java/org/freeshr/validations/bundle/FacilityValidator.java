@@ -1,10 +1,11 @@
-package org.freeshr.validations;
+package org.freeshr.validations.bundle;
 
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.model.dstu2.resource.Composition;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.utils.FhirResourceHelper;
+import org.freeshr.validations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

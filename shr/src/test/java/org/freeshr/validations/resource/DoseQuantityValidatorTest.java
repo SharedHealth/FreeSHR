@@ -1,5 +1,6 @@
-package org.freeshr.validations;
+package org.freeshr.validations.resource;
 
+import org.freeshr.validations.resource.DoseQuantityValidator;
 import org.hl7.fhir.instance.model.Quantity;
 import org.junit.Test;
 

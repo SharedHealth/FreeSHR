@@ -1,4 +1,4 @@
-package org.freeshr.validations;
+package org.freeshr.validations.resource;
 
 
 import ca.uhn.fhir.context.FhirContext;
@@ -6,6 +6,10 @@ import org.freeshr.application.fhir.TRConceptLocator;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.infrastructure.tr.MedicationCodeValidator;
 import org.freeshr.utils.FileUtil;
+import org.freeshr.validations.DoseQuantityValidator;
+import org.freeshr.validations.ShrValidationMessage;
+import org.freeshr.validations.UrlValidator;
+import org.freeshr.validations.resource.MedicationPrescriptionValidator;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.junit.Before;
 import org.junit.Ignore;

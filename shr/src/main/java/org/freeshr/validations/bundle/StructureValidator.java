@@ -1,6 +1,10 @@
-package org.freeshr.validations;
+package org.freeshr.validations.bundle;
 
 import org.freeshr.utils.FhirFeedUtil;
+import org.freeshr.validations.HIEFacilityValidator;
+import org.freeshr.validations.ValidationMessages;
+import org.freeshr.validations.ValidationSubject;
+import org.freeshr.validations.Validator;
 import org.hl7.fhir.instance.model.*;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.springframework.beans.factory.annotation.Autowired;

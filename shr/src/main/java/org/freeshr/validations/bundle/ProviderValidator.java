@@ -1,8 +1,9 @@
-package org.freeshr.validations;
+package org.freeshr.validations.bundle;
 
 import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import org.freeshr.config.SHRProperties;
+import org.freeshr.validations.*;
 import org.freeshr.validations.providerIdentifiers.ClinicalResourceProviderIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

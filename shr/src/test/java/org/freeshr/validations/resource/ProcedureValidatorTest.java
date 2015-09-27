@@ -1,20 +1,17 @@
-package org.freeshr.validations;
+package org.freeshr.validations.resource;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.dstu2.resource.Immunization;
 import ca.uhn.fhir.model.dstu2.resource.Procedure;
 import org.freeshr.utils.FhirResourceHelper;
 import org.freeshr.utils.FileUtil;
-import org.hl7.fhir.instance.model.Bundle;
-import org.hl7.fhir.instance.model.ResourceType;
-import org.hl7.fhir.instance.validation.ValidationMessage;
+import org.freeshr.validations.ShrValidationMessage;
+import org.freeshr.validations.resource.ProcedureValidator;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
 
-import static org.freeshr.utils.BundleHelper.getBundle;
 import static org.freeshr.utils.BundleHelper.parseBundle;
 import static org.junit.Assert.*;
 

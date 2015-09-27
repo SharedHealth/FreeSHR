@@ -1,10 +1,15 @@
-package org.freeshr.validations;
+package org.freeshr.validations.bundle;
 
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.utils.FileUtil;
 import org.freeshr.utils.FhirFeedUtil;
+import org.freeshr.validations.EncounterValidationContext;
+import org.freeshr.validations.FhirMessageFilter;
+import org.freeshr.validations.ShrValidationMessage;
+import org.freeshr.validations.ValidationSubject;
+import org.freeshr.validations.bundle.HealthIdValidator;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

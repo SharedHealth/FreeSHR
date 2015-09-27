@@ -1,8 +1,9 @@
-package org.freeshr.validations;
+package org.freeshr.validations.resource;
 
 
 import ca.uhn.fhir.model.dstu2.composite.SimpleQuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.Immunization;
+import org.freeshr.validations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,13 @@
-package org.freeshr.validations;
+package org.freeshr.validations.bundle;
 
 
+import org.freeshr.validations.DefaultValidator;
+import org.freeshr.validations.ValidationSubject;
+import org.freeshr.validations.Validator;
+import org.freeshr.validations.resource.ConditionValidator;
+import org.freeshr.validations.resource.ImmunizationValidator;
+import org.freeshr.validations.resource.MedicationPrescriptionValidator;
+import org.freeshr.validations.resource.ProcedureValidator;
 import org.hl7.fhir.instance.model.Bundle;
 import org.hl7.fhir.instance.model.ResourceType;
 import org.hl7.fhir.instance.validation.ValidationMessage;

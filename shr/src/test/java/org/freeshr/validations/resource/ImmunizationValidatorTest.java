@@ -1,13 +1,14 @@
-package org.freeshr.application.fhir;
+package org.freeshr.validations.resource;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.Immunization;
+import org.freeshr.application.fhir.TRConceptLocator;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.utils.FhirResourceHelper;
 import org.freeshr.utils.FileUtil;
 import org.freeshr.validations.DoseQuantityValidator;
-import org.freeshr.validations.ImmunizationValidator;
+import org.freeshr.validations.resource.ImmunizationValidator;
 import org.freeshr.validations.ShrValidationMessage;
 import org.freeshr.validations.UrlValidator;
 import org.hl7.fhir.instance.model.OperationOutcome;
