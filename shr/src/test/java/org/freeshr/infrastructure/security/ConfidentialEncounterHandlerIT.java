@@ -20,7 +20,6 @@ import static org.freeshr.utils.FileUtil.asString;
 import static org.junit.Assert.assertEquals;
 
 public class ConfidentialEncounterHandlerIT extends APIIntegrationTestBase {
-    private static final String VALID_HEALTH_ID = "5893922485019082753";
 
     private ConfidentialEncounterHandler confidentialEncounterHandler;
     private FhirFeedUtil fhirFeedUtil;
@@ -36,7 +35,7 @@ public class ConfidentialEncounterHandlerIT extends APIIntegrationTestBase {
         final Requester createdBy = new Requester("facilityId", "providerId");
         Date receivedAt = new Date();
         String confidentialContent = asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml");
-        EncounterEvent confidentialEncounterEvent = new EncounterEvent(receivedAt, createEncounterBundle("encounter id", VALID_HEALTH_ID,
+        EncounterEvent confidentialEncounterEvent = new EncounterEvent(receivedAt, createEncounterBundle("encounter id", "98001046534",
                 Confidentiality.Restricted, Confidentiality.Normal, confidentialContent,
                 createdBy, receivedAt));
         List<EncounterEvent> replacedEncounterEvents = confidentialEncounterHandler.replaceConfidentialEncounterEvents(asList(confidentialEncounterEvent));

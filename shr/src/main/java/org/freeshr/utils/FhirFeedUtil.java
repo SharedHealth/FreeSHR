@@ -64,4 +64,12 @@ public class FhirFeedUtil {
     public FhirContext getFhirContext() {
         return fhirContext;
     }
+
+    public org.hl7.fhir.instance.model.api.IBaseResource parseResource(String content, String type) {
+        if (type.equals("xml")) {
+            return fhirContext.newXmlParser().parseResource(content);
+        } else {
+            return fhirContext.newJsonParser().parseResource(content);
+        }
+    }
 }

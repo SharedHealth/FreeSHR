@@ -4,7 +4,8 @@
   "name": "Encounter Type",
   "description": "Encounter Types",
   "status": "active",
-  "define": {
+  "date": "2015-06-22",
+  "codeSystem": {
     "system": "/rest/v1/tr/vs/encounter-type",
     "caseSensitive": false,
     "concept": [

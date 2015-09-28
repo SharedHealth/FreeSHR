@@ -1,12 +1,11 @@
 package org.freeshr.infrastructure.tr;
 
 
-import org.apache.commons.io.IOUtils;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.utils.StringUtils;
-import org.hl7.fhir.instance.formats.JsonParser;
-import org.hl7.fhir.instance.model.Resource;
 import org.hl7.fhir.instance.model.ValueSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -16,8 +15,6 @@ import org.springframework.web.client.AsyncRestTemplate;
 import rx.Observable;
 import rx.functions.Func1;
 
-import java.util.List;
-
 import static org.freeshr.utils.HttpUtil.basicAuthHeaders;
 
 @Component
@@ -25,13 +22,17 @@ public class ValueSetCodeValidator implements CodeValidator {
 
     private AsyncRestTemplate shrRestTemplate;
     private SHRProperties shrProperties;
+    private ValueSetBuilder vsBuilder;
+
+    private static final Logger logger = LoggerFactory.getLogger(ValueSetCodeValidator.class);
 
     @Autowired
     public ValueSetCodeValidator(AsyncRestTemplate shrRestTemplate,
-                                 SHRProperties shrProperties) {
+                                 SHRProperties shrProperties, ValueSetBuilder vsBuilder) {
 
         this.shrRestTemplate = shrRestTemplate;
         this.shrProperties = shrProperties;
+        this.vsBuilder = vsBuilder;
     }
 
     @Override
@@ -41,24 +42,22 @@ public class ValueSetCodeValidator implements CodeValidator {
 
     @Override
     public Observable<Boolean> isValid(final String system, final String code) {
-        Observable<Boolean> map = get(system).map(new Func1<ResponseEntity<String>, Boolean>() {
+        Observable<Boolean> map = fetch(system).map(new Func1<ResponseEntity<String>, Boolean>() {
             @Override
             public Boolean call(ResponseEntity<String> stringResponseEntity) {
                 try {
-//                    Resource resource = new JsonParser().parse(IOUtils.toInputStream(stringResponseEntity.getBody(),
-//                            "UTF-8"));
-//                    ValueSet valueSet = (ValueSet) resource;
-//                    ValueSet.ValueSetDefineComponent definition = valueSet.getDefine();
-//                    Boolean isCaseSensitive = definition.getCaseSensitive().getValue();
-//
-//                    ConceptMatcher conceptMatcher = getConceptMatcher(isCaseSensitive);
-//
-//                    List<ValueSet.ValueSetDefineConceptComponent> concepts = definition.getConcept();
-//                    for (ValueSet.ValueSetDefineConceptComponent concept : concepts) {
-//                        if (conceptMatcher.isMatching(concept.getCode().getValue(), code)) {
-//                            return true;
-//                        }
-//                    }
+                    String content = stringResponseEntity.getBody();
+                    ValueSet valueSet = vsBuilder.deSerializeValueSet(content, system);
+                    ValueSet.ValueSetCodeSystemComponent codeSystem = valueSet.getCodeSystem();
+                    boolean isCaseSensitive = codeSystem.getCaseSensitive();
+                    ConceptMatcher conceptMatcher = getConceptMatcher(isCaseSensitive);
+
+                    for (ValueSet.ConceptDefinitionComponent concept : codeSystem.getConcept()) {
+                        if (conceptMatcher.isMatching(concept.getCode(), code)) {
+                            return true;
+                        }
+                    }
+
                     return false;
 
 
@@ -104,7 +103,7 @@ public class ValueSetCodeValidator implements CodeValidator {
         return !(uri.startsWith("http://") || uri.startsWith("https://"));
     }
 
-    private Observable<ResponseEntity<String>> get(String uri) {
+    private Observable<ResponseEntity<String>> fetch(String uri) {
         return Observable.from(shrRestTemplate.exchange(uri,
                 HttpMethod.GET,
                 new HttpEntity(basicAuthHeaders(shrProperties.getTrUser(), shrProperties.getTrPassword())),
