@@ -40,6 +40,7 @@ public class PatientRepositoryIntegrationTest {
         assertThat(patient, is(patient(healthId, false)));
         assertThat(patient.getAddress(), is(address()));
         assertTrue(patient.getConfidentiality().equals(Confidentiality.VeryRestricted));
+        assertTrue(patient.isActive());
 
     }
 
@@ -49,6 +50,7 @@ public class PatientRepositoryIntegrationTest {
         patient.setGender("1");
         patient.setAddress(address());
         patient.setConfidentiality(confidential);
+        patient.setActive(true);
         return patient;
     }
 

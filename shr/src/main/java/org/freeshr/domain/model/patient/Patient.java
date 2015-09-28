@@ -17,6 +17,12 @@ public class Patient {
     @JsonProperty("gender")
     private String gender;
 
+    @JsonProperty("active")
+    private Boolean active;
+
+    @JsonProperty("merged_with")
+    private String mergedWith;
+
     private Confidentiality confidentiality;
 
     public String getHealthId() {
@@ -39,10 +45,14 @@ public class Patient {
         return gender;
     }
 
+    public String getMergedWith() {
+        return mergedWith;
+    }
+
+
     public void setGender(String gender) {
         this.gender = gender;
     }
-
 
     public Confidentiality getConfidentiality() {
         return confidentiality;
@@ -57,6 +67,18 @@ public class Patient {
     public void setConfidentiality(String confidentiality) {
         this.confidentiality = "YES".equalsIgnoreCase(confidentiality) ?
                 Confidentiality.VeryRestricted : Confidentiality.Normal;
+    }
+
+    public void setMergedWith(String mergedWith) {
+        this.mergedWith = mergedWith;
+    }
+
+    public Boolean isActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     @Override
@@ -82,5 +104,4 @@ public class Patient {
                 ", gender='" + gender + '\'' +
                 '}';
     }
-
 }

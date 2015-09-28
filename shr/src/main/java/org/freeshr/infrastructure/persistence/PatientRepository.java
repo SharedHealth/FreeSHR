@@ -32,7 +32,7 @@ public class PatientRepository {
     public Observable<Patient> find(String healthId) {
         Observable<ResultSet> observable = Observable.from(
                 cqlOperations.queryAsynchronously("SELECT " +
-                        " health_id, gender, division_id, district_id, upazila_id, city_corporation_id, " +
+                        " health_id, gender,active, merged_with, division_id, district_id, upazila_id, city_corporation_id, " +
                         "union_urban_ward_id, address_line, confidentiality" +
                         " FROM patient WHERE health_id='" + healthId + "';"));
         return observable.map(new Func1<ResultSet, Patient>() {
@@ -50,6 +50,8 @@ public class PatientRepository {
             Address address = new Address();
             patient.setHealthId(result.getString("health_id"));
             patient.setGender(result.getString("gender"));
+            patient.setActive(result.getBool("active"));
+            patient.setMergedWith(result.getString("merged_with"));
             patient.setConfidentiality(isConfidential(result.getString("Confidentiality")));
             address.setDivision(result.getString("division_id"));
             address.setDistrict(result.getString("district_id"));
@@ -81,15 +83,20 @@ public class PatientRepository {
 
     private Insert buildPatientInsertQuery(Patient patient) {
         Address address = patient.getAddress();
-        return QueryBuilder.insertInto("patient")
+        Insert insert = QueryBuilder.insertInto("patient")
                 .value("health_id", patient.getHealthId())
-                .value("gender", patient.getGender())
-                .value("address_line", address.getLine())
-                .value("division_id", address.getDivision())
-                .value("district_id", address.getDistrict())
-                .value("upazila_id", address.getUpazila())
-                .value("city_corporation_id", address.getCityCorporation())
-                .value("union_urban_ward_id", address.getUnionOrUrbanWardId())
-                .value("confidentiality", patient.getConfidentiality().getLevel());
+                .value("merged_with", patient.getMergedWith())
+                .value("active", patient.isActive());
+        if(patient.getMergedWith() == null) {
+            insert.value("gender", patient.getGender())
+                    .value("address_line", address.getLine())
+                    .value("division_id", address.getDivision())
+                    .value("district_id", address.getDistrict())
+                    .value("upazila_id", address.getUpazila())
+                    .value("city_corporation_id", address.getCityCorporation())
+                    .value("union_urban_ward_id", address.getUnionOrUrbanWardId())
+                    .value("confidentiality", patient.getConfidentiality().getLevel());
+        }
+    return insert;
     }
 }
