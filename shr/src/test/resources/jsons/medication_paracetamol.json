@@ -1,5 +1,6 @@
 {
   "resourceType": "Medication",
+  "id":"23d7e743-75bd-4a25-8f34-bd849bd50394",
   "name": "Paracetamol1",
   "code": {
     "coding": [

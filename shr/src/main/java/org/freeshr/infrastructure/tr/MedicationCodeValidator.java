@@ -1,14 +1,13 @@
 package org.freeshr.infrastructure.tr;
 
-import com.google.common.util.concurrent.SettableFuture;
+import org.apache.commons.lang3.StringUtils;
 import org.freeshr.config.SHRProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.web.client.AsyncRestTemplate;
 import rx.Observable;
 import rx.functions.Func0;
@@ -37,13 +36,22 @@ public class MedicationCodeValidator implements CodeValidator {
         return (system != null) && system.contains(shrProperties.getTerminologiesContextPathForMedication());
     }
 
+    private Observable<ResponseEntity<String>> fetch(String uri) {
+        return Observable.from(shrRestTemplate.exchange(uri,
+                HttpMethod.GET,
+                new HttpEntity(basicAuthHeaders(shrProperties.getTrUser(), shrProperties.getTrPassword())),
+                String.class));
+    }
+
     @Override
-    public Observable<Boolean> isValid(String system, String code) {
-        if (isEmpty(code) || substringAfterLast(system, "/").equalsIgnoreCase(code)) {
+    public Observable<Boolean> isValid(final String system, final String code) {
+        if (!StringUtils.isBlank(system)) {
             return fetch(system).flatMap(new Func1<ResponseEntity<String>, Observable<Boolean>>() {
                 @Override
                 public Observable<Boolean> call(ResponseEntity<String> stringResponseEntity) {
-                    return Observable.just(Boolean.TRUE);
+                    boolean checkResult = checkMedicationCode(system, code, stringResponseEntity.getBody());
+                    boolean result = isEmpty(code) || checkResult;
+                    return Observable.just(result);
                 }
             }, new Func1<Throwable, Observable<? extends Boolean>>() {
                 @Override
@@ -60,10 +68,20 @@ public class MedicationCodeValidator implements CodeValidator {
         return Observable.just(Boolean.FALSE);
     }
 
-    private Observable<ResponseEntity<String>> fetch(String uri) {
-        return Observable.from(shrRestTemplate.exchange(uri,
-                HttpMethod.GET,
-                new HttpEntity(basicAuthHeaders(shrProperties.getTrUser(), shrProperties.getTrPassword())),
-                String.class));
+    private boolean checkMedicationCode(final String system, final String code, final String medicationJson) {
+        //should be deserializing medication and checking code
+        return substringAfterLast(system, "/").equalsIgnoreCase(code);
+    }
+
+    /**
+     * Not caching validation false, as the other system maybe temporarily down
+     * @param system
+     * @param code
+     * @return
+     */
+    @Cacheable(value = "trCache", unless = "#result == false")
+    public boolean validate(String system, String code) {
+        Observable<Boolean> observable = isValid(system, code);
+        return observable.toBlocking().first();
     }
 }

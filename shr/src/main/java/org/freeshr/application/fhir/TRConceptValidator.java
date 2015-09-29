@@ -9,18 +9,19 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.util.StringUtils;
 
 
 @Component
-public class TRValidationSupport implements IValidationSupport {
+public class TRConceptValidator implements IValidationSupport {
 
     private final TerminologyServer terminologyServer;
-    private final static Logger logger = LoggerFactory.getLogger(TRValidationSupport.class);
+    private final static Logger logger = LoggerFactory.getLogger(TRConceptValidator.class);
 
     @Autowired
-    public TRValidationSupport(TerminologyServer terminologyServer) {
+    public TRConceptValidator(TerminologyServer terminologyServer) {
         this.terminologyServer = terminologyServer;
     }
 
@@ -45,7 +46,11 @@ public class TRValidationSupport implements IValidationSupport {
     }
 
     @Override
+    @Cacheable(value = "trCache", unless = "#result.ok == false")
     public CodeValidationResult validateCode(String theCodeSystem, String theCode, String theDisplay) {
+        /** TODO - Note: should we be creating a custom CodeValidationResult and return that?
+         * the caching expression "unless" uses the javabeans convention for boolean property for ok (isOk) rather than a field
+         */
         CodeValidationResult result = locate(theCodeSystem, theCode, theDisplay);
         return result;
     }
@@ -53,7 +58,7 @@ public class TRValidationSupport implements IValidationSupport {
     private CodeValidationResult locate(String system, String code, String display) {
         try {
             Boolean result = terminologyServer.isValid(system, code).toBlocking().first();
-            if (result) {
+            if (result != null && result.booleanValue()) {
                 ValueSet.ConceptDefinitionComponent def = new ValueSet.ConceptDefinitionComponent();
                 def.setDefinition(system);
                 def.setCode(code);

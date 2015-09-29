@@ -16,6 +16,7 @@ import static org.hl7.fhir.instance.model.ValueSet.ValueSetCodeSystemComponent;
 import static org.hl7.fhir.instance.model.ValueSet.ValueSetExpansionContainsComponent;
 
 @Component
+@Deprecated
 public class TRConceptLocator  {
 
     private TerminologyServer terminologyServer;

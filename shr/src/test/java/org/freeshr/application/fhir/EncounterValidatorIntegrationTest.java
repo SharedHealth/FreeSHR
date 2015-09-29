@@ -39,7 +39,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
-public class HapiEncounterValidatorIntegrationTest {
+public class EncounterValidatorIntegrationTest {
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(9997);
@@ -71,7 +71,6 @@ public class HapiEncounterValidatorIntegrationTest {
     @Before
     public void setup() throws Exception {
         initMocks(this);
-        FhirSchemaValidator fhirSchemaValidator = new FhirSchemaValidator(trConceptLocator, shrProperties);
         encounterBundle = EncounterBundleData.withValidEncounter();
 
         givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"))
@@ -640,6 +639,8 @@ public class HapiEncounterValidatorIntegrationTest {
                 errors);
     }
 
+
+    @Ignore
     @Test
     public void shouldValidateEncounterWithAllResources() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,

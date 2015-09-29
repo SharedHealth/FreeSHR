@@ -11,8 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import rx.Observable;
-import rx.functions.Func1;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,14 +28,14 @@ public class MedicationPrescriptionValidator implements SubResourceValidator {
     private static final Logger logger = LoggerFactory.getLogger(MedicationPrescriptionValidator.class);
     public static final String ORDER_MEDICATION_LOCATION = "f:MedicationOrder/f:medication";
     public static final String MEDICATION_DOSE_INSTRUCTION_LOCATION = "f:MedicationOrder/f:dosageInstruction/f:dose";
-    private MedicationCodeValidator codeValidator;
+    private MedicationCodeValidator medicationValidator;
     private DoseQuantityValidator doseQuantityValidator;
     private UrlValidator urlValidator;
 
     @Autowired
-    public MedicationPrescriptionValidator(MedicationCodeValidator codeValidator,
+    public MedicationPrescriptionValidator(MedicationCodeValidator medicationValidator,
                                            DoseQuantityValidator doseQuantityValidator, UrlValidator urlValidator) {
-        this.codeValidator = codeValidator;
+        this.medicationValidator = medicationValidator;
         this.doseQuantityValidator = doseQuantityValidator;
         this.urlValidator = urlValidator;
     }
@@ -134,14 +132,7 @@ public class MedicationPrescriptionValidator implements SubResourceValidator {
 //    }
 
     private boolean isValidCodeableConceptUrl(String url, String code) {
-        Observable<Boolean> observable = codeValidator.isValid(url, code);
-        observable.onErrorReturn(new Func1<Throwable, Boolean>() {
-            @Override
-            public Boolean call(Throwable throwable) {
-                return null;
-            }
-        });
-        return observable.toBlocking().first();
+        return medicationValidator.validate(url, code);
     }
 
 //    private String getReferenceUrl(Property medication) {

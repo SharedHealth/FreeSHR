@@ -2,7 +2,7 @@ package org.freeshr.validations.resource;
 
 
 import ca.uhn.fhir.context.FhirContext;
-import org.freeshr.application.fhir.TRConceptLocator;
+import org.freeshr.application.fhir.TRConceptValidator;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.infrastructure.tr.MedicationCodeValidator;
 import org.freeshr.utils.FileUtil;
@@ -34,13 +34,13 @@ public class MedicationPrescriptionValidatorTest {
     private MedicationPrescriptionValidator medicationOrderValidator;
 
     @Mock
-    TRConceptLocator trConceptLocator;
+    TRConceptValidator trConceptValidator;
 
     @Mock
     SHRProperties properties;
 
     @Mock
-    private MedicationCodeValidator codeValidator;
+    private MedicationCodeValidator medicationValidator;
 
     @Mock
     UrlValidator urlValidator;
@@ -48,8 +48,8 @@ public class MedicationPrescriptionValidatorTest {
     @Before
     public void setup() throws Exception {
         initMocks(this);
-        quantityValidator = new DoseQuantityValidator(trConceptLocator);
-        medicationOrderValidator = new MedicationPrescriptionValidator(codeValidator, quantityValidator, urlValidator);
+        quantityValidator = new DoseQuantityValidator(trConceptValidator);
+        medicationOrderValidator = new MedicationPrescriptionValidator(medicationValidator, quantityValidator, urlValidator);
 
     }
 
@@ -58,14 +58,14 @@ public class MedicationPrescriptionValidatorTest {
         final FhirContext fhirContext = FhirContext.forDstu2();
         IBaseResource medicationOrder = parseResource(FileUtil.asString("xmls/encounters/dstu2/example_medication_order.xml"), fhirContext);
         //IDatatype medication = ((MedicationOrder) medicationOrder).getMedication();
-        when(codeValidator.isValid(anyString(), anyString())).thenReturn(Observable.just(Boolean.FALSE));
+        when(medicationValidator.validate(anyString(), anyString())).thenReturn(false);
         when(urlValidator.isValid(anyString())).thenReturn(true);
         List<ShrValidationMessage> validate = medicationOrderValidator.validate(medicationOrder);
         assertFalse(validate.isEmpty());
         for (ShrValidationMessage shrValidationMessage : validate) {
             System.out.println(shrValidationMessage.getMessage());
         }
-        verify(codeValidator, times(1)).isValid(eq("Medication/f001"), eq(""));
+        verify(medicationValidator, times(1)).validate(eq("Medication/f001"), eq(""));
     }
 
     @Test

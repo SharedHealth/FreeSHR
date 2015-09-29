@@ -44,9 +44,6 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
     private final String validEmail = "some@thoughtworks.com";
     private final String validAccessToken = "2361e0a8-f352-4155-8415-32adfb8c2472";
 
-    @Autowired
-    SHRProperties properties;
-
     @Before
     public void setUp() throws Exception {
         givenThat(get(urlEqualTo("/api/default/patients/" + VALID_HEALTH_ID_CONFIDENTIAL))
@@ -86,17 +83,6 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                         .withBody(asString("jsons/concept_dengue.json"))));
 
 
-//        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/referenceterms/fa460ea6-04c7-45af-a6fa-5072e7caed40"))
-//                .willReturn(aResponse()
-//                        .withStatus(200)
-//                        .withHeader("Content-Type", "application/json")
-//                        .withBody(asString("jsons/refterm.json"))));
-//
-//        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/concepts/eddb01eb-61fc-4f9e-aca5-e44193509f35"))
-//                .willReturn(aResponse()
-//                        .withStatus(200)
-//                        .withHeader("Content-Type", "application/json")
-//                        .withBody(asString("jsons/concept.json"))));
 
         givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba"))
                 .willReturn(aResponse()
@@ -121,15 +107,6 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/userDetailsWithAllRoles.json"))));
-
-//        givenThat(get(urlEqualTo("/facilities/10000069.json"))
-//                .withHeader("client_id", matching("18550"))
-//                .withHeader("X-Auth-Token", matching("c6e6fd3a26313eb250e1019519af33e743808f5bb50428ae5423b8ee278e6fa5"))
-//                .willReturn(aResponse()
-//                        .withStatus(200)
-//                        .withHeader("Content-Type", "application/json")
-//                        .withBody(asString("jsons/facility10000069.json"))));
-
 
     }
 

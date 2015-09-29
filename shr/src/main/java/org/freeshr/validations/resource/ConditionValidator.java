@@ -1,11 +1,13 @@
 package org.freeshr.validations.resource;
 
+import ca.uhn.fhir.model.dstu2.resource.Condition;
 import org.freeshr.validations.ShrValidationMessage;
 import org.freeshr.validations.SubResourceValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -80,11 +82,11 @@ public class ConditionValidator implements SubResourceValidator {
 
     @Override
     public boolean validates(Object resource) {
-        return false;
+        return (resource instanceof Condition);
     }
 
     @Override
     public List<ShrValidationMessage> validate(Object resource) {
-        return null;
+        return new ArrayList<>();
     }
 }

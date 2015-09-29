@@ -3,7 +3,7 @@ package org.freeshr.validations;
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.validation.*;
 import org.apache.commons.lang3.StringUtils;
-import org.freeshr.application.fhir.TRValidationSupport;
+import org.freeshr.application.fhir.TRConceptValidator;
 import org.freeshr.utils.FhirFeedUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,13 +12,13 @@ import org.springframework.stereotype.Component;
 public class FhirResourceValidator {
 
     private FhirFeedUtil fhirUtil;
-    private TRValidationSupport trValidationSupport;
+    private TRConceptValidator trConceptValidator;
     private volatile FhirValidator fhirValidator;
 
     @Autowired
-    public FhirResourceValidator(FhirFeedUtil fhirUtil, TRValidationSupport trValidationSupport) {
+    public FhirResourceValidator(FhirFeedUtil fhirUtil, TRConceptValidator trConceptValidator) {
         this.fhirUtil = fhirUtil;
-        this.trValidationSupport = trValidationSupport;
+        this.trConceptValidator = trConceptValidator;
     }
 
     public ValidationResult validateWithResult(Bundle bundle) {
@@ -37,7 +37,7 @@ public class FhirResourceValidator {
             String message = singleValidationMessage.getMessage();
             String terminologySystem = getTerminologySystem(message);
             if (!StringUtils.isBlank(terminologySystem)) {
-                if (trValidationSupport.isCodeSystemSupported(terminologySystem)) {
+                if (trConceptValidator.isCodeSystemSupported(terminologySystem)) {
                     singleValidationMessage.setSeverity(ResultSeverityEnum.ERROR);
                 }
             }
@@ -73,7 +73,7 @@ public class FhirResourceValidator {
     }
 
     private ValidationSupportChain validationSupportChain() {
-        return new ValidationSupportChain(new DefaultProfileValidationSupport(), trValidationSupport);
+        return new ValidationSupportChain(new DefaultProfileValidationSupport(), trConceptValidator);
     }
 
 }
