@@ -1,0 +1,52 @@
+{
+  "version": "1.1",
+  "conceptClass": "LabTest",
+  "fullySpecifiedName": {
+    "conceptNameType": "FULLY_SPECIFIED",
+    "conceptName": "Creatinine:MCnc:XXX:Urine:Qn",
+    "locale": "en"
+  },
+  "retireReason": null,
+  "retired": false,
+  "names": [
+    {
+      "conceptNameType": null,
+      "conceptName": "Creatinine [Mass/​volume] in Urine",
+      "locale": "en"
+    },
+    {
+      "conceptNameType": "SHORT",
+      "conceptName": "Urine Creatinine",
+      "locale": "en"
+    },
+    {
+      "conceptNameType": "FULLY_SPECIFIED",
+      "conceptName": "Creatinine:MCnc:XXX:Urine:Qn",
+      "locale": "en"
+    }
+  ],
+  "uuid": "Creatinine-5206-11e5-ae6d-0050568225ca",
+  "referenceTerms": [
+    {
+      "version": "1.0",
+      "code": "35674-1",
+      "retired": false,
+      "uuid": "Creatinine-4df1-438e-9d72-0a8b161d409b",
+      "conceptSource": {
+        "uuid": "1fe5d49f-f3d2-44a5-8b01-30cb836ed747",
+        "hl7Code": "LOINC",
+        "description": "LOINC",
+        "name": "LOINC"
+      },
+      "mapType": "SAME-AS",
+      "description": "Creatinine [Mass/​volume] in Urine",
+      "name": "Creatinine [Mass/​volume] in Urine"
+    }
+  ],
+  "datatypeName": "N/A",
+  "description": {
+    "locale": "en",
+    "description": "Creatinine [Mass/​volume] in Urine collected for unspecified duration"
+  },
+  "set": false
+}

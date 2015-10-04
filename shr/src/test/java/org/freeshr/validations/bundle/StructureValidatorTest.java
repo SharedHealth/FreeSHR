@@ -5,7 +5,6 @@ import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.utils.FileUtil;
 import org.freeshr.validations.HIEFacilityValidator;
 import org.freeshr.validations.ValidationSubject;
-import org.freeshr.validations.bundle.StructureValidator;
 import org.hl7.fhir.instance.model.Bundle;
 import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.junit.Before;
@@ -39,11 +38,11 @@ public class StructureValidatorTest {
     @Ignore
     @Test
     public void shouldAcceptAValidXmlWithOneEntryForEachSectionPresentInComposition() {
-        final String xml = FileUtil.asString("xmls/encounters/diagnostic_order_valid.xml");
+        final String xml = FileUtil.asString("xmls/encounters/dstu1/diagnostic_order_valid.xml");
         List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<Bundle>() {
             @Override
             public Bundle extract() {
-                return fhirFeedUtil.deserialize(xml);
+                return fhirFeedUtil.deSerialize(xml);
             }
         });
         assertThat(validationMessages.isEmpty(), is(true));
@@ -52,12 +51,12 @@ public class StructureValidatorTest {
     @Ignore
     @Test
     public void shouldAcceptIfAuthorInCompositionIsAValidFacility() {
-        final String xml = FileUtil.asString("xmls/encounters/diagnostic_order_valid.xml");
+        final String xml = FileUtil.asString("xmls/encounters/dstu1/diagnostic_order_valid.xml");
         when(hieFacilityValidator.validate(anyString())).thenReturn(true);
         List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<Bundle>() {
             @Override
             public Bundle extract() {
-                return fhirFeedUtil.deserialize(xml);
+                return fhirFeedUtil.deSerialize(xml);
             }
         });
         assertThat(validationMessages.isEmpty(), is(true));
@@ -66,12 +65,12 @@ public class StructureValidatorTest {
     @Ignore
     @Test
     public void shouldRejectIfCompositionHasInvalidAuthor() throws Exception {
-        final String xml = FileUtil.asString("xmls/encounters/diagnostic_order_valid.xml");
+        final String xml = FileUtil.asString("xmls/encounters/dstu1/diagnostic_order_valid.xml");
         when(hieFacilityValidator.validate(anyString())).thenReturn(false);
         List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<Bundle>() {
             @Override
             public Bundle extract() {
-                return fhirFeedUtil.deserialize(xml);
+                return fhirFeedUtil.deSerialize(xml);
             }
         });
 
@@ -83,11 +82,11 @@ public class StructureValidatorTest {
     @Ignore
     @Test
     public void shouldRejectIfCompositionIsNotPresent() {
-        final String xml = FileUtil.asString("xmls/encounters/no_composition.xml");
+        final String xml = FileUtil.asString("xmls/encounters/dstu1/no_composition.xml");
         List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<Bundle>() {
             @Override
             public Bundle extract() {
-                return fhirFeedUtil.deserialize(xml);
+                return fhirFeedUtil.deSerialize(xml);
             }
         });
         assertThat(validationMessages.isEmpty(), is(false));
@@ -98,11 +97,11 @@ public class StructureValidatorTest {
     @Ignore
     @Test
     public void shouldRejectIfCompositionDoesNotContainASectionCalledEncounter() {
-        final String xml = FileUtil.asString("xmls/encounters/invalid_composition.xml");
+        final String xml = FileUtil.asString("xmls/encounters/dstu1/invalid_composition.xml");
         List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<Bundle>() {
             @Override
             public Bundle extract() {
-                return fhirFeedUtil.deserialize(xml);
+                return fhirFeedUtil.deSerialize(xml);
             }
         });
         assertThat(validationMessages.isEmpty(), is(false));
@@ -121,11 +120,11 @@ public class StructureValidatorTest {
         3. An entry with no matching section
 
          */
-        final String xml = FileUtil.asString("xmls/encounters/invalid_composition_sections.xml");
+        final String xml = FileUtil.asString("xmls/encounters/dstu1/invalid_composition_sections.xml");
         List<ValidationMessage> validationMessages = structureValidator.validate(new ValidationSubject<Bundle>() {
             @Override
             public Bundle extract() {
-                return fhirFeedUtil.deserialize(xml);
+                return fhirFeedUtil.deSerialize(xml);
             }
         });
         assertThat(validationMessages.isEmpty(), is(false));

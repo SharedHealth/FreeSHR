@@ -39,7 +39,7 @@ public class DiagnosticOrdererIdentifierTest {
         List<DiagnosticOrder> orders = FhirResourceHelper.findBundleResourcesOfType(bundle, DiagnosticOrder.class);
         List<ResourceReferenceDt> providerReferences = diagnosticOrdererIdentifier.getProviderReferences(orders.get(0));
         assertEquals(1, providerReferences.size());
-        assertEquals("http://172.18.46.199:8080/api/1.0/providers/18.json", providerReferences.get(0).getReference().getValue());
+        assertEquals("http://localhost:9997/providers/18.json", providerReferences.get(0).getReference().getValue());
     }
 
     @Test

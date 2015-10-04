@@ -7,7 +7,6 @@ import org.freeshr.utils.FhirFeedUtil;
 public class EncounterValidationContext {
     private EncounterBundle encounterBundle;
     private FhirFeedUtil fhirFeedUtil;
-    private org.hl7.fhir.instance.model.Bundle feed;
     private Bundle bundle;
 
     public EncounterValidationContext(EncounterBundle encounterBundle,
@@ -16,11 +15,9 @@ public class EncounterValidationContext {
         this.fhirFeedUtil = fhirFeedUtil;
     }
 
+    @Deprecated
     public org.hl7.fhir.instance.model.Bundle getFeed() {
-        //deserialize only once
-        if (feed != null) return feed;
-        feed = fhirFeedUtil.deserialize(encounterBundle.getContent());
-        return feed;
+        return null;
     }
 
     public String getHealthId() {
@@ -28,6 +25,7 @@ public class EncounterValidationContext {
     }
 
 
+    @Deprecated
     public ValidationSubject<org.hl7.fhir.instance.model.Bundle> feedFragment() {
         return new ValidationSubject<org.hl7.fhir.instance.model.Bundle>() {
             @Override

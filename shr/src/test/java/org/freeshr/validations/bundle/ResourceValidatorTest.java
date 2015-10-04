@@ -6,7 +6,6 @@ import ca.uhn.fhir.validation.*;
 import org.freeshr.utils.FileUtil;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.validations.*;
-import org.freeshr.validations.bundle.ResourceValidator;
 import org.freeshr.validations.resource.ConditionValidator;
 import org.freeshr.validations.resource.ImmunizationValidator;
 import org.freeshr.validations.resource.MedicationPrescriptionValidator;
@@ -55,11 +54,11 @@ public class ResourceValidatorTest {
         // 4. With non-coded severity, location, evidence etc.
 
 
-        final String xml = FileUtil.asString("xmls/encounters/coded_and_noncoded_diagnosis.xml");
+        final String xml = FileUtil.asString("xmls/encounters/dstu1/coded_and_noncoded_diagnosis.xml");
         List<ValidationMessage> messages = resourceValidator.validate(new ValidationSubject<Bundle>() {
             @Override
             public Bundle extract() {
-                return fhirFeedUtil.deserialize(xml);
+                return fhirFeedUtil.deSerialize(xml);
             }
         });
         assertThat(messages.size(), is(3));
@@ -77,11 +76,11 @@ public class ResourceValidatorTest {
     @Ignore
     @Test
     public void shouldValidateConditionDiagnosisWithAllValidComponents() {
-        final String xml = FileUtil.asString("xmls/encounters/valid_diagnosis.xml");
+        final String xml = FileUtil.asString("xmls/encounters/dstu1/valid_diagnosis.xml");
         List<ValidationMessage> messages = resourceValidator.validate(new ValidationSubject<Bundle>() {
             @Override
             public Bundle extract() {
-                return fhirFeedUtil.deserialize(xml);
+                return fhirFeedUtil.deSerialize(xml);
             }
         });
 
@@ -91,11 +90,11 @@ public class ResourceValidatorTest {
     @Ignore
     @Test
     public void shouldAllowResourceTypeConditionWithCodedAsWellAsNonCodedForAnythingOtherThanDiagnosis() {
-        final String xml = FileUtil.asString("xmls/encounters/other_conditions.xml");
+        final String xml = FileUtil.asString("xmls/encounters/dstu1/other_conditions.xml");
         List<ValidationMessage> messages = resourceValidator.validate(new ValidationSubject<Bundle>() {
             @Override
             public Bundle extract() {
-                return fhirFeedUtil.deserialize(xml);
+                return fhirFeedUtil.deSerialize(xml);
             }
         });
         assertThat(messages.isEmpty(), is(true));
@@ -104,11 +103,11 @@ public class ResourceValidatorTest {
     @Ignore
     @Test
     public void shouldAcceptDiagnosisIfAtLeaseOneReferenceTermIsRight() {
-        final String xml = FileUtil.asString("xmls/encounters/multiple_coded_diagnosis.xml");
+        final String xml = FileUtil.asString("xmls/encounters/dstu1/multiple_coded_diagnosis.xml");
         List<ValidationMessage> messages = resourceValidator.validate(new ValidationSubject<Bundle>() {
             @Override
             public Bundle extract() {
-                return fhirFeedUtil.deserialize(xml);
+                return fhirFeedUtil.deSerialize(xml);
             }
         });
         assertThat(messages.isEmpty(), is(true));

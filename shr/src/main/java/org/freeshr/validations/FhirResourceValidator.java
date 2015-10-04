@@ -8,41 +8,66 @@ import org.freeshr.utils.FhirFeedUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public class FhirResourceValidator {
 
     private FhirFeedUtil fhirUtil;
     private TRConceptValidator trConceptValidator;
     private volatile FhirValidator fhirValidator;
+    private List<String> resourceFieldErrors = new ArrayList<>();
 
     @Autowired
     public FhirResourceValidator(FhirFeedUtil fhirUtil, TRConceptValidator trConceptValidator) {
         this.fhirUtil = fhirUtil;
         this.trConceptValidator = trConceptValidator;
+        initFieldErrorChecks();
     }
 
-    public ValidationResult validateWithResult(Bundle bundle) {
-        ValidationResult validationResult = validatorInstance().validateWithResult(bundle);
-        return checkForConceptValidationError(validationResult);
+    private void initFieldErrorChecks() {
+        this.resourceFieldErrors.add("/f:Bundle/f:entry/f:resource/f:Condition/f:category");
+        this.resourceFieldErrors.add("/f:Bundle/f:entry/f:resource/f:Condition/f:code/f:coding");
+        this.resourceFieldErrors.add("/f:Bundle/f:entry/f:resource/f:Condition/f:clinicalStatus");
+    }
+
+    public FhirValidationResult validate(Bundle bundle) {
+        ValidationResult result = validatorInstance().validateWithResult(bundle);
+        FhirValidationResult validationResult = new FhirValidationResult(fhirUtil.getFhirContext(), result);
+        checkValidationResult(validationResult);
+        return validationResult;
+    }
+
+    private void checkValidationResult(FhirValidationResult validationResult) {
+        checkForConceptValidationError(validationResult);
+        checkForConditionErrors(validationResult);
+    }
+
+    private void checkForConditionErrors(FhirValidationResult validationResult) {
+        for (SingleValidationMessage validationMessage : validationResult.getMessages()) {
+            if (resourceFieldErrors.contains(validationMessage.getLocationString())) {
+                if (validationMessage.getSeverity().ordinal() <= ResultSeverityEnum.WARNING.ordinal()) {
+                    validationMessage.setSeverity(ResultSeverityEnum.ERROR);
+                }
+            }
+        }
     }
 
     /**
      * This is required since the InstanceValidator does not raise a severity.error on concept validation failure.
      * InstanceValidator.checkCodeableConcept() line number 225
-     * @param validationResult
-     * @return
      */
-    private ValidationResult checkForConceptValidationError(ValidationResult validationResult) {
-        for (SingleValidationMessage singleValidationMessage : validationResult.getMessages()) {
-            String message = singleValidationMessage.getMessage();
+    private void checkForConceptValidationError(FhirValidationResult validationResult) {
+        for (SingleValidationMessage validationMessage : validationResult.getMessages()) {
+            String message = validationMessage.getMessage();
             String terminologySystem = getTerminologySystem(message);
             if (!StringUtils.isBlank(terminologySystem)) {
                 if (trConceptValidator.isCodeSystemSupported(terminologySystem)) {
-                    singleValidationMessage.setSeverity(ResultSeverityEnum.ERROR);
+                    validationMessage.setSeverity(ResultSeverityEnum.ERROR);
                 }
             }
         }
-        return new ValidationResult(fhirUtil.getFhirContext(),validationResult.getMessages());
     }
 
     private static String getTerminologySystem(String message) {

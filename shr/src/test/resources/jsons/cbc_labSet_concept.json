@@ -1,0 +1,52 @@
+{
+  "version": "1.1",
+  "conceptClass": "LabSet",
+  "fullySpecifiedName": {
+    "conceptNameType": "FULLY_SPECIFIED",
+    "conceptName": "Complete blood count (hemogram) panel:-:Pt:Bld:-:Automated count",
+    "locale": "en"
+  },
+  "retireReason": null,
+  "retired": false,
+  "names": [
+    {
+      "conceptNameType": null,
+      "conceptName": "Complete blood count (hemogram) panel - Blood by Automated count",
+      "locale": "en"
+    },
+    {
+      "conceptNameType": "SHORT",
+      "conceptName": "Complete blood count",
+      "locale": "en"
+    },
+    {
+      "conceptNameType": "FULLY_SPECIFIED",
+      "conceptName": "Complete blood count (hemogram) panel:-:Pt:Bld:-:Automated count",
+      "locale": "en"
+    }
+  ],
+  "uuid": "CBC-5206-11e5-ae6d-0050568225ca",
+  "referenceTerms": [
+    {
+      "version": "1.0",
+      "code": "58410-2",
+      "retired": false,
+      "uuid": "CBC-4df1-438e-9d72-0a8b161d409b",
+      "conceptSource": {
+        "uuid": "1fe5d49f-f3d2-44a5-8b01-30cb836ed747",
+        "hl7Code": "LOINC",
+        "description": "LOINC",
+        "name": "LOINC"
+      },
+      "mapType": "SAME-AS",
+      "description": "Creatinine [Mass/​volume] in Urine",
+      "name": "Creatinine [Mass/​volume] in Urine"
+    }
+  ],
+  "datatypeName": "N/A",
+  "description": {
+    "locale": "en",
+    "description": "Complete blood count (hemogram) panel - Blood by Automated count"
+  },
+  "set": false
+}

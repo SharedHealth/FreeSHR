@@ -1,6 +1,9 @@
 package org.freeshr.validations.resource;
 
 import ca.uhn.fhir.model.dstu2.resource.Condition;
+import ca.uhn.fhir.model.dstu2.valueset.ConditionClinicalStatusCodesEnum;
+import ca.uhn.fhir.model.primitive.BoundCodeDt;
+import org.freeshr.validations.Severity;
 import org.freeshr.validations.ShrValidationMessage;
 import org.freeshr.validations.SubResourceValidator;
 import org.slf4j.Logger;
@@ -8,7 +11,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import static org.freeshr.validations.ValidationMessages.INVALID_DOSAGE_QUANTITY;
 
 @Component
 public class ConditionValidator implements SubResourceValidator {
@@ -17,6 +23,9 @@ public class ConditionValidator implements SubResourceValidator {
     private static final String CODEABLE_CONCEPT = "CodeableConcept";
     public static final String DIAGNOSIS = "Diagnosis";
     public static final String CATEGORY = "category";
+    private static final String CONDITION_CLINICAL_STATUS_LOCATION = "/f:Bundle/f:entry/f:resource/f:Condition/f:clinicalStatus";
+    private static final String UNKNOWN_CONDITION_CLINICAL_STATUS_MSG =
+            "Coded value %s is not in value set http://hl7.org/fhir/ValueSet/condition-clinical (http://hl7.org/fhir/ValueSet/condition-clinical). Condition: %s";
 
 //    @Override
 //    public List<ValidationMessage> validate(ValidationSubject<Bundle.BundleEntryComponent> subject) {
@@ -87,6 +96,24 @@ public class ConditionValidator implements SubResourceValidator {
 
     @Override
     public List<ShrValidationMessage> validate(Object resource) {
+//        Condition condition = (Condition) resource;
+//        ConditionClinicalStatusCodesEnum[] values = ConditionClinicalStatusCodesEnum.values();
+//        boolean validClinicalStatus = isValidClinicalStatus(condition, values);
+//        if (!validClinicalStatus) {
+//           return Arrays.asList(new ShrValidationMessage(Severity.ERROR, CONDITION_CLINICAL_STATUS_LOCATION,
+//                   "invalid", String.format(UNKNOWN_CONDITION_CLINICAL_STATUS_MSG, condition.getClinicalStatus(), condition.getId().getValue())));
+//        }
         return new ArrayList<>();
+    }
+
+    private boolean isValidClinicalStatus(Condition condition, ConditionClinicalStatusCodesEnum[] values) {
+        boolean validClinicalStatus = false;
+        for (ConditionClinicalStatusCodesEnum value : values) {
+             if (value.getCode().equals(condition.getClinicalStatus())) {
+                 validClinicalStatus = true;
+                 break;
+             }
+        }
+        return validClinicalStatus;
     }
 }

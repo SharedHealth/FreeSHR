@@ -1,9 +1,6 @@
 package org.freeshr.infrastructure.security;
 
-import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
-import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
-import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.events.EncounterEvent;
 import org.freeshr.utils.FhirFeedUtil;
@@ -72,7 +69,7 @@ public class ConfidentialEncounterHandler {
     }
 
     private String replacedContentWithDstu1(EncounterEvent encounterEvent) {
-        org.hl7.fhir.instance.model.Bundle originalFeed = fhirFeedUtil.deserialize(encounterEvent.getContent());
+        org.hl7.fhir.instance.model.Bundle originalFeed = fhirFeedUtil.deSerialize(encounterEvent.getContent());
 
         org.hl7.fhir.instance.model.Bundle.BundleEntryComponent originalCompositionEntry = fhirFeedUtil.getAtomEntryOfResourceType(originalFeed.getEntry(), ResourceType.Composition);
         Composition originalComposition = (Composition) originalCompositionEntry.getResource();

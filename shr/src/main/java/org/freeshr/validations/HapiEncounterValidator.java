@@ -1,7 +1,9 @@
 package org.freeshr.validations;
 
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
-import ca.uhn.fhir.validation.*;
+import ca.uhn.fhir.validation.ResultSeverityEnum;
+import ca.uhn.fhir.validation.SingleValidationMessage;
+import ca.uhn.fhir.validation.ValidationResult;
 import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.application.fhir.Error;
 import org.freeshr.validations.bundle.BundleResourceValidator;
@@ -38,9 +40,9 @@ public class HapiEncounterValidator implements ShrEncounterValidator {
     public EncounterValidationResponse validate(EncounterValidationContext validationContext) {
         EncounterValidationResponse validationResponse = new EncounterValidationResponse();
         Bundle bundle = validationContext.getBundle();
-        ValidationResult validationResult = fhirResourceValidator.validateWithResult(bundle);
+        FhirValidationResult validationResult = fhirResourceValidator.validate(bundle);
         if (!validationResult.isSuccessful()) {
-            return respondFromHapiValidationMessages(validationResult);
+            return respondFromValidationMessages(validationResult);
         }
 
         validationResponse.mergeErrors(fromShrValidationMessages(
@@ -61,7 +63,7 @@ public class HapiEncounterValidator implements ShrEncounterValidator {
         return validationResponse;
     }
 
-    private EncounterValidationResponse respondFromHapiValidationMessages(ValidationResult validationResult) {
+    private EncounterValidationResponse respondFromValidationMessages(ValidationResult validationResult) {
         EncounterValidationResponse response = new EncounterValidationResponse();
         for (SingleValidationMessage validationMessage : validationResult.getMessages()) {
             boolean possibleError = validationMessage.getSeverity().compareTo(ResultSeverityEnum.ERROR) >= 0;

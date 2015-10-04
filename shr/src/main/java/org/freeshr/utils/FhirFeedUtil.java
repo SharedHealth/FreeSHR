@@ -14,7 +14,7 @@ public class FhirFeedUtil {
     //TODO initialize when needed.
     private FhirContext fhirContext = FhirContext.forDstu2();
 
-    public org.hl7.fhir.instance.model.Bundle deserialize(String xml) {
+    public org.hl7.fhir.instance.model.Bundle deSerialize(String xml) {
         try {
 //            return new XmlParser(true).parseGeneral(new ByteArrayInputStream(xml.getBytes())).getFeed();
             return null;

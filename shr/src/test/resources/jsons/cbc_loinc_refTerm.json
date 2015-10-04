@@ -1,0 +1,28 @@
+{
+  "uuid": "CBC-4df1-438e-9d72-0a8b161d409b",
+  "name": "Complete blood count (hemogram) panel",
+  "conceptSource": {
+    "uuid": "1fe5d49f-f3d2-44a5-8b01-30cb836ed747",
+    "display": "LOINC",
+    "name": "LOINC",
+    "description": "LOINC",
+    "hl7Code": "LOINC",
+    "retired": false,
+    "links": [
+      {
+        "uri": "https://localhost:9997/openmrs/ws/rest/v1/conceptsource/1fe5d49f-f3d2-44a5-8b01-30cb836ed747",
+        "rel": "self"
+      },
+      {
+        "uri": "https://localhost:9997/openmrs/ws/rest/v1/conceptsource/1fe5d49f-f3d2-44a5-8b01-30cb836ed747?v=full",
+        "rel": "full"
+      }
+    ],
+    "resourceVersion": "1.8"
+  },
+  "description": "Complete blood count (hemogram) panel - Blood by Automated count",
+  "code": "58410-2",
+  "version": "1.0",
+  "retired": false,
+  "conceptReferenceTermMaps": []
+}
