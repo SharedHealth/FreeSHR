@@ -8,7 +8,6 @@ mainClassName = "org.freeshr.launch.Main"
 
 jar {
     baseName = 'freeshr'
-    version = '0.2-SNAPSHOT'
 }
 
 repositories {
