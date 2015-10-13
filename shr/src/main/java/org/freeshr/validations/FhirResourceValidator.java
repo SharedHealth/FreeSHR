@@ -5,6 +5,7 @@ import ca.uhn.fhir.validation.*;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.TRConceptValidator;
 import org.freeshr.utils.FhirFeedUtil;
+import org.freeshr.validations.resource.ShrProfileValidationSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,12 +18,14 @@ public class FhirResourceValidator {
     private FhirFeedUtil fhirUtil;
     private TRConceptValidator trConceptValidator;
     private volatile FhirValidator fhirValidator;
+    private ShrProfileValidationSupport shrProfileValidationSupport;
     private List<String> resourceFieldErrors = new ArrayList<>();
 
     @Autowired
-    public FhirResourceValidator(FhirFeedUtil fhirUtil, TRConceptValidator trConceptValidator) {
+    public FhirResourceValidator(FhirFeedUtil fhirUtil, TRConceptValidator trConceptValidator, ShrProfileValidationSupport shrProfileValidationSupport) {
         this.fhirUtil = fhirUtil;
         this.trConceptValidator = trConceptValidator;
+        this.shrProfileValidationSupport = shrProfileValidationSupport;
         initFieldErrorChecks();
     }
 
@@ -73,7 +76,7 @@ public class FhirResourceValidator {
     private static String getTerminologySystem(String message) {
         if (message.contains("Unable to validate code")) {
             String substring = message.substring(message.indexOf("in code system"));
-            return StringUtils.remove(StringUtils.removeStart(substring, "in code system"),"\"");
+            return StringUtils.remove(StringUtils.removeStart(substring, "in code system"), "\"");
         }
         return "";
     }
@@ -98,7 +101,7 @@ public class FhirResourceValidator {
     }
 
     private ValidationSupportChain validationSupportChain() {
-        return new ValidationSupportChain(new DefaultProfileValidationSupport(), trConceptValidator);
+        return new ValidationSupportChain(shrProfileValidationSupport, trConceptValidator);
     }
 
 }

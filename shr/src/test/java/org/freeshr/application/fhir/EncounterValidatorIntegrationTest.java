@@ -1,8 +1,5 @@
 package org.freeshr.application.fhir;
 
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.api.IResource;
-import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
@@ -11,7 +8,9 @@ import org.freeshr.data.EncounterBundleData;
 import org.freeshr.infrastructure.tr.ValueSetCodeValidator;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.utils.FileUtil;
-import org.freeshr.validations.*;
+import org.freeshr.validations.EncounterValidationContext;
+import org.freeshr.validations.FhirMessageFilter;
+import org.freeshr.validations.HapiEncounterValidator;
 import org.freeshr.validations.bundle.*;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -33,7 +32,6 @@ import static org.freeshr.validations.ValidationMessages.INVALID_MEDICATION_REFE
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -194,6 +192,7 @@ public class EncounterValidatorIntegrationTest {
 
     /**
      * Dependency: StructureValidator
+     *
      * @throws Exception
      */
     @Test
@@ -246,6 +245,7 @@ public class EncounterValidatorIntegrationTest {
      * Coding System can not be empty
      * Category must be one of the preferred
      * Clinical Status must be of the preferred
+     *
      * @throws Exception
      */
     @Test
