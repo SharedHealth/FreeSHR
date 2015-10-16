@@ -1,0 +1,43 @@
+{
+  "resourceType": "ValueSet",
+  "identifier": "http://localhost:9997/openmrs/ws/rest/v1/tr/vs/relationship-type",
+  "name": "Relationship Type",
+  "description": "",
+  "status": "active",
+  "codeSystem": {
+    "system": "http://localhost:9997/openmrs/ws/rest/v1/tr/vs/relationship-type",
+    "caseSensitive": true,
+    "concept": [
+      {
+        "code": "FTH",
+        "display": "father",
+        "definition": ""
+      },
+      {
+        "code": "MTH",
+        "display": "mother",
+        "definition": ""
+      },
+      {
+        "code": "CHILD",
+        "display": "child",
+        "definition": ""
+      },
+      {
+        "code": "SPS",
+        "display": "spouse",
+        "definition": ""
+      },
+      {
+        "code": "SIB",
+        "display": "sibling",
+        "definition": ""
+      },
+      {
+        "code": "FAMMEMB",
+        "display": "family member",
+        "definition": ""
+      }
+    ]
+  }
+}

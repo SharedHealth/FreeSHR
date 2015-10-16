@@ -152,6 +152,14 @@ public class EncounterValidatorIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/creatinine_labtest_concept.json"))));
 
+        //tr valueset relationship type
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/Relationship-Type"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/trValueset_Relationship_type.json"))));
+
+
     }
 
     @Test
@@ -286,6 +294,27 @@ public class EncounterValidatorIntegrationTest {
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue(response.isSuccessful());
+    }
+
+    @Test
+    public void shouldValidateFamilyMemberHistory() throws Exception {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_family_member_history.xml"));
+        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
+        EncounterValidationResponse response = validator.validate(validationContext);
+        assertTrue(response.isSuccessful());
+    }
+
+    @Test
+    public void shouldRejectInvalidRelationshipTypeInFamilyMemberHistory() throws Exception {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_family_member_history_relationship_invalid.xml"));
+        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
+        EncounterValidationResponse response = validator.validate(validationContext);
+        assertFalse(response.isSuccessful());
+        assertEquals(1, response.getErrors().size());
+        assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:FamilyMemberHistory/f:relationship",
+                "Unable to validate code \"FT\" in code system \"http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Relationship-Type\"", true, response);
     }
 
     @Test
