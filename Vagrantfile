@@ -19,7 +19,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         ansible.inventory_path = "../FreeSHR-Playbooks/inventories/local"
         ansible.playbook =  "../FreeSHR-Playbooks/all.yml"
         ansible.tags = ["setup", "cassandra"]
-        ansible.extra_vars= { java_runtime: "jdk" }
+        ansible.extra_vars= { java_runtime: "jdk", setup_nrpe: "no" }
         ansible.vault_password_file = "~/.vaultpass.txt"
       end
 
@@ -27,7 +27,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         ansible.inventory_path = "../FreeSHR-Playbooks/inventories/local"
         ansible.playbook =  "../FreeSHR-Playbooks/freeshr.yml"
         ansible.tags = ["shr"]
-        ansible.extra_vars= { java_runtime: "jdk" }
+        ansible.extra_vars= { java_runtime: "jdk", setup_nrpe: "no" }
         ansible.vault_password_file = "~/.vaultpass.txt"
       end
   end
