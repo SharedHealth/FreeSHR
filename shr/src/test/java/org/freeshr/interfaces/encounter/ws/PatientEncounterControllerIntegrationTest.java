@@ -1,8 +1,8 @@
 package org.freeshr.interfaces.encounter.ws;
 
 import com.google.common.base.Charsets;
+import net.sf.ehcache.CacheManager;
 import org.freeshr.application.fhir.EncounterResponse;
-import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
@@ -12,11 +12,11 @@ import org.freeshr.interfaces.encounter.ws.exceptions.UnProcessableEntity;
 import org.freeshr.utils.Confidentiality;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.internal.matchers.InstanceOf;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -108,6 +108,11 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/userDetailsWithAllRoles.json"))));
 
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        CacheManager.getInstance().clearAll();
     }
 
     @Test

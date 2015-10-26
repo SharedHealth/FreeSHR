@@ -1,6 +1,7 @@
 package org.freeshr.domain.service;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import net.sf.ehcache.CacheManager;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.config.SHRConfig;
@@ -15,7 +16,7 @@ import org.freeshr.infrastructure.persistence.PatientRepository;
 import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.infrastructure.security.UserProfile;
 import org.freeshr.interfaces.encounter.ws.APIIntegrationTestBase;
-import org.freeshr.util.ValidationFailures;
+import org.freeshr.util.EncounterResponseFailures;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -115,7 +116,7 @@ public class PatientEncounterServiceIntegrationTest extends APIIntegrationTestBa
                 withContentForHealthId(EncounterBundleData.HEALTH_ID, "xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_localRefs_with_invalidRefTerm.xml"),
                 getUserInfo(clientId, email, securityToken))
                 .toBlocking().first();
-        assertTrue(new ValidationFailures(response).matches(new
+        assertTrue(new EncounterResponseFailures(response).matches(new
                 String[]{"/f:Bundle/f:entry/f:resource/f:Condition/f:code", "error",
                 "Unable to validate code \"INVALID-A90\" in code system \"http://localhost:9997/openmrs/ws/rest/v1/tr/referenceterms/2f6z9872-4df1-438e-9d72-0a8b161d409b\""}));
     }
@@ -130,7 +131,7 @@ public class PatientEncounterServiceIntegrationTest extends APIIntegrationTestBa
                 withContentForHealthId(EncounterBundleData.HEALTH_ID, "xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_localRefs_with_invalidConcept.xml"),
                 getUserInfo(clientId, email, securityToken))
                 .toBlocking().first();
-        assertTrue(new ValidationFailures(response).matches(new
+        assertTrue(new EncounterResponseFailures(response).matches(new
                 String[]{"/f:Bundle/f:entry/f:resource/f:Condition/f:code", "error",
                 "Unable to validate code \"INVALID-07952dc2-5206-11e5-ae6d-0050568225ca\" in code system \"http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca\""}));
     }
@@ -150,7 +151,7 @@ public class PatientEncounterServiceIntegrationTest extends APIIntegrationTestBa
                 withContentForHealthId(EncounterBundleData.HEALTH_ID, "xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_localRefs_with_invalidConcept.xml"),
                 userInfo)
                 .toBlocking().first();
-        assertTrue(new ValidationFailures(encounterUpdateResponse).matches(new
+        assertTrue(new EncounterResponseFailures(encounterUpdateResponse).matches(new
                 String[]{"/f:Bundle/f:entry/f:resource/f:Condition/f:code", "error",
                 "Unable to validate code \"INVALID-07952dc2-5206-11e5-ae6d-0050568225ca\" in code system \"http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca\""}));
     }
@@ -256,6 +257,7 @@ public class PatientEncounterServiceIntegrationTest extends APIIntegrationTestBa
 
     @After
     public void teardown() {
+        CacheManager.getInstance().clearAll();
         cqlOperations.execute("truncate encounter;");
         cqlOperations.execute("truncate patient;");
         cqlOperations.execute("truncate enc_by_catchment;");

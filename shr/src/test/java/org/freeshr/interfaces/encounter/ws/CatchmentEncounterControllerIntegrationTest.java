@@ -1,9 +1,11 @@
 package org.freeshr.interfaces.encounter.ws;
 
+import net.sf.ehcache.CacheManager;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.MediaType;
@@ -32,6 +34,11 @@ public class CatchmentEncounterControllerIntegrationTest extends APIIntegrationT
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/userDetailsWithAllRoles.json"))));
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        CacheManager.getInstance().clearAll();
     }
 
     @Test

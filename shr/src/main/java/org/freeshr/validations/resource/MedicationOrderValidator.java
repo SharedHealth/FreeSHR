@@ -71,7 +71,7 @@ public class MedicationOrderValidator implements SubResourceValidator {
 
             CodeableConceptDt medicationCoding = ((CodeableConceptDt) medicine);
 
-            return validateCodeableConcept(medicationCoding, MEDICATION_ORDER_DISPENSE_MEDICATION_LOCATION, INVALID_DISPENSE_MEDICATION_REFERENCE_URL);
+            return validateCodeableConcept(medicationCoding, MEDICATION_ORDER_DISPENSE_MEDICATION_LOCATION);
         }
         return new ArrayList<>();
     }
@@ -115,18 +115,18 @@ public class MedicationOrderValidator implements SubResourceValidator {
                     UNSPECIFIED_MEDICATION));
         }
 
-        return validateCodeableConcept(medicationCoding, MEDICATION_ORDER_MEDICATION_LOCATION, INVALID_MEDICATION_REFERENCE_URL);
+        return validateCodeableConcept(medicationCoding, MEDICATION_ORDER_MEDICATION_LOCATION);
     }
 
-    private Collection<? extends ShrValidationMessage> validateCodeableConcept(CodeableConceptDt medicationCoding, String location, String message) {
+    private Collection<? extends ShrValidationMessage> validateCodeableConcept(CodeableConceptDt medicationCoding, String location) {
         ArrayList<ShrValidationMessage> shrValidationMessages = new ArrayList<>();
         for (CodingDt codingDt : medicationCoding.getCoding()) {
             if (codingDt.getSystem() != null && codingDt.getCode() != null) {
                 if (trConceptValidator.isCodeSystemSupported(codingDt.getSystem())) {
                     IValidationSupport.CodeValidationResult validationResult = trConceptValidator.validateCode(codingDt.getSystem(), codingDt.getCode(), codingDt.getDisplay());
                     if (validationResult != null && !validationResult.isOk()) {
-                        logger.debug(String.format("Medication-Order:Encounter failed for %s", message));
-                        shrValidationMessages.add(new ShrValidationMessage(Severity.ERROR, location, "invalid", message));
+                        logger.debug(String.format("Medication-Order:Encounter failed for %s", validationResult.getMessage()));
+                        shrValidationMessages.add(new ShrValidationMessage(Severity.ERROR, location, "invalid", validationResult.getMessage()));
                     }
                 }
             }

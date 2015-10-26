@@ -1,17 +1,17 @@
 package org.freeshr.application.fhir;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import net.sf.ehcache.CacheManager;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
-import org.freeshr.config.SHRProperties;
 import org.freeshr.data.EncounterBundleData;
 import org.freeshr.infrastructure.tr.ValueSetCodeValidator;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.utils.FileUtil;
 import org.freeshr.validations.EncounterValidationContext;
-import org.freeshr.validations.FhirMessageFilter;
 import org.freeshr.validations.HapiEncounterValidator;
-import org.freeshr.validations.bundle.*;
+import org.freeshr.validations.bundle.FacilityValidator;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -26,6 +26,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.freeshr.util.ValidationFailureTestHelper.assertFailureFromResponseErrors;
+import static org.freeshr.util.ValidationFailureTestHelper.assertFailureInResponse;
 import static org.freeshr.utils.FileUtil.asString;
 import static org.freeshr.validations.ValidationMessages.INVALID_DISPENSE_MEDICATION_REFERENCE_URL;
 import static org.freeshr.validations.ValidationMessages.INVALID_MEDICATION_REFERENCE_URL;
@@ -46,28 +48,12 @@ public class EncounterValidatorIntegrationTest {
     public WireMockRule wireMockRule = new WireMockRule(9997);
     @Autowired
     ValueSetCodeValidator valueSetCodeValidator;
-    EncounterBundle encounterBundle;
     @Autowired
     private HapiEncounterValidator validator;
     @Mock
     private TRConceptLocator trConceptLocator;
-    @Autowired
-    private SHRProperties shrProperties;
-    @Autowired
-    private ResourceValidator resourceValidator;
-    @Autowired
-    private HealthIdValidator healthIdValidator;
-    @Autowired
-    private StructureValidator structureValidator;
-    @Autowired
-    private FhirMessageFilter fhirMessageFilter;
-    @Autowired
-    private ProviderValidator providerValidator;
-    @Autowired
-    private FacilityValidator facilityValidator;
-
     private EncounterValidationContext validationContext;
-
+    EncounterBundle encounterBundle;
 
     @Before
     public void setup() throws Exception {
@@ -173,7 +159,6 @@ public class EncounterValidatorIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/trValueset_medication_forms.json"))));
 
-        //tr drug for Lactic Acid
         givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/drugs/23d7e743-75bd-4a25-8f34-bd849bd50394"))
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -181,6 +166,11 @@ public class EncounterValidatorIntegrationTest {
                         .withBody(asString("jsons/medication_paracetamol.json"))));
 
 
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        CacheManager.getInstance().clearAll();
     }
 
     @Test
@@ -339,7 +329,7 @@ public class EncounterValidatorIntegrationTest {
     }
 
     @Test
-    public void shouldValidateMedicationOrderWithScheduledDate() throws Exception {
+    public void shouldValidateMedicationOrderWithScheduledDateExtension() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_scheduled_date.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
@@ -348,7 +338,7 @@ public class EncounterValidatorIntegrationTest {
     }
 
     @Test
-    public void shouldValidateMedicationOrderWithCustomDosage() throws Exception {
+    public void shouldValidateMedicationOrderWithCustomDosageExtension() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_custom_dosage.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
@@ -726,30 +716,9 @@ public class EncounterValidatorIntegrationTest {
         assertTrue(response.isSuccessful());
     }
 
-
-    private void assertFailureFromResponseErrors(String fieldName, String reason, List<Error> errors) {
-        for (Error error : errors) {
-            if (error.getReason().equals(reason)) {
-                assertEquals(reason, error.getReason());
-                return;
-            }
-        }
-        fail(String.format("Couldn't find expected error with fieldName [%s] reason [%s]", fieldName, reason));
-    }
-
     private void debugEncounterValidationResponse(EncounterValidationResponse response) {
         for (Error error : response.getErrors()) {
             System.out.println("Reason : " + error.getReason() + "      Field: " + error.getField() + "      Type: " + error.getType());
         }
-    }
-
-    private void assertFailureInResponse(String field, String message, boolean partialSearch, EncounterValidationResponse response) {
-        for (Error error : response.getErrors()) {
-            if (error.getField().equals(field)) {
-                boolean result = partialSearch ? error.getReason().startsWith(message) : error.getReason().equals(message);
-                if (result) return;
-            }
-        }
-        fail("Unable to find expected validation error with matching field and message:");
     }
 }

@@ -4,11 +4,11 @@ package org.freeshr.util;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterResponse;
 
-public class ValidationFailures {
+public class EncounterResponseFailures {
 
     private EncounterResponse response;
 
-    public ValidationFailures(EncounterResponse response) {
+    public EncounterResponseFailures(EncounterResponse response) {
         this.response = response;
     }
 

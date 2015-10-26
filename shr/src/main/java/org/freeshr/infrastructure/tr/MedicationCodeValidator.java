@@ -3,7 +3,6 @@ package org.freeshr.infrastructure.tr;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.config.SHRProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -71,17 +70,5 @@ public class MedicationCodeValidator implements CodeValidator {
     private boolean checkMedicationCode(final String system, final String code, final String medicationJson) {
         //should be deserializing medication and checking code
         return substringAfterLast(system, "/").equalsIgnoreCase(code);
-    }
-
-    /**
-     * Not caching validation false, as the other system maybe temporarily down
-     * @param system
-     * @param code
-     * @return
-     */
-    @Cacheable(value = "trCache", unless = "#result == false")
-    public boolean validate(String system, String code) {
-        Observable<Boolean> observable = isValid(system, code);
-        return observable.toBlocking().first();
     }
 }

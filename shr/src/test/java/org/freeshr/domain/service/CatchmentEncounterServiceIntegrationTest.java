@@ -1,6 +1,7 @@
 package org.freeshr.domain.service;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import net.sf.ehcache.CacheManager;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
@@ -24,7 +25,11 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import static ch.lambdaj.Lambda.extract;
@@ -32,8 +37,6 @@ import static ch.lambdaj.Lambda.on;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.util.Arrays.asList;
 import static org.freeshr.data.EncounterBundleData.withContentForHealthId;
-import static org.freeshr.data.EncounterBundleData.withNewEncounterForPatient;
-import static org.freeshr.data.EncounterBundleData.withValidEncounter;
 import static org.freeshr.utils.FileUtil.asString;
 import static org.junit.Assert.*;
 
@@ -98,7 +101,6 @@ public class CatchmentEncounterServiceIntegrationTest {
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/concept_dengue.json"))));
-
     }
 
     @Test
@@ -164,6 +166,7 @@ public class CatchmentEncounterServiceIntegrationTest {
 
     @After
     public void teardown() {
+        CacheManager.getInstance().clearAll();
         cqlOperations.execute("truncate encounter;");
         cqlOperations.execute("truncate patient;");
         cqlOperations.execute("truncate enc_by_catchment;");
