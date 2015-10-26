@@ -1,7 +1,13 @@
 package org.freeshr.validations;
 
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
-import ca.uhn.fhir.validation.*;
+import ca.uhn.fhir.validation.FhirInstanceValidator;
+import ca.uhn.fhir.validation.FhirValidator;
+import ca.uhn.fhir.validation.IValidatorModule;
+import ca.uhn.fhir.validation.ResultSeverityEnum;
+import ca.uhn.fhir.validation.SingleValidationMessage;
+import ca.uhn.fhir.validation.ValidationResult;
+import ca.uhn.fhir.validation.ValidationSupportChain;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.TRConceptValidator;
 import org.freeshr.utils.FhirFeedUtil;
@@ -10,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class FhirResourceValidator {
@@ -20,6 +28,7 @@ public class FhirResourceValidator {
     private volatile FhirValidator fhirValidator;
     private ShrProfileValidationSupport shrProfileValidationSupport;
     private List<String> resourceFieldErrors = new ArrayList<>();
+    private Map<String, String> extensionFieldErrors = new HashMap<>();
 
     @Autowired
     public FhirResourceValidator(FhirFeedUtil fhirUtil, TRConceptValidator trConceptValidator, ShrProfileValidationSupport shrProfileValidationSupport) {
@@ -33,6 +42,9 @@ public class FhirResourceValidator {
         this.resourceFieldErrors.add("/f:Bundle/f:entry/f:resource/f:Condition/f:category");
         this.resourceFieldErrors.add("/f:Bundle/f:entry/f:resource/f:Condition/f:code/f:coding");
         this.resourceFieldErrors.add("/f:Bundle/f:entry/f:resource/f:Condition/f:clinicalStatus");
+
+        this.extensionFieldErrors.put("/f:Bundle/f:entry/f:resource/f:MedicationOrder/f:dosageInstruction/f:timing/f:extension", "https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#TimingScheduledDate");
+        this.extensionFieldErrors.put("/f:Bundle/f:entry/f:resource/f:MedicationOrder/f:dosageInstruction/f:extension", "https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#DosageInstructionCustomDosage");
     }
 
     public FhirValidationResult validate(Bundle bundle) {
@@ -45,6 +57,18 @@ public class FhirResourceValidator {
     private void checkValidationResult(FhirValidationResult validationResult) {
         checkForConceptValidationError(validationResult);
         checkForConditionErrors(validationResult);
+        checkForExtensionErrors(validationResult);
+    }
+
+    private void checkForExtensionErrors(FhirValidationResult validationResult) {
+        for (SingleValidationMessage validationMessage : validationResult.getMessages()) {
+            if (extensionFieldErrors.containsKey(validationMessage.getLocationString())
+                    && validationMessage.getMessage().contains(extensionFieldErrors.get(validationMessage.getLocationString()))) {
+                if (validationMessage.getSeverity().ordinal() >= ResultSeverityEnum.ERROR.ordinal()) {
+                    validationMessage.setSeverity(ResultSeverityEnum.WARNING);
+                }
+            }
+        }
     }
 
     private void checkForConditionErrors(FhirValidationResult validationResult) {
@@ -97,6 +121,7 @@ public class FhirResourceValidator {
     private IValidatorModule validatorModule() {
         FhirInstanceValidator instanceValidator = new FhirInstanceValidator();
         instanceValidator.setValidationSupport(validationSupportChain());
+
         return instanceValidator;
     }
 

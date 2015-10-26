@@ -159,6 +159,27 @@ public class EncounterValidatorIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/trValueset_Relationship_type.json"))));
 
+        //tr valueset routes of administration
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/Route-of-Administration"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/trValueset_Routes_of_administration.json"))));
+
+        //tr valueset medication forms
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/Medication-Forms"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/trValueset_medication_forms.json"))));
+
+        //tr drug for Lactic Acid
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/drugs/23d7e743-75bd-4a25-8f34-bd849bd50394"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/medication_paracetamol.json"))));
+
 
     }
 
@@ -318,6 +339,25 @@ public class EncounterValidatorIntegrationTest {
     }
 
     @Test
+    public void shouldValidateMedicationOrderWithScheduledDate() throws Exception {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_scheduled_date.xml"));
+        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
+        EncounterValidationResponse response = validator.validate(validationContext);
+        assertTrue(response.isSuccessful());
+    }
+
+    @Test
+    public void shouldValidateMedicationOrderWithCustomDosage() throws Exception {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_custom_dosage.xml"));
+        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
+        EncounterValidationResponse response = validator.validate(validationContext);
+        debugEncounterValidationResponse(response);
+        assertTrue(response.isSuccessful());
+    }
+
+    @Test
     @Ignore
     public void shouldValidateSpecimenWithDiagnosticOrder() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
@@ -342,6 +382,7 @@ public class EncounterValidatorIntegrationTest {
         assertTrue(response.isSuccessful());
     }
 
+
     @Test
     @Ignore
     public void shouldValidateConditionsToCheckIfCategoriesOtherThanChiefComplaintAreCoded() {
@@ -356,7 +397,6 @@ public class EncounterValidatorIntegrationTest {
         assertFailureFromResponseErrors("urn:5f982a33-4454-4b74-9236-b8157aa8e678", "Viral pneumonia 785857", errors);
         assertFailureFromResponseErrors("urn:9826cf0c-66d6-4e33-bed1-91381ab200b5", "Moderate", errors);
     }
-
 
     @Test
     @Ignore
@@ -412,17 +452,6 @@ public class EncounterValidatorIntegrationTest {
                 ("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type");
         verify(trConceptLocator, times(1)).validate("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type",
                 "REG", "registration");
-        assertTrue(response.isSuccessful());
-    }
-
-    @Test
-    @Ignore
-    public void shouldValidateMedicationPrescription() throws Exception {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu1/medication_prescription.xml"));
-        when(trConceptLocator.verifiesSystem(anyString())).thenReturn(true);
-        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
-        EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue(response.isSuccessful());
     }
 
@@ -710,7 +739,7 @@ public class EncounterValidatorIntegrationTest {
 
     private void debugEncounterValidationResponse(EncounterValidationResponse response) {
         for (Error error : response.getErrors()) {
-            System.out.println(error.getReason());
+            System.out.println("Reason : " + error.getReason() + "      Field: " + error.getField() + "      Type: " + error.getType());
         }
     }
 

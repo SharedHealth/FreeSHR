@@ -8,7 +8,7 @@ import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.validations.*;
 import org.freeshr.validations.resource.ConditionValidator;
 import org.freeshr.validations.resource.ImmunizationValidator;
-import org.freeshr.validations.resource.MedicationPrescriptionValidator;
+import org.freeshr.validations.resource.MedicationOrderValidator;
 import org.freeshr.validations.resource.ProcedureValidator;
 import org.hl7.fhir.instance.model.Bundle;
 import org.hl7.fhir.instance.model.OperationOutcome;
@@ -31,7 +31,7 @@ public class ResourceValidatorTest {
     FhirFeedUtil fhirFeedUtil;
 
     @Mock
-    MedicationPrescriptionValidator medicationPrescriptionValidator;
+    MedicationOrderValidator medicationOrderValidator;
     @Mock
     ImmunizationValidator immunizationValidator;
     @Mock
@@ -40,7 +40,7 @@ public class ResourceValidatorTest {
     @Before
     public void setup() {
         initMocks(this);
-        resourceValidator = new ResourceValidator(new ConditionValidator(), medicationPrescriptionValidator, immunizationValidator,
+        resourceValidator = new ResourceValidator(new ConditionValidator(), medicationOrderValidator, immunizationValidator,
                 procedureValidator);
         fhirFeedUtil = new FhirFeedUtil();
     }

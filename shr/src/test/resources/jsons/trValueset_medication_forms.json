@@ -1,0 +1,1773 @@
+{
+  "resourceType": "ValueSet",
+  "identifier": "http://localhost:9997/openmrs/ws/rest/v1/tr/vs/medication-forms",
+  "name": "Medication Forms",
+  "description": "",
+  "status": "active",
+  "codeSystem": {
+    "system": "http://localhost:9997/openmrs/ws/rest/v1/tr/vs/medication-forms",
+    "caseSensitive": true,
+    "concept": [
+      {
+        "code": "7946007",
+        "display": "Drug suspension",
+        "definition": ""
+      },
+      {
+        "code": "11190007",
+        "display": "Drug stick",
+        "definition": ""
+      },
+      {
+        "code": "17519006",
+        "display": "Drug lotion",
+        "definition": ""
+      },
+      {
+        "code": "30843009",
+        "display": "Drug aerosol foam",
+        "definition": ""
+      },
+      {
+        "code": "36875001",
+        "display": "Drug patch",
+        "definition": ""
+      },
+      {
+        "code": "37937005",
+        "display": "Drug paste",
+        "definition": ""
+      },
+      {
+        "code": "46992007",
+        "display": "Pill",
+        "definition": ""
+      },
+      {
+        "code": "48582000",
+        "display": "Caplet",
+        "definition": ""
+      },
+      {
+        "code": "52262001",
+        "display": "Drug aerosol",
+        "definition": ""
+      },
+      {
+        "code": "63316001",
+        "display": "Liniment",
+        "definition": ""
+      },
+      {
+        "code": "64241004",
+        "display": "Drug pledget",
+        "definition": ""
+      },
+      {
+        "code": "66076007",
+        "display": "Chewable tablet",
+        "definition": ""
+      },
+      {
+        "code": "77899000",
+        "display": "Drug solution",
+        "definition": ""
+      },
+      {
+        "code": "85581007",
+        "display": "Drug powder",
+        "definition": ""
+      },
+      {
+        "code": "385018001",
+        "display": "Oral drops",
+        "definition": ""
+      },
+      {
+        "code": "385019009",
+        "display": "Oral drops solution",
+        "definition": ""
+      },
+      {
+        "code": "385020003",
+        "display": "Oral drops suspension",
+        "definition": ""
+      },
+      {
+        "code": "385021004",
+        "display": "Oral drops emulsion",
+        "definition": ""
+      },
+      {
+        "code": "385022006",
+        "display": "Oral liquid",
+        "definition": ""
+      },
+      {
+        "code": "385023001",
+        "display": "Oral solution",
+        "definition": ""
+      },
+      {
+        "code": "385024007",
+        "display": "Oral suspension",
+        "definition": ""
+      },
+      {
+        "code": "385025008",
+        "display": "Oral emulsion",
+        "definition": ""
+      },
+      {
+        "code": "385026009",
+        "display": "Powder for oral solution",
+        "definition": ""
+      },
+      {
+        "code": "385027000",
+        "display": "Powder for oral suspension",
+        "definition": ""
+      },
+      {
+        "code": "385028005",
+        "display": "Granules for oral solution",
+        "definition": ""
+      },
+      {
+        "code": "385029002",
+        "display": "Granules for oral suspension",
+        "definition": ""
+      },
+      {
+        "code": "385032004",
+        "display": "Syrup",
+        "definition": ""
+      },
+      {
+        "code": "385033009",
+        "display": "Powder for syrup",
+        "definition": ""
+      },
+      {
+        "code": "385034003",
+        "display": "Granules for syrup",
+        "definition": ""
+      },
+      {
+        "code": "385035002",
+        "display": "Soluble tablet",
+        "definition": ""
+      },
+      {
+        "code": "385036001",
+        "display": "Dispersible tablet",
+        "definition": ""
+      },
+      {
+        "code": "385038000",
+        "display": "Oral gel",
+        "definition": ""
+      },
+      {
+        "code": "385039008",
+        "display": "Oral paste",
+        "definition": ""
+      },
+      {
+        "code": "385041009",
+        "display": "Oral powder",
+        "definition": ""
+      },
+      {
+        "code": "385042002",
+        "display": "Effervescent powder",
+        "definition": ""
+      },
+      {
+        "code": "385043007",
+        "display": "Granules dose form",
+        "definition": ""
+      },
+      {
+        "code": "385044001",
+        "display": "Effervescent granules",
+        "definition": ""
+      },
+      {
+        "code": "385045000",
+        "display": "Gastro-resistant granules",
+        "definition": ""
+      },
+      {
+        "code": "385046004",
+        "display": "Prolonged-release granules",
+        "definition": ""
+      },
+      {
+        "code": "385047008",
+        "display": "Modified-release granules",
+        "definition": ""
+      },
+      {
+        "code": "385048003",
+        "display": "Cachet",
+        "definition": ""
+      },
+      {
+        "code": "385049006",
+        "display": "Capsule dose form",
+        "definition": ""
+      },
+      {
+        "code": "385050006",
+        "display": "Hard capsule",
+        "definition": ""
+      },
+      {
+        "code": "385051005",
+        "display": "Soft capsule",
+        "definition": ""
+      },
+      {
+        "code": "385052003",
+        "display": "Gastro-resistant capsule",
+        "definition": ""
+      },
+      {
+        "code": "385053008",
+        "display": "Prolonged-release capsule",
+        "definition": ""
+      },
+      {
+        "code": "385054002",
+        "display": "Modified-release capsule",
+        "definition": ""
+      },
+      {
+        "code": "385055001",
+        "display": "Tablet dose form",
+        "definition": ""
+      },
+      {
+        "code": "385057009",
+        "display": "Film-coated tablet",
+        "definition": ""
+      },
+      {
+        "code": "385058004",
+        "display": "Effervescent tablet",
+        "definition": ""
+      },
+      {
+        "code": "385059007",
+        "display": "Gastro-resistant tablet",
+        "definition": ""
+      },
+      {
+        "code": "385060002",
+        "display": "Prolonged-release tablet",
+        "definition": ""
+      },
+      {
+        "code": "385061003",
+        "display": "Modified-release tablet",
+        "definition": ""
+      },
+      {
+        "code": "385062005",
+        "display": "Oral lyophilisate",
+        "definition": ""
+      },
+      {
+        "code": "385063000",
+        "display": "Oral gum",
+        "definition": ""
+      },
+      {
+        "code": "385064006",
+        "display": "Pillule",
+        "definition": ""
+      },
+      {
+        "code": "385069001",
+        "display": "Oromucosal liquid",
+        "definition": ""
+      },
+      {
+        "code": "385070000",
+        "display": "Oromucosal solution",
+        "definition": ""
+      },
+      {
+        "code": "385071001",
+        "display": "Oromucosal suspension",
+        "definition": ""
+      },
+      {
+        "code": "385073003",
+        "display": "Oromucosal spray",
+        "definition": ""
+      },
+      {
+        "code": "385074009",
+        "display": "Sublingual spray",
+        "definition": ""
+      },
+      {
+        "code": "385077002",
+        "display": "Gingival solution",
+        "definition": ""
+      },
+      {
+        "code": "385078007",
+        "display": "Oromucosal gel",
+        "definition": ""
+      },
+      {
+        "code": "385079004",
+        "display": "Oromucosal paste",
+        "definition": ""
+      },
+      {
+        "code": "385080001",
+        "display": "Medicated chewing-gum",
+        "definition": ""
+      },
+      {
+        "code": "385081002",
+        "display": "Gingival gel",
+        "definition": ""
+      },
+      {
+        "code": "385082009",
+        "display": "Gingival paste",
+        "definition": ""
+      },
+      {
+        "code": "385083004",
+        "display": "Oromucosal capsule",
+        "definition": ""
+      },
+      {
+        "code": "385084005",
+        "display": "Sublingual tablet",
+        "definition": ""
+      },
+      {
+        "code": "385085006",
+        "display": "Buccal tablet",
+        "definition": ""
+      },
+      {
+        "code": "385086007",
+        "display": "Muco-adhesive buccal tablet",
+        "definition": ""
+      },
+      {
+        "code": "385087003",
+        "display": "Lozenge",
+        "definition": ""
+      },
+      {
+        "code": "385088008",
+        "display": "Dental gel",
+        "definition": ""
+      },
+      {
+        "code": "385089000",
+        "display": "Dental stick",
+        "definition": ""
+      },
+      {
+        "code": "385090009",
+        "display": "Dental insert",
+        "definition": ""
+      },
+      {
+        "code": "385091008",
+        "display": "Dental powder",
+        "definition": ""
+      },
+      {
+        "code": "385092001",
+        "display": "Dental liquid",
+        "definition": ""
+      },
+      {
+        "code": "385094000",
+        "display": "Dental solution",
+        "definition": ""
+      },
+      {
+        "code": "385095004",
+        "display": "Dental suspension",
+        "definition": ""
+      },
+      {
+        "code": "385096003",
+        "display": "Dental emulsion",
+        "definition": ""
+      },
+      {
+        "code": "385098002",
+        "display": "Bath additive",
+        "definition": ""
+      },
+      {
+        "code": "385099005",
+        "display": "Cream",
+        "definition": ""
+      },
+      {
+        "code": "385100002",
+        "display": "Gel",
+        "definition": ""
+      },
+      {
+        "code": "385101003",
+        "display": "Ointment",
+        "definition": ""
+      },
+      {
+        "code": "385102005",
+        "display": "Cutaneous paste",
+        "definition": ""
+      },
+      {
+        "code": "385103000",
+        "display": "Cutaneous foam",
+        "definition": ""
+      },
+      {
+        "code": "385104006",
+        "display": "Shampoo dose form",
+        "definition": ""
+      },
+      {
+        "code": "385105007",
+        "display": "Cutaneous spray",
+        "definition": ""
+      },
+      {
+        "code": "385106008",
+        "display": "Cutaneous solution spray",
+        "definition": ""
+      },
+      {
+        "code": "385107004",
+        "display": "Cutaneous liquid",
+        "definition": ""
+      },
+      {
+        "code": "385108009",
+        "display": "Cutaneous solution",
+        "definition": ""
+      },
+      {
+        "code": "385110006",
+        "display": "Cutaneous suspension",
+        "definition": ""
+      },
+      {
+        "code": "385111005",
+        "display": "Cutaneous emulsion",
+        "definition": ""
+      },
+      {
+        "code": "385112003",
+        "display": "Cutaneous powder",
+        "definition": ""
+      },
+      {
+        "code": "385113008",
+        "display": "Solution for iontophoresis",
+        "definition": ""
+      },
+      {
+        "code": "385114002",
+        "display": "Transdermal patch",
+        "definition": ""
+      },
+      {
+        "code": "385115001",
+        "display": "Collodion",
+        "definition": ""
+      },
+      {
+        "code": "385116000",
+        "display": "Medicated nail laquer",
+        "definition": ""
+      },
+      {
+        "code": "385117009",
+        "display": "Poultice",
+        "definition": ""
+      },
+      {
+        "code": "385118004",
+        "display": "Cutaneous stick",
+        "definition": ""
+      },
+      {
+        "code": "385119007",
+        "display": "Cutaneous sponge",
+        "definition": ""
+      },
+      {
+        "code": "385121002",
+        "display": "Eye cream",
+        "definition": ""
+      },
+      {
+        "code": "385122009",
+        "display": "Eye gel",
+        "definition": ""
+      },
+      {
+        "code": "385123004",
+        "display": "Eye ointment",
+        "definition": ""
+      },
+      {
+        "code": "385124005",
+        "display": "Eye drops",
+        "definition": ""
+      },
+      {
+        "code": "385125006",
+        "display": "Eye drops solution",
+        "definition": ""
+      },
+      {
+        "code": "385128008",
+        "display": "Prolonged-release eye drops",
+        "definition": ""
+      },
+      {
+        "code": "385130005",
+        "display": "Eye lotion",
+        "definition": ""
+      },
+      {
+        "code": "385132002",
+        "display": "Ophthalmic insert",
+        "definition": ""
+      },
+      {
+        "code": "385133007",
+        "display": "Ear cream",
+        "definition": ""
+      },
+      {
+        "code": "385134001",
+        "display": "Ear gel",
+        "definition": ""
+      },
+      {
+        "code": "385135000",
+        "display": "Ear ointment",
+        "definition": ""
+      },
+      {
+        "code": "385136004",
+        "display": "Ear drops",
+        "definition": ""
+      },
+      {
+        "code": "385137008",
+        "display": "Ear drops solution",
+        "definition": ""
+      },
+      {
+        "code": "385138003",
+        "display": "Ear drops emulsion",
+        "definition": ""
+      },
+      {
+        "code": "385139006",
+        "display": "Ear powder",
+        "definition": ""
+      },
+      {
+        "code": "385140008",
+        "display": "Ear spray",
+        "definition": ""
+      },
+      {
+        "code": "385141007",
+        "display": "Ear spray solution",
+        "definition": ""
+      },
+      {
+        "code": "385142000",
+        "display": "Ear spray suspension",
+        "definition": ""
+      },
+      {
+        "code": "385143005",
+        "display": "Ear spray emulsion",
+        "definition": ""
+      },
+      {
+        "code": "385147006",
+        "display": "Ear tampon",
+        "definition": ""
+      },
+      {
+        "code": "385148001",
+        "display": "Ear stick",
+        "definition": ""
+      },
+      {
+        "code": "385149009",
+        "display": "Nasal cream",
+        "definition": ""
+      },
+      {
+        "code": "385150009",
+        "display": "Nasal gel",
+        "definition": ""
+      },
+      {
+        "code": "385151008",
+        "display": "Nasal ointment",
+        "definition": ""
+      },
+      {
+        "code": "385152001",
+        "display": "Nasal drops",
+        "definition": ""
+      },
+      {
+        "code": "385153006",
+        "display": "Nasal drops solution",
+        "definition": ""
+      },
+      {
+        "code": "385154000",
+        "display": "Nasal drops suspension",
+        "definition": ""
+      },
+      {
+        "code": "385155004",
+        "display": "Nasal drops emulsion",
+        "definition": ""
+      },
+      {
+        "code": "385156003",
+        "display": "Nasal powder",
+        "definition": ""
+      },
+      {
+        "code": "385157007",
+        "display": "Nasal spray",
+        "definition": ""
+      },
+      {
+        "code": "385158002",
+        "display": "Nasal spray solution",
+        "definition": ""
+      },
+      {
+        "code": "385159005",
+        "display": "Nasal spray suspension",
+        "definition": ""
+      },
+      {
+        "code": "385160000",
+        "display": "Nasal spray emulsion",
+        "definition": ""
+      },
+      {
+        "code": "385162008",
+        "display": "Nasal stick",
+        "definition": ""
+      },
+      {
+        "code": "385163003",
+        "display": "Eye/ear/nose drops",
+        "definition": ""
+      },
+      {
+        "code": "385164009",
+        "display": "Eye/ear/nose ointment",
+        "definition": ""
+      },
+      {
+        "code": "385165005",
+        "display": "Vaginal cream",
+        "definition": ""
+      },
+      {
+        "code": "385166006",
+        "display": "Vaginal gel",
+        "definition": ""
+      },
+      {
+        "code": "385167002",
+        "display": "Vaginal ointment",
+        "definition": ""
+      },
+      {
+        "code": "385168007",
+        "display": "Vaginal foam",
+        "definition": ""
+      },
+      {
+        "code": "385169004",
+        "display": "Vaginal liquid",
+        "definition": ""
+      },
+      {
+        "code": "385170003",
+        "display": "Vaginal solution",
+        "definition": ""
+      },
+      {
+        "code": "385171004",
+        "display": "Vaginal suspension",
+        "definition": ""
+      },
+      {
+        "code": "385172006",
+        "display": "Vaginal emulsion",
+        "definition": ""
+      },
+      {
+        "code": "385173001",
+        "display": "Tablet for vaginal solution",
+        "definition": ""
+      },
+      {
+        "code": "385174007",
+        "display": "Pessary",
+        "definition": ""
+      },
+      {
+        "code": "385175008",
+        "display": "Vaginal capsule",
+        "definition": ""
+      },
+      {
+        "code": "385176009",
+        "display": "Hard vaginal capsule",
+        "definition": ""
+      },
+      {
+        "code": "385177000",
+        "display": "Soft vaginal capsule",
+        "definition": ""
+      },
+      {
+        "code": "385178005",
+        "display": "Vaginal tablet",
+        "definition": ""
+      },
+      {
+        "code": "385179002",
+        "display": "Effervescent vaginal tablet",
+        "definition": ""
+      },
+      {
+        "code": "385180004",
+        "display": "Medicated vaginal tampon",
+        "definition": ""
+      },
+      {
+        "code": "385182007",
+        "display": "Rectal cream",
+        "definition": ""
+      },
+      {
+        "code": "385183002",
+        "display": "Rectal gel",
+        "definition": ""
+      },
+      {
+        "code": "385184008",
+        "display": "Rectal ointment",
+        "definition": ""
+      },
+      {
+        "code": "385185009",
+        "display": "Rectal foam",
+        "definition": ""
+      },
+      {
+        "code": "385186005",
+        "display": "Enema",
+        "definition": ""
+      },
+      {
+        "code": "385187001",
+        "display": "Rectal solution",
+        "definition": ""
+      },
+      {
+        "code": "385188006",
+        "display": "Rectal suspension",
+        "definition": ""
+      },
+      {
+        "code": "385189003",
+        "display": "Rectal emulsion",
+        "definition": ""
+      },
+      {
+        "code": "385191006",
+        "display": "Powder for rectal suspension",
+        "definition": ""
+      },
+      {
+        "code": "385192004",
+        "display": "Tablet for rectal solution",
+        "definition": ""
+      },
+      {
+        "code": "385193009",
+        "display": "Tablet for rectal suspension",
+        "definition": ""
+      },
+      {
+        "code": "385194003",
+        "display": "Suppository dose form",
+        "definition": ""
+      },
+      {
+        "code": "385195002",
+        "display": "Rectal capsule",
+        "definition": ""
+      },
+      {
+        "code": "385196001",
+        "display": "Rectal tampon",
+        "definition": ""
+      },
+      {
+        "code": "385197005",
+        "display": "Nebulizer liquid",
+        "definition": ""
+      },
+      {
+        "code": "385198000",
+        "display": "Nebulizer solution",
+        "definition": ""
+      },
+      {
+        "code": "385199008",
+        "display": "Nebulizer suspension",
+        "definition": ""
+      },
+      {
+        "code": "385200006",
+        "display": "Powder for nebulizer suspension",
+        "definition": ""
+      },
+      {
+        "code": "385201005",
+        "display": "Powder for nebulizer solution",
+        "definition": ""
+      },
+      {
+        "code": "385202003",
+        "display": "Nebulizer emulsion",
+        "definition": ""
+      },
+      {
+        "code": "385203008",
+        "display": "Pressurised inhalation",
+        "definition": ""
+      },
+      {
+        "code": "385204002",
+        "display": "Pressurised inhalation solution",
+        "definition": ""
+      },
+      {
+        "code": "385205001",
+        "display": "Pressurised inhalation suspension",
+        "definition": ""
+      },
+      {
+        "code": "385206000",
+        "display": "Pressurised inhalation emulsion",
+        "definition": ""
+      },
+      {
+        "code": "385207009",
+        "display": "Inhalation powder",
+        "definition": ""
+      },
+      {
+        "code": "385208004",
+        "display": "Hard capsule inhalation powder",
+        "definition": ""
+      },
+      {
+        "code": "385210002",
+        "display": "Inhalation vapor",
+        "definition": ""
+      },
+      {
+        "code": "385211003",
+        "display": "Inhalation vapor powder",
+        "definition": ""
+      },
+      {
+        "code": "385212005",
+        "display": "Inhalation vapor capsule",
+        "definition": ""
+      },
+      {
+        "code": "385213000",
+        "display": "Inhalation vapor solution",
+        "definition": ""
+      },
+      {
+        "code": "385214006",
+        "display": "Inhalation vapor tablet",
+        "definition": ""
+      },
+      {
+        "code": "385215007",
+        "display": "Inhalation vapor ointment",
+        "definition": ""
+      },
+      {
+        "code": "385216008",
+        "display": "Inhalation vapor liquid",
+        "definition": ""
+      },
+      {
+        "code": "385217004",
+        "display": "Gas for inhalation",
+        "definition": ""
+      },
+      {
+        "code": "385219001",
+        "display": "Injection solution",
+        "definition": ""
+      },
+      {
+        "code": "385220007",
+        "display": "Injection suspension",
+        "definition": ""
+      },
+      {
+        "code": "385221006",
+        "display": "Injection emulsion",
+        "definition": ""
+      },
+      {
+        "code": "385222004",
+        "display": "Injection powder",
+        "definition": ""
+      },
+      {
+        "code": "385223009",
+        "display": "Powder for injection solution",
+        "definition": ""
+      },
+      {
+        "code": "385224003",
+        "display": "Powder for injection suspension",
+        "definition": ""
+      },
+      {
+        "code": "385229008",
+        "display": "Infusion solution",
+        "definition": ""
+      },
+      {
+        "code": "385230003",
+        "display": "Infusion powder",
+        "definition": ""
+      },
+      {
+        "code": "385231004",
+        "display": "Powder for infusion solution",
+        "definition": ""
+      },
+      {
+        "code": "385236009",
+        "display": "Implantation tablet",
+        "definition": ""
+      },
+      {
+        "code": "385237000",
+        "display": "Implantation chain",
+        "definition": ""
+      },
+      {
+        "code": "385242008",
+        "display": "Intravesical solution",
+        "definition": ""
+      },
+      {
+        "code": "385245005",
+        "display": "Urethral gel",
+        "definition": ""
+      },
+      {
+        "code": "385246006",
+        "display": "Urethral stick",
+        "definition": ""
+      },
+      {
+        "code": "385247002",
+        "display": "Endotracheopulmonary instillation solution",
+        "definition": ""
+      },
+      {
+        "code": "385248007",
+        "display": "Powder for endotracheopulmonary instillation solution",
+        "definition": ""
+      },
+      {
+        "code": "385250004",
+        "display": "Endotracheopulmonary instillation suspension",
+        "definition": ""
+      },
+      {
+        "code": "385251000",
+        "display": "Endocervical gel",
+        "definition": ""
+      },
+      {
+        "code": "385257001",
+        "display": "Gastroenteral liquid",
+        "definition": ""
+      },
+      {
+        "code": "385258006",
+        "display": "Gastroenteral solution",
+        "definition": ""
+      },
+      {
+        "code": "385259003",
+        "display": "Gastroenteral suspension",
+        "definition": ""
+      },
+      {
+        "code": "385260008",
+        "display": "Gastroenteral emulsion",
+        "definition": ""
+      },
+      {
+        "code": "385261007",
+        "display": "Wound stick",
+        "definition": ""
+      },
+      {
+        "code": "385262000",
+        "display": "Organ preservation solution",
+        "definition": ""
+      },
+      {
+        "code": "385278003",
+        "display": "Cutaneous powder spray",
+        "definition": ""
+      },
+      {
+        "code": "385279006",
+        "display": "Cutaneous suspension spray",
+        "definition": ""
+      },
+      {
+        "code": "385286003",
+        "display": "Implant dosage form",
+        "definition": ""
+      },
+      {
+        "code": "414951009",
+        "display": "Oral elixir",
+        "definition": ""
+      },
+      {
+        "code": "420243009",
+        "display": "Tampon dose form",
+        "definition": ""
+      },
+      {
+        "code": "420253005",
+        "display": "Oil injection",
+        "definition": ""
+      },
+      {
+        "code": "420275007",
+        "display": "Semi-solid dose form",
+        "definition": ""
+      },
+      {
+        "code": "420283001",
+        "display": "Nasal emulsion",
+        "definition": ""
+      },
+      {
+        "code": "420292003",
+        "display": "Rectal powder",
+        "definition": ""
+      },
+      {
+        "code": "420293008",
+        "display": "Coated pellets capsule",
+        "definition": ""
+      },
+      {
+        "code": "420305009",
+        "display": "Powder for oral liquid",
+        "definition": ""
+      },
+      {
+        "code": "420317006",
+        "display": "Inhaler",
+        "definition": ""
+      },
+      {
+        "code": "420378007",
+        "display": "Extended-release film coated tablet",
+        "definition": ""
+      },
+      {
+        "code": "420385006",
+        "display": "Extended-release insert",
+        "definition": ""
+      },
+      {
+        "code": "420386007",
+        "display": "Drug emulsion",
+        "definition": ""
+      },
+      {
+        "code": "420407000",
+        "display": "Inhalation aerosol solution",
+        "definition": ""
+      },
+      {
+        "code": "420430006",
+        "display": "Lyophilized powder for injectable extended release liposomal suspension",
+        "definition": ""
+      },
+      {
+        "code": "420450005",
+        "display": "Pressurized nebulizer suspension",
+        "definition": ""
+      },
+      {
+        "code": "420460001",
+        "display": "Film",
+        "definition": ""
+      },
+      {
+        "code": "420509004",
+        "display": "Oral granules",
+        "definition": ""
+      },
+      {
+        "code": "420536002",
+        "display": "Vaginal powder",
+        "definition": ""
+      },
+      {
+        "code": "420540006",
+        "display": "Cutaneous oil",
+        "definition": ""
+      },
+      {
+        "code": "420610000",
+        "display": "Nasal aerosol",
+        "definition": ""
+      },
+      {
+        "code": "420627008",
+        "display": "Extended-release tablet",
+        "definition": ""
+      },
+      {
+        "code": "420631002",
+        "display": "Vaginal insert",
+        "definition": ""
+      },
+      {
+        "code": "420634005",
+        "display": "Microspheres for injectable suspension",
+        "definition": ""
+      },
+      {
+        "code": "420636007",
+        "display": "Eye/ear drops",
+        "definition": ""
+      },
+      {
+        "code": "420641004",
+        "display": "Solution for inhalation",
+        "definition": ""
+      },
+      {
+        "code": "420656008",
+        "display": "Lyophilized powder for injectable liposomal suspension",
+        "definition": ""
+      },
+      {
+        "code": "420692007",
+        "display": "Oral capsule",
+        "definition": ""
+      },
+      {
+        "code": "420699003",
+        "display": "Liquid dose form",
+        "definition": ""
+      },
+      {
+        "code": "420705007",
+        "display": "Inhalation aerosol suspension",
+        "definition": ""
+      },
+      {
+        "code": "420736004",
+        "display": "Eye suspension",
+        "definition": ""
+      },
+      {
+        "code": "420757007",
+        "display": "Delayed-release granules",
+        "definition": ""
+      },
+      {
+        "code": "420761001",
+        "display": "Urethral suppository",
+        "definition": ""
+      },
+      {
+        "code": "420767002",
+        "display": "Delayed-release pellets capsule",
+        "definition": ""
+      },
+      {
+        "code": "420768007",
+        "display": "Pellet",
+        "definition": ""
+      },
+      {
+        "code": "420802004",
+        "display": "Extended-release oral liquid",
+        "definition": ""
+      },
+      {
+        "code": "420828001",
+        "display": "Powder for reconstitution for drug product",
+        "definition": ""
+      },
+      {
+        "code": "420847003",
+        "display": "Metered dose aerosol",
+        "definition": ""
+      },
+      {
+        "code": "420873008",
+        "display": "Extended release injectable suspension",
+        "definition": ""
+      },
+      {
+        "code": "420887008",
+        "display": "Intrathecal suspension",
+        "definition": ""
+      },
+      {
+        "code": "420891003",
+        "display": "Ear drops suspension",
+        "definition": ""
+      },
+      {
+        "code": "420901005",
+        "display": "Ear emulsion",
+        "definition": ""
+      },
+      {
+        "code": "420927005",
+        "display": "Metered powder",
+        "definition": ""
+      },
+      {
+        "code": "420929008",
+        "display": "Rectal suppository",
+        "definition": ""
+      },
+      {
+        "code": "420955009",
+        "display": "Powder for solution",
+        "definition": ""
+      },
+      {
+        "code": "420956005",
+        "display": "Ultramicronized tablet",
+        "definition": ""
+      },
+      {
+        "code": "420992009",
+        "display": "Implantable pellet",
+        "definition": ""
+      },
+      {
+        "code": "421026006",
+        "display": "Oral tablet",
+        "definition": ""
+      },
+      {
+        "code": "421027002",
+        "display": "Delayed-release capsule",
+        "definition": ""
+      },
+      {
+        "code": "421034000",
+        "display": "Extended-release suppository",
+        "definition": ""
+      },
+      {
+        "code": "421043009",
+        "display": "Extended-release film",
+        "definition": ""
+      },
+      {
+        "code": "421051007",
+        "display": "Sonicated injectable suspension",
+        "definition": ""
+      },
+      {
+        "code": "421056002",
+        "display": "Emulsion for inhalation",
+        "definition": ""
+      },
+      {
+        "code": "421079001",
+        "display": "Pastille",
+        "definition": ""
+      },
+      {
+        "code": "421080003",
+        "display": "Powder for suspension",
+        "definition": ""
+      },
+      {
+        "code": "421104008",
+        "display": "Aerosol powder",
+        "definition": ""
+      },
+      {
+        "code": "421131006",
+        "display": "Gaseous dose form",
+        "definition": ""
+      },
+      {
+        "code": "421155001",
+        "display": "Extended-release enteric coated tablet",
+        "definition": ""
+      },
+      {
+        "code": "421166008",
+        "display": "Foam",
+        "definition": ""
+      },
+      {
+        "code": "421195004",
+        "display": "Vaginal suppository",
+        "definition": ""
+      },
+      {
+        "code": "421221008",
+        "display": "Suspension for inhalation",
+        "definition": ""
+      },
+      {
+        "code": "421271006",
+        "display": "Extended-release bead implant",
+        "definition": ""
+      },
+      {
+        "code": "421288004",
+        "display": "Sponge",
+        "definition": ""
+      },
+      {
+        "code": "421300005",
+        "display": "Extended-release film coated capsule",
+        "definition": ""
+      },
+      {
+        "code": "421316007",
+        "display": "Powder for eye drops",
+        "definition": ""
+      },
+      {
+        "code": "421338009",
+        "display": "Extended-release coated capsule",
+        "definition": ""
+      },
+      {
+        "code": "421340004",
+        "display": "Powder spray",
+        "definition": ""
+      },
+      {
+        "code": "421343002",
+        "display": "Powder for cutaneous solution",
+        "definition": ""
+      },
+      {
+        "code": "421347001",
+        "display": "Cutaneous aerosol",
+        "definition": ""
+      },
+      {
+        "code": "421366001",
+        "display": "Tablet for oral suspension",
+        "definition": ""
+      },
+      {
+        "code": "421374000",
+        "display": "Delayed-release tablet",
+        "definition": ""
+      },
+      {
+        "code": "421378002",
+        "display": "Solid dose form",
+        "definition": ""
+      },
+      {
+        "code": "421382000",
+        "display": "Ear suspension",
+        "definition": ""
+      },
+      {
+        "code": "421410002",
+        "display": "Intravenous solution",
+        "definition": ""
+      },
+      {
+        "code": "421425002",
+        "display": "Powder for inhalation solution",
+        "definition": ""
+      },
+      {
+        "code": "421427005",
+        "display": "Eye/ear ointment",
+        "definition": ""
+      },
+      {
+        "code": "421428000",
+        "display": "Injectable oil suspension",
+        "definition": ""
+      },
+      {
+        "code": "421446006",
+        "display": "Extended-release granules for suspension",
+        "definition": ""
+      },
+      {
+        "code": "421504000",
+        "display": "Cone",
+        "definition": ""
+      },
+      {
+        "code": "421522002",
+        "display": "Liposomal injectable suspension",
+        "definition": ""
+      },
+      {
+        "code": "421532009",
+        "display": "Insert",
+        "definition": ""
+      },
+      {
+        "code": "421535006",
+        "display": "Delayed-release particles tablet",
+        "definition": ""
+      },
+      {
+        "code": "421575003",
+        "display": "Powder for ear drops",
+        "definition": ""
+      },
+      {
+        "code": "421606006",
+        "display": "Aerosol spray",
+        "definition": ""
+      },
+      {
+        "code": "421607002",
+        "display": "Powder for nasal drops",
+        "definition": ""
+      },
+      {
+        "code": "421618002",
+        "display": "Extended-release capsule",
+        "definition": ""
+      },
+      {
+        "code": "421620004",
+        "display": "Sustained-release buccal tablet",
+        "definition": ""
+      },
+      {
+        "code": "421628006",
+        "display": "Cutaneous cream",
+        "definition": ""
+      },
+      {
+        "code": "421637006",
+        "display": "Lyophilized powder for injectable solution",
+        "definition": ""
+      },
+      {
+        "code": "421669002",
+        "display": "Metered gel",
+        "definition": ""
+      },
+      {
+        "code": "421701006",
+        "display": "Tablet for oral solution",
+        "definition": ""
+      },
+      {
+        "code": "421713001",
+        "display": "Ear solution",
+        "definition": ""
+      },
+      {
+        "code": "421716009",
+        "display": "Transdermal drug delivery system",
+        "definition": ""
+      },
+      {
+        "code": "421720008",
+        "display": "Spray dose form",
+        "definition": ""
+      },
+      {
+        "code": "421721007",
+        "display": "Coated particles tablet",
+        "definition": ""
+      },
+      {
+        "code": "421752008",
+        "display": "Extended-release enteric coated capsule",
+        "definition": ""
+      },
+      {
+        "code": "421759004",
+        "display": "Metered dose aerosol inhaler",
+        "definition": ""
+      },
+      {
+        "code": "421765004",
+        "display": "Intraperitoneal solution",
+        "definition": ""
+      },
+      {
+        "code": "421857007",
+        "display": "Powder for ophthalmic solution",
+        "definition": ""
+      },
+      {
+        "code": "421873001",
+        "display": "Oral cream",
+        "definition": ""
+      },
+      {
+        "code": "421890007",
+        "display": "Oil",
+        "definition": ""
+      },
+      {
+        "code": "421932003",
+        "display": "Multilayer tablet",
+        "definition": ""
+      },
+      {
+        "code": "421937009",
+        "display": "Medicated toothpaste",
+        "definition": ""
+      },
+      {
+        "code": "421943006",
+        "display": "Lyophilized powder for injectable suspension",
+        "definition": ""
+      },
+      {
+        "code": "421949005",
+        "display": "Cutaneous gel",
+        "definition": ""
+      },
+      {
+        "code": "421987002",
+        "display": "Intraocular solution",
+        "definition": ""
+      },
+      {
+        "code": "421999009",
+        "display": "Extended-release coated pellets",
+        "definition": ""
+      },
+      {
+        "code": "422054001",
+        "display": "Metered dose powder inhaler",
+        "definition": ""
+      },
+      {
+        "code": "422059006",
+        "display": "Metered dose inhaler",
+        "definition": ""
+      },
+      {
+        "code": "422060001",
+        "display": "Ophthalmic solution",
+        "definition": ""
+      },
+      {
+        "code": "422068008",
+        "display": "Eye drops suspension",
+        "definition": ""
+      },
+      {
+        "code": "422080000",
+        "display": "Nasal suspension",
+        "definition": ""
+      },
+      {
+        "code": "422085005",
+        "display": "Powder for ophthalmic suspension",
+        "definition": ""
+      },
+      {
+        "code": "422151007",
+        "display": "Breath activated powder inhaler",
+        "definition": ""
+      },
+      {
+        "code": "422186009",
+        "display": "Tincture",
+        "definition": ""
+      },
+      {
+        "code": "422197009",
+        "display": "Breath activated inhaler",
+        "definition": ""
+      },
+      {
+        "code": "422199007",
+        "display": "Dental cone",
+        "definition": ""
+      },
+      {
+        "code": "422201009",
+        "display": "Tablet for cutaneous solution",
+        "definition": ""
+      },
+      {
+        "code": "422202002",
+        "display": "Colloidal suspension for injection",
+        "definition": ""
+      },
+      {
+        "code": "422259002",
+        "display": "Spirit",
+        "definition": ""
+      },
+      {
+        "code": "422264003",
+        "display": "Powder for injectable extended release suspension",
+        "definition": ""
+      },
+      {
+        "code": "422301006",
+        "display": "Modified-release pessary",
+        "definition": ""
+      },
+      {
+        "code": "422336005",
+        "display": "Nasal solution",
+        "definition": ""
+      },
+      {
+        "code": "422353003",
+        "display": "Extended-release oral suspension",
+        "definition": ""
+      },
+      {
+        "code": "424179000",
+        "display": "Aerosol generator",
+        "definition": ""
+      },
+      {
+        "code": "424552006",
+        "display": "Vaginal sponge",
+        "definition": ""
+      },
+      {
+        "code": "425753008",
+        "display": "Cutaneous ointment",
+        "definition": ""
+      },
+      {
+        "code": "425965000",
+        "display": "Rectal spray",
+        "definition": ""
+      },
+      {
+        "code": "426210003",
+        "display": "Gum",
+        "definition": ""
+      },
+      {
+        "code": "426684005",
+        "display": "Drops dose form",
+        "definition": ""
+      },
+      {
+        "code": "426823003",
+        "display": "Vaginal spray",
+        "definition": ""
+      },
+      {
+        "code": "426969004",
+        "display": "Metered spray",
+        "definition": ""
+      },
+      {
+        "code": "427129005",
+        "display": "Coated capsule",
+        "definition": ""
+      },
+      {
+        "code": "427564005",
+        "display": "Pressurized spray",
+        "definition": ""
+      },
+      {
+        "code": "427609008",
+        "display": "Modified release drops dose form",
+        "definition": ""
+      },
+      {
+        "code": "429885007",
+        "display": "Bar dose form",
+        "definition": ""
+      },
+      {
+        "code": "443424002",
+        "display": "Buccal film",
+        "definition": ""
+      },
+      {
+        "code": "447050008",
+        "display": "Orodispersible film",
+        "definition": ""
+      },
+      {
+        "code": "447079001",
+        "display": "Orodispersible tablet",
+        "definition": ""
+      }
+    ]
+  }
+}

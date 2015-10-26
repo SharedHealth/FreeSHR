@@ -48,18 +48,21 @@ public class TRConceptValidator implements IValidationSupport {
     @Override
     @Cacheable(value = "shrProfileCache", unless = "#result == null")
     public <T extends IBaseResource> T fetchResource(FhirContext theContext, Class<T> theClass, String theUri) {
-        ValueSet valueSet = null;
+        IBaseResource baseResource = null;
         if (map.containsKey(theUri)) {
             String theSystem = map.get(theUri);
-            valueSet = new ValueSet();
+            ValueSet valueSet = new ValueSet();
             valueSet.setUrl(theUri);
             valueSet.setStatus(Enumerations.ConformanceResourceStatus.DRAFT);
             ValueSet.ValueSetComposeComponent valueSetComposeComponent = new ValueSet.ValueSetComposeComponent();
             valueSetComposeComponent.addInclude().setSystem(theSystem);
             valueSet.setCompose(valueSetComposeComponent);
+            baseResource = valueSet;
         }
-        return (T) valueSet;
+        return (T) baseResource;
     }
+
+
 
     @Override
     public boolean isCodeSystemSupported(String theSystem) {

@@ -2,6 +2,7 @@ package org.freeshr.validations.resource;
 
 
 import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
+import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.TRConceptValidator;
 import org.hl7.fhir.instance.model.Quantity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,11 @@ public class DoseQuantityValidator {
     }
 
     public ca.uhn.fhir.validation.IValidationSupport.CodeValidationResult validate(QuantityDt doseQuantity) {
-        return conceptValidator.validateCode(doseQuantity.getSystem(), doseQuantity.getCode(), DOSE_QUANTITY);
+        if (StringUtils.isNotBlank(doseQuantity.getSystem())) {
+            if (conceptValidator.isCodeSystemSupported(doseQuantity.getSystem())) {
+                return conceptValidator.validateCode(doseQuantity.getSystem(), doseQuantity.getCode(), doseQuantity.getUnit());
+            }
+        }
+        return null;
     }
 }

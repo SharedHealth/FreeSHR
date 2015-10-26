@@ -13,7 +13,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
-import rx.Observable;
 
 import java.util.List;
 
@@ -26,12 +25,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class MedicationPrescriptionValidatorTest {
+public class MedicationOrderValidatorTest {
 
     private DoseQuantityValidator quantityValidator;
 
 
-    private MedicationPrescriptionValidator medicationOrderValidator;
+    private MedicationOrderValidator medicationOrderValidator;
 
     @Mock
     TRConceptValidator trConceptValidator;
@@ -49,7 +48,7 @@ public class MedicationPrescriptionValidatorTest {
     public void setup() throws Exception {
         initMocks(this);
         quantityValidator = new DoseQuantityValidator(trConceptValidator);
-        medicationOrderValidator = new MedicationPrescriptionValidator(medicationValidator, quantityValidator, urlValidator);
+        medicationOrderValidator = new MedicationOrderValidator(trConceptValidator, quantityValidator, urlValidator);
 
     }
 

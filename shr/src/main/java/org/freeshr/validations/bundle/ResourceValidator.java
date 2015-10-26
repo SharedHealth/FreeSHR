@@ -6,7 +6,7 @@ import org.freeshr.validations.ValidationSubject;
 import org.freeshr.validations.Validator;
 import org.freeshr.validations.resource.ConditionValidator;
 import org.freeshr.validations.resource.ImmunizationValidator;
-import org.freeshr.validations.resource.MedicationPrescriptionValidator;
+import org.freeshr.validations.resource.MedicationOrderValidator;
 import org.freeshr.validations.resource.ProcedureValidator;
 import org.hl7.fhir.instance.model.Bundle;
 import org.hl7.fhir.instance.model.ResourceType;
@@ -29,7 +29,7 @@ public class ResourceValidator implements Validator<Bundle> {
 
     @Autowired
     public ResourceValidator(ConditionValidator conditionValidator,
-                             MedicationPrescriptionValidator medicationPrescriptionValidator,
+                             MedicationOrderValidator medicationOrderValidator,
                              ImmunizationValidator immunizationValidator,
                              ProcedureValidator procedureValidator) {
         assignDefaultValidatorToAllResourceTypes();
