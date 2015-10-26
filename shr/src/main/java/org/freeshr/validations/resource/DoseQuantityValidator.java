@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Component
 public class DoseQuantityValidator {
@@ -28,8 +29,8 @@ public class DoseQuantityValidator {
         return conceptValidator.validateCode(doseQuantity.getSystem(), doseQuantity.getCode(), DOSE_QUANTITY);
     }
 
-    public boolean isReferenceUrlNotFound(QuantityDt doseQuantity) {
-        return doseQuantity == null || isEmpty(doseQuantity.getSystem());
+    public boolean hasReferenceUrlAndCode(QuantityDt doseQuantity) {
+        return doseQuantity != null && isNotEmpty(doseQuantity.getSystem()) && isNotEmpty(doseQuantity.getCode());
     }
 
     public ca.uhn.fhir.validation.IValidationSupport.CodeValidationResult validate(QuantityDt doseQuantity) {

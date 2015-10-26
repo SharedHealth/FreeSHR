@@ -5,6 +5,8 @@ import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.composite.CodingDt;
 import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
+import ca.uhn.fhir.model.dstu2.composite.SimpleQuantityDt;
+import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.validation.IValidationSupport;
 import org.freeshr.application.fhir.TRConceptValidator;
 import org.freeshr.validations.Severity;
@@ -21,7 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import static org.freeshr.validations.ValidationMessages.*;
+import static org.freeshr.validations.ValidationMessages.UNSPECIFIED_MEDICATION;
 
 @Component
 public class MedicationOrderValidator implements SubResourceValidator {
@@ -29,17 +31,17 @@ public class MedicationOrderValidator implements SubResourceValidator {
     private static final Logger logger = LoggerFactory.getLogger(MedicationOrderValidator.class);
     public static final String MEDICATION_ORDER_MEDICATION_LOCATION = "f:MedicationOrder/f:medication";
     public static final String MEDICATION_DOSE_INSTRUCTION_LOCATION = "f:MedicationOrder/f:dosageInstruction/f:dose";
-    private String MEDICATION_ORDER_DISPENSE_MEDICATION_LOCATION = "f:MedicationOrder/f:dispenseRequest/f:medication";
+    private static final String MEDICATION_ORDER_DISPENSE_MEDICATION_LOCATION = "f:MedicationOrder/f:dispenseRequest/f:medication";
+    private static final String MEDICATION_ORDER_DISPENSE_QUANTITY_LOCATION = "f:MedicationOrder/f:dispenseRequest/f:quantity";
+
     private TRConceptValidator trConceptValidator;
     private DoseQuantityValidator doseQuantityValidator;
-    private UrlValidator urlValidator;
 
     @Autowired
     public MedicationOrderValidator(TRConceptValidator trConceptValidator,
                                     DoseQuantityValidator doseQuantityValidator, UrlValidator urlValidator) {
         this.trConceptValidator = trConceptValidator;
         this.doseQuantityValidator = doseQuantityValidator;
-        this.urlValidator = urlValidator;
     }
 
     @Override
@@ -53,17 +55,17 @@ public class MedicationOrderValidator implements SubResourceValidator {
         List<ShrValidationMessage> validationMessages = new ArrayList<>();
 
         validationMessages.addAll(validateMedication(medicationOrder));
-        if (validationMessages.size() > 0) return validationMessages;
 
-        validationMessages.addAll(validateDosageQuantity(medicationOrder));
-        if (validationMessages.size() > 0) return validationMessages;
+        validationMessages.addAll(validateDosageInstructionDosageQuantity(medicationOrder));
 
         validationMessages.addAll(validateDispenseMedication(medicationOrder));
+
+        validationMessages.addAll(validateDispenseQuantity(medicationOrder));
         return validationMessages;
     }
 
     private Collection<? extends ShrValidationMessage> validateDispenseMedication(ca.uhn.fhir.model.dstu2.resource.MedicationOrder medicationOrder) {
-        if(medicationOrder.getDispenseRequest() != null) {
+        if (medicationOrder.getDispenseRequest() != null) {
             IDatatype medicine = medicationOrder.getDispenseRequest().getMedication();
             if (medicine == null || !(medicine instanceof CodeableConceptDt)) {
                 return new ArrayList<>();
@@ -76,7 +78,15 @@ public class MedicationOrderValidator implements SubResourceValidator {
         return new ArrayList<>();
     }
 
-    private Collection<? extends ShrValidationMessage> validateDosageQuantity(ca.uhn.fhir.model.dstu2.resource.MedicationOrder medicationOrder) {
+    private Collection<? extends ShrValidationMessage> validateDispenseQuantity(MedicationOrder medicationOrder) {
+        SimpleQuantityDt dispenseQuantity = medicationOrder.getDispenseRequest().getQuantity();
+        if (dispenseQuantity != null) {
+            return validateQuantity(dispenseQuantity, MEDICATION_ORDER_DISPENSE_QUANTITY_LOCATION);
+        }
+        return null;
+    }
+
+    private Collection<? extends ShrValidationMessage> validateDosageInstructionDosageQuantity(ca.uhn.fhir.model.dstu2.resource.MedicationOrder medicationOrder) {
         List<ca.uhn.fhir.model.dstu2.resource.MedicationOrder.DosageInstruction> instructions = medicationOrder.getDosageInstruction();
 
 
@@ -84,20 +94,20 @@ public class MedicationOrderValidator implements SubResourceValidator {
             IDatatype dose = instruction.getDose();
 
             if (dose instanceof QuantityDt) {
-                QuantityDt doseQuantity = (QuantityDt) dose;
-                if (doseQuantityValidator.isReferenceUrlNotFound(doseQuantity)) return new ArrayList<>();
+                return validateQuantity((QuantityDt) dose, MEDICATION_DOSE_INSTRUCTION_LOCATION);
+            }
+        }
+        return new ArrayList<>();
+    }
 
-                if (!urlValidator.isValid(doseQuantity.getSystem())) {
-                    logger.debug(String.format("Medication-Prescription:Encounter failed for %s", INVALID_DOSAGE_QUANTITY_REFERENCE));
-                    return Arrays.asList(
-                            new ShrValidationMessage(Severity.ERROR, MEDICATION_DOSE_INSTRUCTION_LOCATION, "invalid", INVALID_DOSAGE_QUANTITY_REFERENCE));
-                }
-                IValidationSupport.CodeValidationResult codeValidationResult = doseQuantityValidator.validate(doseQuantity);
-                if (!codeValidationResult.isOk()) {
-                    logger.debug(String.format("Medication-Prescription:Encounter failed for %s", codeValidationResult.getMessage()));
-                    return Arrays.asList(
-                            new ShrValidationMessage(Severity.ERROR, MEDICATION_DOSE_INSTRUCTION_LOCATION, "invalid", codeValidationResult.getMessage()));
-                }
+    private List<ShrValidationMessage> validateQuantity(QuantityDt quantity, String location) {
+        if (doseQuantityValidator.hasReferenceUrlAndCode(quantity)) {
+
+            IValidationSupport.CodeValidationResult codeValidationResult = doseQuantityValidator.validate(quantity);
+            if (!codeValidationResult.isOk()) {
+                logger.debug(String.format("Medication-Prescription:Encounter failed for %s", codeValidationResult.getMessage()));
+                return Arrays.asList(
+                        new ShrValidationMessage(Severity.ERROR, location, "invalid", codeValidationResult.getMessage()));
             }
         }
         return new ArrayList<>();

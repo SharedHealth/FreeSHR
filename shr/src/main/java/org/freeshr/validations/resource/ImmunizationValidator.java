@@ -47,7 +47,7 @@ public class ImmunizationValidator implements SubResourceValidator {
             return validationMessages;
         }
 
-        if (doseQuantityValidator.isReferenceUrlNotFound(doseQuantity) || !urlValidator.isValid(doseQuantity.getSystem()))
+        if (!doseQuantityValidator.hasReferenceUrlAndCode(doseQuantity) || !urlValidator.isValid(doseQuantity.getSystem()))
             return validationMessages;
 
         if (doseQuantityValidator.validate(doseQuantity) == null) {
