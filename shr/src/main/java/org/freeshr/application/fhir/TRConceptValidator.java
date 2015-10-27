@@ -2,6 +2,7 @@ package org.freeshr.application.fhir;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.validation.IValidationSupport;
+import org.freeshr.config.SHRProperties;
 import org.freeshr.infrastructure.tr.TerminologyServer;
 import org.hl7.fhir.instance.model.Enumerations;
 import org.hl7.fhir.instance.model.OperationOutcome;
@@ -21,18 +22,20 @@ import java.util.HashMap;
 public class TRConceptValidator implements IValidationSupport {
 
     private final TerminologyServer terminologyServer;
+    private SHRProperties shrProperties;
     private final static Logger logger = LoggerFactory.getLogger(TRConceptValidator.class);
     private final HashMap<String, String> map;
 
     @Autowired
-    public TRConceptValidator(TerminologyServer terminologyServer) {
+    public TRConceptValidator(TerminologyServer terminologyServer, SHRProperties shrProperties) {
         this.terminologyServer = terminologyServer;
+        this.shrProperties = shrProperties;
         map = new HashMap<>();
         loadValueSetUrls();
     }
 
     private void loadValueSetUrls() {
-        map.put("http://hl7.org/fhir/ValueSet/v3-FamilyMember", "http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/vs/Relationship-Type");
+        map.put("http://hl7.org/fhir/ValueSet/v3-FamilyMember", shrProperties.getTRLocationPath() + "/openmrs/ws/rest/v1/tr/vs/Relationship-Type");
     }
 
     @Override
