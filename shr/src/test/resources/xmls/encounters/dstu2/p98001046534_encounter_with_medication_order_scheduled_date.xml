@@ -41,6 +41,12 @@
                 </section>
                 <section>
                     <entry>
+                        <reference value="urn:uuid:3461943b-7ad6-4b41-9730-70b83c332f43"/>
+                        <display value="Medication Order"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
                         <reference value="urn:uuid:e461943b-7ad6-4b41-9730-70b8fc452f45"/>
                         <display value="Medication Order"/>
                     </entry>
@@ -77,10 +83,69 @@
         </resource>
     </entry>
     <entry>
+        <fullUrl value="urn:uuid:3461943b-7ad6-4b41-9730-70b83c332f43"/>
+        <resource>
+            <MedicationOrder xmlns="http://hl7.org/fhir">
+                <id value="3461943b-7ad6-4b41-9730-70b83c332f43"/>
+                <identifier>
+                    <value value="urn:uuid:3461943b-7ad6-4b41-9730-70b83c332f43"/>
+                </identifier>
+                <dateWritten value="2015-09-22T17:09:54.000+05:30"/>
+                <status value="active"/>
+                <patient>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </patient>
+                <prescriber>
+                    <reference value="http://localhost:9997/providers/19.json"/>
+                </prescriber>
+                <encounter>
+                    <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+                </encounter>
+                <medicationCodeableConcept>
+                    <coding>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/23d7e743-75bd-4a25-8f34-bd849bd50394"/>
+                        <code value="23d7e743-75bd-4a25-8f34-bd849bd50394"/>
+                        <display value="Paracetamol"/>
+                    </coding>
+                </medicationCodeableConcept>
+                <dosageInstruction>
+                    <timing>
+                        <repeat>
+                            <boundsQuantity>
+                                <value value="3"/>
+                                <system value="http://unitsofmeasure.org"/>
+                                <code value="d"/>
+                            </boundsQuantity>
+                            <frequency value="2"/>
+                            <period value="7"/>
+                            <periodUnits value="h"/>
+                        </repeat>
+                    </timing>
+                    <asNeededBoolean value="false"/>
+                    <doseQuantity>
+                        <value value="1"/>
+                        <unit value="mg"/>
+                    </doseQuantity>
+                </dosageInstruction>
+                <dispenseRequest>
+                    <quantity>
+                        <value value="192.0"/>
+                        <unit value="mg"/>
+                    </quantity>
+                </dispenseRequest>
+            </MedicationOrder>
+        </resource>
+    </entry>
+    <entry>
         <fullUrl value="urn:uuid:e461943b-7ad6-4b41-9730-70b8fc452f45"/>
         <resource>
             <MedicationOrder xmlns="http://hl7.org/fhir">
                 <id value="e461943b-7ad6-4b41-9730-70b8fc452f45"/>
+                <extension
+                        url="https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#MedicationOrderAction">
+                    <valueString value="NEW"/>
+                </extension>
                 <identifier>
                     <value value="urn:uuid:e461943b-7ad6-4b41-9730-70b8fc452f45"/>
                 </identifier>
@@ -121,7 +186,7 @@
                     </timing>
                     <asNeededBoolean value="false"/>
                     <doseQuantity>
-                        <value value="10"/>
+                        <value value="1"/>
                         <unit value="Pill"/>
                     </doseQuantity>
                 </dosageInstruction>

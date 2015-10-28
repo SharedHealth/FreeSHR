@@ -92,7 +92,7 @@
                 <relationship>
                     <coding>
                         <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Relationship-Type"/>
-                        <code value="FT"/>
+                        <code value="INVALID"/>
                         <display value="father"/>
                     </coding>
                 </relationship>

@@ -273,13 +273,19 @@ public class EncounterValidatorIntegrationTest {
                 FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_localRefs_invalidCondition.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
+        assertEquals(6, response.getErrors().size());
         assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:Condition/f:code/f:coding/f:system",
+                "@value cannot be empty", false, response);
+        assertFailureInResponse("/f:Bundle/f:entry[3]/f:resource/f:Condition/f:code/f:coding/f:system",
                 "@value cannot be empty", false, response);
         assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:Condition/f:category",
                 "None of the codes are in the example value set http://hl7.org/fhir/ValueSet/condition-category", true, response);
+        assertFailureInResponse("/f:Bundle/f:entry[3]/f:resource/f:Condition/f:category",
+                "None of the codes are in the example value set http://hl7.org/fhir/ValueSet/condition-category", true, response);
         assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:Condition/f:clinicalStatus",
                 "Coded value wrong is not in value set http://hl7.org/fhir/ValueSet/condition-clinical", true, response);
-        assertEquals(3, response.getErrors().size());
+        assertFailureInResponse("/f:Bundle/f:entry[3]/f:resource/f:Condition/f:clinicalStatus",
+                "Coded value wrong is not in value set http://hl7.org/fhir/ValueSet/condition-clinical", true, response);
     }
 
     @Test
@@ -325,7 +331,7 @@ public class EncounterValidatorIntegrationTest {
         assertFalse(response.isSuccessful());
         assertEquals(1, response.getErrors().size());
         assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:FamilyMemberHistory/f:relationship",
-                "Unable to validate code \"FT\" in code system \"http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Relationship-Type\"", true, response);
+                "Unable to validate code \"INVALID\" in code system \"http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Relationship-Type\"", true, response);
     }
 
     @Test
@@ -343,7 +349,6 @@ public class EncounterValidatorIntegrationTest {
                 FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_custom_dosage.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
-        debugEncounterValidationResponse(response);
         assertTrue(response.isSuccessful());
     }
 

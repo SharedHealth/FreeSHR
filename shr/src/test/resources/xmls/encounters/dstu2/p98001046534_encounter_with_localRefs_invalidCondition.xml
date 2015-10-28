@@ -41,6 +41,12 @@
                 </section>
                 <section>
                     <entry>
+                        <reference value="urn:uuid:04e9f319-980c-4ff1-9942-bcb5e2b5243b"/>
+                        <display value="Diagnosis"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
                         <reference value="urn:uuid:04e9f317-680c-4ff1-9942-bcb5e2b5243b"/>
                         <display value="Diagnosis"/>
                     </entry>
@@ -74,6 +80,44 @@
                     <reference value="http://localhost:9997/facilities/10019841.json"/>
                 </serviceProvider>
             </Encounter>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:04e9f319-980c-4ff1-9942-bcb5e2b5243b"/>
+        <resource>
+            <Condition xmlns="http://hl7.org/fhir">
+                <id value="04e9f319-980c-4ff1-9942-bcb5e2b5243b"/>
+                <identifier>
+                    <value value="urn:uuid:04e9f319-980c-4ff1-9942-bcb5e2b5243b"/>
+                </identifier>
+                <patient>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </patient>
+                <encounter>
+                    <reference value="urn:uuid:dd4d51ac-d4b6-42e4-8b50-fa88af41a3e3"/>
+                </encounter>
+                <asserter>
+                    <reference value="http://localhost:9997/providers/19.json"/>
+                </asserter>
+                <dateRecorded value="2015-09-04"/>
+                <code>
+                    <coding>
+                        <system value=""/>
+                        <code value="A90"/>
+                        <display value="Dengue Fever"/>
+                    </coding>
+                </code>
+                <category>
+                    <coding>
+                        <system value="http://hl7.org/fhir/condition-category"/>
+                        <code value="invalid"/>
+                        <display value="invalid-category"/>
+                    </coding>
+                </category>
+                <clinicalStatus value="wrong"/>
+                <verificationStatus value="provisional"/>
+            </Condition>
         </resource>
     </entry>
     <entry>

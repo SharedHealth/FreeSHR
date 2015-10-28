@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class FhirResourceValidator {
@@ -27,8 +29,8 @@ public class FhirResourceValidator {
     private TRConceptValidator trConceptValidator;
     private volatile FhirValidator fhirValidator;
     private ShrProfileValidationSupport shrProfileValidationSupport;
-    private List<String> resourceFieldErrors = new ArrayList<>();
-    private Map<String, String> extensionFieldErrors = new HashMap<>();
+    private List<Pattern> resourceFieldErrors = new ArrayList<>();
+    private Map<Pattern, String> extensionFieldErrors = new HashMap<>();
 
     @Autowired
     public FhirResourceValidator(FhirFeedUtil fhirUtil, TRConceptValidator trConceptValidator, ShrProfileValidationSupport shrProfileValidationSupport) {
@@ -39,12 +41,13 @@ public class FhirResourceValidator {
     }
 
     private void initFieldErrorChecks() {
-        this.resourceFieldErrors.add("/f:Bundle/f:entry/f:resource/f:Condition/f:category");
-        this.resourceFieldErrors.add("/f:Bundle/f:entry/f:resource/f:Condition/f:code/f:coding");
-        this.resourceFieldErrors.add("/f:Bundle/f:entry/f:resource/f:Condition/f:clinicalStatus");
+        this.resourceFieldErrors.add(Pattern.compile("/f:Bundle/f:entry(\\[\\d+\\])*/f:resource/f:Condition/f:category"));
+        this.resourceFieldErrors.add(Pattern.compile("/f:Bundle/f:entry(\\[\\d+\\])*/f:resource/f:Condition/f:code/f:coding"));
+        this.resourceFieldErrors.add(Pattern.compile("/f:Bundle/f:entry(\\[\\d+\\])*/f:resource/f:Condition/f:clinicalStatus"));
 
-        this.extensionFieldErrors.put("/f:Bundle/f:entry/f:resource/f:MedicationOrder/f:dosageInstruction/f:timing/f:extension", "https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#TimingScheduledDate");
-        this.extensionFieldErrors.put("/f:Bundle/f:entry/f:resource/f:MedicationOrder/f:dosageInstruction/f:extension", "https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#DosageInstructionCustomDosage");
+        this.extensionFieldErrors.put(Pattern.compile("/f:Bundle/f:entry(\\[\\d+\\])*/f:resource/f:MedicationOrder/f:dosageInstruction(\\[\\d+\\])*/f:timing/f:extension(\\[\\d+\\])*"), "https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#TimingScheduledDate");
+        this.extensionFieldErrors.put(Pattern.compile("/f:Bundle/f:entry(\\[\\d+\\])*/f:resource/f:MedicationOrder/f:dosageInstruction(\\[\\d+\\])*/f:extension(\\[\\d+\\])*"), "https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#DosageInstructionCustomDosage");
+        this.extensionFieldErrors.put(Pattern.compile("/f:Bundle/f:entry(\\[\\d+\\])*/f:resource/f:MedicationOrder/f:extension(\\[\\d+\\])*"), "https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#MedicationOrderAction");
     }
 
     public FhirValidationResult validate(Bundle bundle) {
@@ -62,8 +65,8 @@ public class FhirResourceValidator {
 
     private void checkForExtensionErrors(FhirValidationResult validationResult) {
         for (SingleValidationMessage validationMessage : validationResult.getMessages()) {
-            if (extensionFieldErrors.containsKey(validationMessage.getLocationString())
-                    && validationMessage.getMessage().contains(extensionFieldErrors.get(validationMessage.getLocationString()))) {
+            String extensionUrlForLocation = getExtensionForLocationError(validationMessage.getLocationString());
+            if (extensionUrlForLocation != null && validationMessage.getMessage().contains(extensionUrlForLocation)) {
                 if (validationMessage.getSeverity().ordinal() >= ResultSeverityEnum.ERROR.ordinal()) {
                     validationMessage.setSeverity(ResultSeverityEnum.WARNING);
                 }
@@ -73,12 +76,28 @@ public class FhirResourceValidator {
 
     private void checkForConditionErrors(FhirValidationResult validationResult) {
         for (SingleValidationMessage validationMessage : validationResult.getMessages()) {
-            if (resourceFieldErrors.contains(validationMessage.getLocationString())) {
+            if (isPossibleResourceFieldError(validationMessage.getLocationString())) {
                 if (validationMessage.getSeverity().ordinal() <= ResultSeverityEnum.WARNING.ordinal()) {
                     validationMessage.setSeverity(ResultSeverityEnum.ERROR);
                 }
             }
         }
+    }
+
+    private String getExtensionForLocationError(String locationString) {
+        for (Pattern extensionFieldErrorLocationPattern : extensionFieldErrors.keySet()) {
+            Matcher matcher = extensionFieldErrorLocationPattern.matcher(locationString);
+            if (matcher.matches()) return extensionFieldErrors.get(extensionFieldErrorLocationPattern);
+        }
+        return null;
+    }
+
+    private boolean isPossibleResourceFieldError(String locationString) {
+        for (Pattern resourceFieldErrorPattern : resourceFieldErrors) {
+            Matcher matcher = resourceFieldErrorPattern.matcher(locationString);
+            if (matcher.matches()) return true;
+        }
+        return false;
     }
 
     /**
@@ -98,9 +117,10 @@ public class FhirResourceValidator {
     }
 
     private static String getTerminologySystem(String message) {
-        if (message.contains("Unable to validate code")) {
-            String substring = message.substring(message.indexOf("in code system"));
-            return StringUtils.remove(StringUtils.removeStart(substring, "in code system"), "\"");
+        Pattern pattern = Pattern.compile("Unable to validate code \"(.*)\" in code system \"(?<TRSERVERURL>.*)\"");
+        Matcher matcher = pattern.matcher(message);
+        if(matcher.matches()) {
+            return matcher.group("TRSERVERURL");
         }
         return "";
     }

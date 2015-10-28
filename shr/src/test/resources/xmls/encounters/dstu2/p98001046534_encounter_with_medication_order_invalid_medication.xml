@@ -81,6 +81,10 @@
         <resource>
             <MedicationOrder xmlns="http://hl7.org/fhir">
                 <id value="e461943b-7ad6-4b41-9730-70b8fc452f45"/>
+                <extension
+                        url="https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#MedicationOrderAction">
+                    <valueString value="NEW"/>
+                </extension>
                 <identifier>
                     <value value="urn:uuid:e461943b-7ad6-4b41-9730-70b8fc452f45"/>
                 </identifier>
