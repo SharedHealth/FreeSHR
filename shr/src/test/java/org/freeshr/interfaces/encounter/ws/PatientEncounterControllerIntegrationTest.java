@@ -8,10 +8,12 @@ import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.events.EncounterEvent;
 import org.freeshr.interfaces.encounter.ws.exceptions.PreconditionFailed;
+import org.freeshr.interfaces.encounter.ws.exceptions.Redirect;
 import org.freeshr.interfaces.encounter.ws.exceptions.UnProcessableEntity;
 import org.freeshr.utils.Confidentiality;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -331,6 +333,39 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .accept(MediaType.APPLICATION_ATOM_XML))
                 .andExpect(status().isOk())
                 .andExpect(request().asyncResult(hasEncounterEventsOfSize(0)));
+    }
+
+    @Test
+    public void shouldRedirectResponseIfEncountersOfAMergedPatientAreRequested() throws Exception {
+        Patient patient = new Patient();
+        String healthId = generateHealthId();
+        patient.setHealthId(healthId);
+        patient.setMergedWith("Some health Id");
+        createPatient(patient);
+
+        mockMvc.perform(MockMvcRequestBuilders.get(
+                String.format("/patients/%s/encounters", healthId))
+                .header(AUTH_TOKEN_KEY, validAccessToken)
+                .header(FROM_KEY, validEmail)
+                .header(CLIENT_ID_KEY, validClientId)
+                .accept(MediaType.APPLICATION_ATOM_XML))
+                .andExpect(request().asyncResult(new InstanceOf(Redirect.class)))
+                .andExpect(request().asyncResult(hasContent(String.format("%s has been moved and replaced with %s", healthId, "Some health Id"))));
+
+    }
+
+    private Matcher<String> hasContent(final String content) {
+        return new BaseMatcher<String>() {
+            @Override
+            public boolean matches(Object item) {
+                return ((Redirect)item).getMessage().equals(content);
+            }
+
+            @Override
+            public void describeTo(Description description) {
+
+            }
+        };
     }
 
     private BaseMatcher<EncounterSearchResponse> assertConfidentiality(final Confidentiality encounterConfidentiality, final

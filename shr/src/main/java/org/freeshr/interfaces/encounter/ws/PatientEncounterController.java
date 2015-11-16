@@ -4,11 +4,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.domain.service.PatientEncounterService;
+import org.freeshr.domain.service.PatientService;
 import org.freeshr.events.EncounterEvent;
 import org.freeshr.infrastructure.security.AccessFilter;
 import org.freeshr.infrastructure.security.ConfidentialEncounterHandler;
 import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
+import org.freeshr.interfaces.encounter.ws.exceptions.Redirect;
 import org.freeshr.interfaces.encounter.ws.exceptions.ResourceNotFound;
 import org.freeshr.utils.DateUtil;
 import org.freeshr.utils.UrlUtil;
@@ -37,13 +39,15 @@ public class PatientEncounterController extends ShrController {
     private static final Logger logger = LoggerFactory.getLogger(PatientEncounterController.class);
 
     private PatientEncounterService patientEncounterService;
+    private PatientService patientService;
 
     private AccessFilter accessFilter;
     private ConfidentialEncounterHandler confidentialEncounterHandler;
 
     @Autowired
-    public PatientEncounterController(PatientEncounterService patientEncounterService, ConfidentialEncounterHandler confidentialEncounterHandler) {
+    public PatientEncounterController(PatientEncounterService patientEncounterService, PatientService patientService, ConfidentialEncounterHandler confidentialEncounterHandler) {
         this.patientEncounterService = patientEncounterService;
+        this.patientService = patientService;
         this.accessFilter = new AccessFilter();
         this.confidentialEncounterHandler = confidentialEncounterHandler;
     }
@@ -114,6 +118,13 @@ public class PatientEncounterController extends ShrController {
                 deferredResult.setErrorResult(new Forbidden(String.format("Access is denied to user %s for patient %s", userInfo.getProperties().getId(), healthId)));
                 return deferredResult;
             }
+
+            String mergedWith = patientService.getPatientMergedWith(healthId);
+            if (mergedWith != null) {
+                deferredResult.setErrorResult(new Redirect(String.format("%s has been moved and replaced with %s",healthId, mergedWith)));
+                return deferredResult;
+            }
+
             final Date requestedDate = getRequestedDate(updatedSince);
             Observable<List<EncounterEvent>> encounterEventsForPatient =
                     patientEncounterService.findEncounterFeedForPatient(healthId, requestedDate, 200);

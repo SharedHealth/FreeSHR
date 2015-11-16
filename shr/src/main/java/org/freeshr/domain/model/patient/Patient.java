@@ -81,6 +81,10 @@ public class Patient {
         this.active = active;
     }
 
+    public Boolean isMerged() {
+        return !isActive() && getMergedWith()!=null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

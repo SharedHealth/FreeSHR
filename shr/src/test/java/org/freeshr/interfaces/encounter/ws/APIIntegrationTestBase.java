@@ -10,6 +10,7 @@ import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
 import org.freeshr.infrastructure.persistence.FacilityRepository;
+import org.freeshr.infrastructure.persistence.PatientRepository;
 import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
 import org.freeshr.launch.WebMvcConfig;
 import org.freeshr.utils.Confidentiality;
@@ -54,6 +55,9 @@ public abstract class APIIntegrationTestBase {
     private FacilityRepository facilityRepository;
 
     @Autowired
+    private PatientRepository patientRepository;
+
+    @Autowired
     private Filter springSecurityFilterChain;
 
 
@@ -83,6 +87,10 @@ public abstract class APIIntegrationTestBase {
     protected void createEncounter(EncounterBundle encounter, Patient patient) throws ExecutionException,
             InterruptedException {
         encounterRepository.save(encounter, patient).toBlocking().first();
+    }
+
+    protected void createPatient(Patient patient){
+        patientRepository.save(patient).toBlocking().first();
     }
 
     protected void createFacility(Facility facility) {

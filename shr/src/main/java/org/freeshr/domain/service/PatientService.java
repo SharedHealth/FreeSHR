@@ -41,6 +41,12 @@ public class PatientService {
         });
     }
 
+    public String getPatientMergedWith(String healthId){
+        Observable<Patient> patientObservable = patientRepository.find(healthId);
+        Patient patient = patientObservable.toBlocking().first();
+        return patient != null && patient.isMerged() ? patient.getMergedWith() : null;
+    }
+
     private Observable<Patient> findRemote(final String healthId, UserInfo userInfo) {
         Observable<Patient> remotePatient = mciClient.getPatient(healthId, userInfo);
         savePatient(remotePatient);

@@ -15,8 +15,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -91,6 +90,28 @@ public class PatientServiceTest {
         when(mciClient.getPatient(healthId, userInfo)).thenReturn(Observable.<Patient>just(null));
 
         assertTrue(null == patientService.ensurePresent(healthId, userInfo).toBlocking().first());
+    }
+
+    @Test
+    public void shouldNotConsiderActivePatientAsMerged() throws Exception {
+        Patient patient = new Patient();
+        patient.setActive(true);
+        Observable<Patient> patientObservable = Observable.from(asList(patient));
+        when(patientRepository.find("active patient")).thenReturn(patientObservable);
+
+        assertNull(patientService.getPatientMergedWith("active patient"));
+    }
+
+    @Test
+    public void shouldCheckIfPatientIsMerged() throws Exception {
+        Patient patient = new Patient();
+        patient.setActive(false);
+        patient.setMergedWith("Some other patient");
+        Observable<Patient> patientObservable = Observable.from(asList(patient));
+        when(patientRepository.find("merged patient")).thenReturn(patientObservable);
+
+        assertEquals("Some other patient",patientService.getPatientMergedWith("merged patient"));
+
     }
 
     private UserInfo getUserInfo(String clientId, String email, String securityToken) {
