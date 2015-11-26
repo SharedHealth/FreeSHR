@@ -224,6 +224,54 @@ public class PatientEncounterServiceTest {
 
     }
 
+    @Test
+    public void shouldNotCreateEncounterForAnInactivePatient() throws Exception {
+        String facilityId = "10000069";
+        String healthId = "10001";
+        UserInfo userInfo = getUserInfoFacility(facilityId);
+        Patient inactivePatient = new Patient();
+        inactivePatient.setHealthId(healthId);
+        inactivePatient.setMergedWith("some other patient");
+        inactivePatient.setActive(false);
+
+
+        EncounterBundle bundle = createEncounterBundle(healthId, "encounterId");
+
+        EncounterValidationResponse encounterValidationResponse = new EncounterValidationResponse();
+        encounterValidationResponse.setBundle(new FhirFeedUtil().parseBundle(bundle.getContent(), "xml"));
+        when(mockHapiEncounterValidator.validate(any(EncounterValidationContext.class))).thenReturn(encounterValidationResponse);
+        when(mockPatientService.ensurePresent(any(String.class), eq(userInfo))).thenReturn(Observable.just(inactivePatient));
+
+        EncounterResponse ensureCreatedResponse = patientEncounterService.ensureCreated(bundle, userInfo).toBlocking().first();
+        verify(mockEncounterRepository, never()).save(bundle, inactivePatient);
+        assertTrue(ensureCreatedResponse.isTypeOfFailure(EncounterResponse.TypeOfFailure.InactivePatient));
+
+    }
+
+    @Test
+    public void shouldNotUpdateEncounterOfInactivePatient() throws Exception {
+        String facilityId = "10000069";
+        String healthId = "10001";
+        UserInfo userInfo = getUserInfoFacility(facilityId);
+        Patient inactivePatient = new Patient();
+        inactivePatient.setHealthId(healthId);
+        inactivePatient.setMergedWith("some other patient");
+        inactivePatient.setActive(false);
+
+
+        EncounterBundle bundle = createEncounterBundle(healthId, "encounterId");
+
+        EncounterValidationResponse encounterValidationResponse = new EncounterValidationResponse();
+        encounterValidationResponse.setBundle(new FhirFeedUtil().parseBundle(bundle.getContent(), "xml"));
+        when(mockHapiEncounterValidator.validate(any(EncounterValidationContext.class))).thenReturn(encounterValidationResponse);
+        when(mockPatientService.ensurePresent(any(String.class), eq(userInfo))).thenReturn(Observable.just(inactivePatient));
+
+        EncounterResponse ensureCreatedResponse = patientEncounterService.ensureUpdated(bundle, userInfo).toBlocking().first();
+        verify(mockEncounterRepository, never()).save(bundle, inactivePatient);
+        assertTrue(ensureCreatedResponse.isTypeOfFailure(EncounterResponse.TypeOfFailure.InactivePatient));
+
+    }
+
     private EncounterBundle createEncounterBundle(String healthId, String encounterId) {
         EncounterBundle bundle = new EncounterBundle();
         bundle.setHealthId(healthId);

@@ -12,11 +12,10 @@ import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.utils.Confidentiality;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.validations.EncounterValidationContext;
-import org.freeshr.validations.RIEncounterValidator;
 import org.freeshr.validations.HapiEncounterValidator;
+import org.freeshr.validations.RIEncounterValidator;
 import org.freeshr.validations.ShrEncounterValidator;
 import org.hl7.fhir.instance.model.Bundle;
-import org.hl7.fhir.instance.model.Coding;
 import org.hl7.fhir.instance.model.Composition;
 import org.hl7.fhir.instance.model.ResourceType;
 import org.slf4j.Logger;
@@ -27,7 +26,6 @@ import rx.Observable;
 import rx.functions.Func0;
 import rx.functions.Func1;
 
-import java.lang.Boolean;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -62,15 +60,12 @@ public class PatientEncounterService {
         }
     }
 
-    public Observable<EncounterResponse> ensureCreated(final EncounterBundle encounterBundle, UserInfo userInfo)
-            throws
-            ExecutionException, InterruptedException {
+    public Observable<EncounterResponse> ensureCreated(final EncounterBundle encounterBundle, UserInfo userInfo) throws ExecutionException, InterruptedException {
         EncounterValidationResponse validationResult = validate(encounterBundle);
         if (validationResult.isSuccessful()) {
+            Observable<Patient> patientObservable = patientService.ensurePresent(encounterBundle.getHealthId(), userInfo);
             Confidentiality confidentiality = determineEncounterConfidentiality(validationResult);
-            Observable<Patient> patientObservable = patientService.ensurePresent(encounterBundle.getHealthId(),
-                    userInfo);
-            return patientObservable.flatMap(success(encounterBundle, confidentiality, userInfo), error(), complete());
+            return patientObservable.flatMap(patientFetchSuccessCallbackOnCreate(encounterBundle, confidentiality, userInfo), error(), complete());
 
         } else {
             return Observable.just(new EncounterResponse().setValidationFailure(validationResult));
@@ -106,19 +101,7 @@ public class PatientEncounterService {
             final Confidentiality confidentiality = determineEncounterConfidentiality(validationResult);
             Observable<Patient> patientObservable = patientService.ensurePresent(encounterBundle.getHealthId(),
                     userInfo);
-            Func1<? super Patient, ? extends Observable<? extends EncounterResponse>> patientFetchSuccessCallBack = new Func1<Patient, Observable<? extends EncounterResponse>>() {
-                @Override
-                public Observable<? extends EncounterResponse> call(Patient patient) {
-                    if (patient != null) {
-                        Observable<EncounterBundle> encounterFetchObservable = findEncounter(encounterBundle.getHealthId(), encounterBundle.getEncounterId()).firstOrDefault(null);
-                        return encounterFetchObservable.flatMap(encounterFetchSuccessCallbackForUpdate(encounterBundle, patient, confidentiality, userInfo), error(), complete());
-                    } else {
-                        return Observable.just(new EncounterResponse().preconditionFailure("healthId", "invalid",
-                                "Patient not available in patient registry"));
-                    }
-                }
-            };
-            return patientObservable.flatMap(patientFetchSuccessCallBack, error(), complete());
+            return patientObservable.flatMap(patientFetchSuccessCallBackOnUpdate(encounterBundle, confidentiality, userInfo), error(), complete());
 
         } else {
             return Observable.just(new EncounterResponse().setValidationFailure(validationResult));
@@ -189,31 +172,53 @@ public class PatientEncounterService {
         };
     }
 
-    private Func1<Patient, Observable<EncounterResponse>> success(final EncounterBundle encounterBundle, final Confidentiality bundleConfidentiality, final UserInfo userInfo) {
+    private Func1<Patient, Observable<EncounterResponse>> patientFetchSuccessCallBackOnUpdate(final EncounterBundle encounterBundle, final Confidentiality confidentiality, final UserInfo userInfo) {
+        return new Func1<Patient, Observable<EncounterResponse>>() {
+            @Override
+            public Observable<EncounterResponse> call(Patient patient) {
+                EncounterResponse encounterResponse = new EncounterResponse();
+                if (patient == null) {
+                    return Observable.just(encounterResponse.preconditionFailure("healthId", "invalid",
+                            "Patient not available in patient registry"));
+                }
+                if (patient.getMergedWith() != null){
+                    return Observable.just(encounterResponse.activePatientFailure("healthId", "inactive",
+                            String.format("%s has been moved and replaced with %s", patient.getHealthId(), patient.getMergedWith())));
+                }
+                Observable<EncounterBundle> encounterFetchObservable = findEncounter(encounterBundle.getHealthId(), encounterBundle.getEncounterId()).firstOrDefault(null);
+                return encounterFetchObservable.flatMap(encounterFetchSuccessCallbackForUpdate(encounterBundle, patient, confidentiality, userInfo), error(), complete());
+            }
+        };
+    }
+
+    private Func1<Patient, Observable<EncounterResponse>> patientFetchSuccessCallbackOnCreate(final EncounterBundle encounterBundle, final Confidentiality bundleConfidentiality, final UserInfo userInfo) {
         return new Func1<Patient, Observable<EncounterResponse>>() {
             @Override
             public Observable<EncounterResponse> call(Patient patient) {
                 final EncounterResponse response = new EncounterResponse();
-                if (patient != null) {
-                    populateEncounterBundleFields(patient, encounterBundle, bundleConfidentiality, userInfo);
+                if (patient == null)
+                    return Observable.just(response.preconditionFailure("healthId", "invalid", "Patient not available in patient registry"));
+                if (patient.getMergedWith() != null)
+                    return Observable.just(response.activePatientFailure("healthId", "inactive",
+                            String.format("%s has been moved and replaced with %s", patient.getHealthId(), patient.getMergedWith())));
+                populateEncounterBundleFields(patient, encounterBundle, bundleConfidentiality, userInfo);
 
-                    Observable<Boolean> save = encounterRepository.save(encounterBundle, patient);
+                Observable<Boolean> save = encounterRepository.save(encounterBundle, patient);
 
-                    return save.flatMap(new Func1<Boolean, Observable<EncounterResponse>>() {
-                        @Override
-                        public Observable<EncounterResponse> call(Boolean aBoolean) {
-                            if (aBoolean)
-                                response.setEncounterId(encounterBundle.getEncounterId());
-                            return Observable.just(response);
-                        }
-                    }, error(), complete());
+                return save.flatMap(new Func1<Boolean, Observable<EncounterResponse>>() {
+                    @Override
+                    public Observable<EncounterResponse> call(Boolean aBoolean) {
+                        if (aBoolean)
+                            response.setEncounterId(encounterBundle.getEncounterId());
+                        return Observable.just(response);
+                    }
+                }, error(), complete());
 
-                } else {
-                    return Observable.just(response.preconditionFailure("healthId", "invalid",
-                            "Patient not available in patient registry"));
-                }
             }
-        };
+
+        }
+
+                ;
     }
 
     private void populateEncounterBundleFields(Patient patient, EncounterBundle encounterBundle, Confidentiality confidentiality, UserInfo userInfo) {

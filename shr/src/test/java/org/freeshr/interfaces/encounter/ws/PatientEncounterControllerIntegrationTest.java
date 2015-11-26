@@ -2,7 +2,8 @@ package org.freeshr.interfaces.encounter.ws;
 
 import com.google.common.base.Charsets;
 import net.sf.ehcache.CacheManager;
-import org.freeshr.application.fhir.EncounterResponse;
+import org.freeshr.application.fhir.*;
+import org.freeshr.application.fhir.Error;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
@@ -27,6 +28,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static java.util.Arrays.asList;
 import static org.freeshr.utils.Confidentiality.Normal;
 import static org.freeshr.utils.Confidentiality.Restricted;
 import static org.freeshr.utils.FileUtil.asString;
@@ -352,6 +354,50 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .andExpect(request().asyncResult(new InstanceOf(Redirect.class)))
                 .andExpect(request().asyncResult(hasContent(String.format("%s has been moved and replaced with %s", healthId, "Some health Id"))));
 
+    }
+
+    @Test
+    public void shouldRedirectResponseIfEncountersForAMergedPatientIsCreated() throws Exception {
+        Patient patient = new Patient();
+        String healthId = "1234";
+        patient.setHealthId(healthId);
+        patient.setMergedWith("Some health Id");
+        createPatient(patient);
+
+        Error inactivePatientError = new Error("healthId", "inactive", String.format("%s has been moved and replaced with %s", healthId, "Some health Id"));
+
+        mockMvc.perform(post("/patients/" + healthId + "/encounters")
+                .header(AUTH_TOKEN_KEY, validAccessToken)
+                .header(FROM_KEY, validEmail)
+                .header(CLIENT_ID_KEY, validClientId)
+                .accept(MediaType.APPLICATION_ATOM_XML)
+                .contentType(MediaType.APPLICATION_XML)
+                .characterEncoding(Charsets.UTF_8.name())
+                .content(asString("xmls/encounters/dstu2/p1234_encounter_with_diagnoses_with_local_refs.xml")))
+                .andExpect(request().asyncResult(new InstanceOf(Redirect.class)))
+                .andExpect(request().asyncResult(hasContent(asList(inactivePatientError).toString())));
+    }
+
+    @Test
+    public void shouldRedirectResponseIfEncountersForAMergedPatientIsUpdated() throws Exception {
+        Patient patient = new Patient();
+        String healthId = "1234";
+        patient.setHealthId(healthId);
+        patient.setMergedWith("Some health Id");
+        createPatient(patient);
+
+        Error inactivePatientError = new Error("healthId", "inactive", String.format("%s has been moved and replaced with %s", healthId, "Some health Id"));
+
+        mockMvc.perform(put("/patients/" + healthId + "/encounters/encounter-id")
+                .header(AUTH_TOKEN_KEY, validAccessToken)
+                .header(FROM_KEY, validEmail)
+                .header(CLIENT_ID_KEY, validClientId)
+                .accept(MediaType.APPLICATION_ATOM_XML)
+                .contentType(MediaType.APPLICATION_XML)
+                .characterEncoding(Charsets.UTF_8.name())
+                .content(asString("xmls/encounters/dstu2/p1234_encounter_with_diagnoses_with_local_refs.xml")))
+                .andExpect(request().asyncResult(new InstanceOf(Redirect.class)))
+                .andExpect(request().asyncResult(hasContent(asList(inactivePatientError).toString())));
     }
 
     private Matcher<String> hasContent(final String content) {

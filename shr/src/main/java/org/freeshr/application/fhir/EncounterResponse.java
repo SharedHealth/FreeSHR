@@ -4,6 +4,7 @@ package org.freeshr.application.fhir;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
 import org.freeshr.interfaces.encounter.ws.exceptions.PreconditionFailed;
+import org.freeshr.interfaces.encounter.ws.exceptions.Redirect;
 import org.freeshr.interfaces.encounter.ws.exceptions.UnProcessableEntity;
 
 import java.util.Collections;
@@ -64,6 +65,13 @@ public class EncounterResponse {
         return this;
     }
 
+    @JsonIgnore
+    public EncounterResponse activePatientFailure(String field, String type, String message) {
+        this.errors = asList(new Error(field, type, message));
+        this.typeOfFailure = TypeOfFailure.InactivePatient;
+        return this;
+    }
+
     public Exception getErrorResult() {
         if (isTypeOfFailure(TypeOfFailure.Precondition)) {
             return new PreconditionFailed(this);
@@ -71,7 +79,9 @@ public class EncounterResponse {
             return new UnProcessableEntity(this);
         } else if (isTypeOfFailure(TypeOfFailure.Forbidden)) {
             return new Forbidden(this);
-        }
+        } else if (isTypeOfFailure(TypeOfFailure.InactivePatient))
+            return new Redirect(this);
+
         return null;
     }
 
@@ -79,6 +89,7 @@ public class EncounterResponse {
         Validation,
         Precondition,
         Forbidden,
+        InactivePatient,
         None
     }
 
