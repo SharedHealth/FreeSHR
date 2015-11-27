@@ -32,6 +32,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import static org.freeshr.utils.Confidentiality.getConfidentiality;
+import static org.freeshr.validations.ValidationMessages.*;
 
 @Service
 public class PatientEncounterService {
@@ -72,11 +73,16 @@ public class PatientEncounterService {
         }
     }
 
-    private Confidentiality determineEncounterConfidentiality(EncounterValidationResponse validationResult) {
-        if ("v2".equals(shrProperties.getFhirDocumentSchemaVersion())) {
-            return getEncounterConfidentiality(validationResult.getBundle());
+    public Observable<EncounterResponse> ensureUpdated(final EncounterBundle encounterBundle, final UserInfo userInfo) throws ExecutionException, InterruptedException {
+        final EncounterValidationResponse validationResult = validate(encounterBundle);
+        if (validationResult.isSuccessful()) {
+            final Confidentiality confidentiality = determineEncounterConfidentiality(validationResult);
+            Observable<Patient> patientObservable = patientService.ensurePresent(encounterBundle.getHealthId(),
+                    userInfo);
+            return patientObservable.flatMap(patientFetchSuccessCallBackOnUpdate(encounterBundle, confidentiality, userInfo), error(), complete());
+
         } else {
-            return getEncounterConfidentiality(validationResult.getFeed());
+            return Observable.just(new EncounterResponse().setValidationFailure(validationResult));
         }
     }
 
@@ -95,20 +101,15 @@ public class PatientEncounterService {
         return encounterRepository.findEncounterFeedForPatient(healthId, sinceDate, limit);
     }
 
-    public Observable<EncounterResponse> ensureUpdated(final EncounterBundle encounterBundle, final UserInfo userInfo) throws ExecutionException, InterruptedException {
-        final EncounterValidationResponse validationResult = validate(encounterBundle);
-        if (validationResult.isSuccessful()) {
-            final Confidentiality confidentiality = determineEncounterConfidentiality(validationResult);
-            Observable<Patient> patientObservable = patientService.ensurePresent(encounterBundle.getHealthId(),
-                    userInfo);
-            return patientObservable.flatMap(patientFetchSuccessCallBackOnUpdate(encounterBundle, confidentiality, userInfo), error(), complete());
-
+    private Confidentiality determineEncounterConfidentiality(EncounterValidationResponse validationResult) {
+        if ("v2".equals(shrProperties.getFhirDocumentSchemaVersion())) {
+            return getEncounterConfidentiality(validationResult.getBundle());
         } else {
-            return Observable.just(new EncounterResponse().setValidationFailure(validationResult));
+            return getEncounterConfidentiality(validationResult.getFeed());
         }
     }
 
-    private Func1<? super EncounterBundle, ? extends Observable<? extends EncounterResponse>> encounterFetchSuccessCallbackForUpdate(
+    private Func1<EncounterBundle, Observable<EncounterResponse>> encounterFetchSuccessCallbackForUpdate(
             final EncounterBundle encounterBundle, final Patient patient, final Confidentiality confidentiality, final UserInfo userInfo) {
         return new Func1<EncounterBundle, Observable<EncounterResponse>>() {
             @Override
@@ -117,8 +118,47 @@ public class PatientEncounterService {
                     return updateEncounter(existingEncounterBundle, userInfo, encounterBundle, confidentiality, patient);
                 } else {
                     return Observable.just(new EncounterResponse().preconditionFailure("encounterId", "invalid",
-                            String.format("Encounter (%s) not available.", encounterBundle.getEncounterId())));
+                            String.format(ENCOUNTER_NOT_FOUND_MSG_PATTERN, encounterBundle.getEncounterId())));
                 }
+            }
+        };
+    }
+
+    private Func1<Patient, Observable<EncounterResponse>> patientFetchSuccessCallBackOnUpdate(final EncounterBundle encounterBundle, final Confidentiality confidentiality, final UserInfo userInfo) {
+        return new Func1<Patient, Observable<EncounterResponse>>() {
+            @Override
+            public Observable<EncounterResponse> call(Patient patient) {
+                EncounterResponse response = validatePatient(patient);
+                if (response.isSuccessful()) {
+                    Observable<EncounterBundle> encounterFetchObservable = findEncounter(encounterBundle.getHealthId(), encounterBundle.getEncounterId()).firstOrDefault(null);
+                    return encounterFetchObservable.flatMap(encounterFetchSuccessCallbackForUpdate(encounterBundle, patient, confidentiality, userInfo), error(), complete());
+
+                }
+                return Observable.just(response);
+            }
+        };
+    }
+
+    private Func1<Patient, Observable<EncounterResponse>> patientFetchSuccessCallbackOnCreate(final EncounterBundle encounterBundle, final Confidentiality bundleConfidentiality, final UserInfo userInfo) {
+        return new Func1<Patient, Observable<EncounterResponse>>() {
+            @Override
+            public Observable<EncounterResponse> call(Patient patient) {
+                final EncounterResponse response = validatePatient(patient);
+                if(response.isSuccessful()){
+                    populateEncounterBundleFields(patient, encounterBundle, bundleConfidentiality, userInfo);
+
+                    Observable<Boolean> save = encounterRepository.save(encounterBundle, patient);
+
+                    return save.flatMap(new Func1<Boolean, Observable<EncounterResponse>>() {
+                        @Override
+                        public Observable<EncounterResponse> call(Boolean aBoolean) {
+                            if (aBoolean)
+                                response.setEncounterId(encounterBundle.getEncounterId());
+                            return Observable.just(response);
+                        }
+                    }, error(), complete());
+                }
+                return Observable.just(response);
             }
         };
     }
@@ -172,53 +212,16 @@ public class PatientEncounterService {
         };
     }
 
-    private Func1<Patient, Observable<EncounterResponse>> patientFetchSuccessCallBackOnUpdate(final EncounterBundle encounterBundle, final Confidentiality confidentiality, final UserInfo userInfo) {
-        return new Func1<Patient, Observable<EncounterResponse>>() {
-            @Override
-            public Observable<EncounterResponse> call(Patient patient) {
-                EncounterResponse encounterResponse = new EncounterResponse();
-                if (patient == null) {
-                    return Observable.just(encounterResponse.preconditionFailure("healthId", "invalid",
-                            "Patient not available in patient registry"));
-                }
-                if (patient.getMergedWith() != null){
-                    return Observable.just(encounterResponse.activePatientFailure("healthId", "inactive",
-                            String.format("%s has been moved and replaced with %s", patient.getHealthId(), patient.getMergedWith())));
-                }
-                Observable<EncounterBundle> encounterFetchObservable = findEncounter(encounterBundle.getHealthId(), encounterBundle.getEncounterId()).firstOrDefault(null);
-                return encounterFetchObservable.flatMap(encounterFetchSuccessCallbackForUpdate(encounterBundle, patient, confidentiality, userInfo), error(), complete());
-            }
-        };
-    }
-
-    private Func1<Patient, Observable<EncounterResponse>> patientFetchSuccessCallbackOnCreate(final EncounterBundle encounterBundle, final Confidentiality bundleConfidentiality, final UserInfo userInfo) {
-        return new Func1<Patient, Observable<EncounterResponse>>() {
-            @Override
-            public Observable<EncounterResponse> call(Patient patient) {
-                final EncounterResponse response = new EncounterResponse();
-                if (patient == null)
-                    return Observable.just(response.preconditionFailure("healthId", "invalid", "Patient not available in patient registry"));
-                if (patient.getMergedWith() != null)
-                    return Observable.just(response.activePatientFailure("healthId", "inactive",
-                            String.format("%s has been moved and replaced with %s", patient.getHealthId(), patient.getMergedWith())));
-                populateEncounterBundleFields(patient, encounterBundle, bundleConfidentiality, userInfo);
-
-                Observable<Boolean> save = encounterRepository.save(encounterBundle, patient);
-
-                return save.flatMap(new Func1<Boolean, Observable<EncounterResponse>>() {
-                    @Override
-                    public Observable<EncounterResponse> call(Boolean aBoolean) {
-                        if (aBoolean)
-                            response.setEncounterId(encounterBundle.getEncounterId());
-                        return Observable.just(response);
-                    }
-                }, error(), complete());
-
-            }
-
+    private EncounterResponse validatePatient(Patient patient) {
+        EncounterResponse encounterResponse = new EncounterResponse();
+        if (patient == null) {
+            encounterResponse.preconditionFailure("healthId", "invalid", INVALID_PATIENT);
+        }
+        else if (patient.getMergedWith() != null){
+            encounterResponse.activePatientFailure("healthId", "inactive", String.format(INACTIVE_PATIENT_MSG_PATTERN, patient.getHealthId(), patient.getMergedWith()));
         }
 
-                ;
+        return encounterResponse;
     }
 
     private void populateEncounterBundleFields(Patient patient, EncounterBundle encounterBundle, Confidentiality confidentiality, UserInfo userInfo) {
