@@ -146,7 +146,7 @@ public class CatchmentEncounterServiceIntegrationTest {
                 getUserInfo(clientId, email, securityToken)).toBlocking().first()
                 .isSuccessful());
 
-        assertEquals(1, patientEncounterService.findEncounterFeedForPatient(VALID_HEALTH_ID, null,
+        assertEquals(1, patientEncounterService.getEncounterFeedForPatient(VALID_HEALTH_ID, null,
                 200).toBlocking().first().size());
 
         List<EncounterEvent> encounterEvents = catchmentEncounterService.findEncounterFeedForFacilityCatchment(

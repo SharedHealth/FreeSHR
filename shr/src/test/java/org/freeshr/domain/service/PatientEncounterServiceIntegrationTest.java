@@ -195,7 +195,7 @@ public class PatientEncounterServiceIntegrationTest extends APIIntegrationTestBa
         patientTestSubscriber.awaitTerminalEvent();
         assertValidPatient(patientTestSubscriber.getOnNextEvents().get(0));
 
-        Observable<List<EncounterEvent>> encounterEventsForPatientObservable = patientEncounterService.findEncounterFeedForPatient(VALID_HEALTH_ID, null, 200);
+        Observable<List<EncounterEvent>> encounterEventsForPatientObservable = patientEncounterService.getEncounterFeedForPatient(VALID_HEALTH_ID, null, 200);
         TestSubscriber<List<EncounterEvent>> encounterBundleTestSubscriber = new TestSubscriber<>();
         encounterEventsForPatientObservable.subscribe(encounterBundleTestSubscriber);
         encounterBundleTestSubscriber.awaitTerminalEvent();

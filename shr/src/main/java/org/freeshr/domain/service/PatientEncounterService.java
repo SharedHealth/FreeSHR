@@ -95,10 +95,10 @@ public class PatientEncounterService {
         });
     }
 
-    public Observable<List<EncounterEvent>> findEncounterFeedForPatient(String healthId, Date sinceDate,
-                                                                        int limit) throws ExecutionException,
+    public Observable<List<EncounterEvent>> getEncounterFeedForPatient(String healthId, Date sinceDate,
+                                                                       int limit) throws ExecutionException,
             InterruptedException {
-        return encounterRepository.findEncounterFeedForPatient(healthId, sinceDate, limit);
+        return encounterRepository.getEncounterFeedForPatient(healthId, sinceDate, limit);
     }
 
     private Confidentiality determineEncounterConfidentiality(EncounterValidationResponse validationResult) {

@@ -127,7 +127,7 @@ public class PatientEncounterController extends ShrController {
 
             final Date requestedDate = getRequestedDate(updatedSince);
             Observable<List<EncounterEvent>> encounterEventsForPatient =
-                    patientEncounterService.findEncounterFeedForPatient(healthId, requestedDate, 200);
+                    patientEncounterService.getEncounterFeedForPatient(healthId, requestedDate, 200);
             encounterEventsForPatient.subscribe(new Action1<List<EncounterEvent>>() {
                 @Override
                 public void call(List<EncounterEvent> encounterEvents) {

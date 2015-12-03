@@ -66,7 +66,7 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         encounterRepository.save(createEncounterBundle("e-2", healthId, Confidentiality.Normal, Confidentiality.Normal, asString("jsons/encounters/valid.json"),  new Requester("facilityId", null), monthAfter), patient).toBlocking().first();
         encounterRepository.save(createEncounterBundle("e-3", healthId, Confidentiality.Normal, Confidentiality.Normal, asString("jsons/encounters/valid.json"),  new Requester("facilityId", null), twoMonthsAfter), patient).toBlocking().first();
 
-        List<EncounterEvent> encounterBundles = encounterRepository.findEncounterFeedForPatient(healthId,
+        List<EncounterEvent> encounterBundles = encounterRepository.getEncounterFeedForPatient(healthId,
                 updatedSinceYesterday, 200).toBlocking().single();
         assertEquals(3, encounterBundles.size());
 
@@ -75,7 +75,7 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         assertEncounter(encounterBundles, "e-3", twoMonthsAfter);
 
         Date updatedAfterThreeMonths = today.plusMonths(3).toDate();
-        encounterBundles = encounterRepository.findEncounterFeedForPatient(healthId, updatedAfterThreeMonths,
+        encounterBundles = encounterRepository.getEncounterFeedForPatient(healthId, updatedAfterThreeMonths,
                 200).toBlocking().single();
         assertEquals("Should not have returned any encounter as updatedSince is after existing encounter dates", 0,
                 encounterBundles.size());
@@ -304,7 +304,7 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
                         asString("jsons/encounters/valid.json"), updatedBy, jan1st0945),
                 existingEncounterBundle, patient).toBlocking().first();
 
-        List<EncounterEvent> encounterEventsForPatient = encounterRepository.findEncounterFeedForPatient(healthId, null, 5).toBlocking().first();
+        List<EncounterEvent> encounterEventsForPatient = encounterRepository.getEncounterFeedForPatient(healthId, null, 5).toBlocking().first();
 
         assertEquals(3, encounterEventsForPatient.size());
         assertEquals("e-1", encounterEventsForPatient.get(0).getEncounterId());

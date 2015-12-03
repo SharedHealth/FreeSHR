@@ -110,8 +110,8 @@ public class EncounterRepository {
                 });
     }
 
-    public Observable<List<EncounterEvent>> findEncounterFeedForPatient(String healthId, Date updatedSince,
-                                                                        int limit) throws ExecutionException,
+    public Observable<List<EncounterEvent>> getEncounterFeedForPatient(String healthId, Date updatedSince,
+                                                                       int limit) throws ExecutionException,
             InterruptedException {
         StringBuilder queryBuilder = buildQuery(healthId, updatedSince, limit);
         Observable<ResultSet> encounterIdsWithCreatedTimeObservable = Observable.from(cqlOperations.queryAsynchronously
@@ -161,13 +161,13 @@ public class EncounterRepository {
         };
     }
 
-    private Func1<List<EncounterBundle>, Observable<List<EncounterEvent>>> generateEncounterEvents(final List<EncounterEventLog> encounterInstances) {
+    private Func1<List<EncounterBundle>, Observable<List<EncounterEvent>>> generateEncounterEvents(final List<EncounterEventLog> encounterEventLogs) {
         return new Func1<List<EncounterBundle>, Observable<List<EncounterEvent>>>() {
             @Override
             public Observable<List<EncounterEvent>> call(List<EncounterBundle> encounterBundles) {
                 List<EncounterEvent> encounterEvents = new ArrayList<>();
                 EncounterEvent encounterEvent;
-                for (EncounterEventLog encounterInstance : encounterInstances) {
+                for (EncounterEventLog encounterInstance : encounterEventLogs) {
                     EncounterBundle savedEncounterBundle = selectFirst(encounterBundles, having(on(EncounterBundle.class).getEncounterId(),
                             Matchers.equalTo(encounterInstance.getEncounterId())));
 
