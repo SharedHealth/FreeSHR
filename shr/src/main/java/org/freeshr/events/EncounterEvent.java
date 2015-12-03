@@ -14,13 +14,15 @@ import java.util.Date;
 public class EncounterEvent {
 
     private Date updatedAt;
+    private Date mergedAt;
     private EncounterBundle encounterBundle;
     private ArrayList<String> categories = new ArrayList<String>(){{ add("encounter"); }};
     private String title = "Encounter";
 
-    public EncounterEvent(Date updatedAt, EncounterBundle encounterBundle) {
+    public EncounterEvent(EncounterBundle encounterBundle, Date updatedAt, Date mergedAt) {
         this.updatedAt = updatedAt;
         this.encounterBundle = encounterBundle;
+        this.mergedAt = mergedAt;
     }
 
     @JsonProperty("publishedDate")
@@ -79,6 +81,11 @@ public class EncounterEvent {
     @JsonIgnore
     public Date getUpdatedAt() {
         return updatedAt;
+    }
+
+    @JsonIgnore
+    public Date getMergedAt(){
+        return mergedAt;
     }
 
     @JsonIgnore

@@ -35,9 +35,9 @@ public class ConfidentialEncounterHandlerIT extends APIIntegrationTestBase {
         final Requester createdBy = new Requester("facilityId", "providerId");
         Date receivedAt = new Date();
         String confidentialContent = asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml");
-        EncounterEvent confidentialEncounterEvent = new EncounterEvent(receivedAt, createEncounterBundle("encounter id", "98001046534",
+        EncounterEvent confidentialEncounterEvent = new EncounterEvent(createEncounterBundle("encounter id", "98001046534",
                 Confidentiality.Restricted, Confidentiality.Normal, confidentialContent,
-                createdBy, receivedAt));
+                createdBy, receivedAt), receivedAt, null);
         List<EncounterEvent> replacedEncounterEvents = confidentialEncounterHandler.replaceConfidentialEncounterEvents(asList(confidentialEncounterEvent));
         assertEquals(1, replacedEncounterEvents.size());
         EncounterEvent replacedEncounterEvent = replacedEncounterEvents.get(0);

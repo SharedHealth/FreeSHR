@@ -5,6 +5,7 @@ import java.util.UUID;
 public class EncounterEventLog {
     private String encounterId;
     private UUID createdAt;
+    private UUID mergedAt;
 
     public String getEncounterId() {
         return encounterId;
@@ -20,5 +21,13 @@ public class EncounterEventLog {
 
     public void setCreatedAt(UUID createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public UUID getMergedAt() {
+        return mergedAt;
+    }
+
+    public void setMergedAt(UUID mergedAt) {
+        this.mergedAt = mergedAt;
     }
 }

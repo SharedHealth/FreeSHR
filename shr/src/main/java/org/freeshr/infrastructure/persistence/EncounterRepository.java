@@ -150,6 +150,7 @@ public class EncounterRepository {
                     encounterEventLog = new EncounterEventLog();
                     encounterEventLog.setEncounterId(result.getString("encounter_id"));
                     encounterEventLog.setCreatedAt(result.getUUID("created_at"));
+                    encounterEventLog.setMergedAt(result.getUUID("merged_at"));
 
                     encounterEventLogs.add(encounterEventLog);
                 }
@@ -171,7 +172,9 @@ public class EncounterRepository {
                     EncounterBundle savedEncounterBundle = selectFirst(encounterBundles, having(on(EncounterBundle.class).getEncounterId(),
                             Matchers.equalTo(encounterInstance.getEncounterId())));
 
-                    encounterEvent = new EncounterEvent(TimeUuidUtil.getDateFromUUID(encounterInstance.getCreatedAt()), savedEncounterBundle);
+                    UUID mergedAt = encounterInstance.getMergedAt();
+                    Date mergedAtUUID = (mergedAt != null) ? TimeUuidUtil.getDateFromUUID(mergedAt) : null;
+                    encounterEvent = new EncounterEvent(savedEncounterBundle, TimeUuidUtil.getDateFromUUID(encounterInstance.getCreatedAt()), mergedAtUUID);
                     encounterEvents.add(encounterEvent);
                 }
                 return Observable.just(encounterEvents);
@@ -264,7 +267,7 @@ public class EncounterRepository {
         int yearOfDate = DateUtil.getYearOf(updatedSince);
         String lastUpdateTime = DateUtil.toDateString(updatedSince, DateUtil.UTC_DATE_IN_MILLIS_FORMAT);
         //TODO test. condition should be >=
-        return format("SELECT encounter_id, created_at FROM enc_by_catchment " +
+        return format("SELECT encounter_id, created_at, merged_at FROM enc_by_catchment " +
                         " WHERE year = %s and created_at >= minTimeUuid('%s') and %s LIMIT %s ALLOW FILTERING;",
                 yearOfDate, lastUpdateTime, buildClauseForCatchment(catchment), limit);
     }
@@ -272,7 +275,7 @@ public class EncounterRepository {
     private String buildFetchCatchementQueryAfterMarker(Catchment catchment, String lastMarker, Date updatedSince, int limit) {
         int yearOfDate = DateUtil.getYearOf(updatedSince);
         //TODO test. condition should be >=
-        return format("SELECT encounter_id, created_at FROM enc_by_catchment " +
+        return format("SELECT encounter_id, created_at, merged_at FROM enc_by_catchment " +
                         " WHERE year = %s and created_at >= %s and %s LIMIT %s ALLOW FILTERING;",
                 yearOfDate, lastMarker, buildClauseForCatchment(catchment), limit);
     }
@@ -362,7 +365,7 @@ public class EncounterRepository {
     }
 
     private StringBuilder buildQuery(String healthId, Date updatedSince, int limit) {
-        StringBuilder queryBuilder = new StringBuilder(format("SELECT encounter_id, created_at FROM enc_by_patient where " +
+        StringBuilder queryBuilder = new StringBuilder(format("SELECT encounter_id, created_at, merged_at FROM enc_by_patient where " +
                 "health_id='%s'", healthId));
         if (updatedSince != null) {
             String lastUpdateTime = DateUtil.toDateString(updatedSince, DateUtil.UTC_DATE_IN_MILLIS_FORMAT);

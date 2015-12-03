@@ -25,11 +25,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import static ch.lambdaj.Lambda.extract;
@@ -145,9 +141,6 @@ public class CatchmentEncounterServiceIntegrationTest {
                 withContentForHealthId(VALID_HEALTH_ID_NEW, "xmls/encounters/dstu2/p99001046345_encounter_with_diagnoses_with_local_refs.xml"),
                 getUserInfo(clientId, email, securityToken)).toBlocking().first()
                 .isSuccessful());
-
-        assertEquals(1, patientEncounterService.getEncounterFeedForPatient(VALID_HEALTH_ID, null,
-                200).toBlocking().first().size());
 
         List<EncounterEvent> encounterEvents = catchmentEncounterService.findEncounterFeedForFacilityCatchment(
                 "3056", date, null).toBlocking().first();

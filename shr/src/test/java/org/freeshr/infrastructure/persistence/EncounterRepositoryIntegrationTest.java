@@ -309,12 +309,15 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         assertEquals(3, encounterEventsForPatient.size());
         assertEquals("e-1", encounterEventsForPatient.get(0).getEncounterId());
         assertEquals(jan1st0930,encounterEventsForPatient.get(0).getUpdatedAt());
+        assertNull(encounterEventsForPatient.get(0).getMergedAt());
 
         assertEquals("e-2", encounterEventsForPatient.get(1).getEncounterId());
         assertEquals(jan1st0940,encounterEventsForPatient.get(1).getUpdatedAt());
+        assertNull(encounterEventsForPatient.get(0).getMergedAt());
 
         assertEquals("e-1", encounterEventsForPatient.get(2).getEncounterId());
         assertEquals(jan1st0945, encounterEventsForPatient.get(2).getUpdatedAt());
+        assertNull(encounterEventsForPatient.get(0).getMergedAt());
 
 
     }

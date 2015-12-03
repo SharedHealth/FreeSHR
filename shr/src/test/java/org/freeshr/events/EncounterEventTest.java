@@ -23,7 +23,7 @@ public class EncounterEventTest {
         encounterBundle.setUpdatedAt(fiveSecondsLater);
 
 
-        EncounterEvent encounterEvent = new EncounterEvent(now.toDate(), encounterBundle);
+        EncounterEvent encounterEvent = new EncounterEvent(encounterBundle, now.toDate(), null);
 
         assertTrue(encounterEvent.isEncounterFurtherEdited());
 
@@ -35,7 +35,7 @@ public class EncounterEventTest {
         Date now= DateTime.now().toDate();
         encounterBundle.setUpdatedAt(now);
 
-        EncounterEvent encounterEvent = new EncounterEvent(now, encounterBundle);
+        EncounterEvent encounterEvent = new EncounterEvent(encounterBundle, now, null);
 
         assertFalse(encounterEvent.isEncounterFurtherEdited());
 
@@ -49,7 +49,7 @@ public class EncounterEventTest {
         encounterBundle.setUpdatedAt(encounterEditEventDate);
         encounterBundle.setReceivedAt(encounterCreateEventDate);
 
-        EncounterEvent encounterCreateEvent = new EncounterEvent(encounterCreateEventDate, encounterBundle);
+        EncounterEvent encounterCreateEvent = new EncounterEvent(encounterBundle, encounterCreateEventDate, null);
 
         ArrayList<String> categories = encounterCreateEvent.getCategories();
         assertEquals(2, categories.size());
@@ -65,7 +65,7 @@ public class EncounterEventTest {
         encounterBundle.setUpdatedAt(encounterEditEventDate);
         encounterBundle.setReceivedAt(encounterCreateEventDate);
 
-        EncounterEvent encounterUpdateEvent = new EncounterEvent(encounterEditEventDate, encounterBundle);
+        EncounterEvent encounterUpdateEvent = new EncounterEvent(encounterBundle, encounterEditEventDate, null);
 
         ArrayList<String> categories = encounterUpdateEvent.getCategories();
         assertEquals(1, categories.size());
@@ -79,7 +79,7 @@ public class EncounterEventTest {
         encounterBundle.setUpdatedAt(encounterCreateEventDate);
         encounterBundle.setReceivedAt(encounterCreateEventDate);
 
-        EncounterEvent encounterCreateEvent = new EncounterEvent(encounterCreateEventDate, encounterBundle);
+        EncounterEvent encounterCreateEvent = new EncounterEvent(encounterBundle, encounterCreateEventDate, null);
 
         ArrayList<String> categories = encounterCreateEvent.getCategories();
         assertEquals(1, categories.size());

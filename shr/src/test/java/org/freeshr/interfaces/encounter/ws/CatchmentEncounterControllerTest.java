@@ -72,7 +72,7 @@ public class CatchmentEncounterControllerTest {
         List<Date> encounterDates = getTimeInstances(DateUtil.parseDate("2014-10-10"), 10);
         List<EncounterEvent> encounterEvents = createEncounterEvents("hid01", 10, encounterDates);
         Date currentDate = new Date();
-        EncounterEvent updatedEncounterEvent = new EncounterEvent(currentDate, encounterEvents.get(0).getEncounterBundle());
+        EncounterEvent updatedEncounterEvent = new EncounterEvent(encounterEvents.get(0).getEncounterBundle(), currentDate, null);
         encounterEvents.add(updatedEncounterEvent);
 
         TokenAuthentication tokenAuthentication = tokenAuthentication();
@@ -222,16 +222,16 @@ public class CatchmentEncounterControllerTest {
 
         List<EncounterEvent> encounterEvents = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            EncounterBundle bundle = new EncounterBundle();
-            bundle.setEncounterId("e-" + (i + 1));
-            bundle.setHealthId(healthId);
-            bundle.setReceivedAt(dates.get(i));
-            bundle.setUpdatedAt(dates.get(i));
-            bundle.setEncounterContent("content-" + (i + 1));
-            bundle.setPatientConfidentiality(Confidentiality.Normal);
-            bundle.setEncounterConfidentiality(Confidentiality.Normal);
+            EncounterBundle encounter = new EncounterBundle();
+            encounter.setEncounterId("e-" + (i + 1));
+            encounter.setHealthId(healthId);
+            encounter.setReceivedAt(dates.get(i));
+            encounter.setUpdatedAt(dates.get(i));
+            encounter.setEncounterContent("content-" + (i + 1));
+            encounter.setPatientConfidentiality(Confidentiality.Normal);
+            encounter.setEncounterConfidentiality(Confidentiality.Normal);
 
-            EncounterEvent event = new EncounterEvent(dates.get(i), bundle);
+            EncounterEvent event = new EncounterEvent(encounter, dates.get(i), null);
             encounterEvents.add(event);
         }
         return encounterEvents;
