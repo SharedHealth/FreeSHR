@@ -13,11 +13,14 @@ import java.util.Date;
 
 public class EncounterEvent {
 
+    public static final String ENCOUNTER_UPDATED_CATEGORY_PREFIX = "encounter_updated_at:";
+    public static final String LATEST_UPDATE_EVENT_CATEGORY_PREFIX = "latest_update_event_id:";
+    public static final String ENCOUNTER_MERGED_CATEGORY_PREFIX = "encounter_merged_at:";
+    private static final String TITLE = "Encounter";
     private Date createdAt;
     private Date mergedAt;
     private EncounterBundle encounterBundle;
     private ArrayList<String> categories = new ArrayList<String>(){{ add("encounter"); }};
-    private String title = "Encounter";
 
     public EncounterEvent(EncounterBundle encounterBundle, Date eventCreatedAt, Date mergedAt) {
         this.createdAt = eventCreatedAt;
@@ -43,12 +46,16 @@ public class EncounterEvent {
     }
 
     public String getTitle() {
-        return title + ":" + getEncounterId();
+        return TITLE + ":" + getEncounterId();
     }
 
     public ArrayList<String> getCategories() {
+        categories.add(ENCOUNTER_UPDATED_CATEGORY_PREFIX +  DateUtil.toISOString(getEncounterLastUpdatedAt()));
         if (isEncounterFurtherEdited()) {
-            categories.add(String.format("latest_update_event_id:%s", TimeUuidUtil.uuidForDate(getEncounterLastUpdatedAt())));
+            categories.add(LATEST_UPDATE_EVENT_CATEGORY_PREFIX + TimeUuidUtil.uuidForDate(getEncounterLastUpdatedAt()));
+        }
+        if (getMergedAt() != null) {
+            categories.add(ENCOUNTER_MERGED_CATEGORY_PREFIX + DateUtil.toISOString(getMergedAt()));
         }
         return categories;
     }
