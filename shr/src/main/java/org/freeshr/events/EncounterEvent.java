@@ -13,25 +13,25 @@ import java.util.Date;
 
 public class EncounterEvent {
 
-    private Date updatedAt;
+    private Date createdAt;
     private Date mergedAt;
     private EncounterBundle encounterBundle;
     private ArrayList<String> categories = new ArrayList<String>(){{ add("encounter"); }};
     private String title = "Encounter";
 
-    public EncounterEvent(EncounterBundle encounterBundle, Date updatedAt, Date mergedAt) {
-        this.updatedAt = updatedAt;
+    public EncounterEvent(EncounterBundle encounterBundle, Date eventCreatedAt, Date mergedAt) {
+        this.createdAt = eventCreatedAt;
         this.encounterBundle = encounterBundle;
         this.mergedAt = mergedAt;
     }
 
     @JsonProperty("publishedDate")
     public String getUpdatedDateISOString() {
-        return DateUtil.toISOString(updatedAt);
+        return DateUtil.toISOString(createdAt);
     }
 
     public String getId() {
-        return TimeUuidUtil.uuidForDate(updatedAt).toString();
+        return TimeUuidUtil.uuidForDate(createdAt).toString();
     }
 
     public String getContent() {
@@ -60,7 +60,7 @@ public class EncounterEvent {
 
     @JsonIgnore
     public boolean isEncounterFurtherEdited() {
-        return getEncounterLastUpdatedAt().after(getUpdatedAt());
+        return getEncounterLastUpdatedAt().after(getCreatedAt());
     }
 
     @JsonIgnore
@@ -79,8 +79,8 @@ public class EncounterEvent {
     }
 
     @JsonIgnore
-    public Date getUpdatedAt() {
-        return updatedAt;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
     @JsonIgnore

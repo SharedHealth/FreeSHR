@@ -113,9 +113,9 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
 
         List<EncounterEvent> encounterEvents = encounterRepository.findEncounterFeedForCatchmentUpdatedSince(new Catchment("D1d1u1"), mar5T900, 20).toBlocking().first();
         assertEquals(3, encounterEvents.size());
-        assertEquals(mar5T0930, encounterEvents.get(0).getUpdatedAt());
-        assertEquals(mar5T1030, encounterEvents.get(1).getUpdatedAt());
-        assertEquals(mar5T1130, encounterEvents.get(2).getUpdatedAt());
+        assertEquals(mar5T0930, encounterEvents.get(0).getCreatedAt());
+        assertEquals(mar5T1030, encounterEvents.get(1).getCreatedAt());
+        assertEquals(mar5T1130, encounterEvents.get(2).getCreatedAt());
     }
 
     @Test
@@ -130,8 +130,8 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
 
         List<EncounterEvent> encounterEvents = encounterRepository.findEncounterFeedForCatchmentAfterMarker(new Catchment("D1d1u1"),TimeUuidUtil.uuidForDate(mar5T1030).toString(), mar5T900, 20).toBlocking().first();
         assertEquals(2, encounterEvents.size());
-        assertEquals(mar5T1030, encounterEvents.get(0).getUpdatedAt());
-        assertEquals(mar5T1130, encounterEvents.get(1).getUpdatedAt());
+        assertEquals(mar5T1030, encounterEvents.get(0).getCreatedAt());
+        assertEquals(mar5T1130, encounterEvents.get(1).getCreatedAt());
 
     }
 
@@ -308,15 +308,15 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
 
         assertEquals(3, encounterEventsForPatient.size());
         assertEquals("e-1", encounterEventsForPatient.get(0).getEncounterId());
-        assertEquals(jan1st0930,encounterEventsForPatient.get(0).getUpdatedAt());
+        assertEquals(jan1st0930,encounterEventsForPatient.get(0).getCreatedAt());
         assertNull(encounterEventsForPatient.get(0).getMergedAt());
 
         assertEquals("e-2", encounterEventsForPatient.get(1).getEncounterId());
-        assertEquals(jan1st0940,encounterEventsForPatient.get(1).getUpdatedAt());
+        assertEquals(jan1st0940,encounterEventsForPatient.get(1).getCreatedAt());
         assertNull(encounterEventsForPatient.get(0).getMergedAt());
 
         assertEquals("e-1", encounterEventsForPatient.get(2).getEncounterId());
-        assertEquals(jan1st0945, encounterEventsForPatient.get(2).getUpdatedAt());
+        assertEquals(jan1st0945,encounterEventsForPatient.get(2).getCreatedAt());
         assertNull(encounterEventsForPatient.get(0).getMergedAt());
 
 

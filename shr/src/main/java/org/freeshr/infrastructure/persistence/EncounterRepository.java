@@ -168,13 +168,13 @@ public class EncounterRepository {
             public Observable<List<EncounterEvent>> call(List<EncounterBundle> encounterBundles) {
                 List<EncounterEvent> encounterEvents = new ArrayList<>();
                 EncounterEvent encounterEvent;
-                for (EncounterEventLog encounterInstance : encounterEventLogs) {
+                for (EncounterEventLog encounterEventLog : encounterEventLogs) {
                     EncounterBundle savedEncounterBundle = selectFirst(encounterBundles, having(on(EncounterBundle.class).getEncounterId(),
-                            Matchers.equalTo(encounterInstance.getEncounterId())));
+                            Matchers.equalTo(encounterEventLog.getEncounterId())));
 
-                    UUID mergedAt = encounterInstance.getMergedAt();
+                    UUID mergedAt = encounterEventLog.getMergedAt();
                     Date mergedAtUUID = (mergedAt != null) ? TimeUuidUtil.getDateFromUUID(mergedAt) : null;
-                    encounterEvent = new EncounterEvent(savedEncounterBundle, TimeUuidUtil.getDateFromUUID(encounterInstance.getCreatedAt()), mergedAtUUID);
+                    encounterEvent = new EncounterEvent(savedEncounterBundle, TimeUuidUtil.getDateFromUUID(encounterEventLog.getCreatedAt()), mergedAtUUID);
                     encounterEvents.add(encounterEvent);
                 }
                 return Observable.just(encounterEvents);

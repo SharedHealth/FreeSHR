@@ -62,7 +62,7 @@ public class EncounterFeedHelper {
             encLink.setHref(encounterEvent.getLink());
             entry.setAlternateLinks(Arrays.asList(encLink));
 
-            entry.setUpdated(encounterEvent.getUpdatedAt());
+            entry.setUpdated(encounterEvent.getCreatedAt());
             entry.setContents(generateContents(encounterEvent));
             entry.setCategories(getCategories(encounterEvent));
             entryList.add(entry);
