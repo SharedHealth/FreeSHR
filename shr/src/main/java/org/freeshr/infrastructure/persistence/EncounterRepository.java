@@ -257,6 +257,7 @@ public class EncounterRepository {
         int yearOfDate = DateUtil.getYearOf(updatedSince);
         String lastUpdateTime = DateUtil.toDateString(updatedSince, DateUtil.UTC_DATE_IN_MILLIS_FORMAT);
         //TODO test. condition should be >=
+        logger.info(String.format("Querying to get encounters for catchment [%s], year [%s], lastUpdateTime [%s]", catchment.getCode(), yearOfDate, lastUpdateTime));
         return format("SELECT encounter_id, created_at FROM enc_by_catchment " +
                         " WHERE year = %s and created_at >= minTimeUuid('%s') and %s LIMIT %s ALLOW FILTERING;",
                 yearOfDate, lastUpdateTime, buildClauseForCatchment(catchment), limit);
