@@ -72,6 +72,9 @@ public class CatchmentEncounterController extends ShrController {
                 return deferredResult;
             }
             final Date requestedDate = getRequestedDateForCatchment(updatedSince);
+            logger.info(String.format("fetching catching encounters for [catchment=%s], [date=%s], [marker=%s]",
+                    catchment, DateUtil.toDateString(requestedDate, DateUtil.ISO_DATE_IN_MILLIS_FORMAT), lastMarker));
+
             final Boolean isUserAccessRestrictedForConfidentialData = accessFilter.isAccessRestrictedToEncounterFetchForCatchment(catchment, userInfo);
             if (isUserAccessRestrictedForConfidentialData == null) {
                 deferredResult.setErrorResult(new Forbidden(String.format("Access is denied to user %s for catchment %s", userInfo.getProperties().getId(), catchment)));
