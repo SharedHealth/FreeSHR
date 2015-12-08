@@ -152,7 +152,7 @@ public class CatchmentEncounterController extends ShrController {
         }
 
         EncounterEvent lastEncounterEvent = requestResults.get(size - 1);
-        return UrlUtil.addLastUpdatedQueryParams(request, lastEncounterEvent.getUpdatedAt(), lastEncounterEvent.getId());
+        return UrlUtil.addLastUpdatedQueryParams(request, lastEncounterEvent.getCreatedAt(), lastEncounterEvent.getId());
     }
 
     private String rollingFeedUrl(HttpServletRequest request, Date forDate) throws UnsupportedEncodingException {
