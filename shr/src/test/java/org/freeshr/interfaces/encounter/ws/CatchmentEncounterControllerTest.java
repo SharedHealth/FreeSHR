@@ -135,6 +135,38 @@ public class CatchmentEncounterControllerTest {
     }
 
     @Test
+    public void shouldGenerateNextUrlFromEncounterEventDate() throws Exception {
+        int encounterFetchLimit = CatchmentEncounterService.getEncounterFetchLimit();
+        List<Date> encounterDates = getTimeInstances(DateUtil.parseDate("2014-10-10"), 10);
+        List<EncounterEvent> encounterEvents = createEncounterEvents("hid01", 10, encounterDates);
+        Date currentDate = new Date();
+        EncounterEvent updatedEncounterEvent = new EncounterEvent(currentDate, encounterEvents.get(0).getEncounterBundle());
+        encounterEvents.add(updatedEncounterEvent);
+
+        TokenAuthentication tokenAuthentication = tokenAuthentication();
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(tokenAuthentication);
+        when(mockCatchmentEncounterService.findEncounterFeedForFacilityCatchment(anyString(),
+                any(Date.class),
+                eq(encounterFetchLimit * 2))).thenReturn(Observable.just(encounterEvents));
+
+
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null,
+                "/catchments/3026/encounters");
+        DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncounterFeedForCatchment
+                (mockHttpServletRequest, "3026", "2014-10-10", null);
+
+        EncounterSearchResponse response = (EncounterSearchResponse) encountersForCatchment.getResult();
+
+        String nextUrl = response.getNextUrl();
+        List<NameValuePair> params = URLEncodedUtils.parse(new URI(nextUrl), "UTF-8");
+        //generated time uuid for entry at the fetch limit.
+        assertEquals(currentDate, DateUtil.parseDate(params.get(0).getValue()));
+        String timeUUidForLastUpdateEvent = TimeUuidUtil.uuidForDate(currentDate).toString();
+        assertEquals(timeUUidForLastUpdateEvent, params.get(1).getValue());
+    }
+
+    @Test
     public void shouldRollOverForNextUrl() throws UnsupportedEncodingException, URISyntaxException {
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null,
                 "/catchments/3026/encounters");
@@ -195,16 +227,16 @@ public class CatchmentEncounterControllerTest {
 
         List<EncounterEvent> encounterEvents = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            EncounterBundle encounter = new EncounterBundle();
-            encounter.setEncounterId("e-" + (i + 1));
-            encounter.setHealthId(healthId);
-            encounter.setReceivedAt(dates.get(i));
-            encounter.setUpdatedAt(dates.get(i));
-            encounter.setEncounterContent("content-" + (i + 1));
-            encounter.setPatientConfidentiality(Confidentiality.Normal);
-            encounter.setEncounterConfidentiality(Confidentiality.Normal);
+            EncounterBundle bundle = new EncounterBundle();
+            bundle.setEncounterId("e-" + (i + 1));
+            bundle.setHealthId(healthId);
+            bundle.setReceivedAt(dates.get(i));
+            bundle.setUpdatedAt(dates.get(i));
+            bundle.setEncounterContent("content-" + (i + 1));
+            bundle.setPatientConfidentiality(Confidentiality.Normal);
+            bundle.setEncounterConfidentiality(Confidentiality.Normal);
 
-            EncounterEvent event = new EncounterEvent(dates.get(i), encounter);
+            EncounterEvent event = new EncounterEvent(dates.get(i), bundle);
             encounterEvents.add(event);
         }
         return encounterEvents;
