@@ -71,9 +71,16 @@ public class EncounterRepository {
                 completeResponds(true));
     }
 
-    public Observable<List<EncounterEvent>> findEncounterFeedForCatchment(Catchment catchment, Date updatedSince,
-                                                                          int limit) {
-        String identifyEncounterIdsQuery = buildCatchmentSearchQuery(catchment, updatedSince, limit);
+    public Observable<List<EncounterEvent>> findEncounterFeedForCatchmentUpdatedSince(Catchment catchment, Date updatedSince, int limit) {
+        String identifyEncounterIdsQuery = buildFetchCatchementQueryAfterLastUpdateTime(catchment, updatedSince, limit);
+        Observable<ResultSet> encounterIdsObservable = Observable.from(
+                cqlOperations.queryAsynchronously(identifyEncounterIdsQuery), Schedulers.io());
+
+        return encounterIdsObservable.concatMap(findEncountersOrderedByEvents());
+    }
+
+    public Observable<List<EncounterEvent>> findEncounterFeedForCatchmentAfterMarker(Catchment catchment, String lastReadMarker, Date updatedSince, int limit) {
+        String identifyEncounterIdsQuery = buildFetchCatchementQueryAfterMarker(catchment, lastReadMarker, updatedSince, limit);
         Observable<ResultSet> encounterIdsObservable = Observable.from(
                 cqlOperations.queryAsynchronously(identifyEncounterIdsQuery), Schedulers.io());
 
@@ -158,7 +165,7 @@ public class EncounterRepository {
         return new Func1<List<EncounterBundle>, Observable<List<EncounterEvent>>>() {
             @Override
             public Observable<List<EncounterEvent>> call(List<EncounterBundle> encounterBundles) {
-            List<EncounterEvent> encounterEvents = new ArrayList<>();
+                List<EncounterEvent> encounterEvents = new ArrayList<>();
                 EncounterEvent encounterEvent;
                 for (EncounterEventLog encounterInstance : encounterInstances) {
                     EncounterBundle savedEncounterBundle = selectFirst(encounterBundles, having(on(EncounterBundle.class).getEncounterId(),
@@ -253,13 +260,21 @@ public class EncounterRepository {
         return format("content_version_%s", fhirDocumentSchemaVersion);
     }
 
-    private String buildCatchmentSearchQuery(Catchment catchment, Date updatedSince, int limit) {
+    private String buildFetchCatchementQueryAfterLastUpdateTime(Catchment catchment, Date updatedSince, int limit) {
         int yearOfDate = DateUtil.getYearOf(updatedSince);
         String lastUpdateTime = DateUtil.toDateString(updatedSince, DateUtil.UTC_DATE_IN_MILLIS_FORMAT);
         //TODO test. condition should be >=
         return format("SELECT encounter_id, created_at FROM enc_by_catchment " +
                         " WHERE year = %s and created_at >= minTimeUuid('%s') and %s LIMIT %s ALLOW FILTERING;",
                 yearOfDate, lastUpdateTime, buildClauseForCatchment(catchment), limit);
+    }
+
+    private String buildFetchCatchementQueryAfterMarker(Catchment catchment, String lastMarker, Date updatedSince, int limit) {
+        int yearOfDate = DateUtil.getYearOf(updatedSince);
+        //TODO test. condition should be >=
+        return format("SELECT encounter_id, created_at FROM enc_by_catchment " +
+                        " WHERE year = %s and created_at >= %s and %s LIMIT %s ALLOW FILTERING;",
+                yearOfDate, lastMarker, buildClauseForCatchment(catchment), limit);
     }
 
     private Observable<List<EncounterBundle>> findEncounters(LinkedHashSet<String> encounterIds) {

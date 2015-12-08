@@ -23,9 +23,10 @@ public class CatchmentEncounterService {
         this.encounterRepository = encounterRepository;
     }
 
-    public Observable<List<EncounterEvent>> findEncounterFeedForFacilityCatchment(final String catchment,
-                                                                                  final Date sinceDate, final int limit) {
-        return encounterRepository.findEncounterFeedForCatchment(new Catchment(catchment), sinceDate, limit);
+    public Observable<List<EncounterEvent>> findEncounterFeedForFacilityCatchment(final String catchment, final Date sinceDate, String lastMarker){
+        if(StringUtils.isNotBlank(lastMarker))
+            return encounterRepository.findEncounterFeedForCatchmentAfterMarker(new Catchment(catchment), lastMarker, sinceDate, getEncounterFetchLimit());
+        return encounterRepository.findEncounterFeedForCatchmentUpdatedSince(new Catchment(catchment), sinceDate, getEncounterFetchLimit());
     }
 
     public static int getEncounterFetchLimit() {
