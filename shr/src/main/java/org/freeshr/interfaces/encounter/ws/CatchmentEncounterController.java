@@ -141,6 +141,10 @@ public class CatchmentEncounterController extends ShrController {
             return rollingFeedUrl(request, requestedDate);
         }
 
+        if (size == 1) {
+            return null;
+        }
+
         EncounterEvent lastEncounterEvent = requestResults.get(size - 1);
         return UrlUtil.addLastUpdatedQueryParams(request, lastEncounterEvent.getUpdatedAt(), lastEncounterEvent.getId());
     }
