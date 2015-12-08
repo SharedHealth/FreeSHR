@@ -118,8 +118,7 @@ public class CatchmentEncounterServiceIntegrationTest {
                 withContentForHealthId(VALID_HEALTH_ID, "xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_local_refs.xml"),
                 getUserInfo(clientId, email, securityToken)).toBlocking().first();
 
-        List<EncounterEvent> encounterEvents = catchmentEncounterService.findEncounterFeedForFacilityCatchment("305610",
-                date, 20).toBlocking().first();
+        List<EncounterEvent> encounterEvents = catchmentEncounterService.findEncounterFeedForFacilityCatchment("305610", date, null).toBlocking().first();
         assertEquals(1, encounterEvents.size());
         assertEquals(VALID_HEALTH_ID, encounterEvents.iterator().next().getHealthId());
     }
@@ -151,7 +150,7 @@ public class CatchmentEncounterServiceIntegrationTest {
                 200).toBlocking().first().size());
 
         List<EncounterEvent> encounterEvents = catchmentEncounterService.findEncounterFeedForFacilityCatchment(
-                "3056", date, 10).toBlocking().first();
+                "3056", date, null).toBlocking().first();
         assertEquals(2, encounterEvents.size());
 
         List<String> healthIds = extract(encounterEvents, on(EncounterEvent.class).getHealthId());

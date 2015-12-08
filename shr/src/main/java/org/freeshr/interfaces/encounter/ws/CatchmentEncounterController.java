@@ -14,23 +14,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.util.UriComponentsBuilder;
 import rx.Observable;
 import rx.functions.Action1;
-import rx.functions.Func0;
-import rx.functions.Func1;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -80,8 +73,8 @@ public class CatchmentEncounterController extends ShrController {
                 deferredResult.setErrorResult(new Forbidden(String.format("Access is denied to user %s for catchment %s", userInfo.getProperties().getId(), catchment)));
                 return deferredResult;
             }
-            final Observable<List<EncounterEvent>> catchmentEncounters =
-                    findFacilityCatchmentEncounterFeed(catchment, lastMarker, requestedDate);
+            final Observable<List<EncounterEvent>> catchmentEncounters = catchmentEncounterService.findEncounterFeedForFacilityCatchment(catchment, requestedDate, lastMarker);
+
             catchmentEncounters.subscribe(new Action1<List<EncounterEvent>>() {
                 @Override
                 public void call(List<EncounterEvent> encounterEvents) {
@@ -111,16 +104,6 @@ public class CatchmentEncounterController extends ShrController {
             deferredResult.setErrorResult(e);
         }
         return deferredResult;
-    }
-
-    private Observable<List<EncounterEvent>> findFacilityCatchmentEncounterFeed(String catchment,
-                                                                                String lastMarker, Date lastUpdateDate) {
-        int encounterFetchLimit = catchmentEncounterService.getEncounterFetchLimit();
-        Observable<List<EncounterEvent>> facilityCatchmentEncounters =
-                catchmentEncounterService.findEncounterFeedForFacilityCatchment(catchment, lastUpdateDate,
-                        encounterFetchLimit * 2);
-
-        return filterAfterMarker(facilityCatchmentEncounters, lastMarker, encounterFetchLimit);
     }
 
     /**
@@ -181,50 +164,4 @@ public class CatchmentEncounterController extends ShrController {
         return null;
     }
 
-    private Observable<List<EncounterEvent>> filterAfterMarker(final Observable<List<EncounterEvent>> encounterEventsObservable,
-                                                               final String lastMarker, final int limit) {
-
-        return encounterEventsObservable.flatMap(new Func1<List<EncounterEvent>, Observable<? extends List<EncounterEvent>>>() {
-            @Override
-            public Observable<? extends List<EncounterEvent>> call(List<EncounterEvent> encounterEvents) {
-                if (StringUtils.isBlank(lastMarker)) {
-                    return Observable.just(encounterEvents.size() > limit ? encounterEvents.subList(0, limit) :
-                            encounterEvents);
-                }
-
-                int lastMarkerIndex = identifyLastMarker(lastMarker, encounterEvents);
-                if (lastMarkerIndex >= 0) {
-                    if ((lastMarkerIndex + 1) <= encounterEvents.size()) {
-                        List<EncounterEvent> remainingEncounters = encounterEvents.subList(lastMarkerIndex + 1,
-                                encounterEvents.size());
-                        return Observable.just(remainingEncounters.size() > limit ? remainingEncounters.subList(0,
-                                limit) : remainingEncounters);
-                    }
-                }
-                return Observable.just(new ArrayList<EncounterEvent>());
-            }
-        }, new Func1<Throwable, Observable<? extends List<EncounterEvent>>>() {
-            @Override
-            public Observable<? extends List<EncounterEvent>> call(Throwable throwable) {
-                return Observable.error(throwable);
-            }
-        }, new Func0<Observable<? extends List<EncounterEvent>>>() {
-            @Override
-            public Observable<? extends List<EncounterEvent>> call() {
-                return null;
-            }
-        });
-
-    }
-
-    private int identifyLastMarker(String lastMarker, final List<EncounterEvent> encounterEvents) {
-        int idx = 0;
-        for (EncounterEvent encounterEvent : encounterEvents) {
-            if (encounterEvent.getId().equals(lastMarker)) {
-                return idx;
-            }
-            idx++;
-        }
-        return -1;
-    }
 }

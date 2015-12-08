@@ -12,12 +12,14 @@ import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.events.EncounterEvent;
 import org.freeshr.interfaces.encounter.ws.APIIntegrationTestBase;
+import org.freeshr.util.QueryUtils;
 import org.freeshr.utils.Confidentiality;
 import org.freeshr.utils.DateUtil;
 import org.freeshr.utils.TimeUuidUtil;
 import org.hamcrest.Matchers;
 import org.joda.time.DateTime;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -42,6 +44,13 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
     @Autowired
     @Qualifier("SHRCassandraTemplate")
     CqlOperations cqlOperations;
+
+    QueryUtils queryUtils;
+
+    @Before
+    public void setUp() throws Exception {
+        queryUtils = new QueryUtils(cqlOperations);
+    }
 
     @Test
     public void shouldFetchEncounterByHealthId() throws InterruptedException, ExecutionException {
@@ -86,10 +95,44 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         encounterRepository.save(createEncounterBundle("e-12", healthId, Confidentiality.Normal, Confidentiality.Normal,  asString("jsons/encounters/valid.json"), new Requester("facilityId", null), e2ReceivedDate), patient).toBlocking().first();
 
         List<EncounterEvent> encountersForCatchment = encounterRepository.
-                findEncounterFeedForCatchment(new Catchment("0102"), today.toDate(), 10).toBlocking().first();
+                findEncounterFeedForCatchmentUpdatedSince(new Catchment("0102"), today.toDate(), 10).toBlocking().first();
         assertEquals(2, encountersForCatchment.size());
         assertEncounter(encountersForCatchment, "e-11", e1ReceivedDate);
         assertEncounter(encountersForCatchment, "e-12", e2ReceivedDate);
+    }
+
+    @Test
+    public void shouldFetchEncountersForCatchmentsUpdatedSince() throws Exception {
+        Date mar5T900 = new DateTime(2015, 03,05,9,00).toDate();
+        Date mar5T0930 = new DateTime(2015, 03,05,9,30).toDate();
+        Date mar5T1030 = new DateTime(2015, 03,05,10,30).toDate();
+        Date mar5T1130 = new DateTime(2015, 03,05,11,30).toDate();
+        queryUtils.insertEncounterByCatchment("E1", "D1", "D1d1", "D1d1u1", mar5T0930);
+        queryUtils.insertEncounterByCatchment("E2", "D1", "D1d1", "D1d1u1", mar5T1030);
+        queryUtils.insertEncounterByCatchment("E3", "D1", "D1d1", "D1d1u1", mar5T1130);
+
+        List<EncounterEvent> encounterEvents = encounterRepository.findEncounterFeedForCatchmentUpdatedSince(new Catchment("D1d1u1"), mar5T900, 20).toBlocking().first();
+        assertEquals(3, encounterEvents.size());
+        assertEquals(mar5T0930, encounterEvents.get(0).getUpdatedAt());
+        assertEquals(mar5T1030, encounterEvents.get(1).getUpdatedAt());
+        assertEquals(mar5T1130, encounterEvents.get(2).getUpdatedAt());
+    }
+
+    @Test
+    public void shouldFetchEncountersForCatchmentsSinceLastMarker() throws Exception {
+        Date mar5T900 = new DateTime(2015, 03,05,9,00).toDate();
+        Date mar5T0930 = new DateTime(2015, 03,05,9,30).toDate();
+        Date mar5T1030 = new DateTime(2015, 03,05,10,30).toDate();
+        Date mar5T1130 = new DateTime(2015, 03,05,11,30).toDate();
+        queryUtils.insertEncounterByCatchment("E1", "D1", "D1d1", "D1d1u1", mar5T0930);
+        queryUtils.insertEncounterByCatchment("E2", "D1", "D1d1", "D1d1u1", mar5T1030);
+        queryUtils.insertEncounterByCatchment("E3", "D1", "D1d1", "D1d1u1", mar5T1130);
+
+        List<EncounterEvent> encounterEvents = encounterRepository.findEncounterFeedForCatchmentAfterMarker(new Catchment("D1d1u1"),TimeUuidUtil.uuidForDate(mar5T1030).toString(), mar5T900, 20).toBlocking().first();
+        assertEquals(2, encounterEvents.size());
+        assertEquals(mar5T1030, encounterEvents.get(0).getUpdatedAt());
+        assertEquals(mar5T1130, encounterEvents.get(1).getUpdatedAt());
+
     }
 
     @Test
@@ -271,7 +314,7 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         assertEquals(jan1st0940,encounterEventsForPatient.get(1).getUpdatedAt());
 
         assertEquals("e-1", encounterEventsForPatient.get(2).getEncounterId());
-        assertEquals(jan1st0945,encounterEventsForPatient.get(2).getUpdatedAt());
+        assertEquals(jan1st0945, encounterEventsForPatient.get(2).getUpdatedAt());
 
 
     }
