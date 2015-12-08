@@ -8,6 +8,7 @@ import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Patient;
+import org.freeshr.events.EncounterEvent;
 import org.freeshr.infrastructure.persistence.EncounterRepository;
 import org.freeshr.infrastructure.persistence.FacilityRepository;
 import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
@@ -32,7 +33,11 @@ import org.springframework.web.context.WebApplicationContext;
 import javax.annotation.Resource;
 import javax.servlet.Filter;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import static ch.lambdaj.Lambda.extract;
+import static ch.lambdaj.Lambda.on;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = {WebMvcConfig.class, SHRConfig.class})
@@ -100,6 +105,24 @@ public abstract class APIIntegrationTestBase {
             @Override
             public void describeTo(Description description) {
                 description.appendValue(expectedSize);
+
+            }
+        };
+    }
+
+    protected BaseMatcher<EncounterSearchResponse> hasEvents(final List<String> expectedEventIds) {
+        return new BaseMatcher<EncounterSearchResponse>() {
+
+            @Override
+            public boolean matches(Object item) {
+                List<EncounterEvent> entries = ((EncounterSearchResponse) item).getEntries();
+                List<String> eventIds = extract(entries, on(EncounterEvent.class).getId());
+                return eventIds.containsAll(expectedEventIds);
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendValue(expectedEventIds);
 
             }
         };

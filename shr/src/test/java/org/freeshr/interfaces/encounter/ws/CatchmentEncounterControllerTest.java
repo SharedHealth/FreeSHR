@@ -1,8 +1,6 @@
 package org.freeshr.interfaces.encounter.ws;
 
 
-import com.sun.syndication.feed.atom.Feed;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.freeshr.application.fhir.EncounterBundle;
@@ -20,7 +18,6 @@ import org.freeshr.utils.DateUtil;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.utils.TimeUuidUtil;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
@@ -45,7 +42,8 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -71,75 +69,7 @@ public class CatchmentEncounterControllerTest {
     }
 
     @Test
-    @Ignore
-    //Wanted to revisit the test.Shameful for doing this.
-    public void shouldGetPagedEncountersForCatchment() throws Exception {
-        int encounterFetchLimit = CatchmentEncounterService.getEncounterFetchLimit();
-        List<Date> encounterDates = getTimeInstances(DateUtil.parseDate("2014-10-10"), 50);
-        List<EncounterEvent> encounterEvents = createEncounterEvents("hid01", 50, encounterDates);
-
-        TokenAuthentication tokenAuthentication = tokenAuthentication();
-        SecurityContextHolder.setContext(securityContext);
-        when(securityContext.getAuthentication()).thenReturn(tokenAuthentication);
-        when(mockCatchmentEncounterService.findEncounterFeedForFacilityCatchment("3026",
-                DateUtil.parseDate("2014-10-10"), null)).thenReturn(Observable.just(slice(encounterFetchLimit,
-                encounterEvents)));
-
-        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null,
-                "/catchments/3026/encounters");
-        DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncounterFeedForCatchment
-                (mockHttpServletRequest, "3026", "2014-10-10", null);
-        EncounterSearchResponse response = (EncounterSearchResponse) encountersForCatchment.getResult();
-        List<EncounterEvent> entries = response.getEntries();
-        assertEquals(encounterFetchLimit, entries.size());
-        String expectedNextUrl = response.getNextUrl();
-        List<NameValuePair> params = URLEncodedUtils.parse(new URI(expectedNextUrl), "UTF-8");
-        //generated time uuid for entry at the fetch limit.
-        String timeUUidFor20thEntry = TimeUuidUtil.uuidForDate(encounterDates.get(19)).toString();
-        assertEquals(timeUUidFor20thEntry, params.get(1).getValue());
-
-        String timeUUidFor22ndEntry = TimeUuidUtil.uuidForDate(encounterDates.get(21)).toString();
-
-        when(mockCatchmentEncounterService.findEncounterFeedForFacilityCatchment(anyString(),
-                any(Date.class), eq(timeUUidFor22ndEntry))).thenReturn(Observable.just(encounterEvents.subList(22,50)));
-
-
-        encountersForCatchment = controller.findEncounterFeedForCatchment(mockHttpServletRequest, "3026", "2014-10-10", timeUUidFor22ndEntry);
-        response = (EncounterSearchResponse) encountersForCatchment.getResult();
-        entries = response.getEntries();
-        assertEquals(18, entries.size());
-    }
-
-    @Test
-    public void shouldGetAtomFeed() throws Exception {
-        int encounterFetchLimit = CatchmentEncounterService.getEncounterFetchLimit();
-        List<Date> encounterDates = getTimeInstances(DateUtil.parseDate("2014-10-10"), 50);
-        List<EncounterEvent> encounterEvents = createEncounterEvents("hid01", 50, encounterDates);
-
-        TokenAuthentication tokenAuthentication = tokenAuthentication();
-        SecurityContextHolder.setContext(securityContext);
-        when(securityContext.getAuthentication()).thenReturn(tokenAuthentication);
-        when(mockCatchmentEncounterService.findEncounterFeedForFacilityCatchment(anyString(),
-                any(Date.class),
-                anyString())).thenReturn(Observable.just(slice(encounterFetchLimit,
-                encounterEvents)));
-
-
-        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null,
-                "/catchments/3026/encounters");
-        DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncounterFeedForCatchment
-                (mockHttpServletRequest, "3026", "2014-10-10", null);
-        EncounterSearchResponse response = (EncounterSearchResponse) encountersForCatchment.getResult();
-        List<EncounterEvent> results = response.getEntries();
-
-        EncounterFeedHelper encounterFeedBuilder = new EncounterFeedHelper();
-        Feed feed = encounterFeedBuilder.generateFeed(response, generateFeedId("2014-10-10", null));
-        assertEquals(encounterFetchLimit, feed.getEntries().size());
-    }
-
-    @Test
     public void shouldGenerateNextUrlFromEncounterEventDate() throws Exception {
-        int encounterFetchLimit = CatchmentEncounterService.getEncounterFetchLimit();
         List<Date> encounterDates = getTimeInstances(DateUtil.parseDate("2014-10-10"), 10);
         List<EncounterEvent> encounterEvents = createEncounterEvents("hid01", 10, encounterDates);
         Date currentDate = new Date();
@@ -214,15 +144,6 @@ public class CatchmentEncounterControllerTest {
         DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncounterFeedForCatchment
                 (mockHttpServletRequest, "30", "2014-10-10", null);
         assertTrue(encountersForCatchment.getResult() instanceof BadRequest);
-    }
-
-    private String generateFeedId(String updatedSince, String requestedMarker) {
-        return StringUtils.isBlank(requestedMarker) ? "E-" + updatedSince : "E-" + updatedSince + "%2B" +
-                requestedMarker;
-    }
-
-    private List<EncounterEvent> slice(int size, List<EncounterEvent> encounterEvents) {
-        return encounterEvents.subList(0, size);
     }
 
 
