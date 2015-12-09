@@ -42,9 +42,8 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class CatchmentEncounterControllerTest {
@@ -143,6 +142,34 @@ public class CatchmentEncounterControllerTest {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(controller.getRequestedDateForCatchment(""));
         assertEquals(1, calendar.get(Calendar.DAY_OF_MONTH));
+    }
+
+    @Test
+    public void shouldReturnBadRequestIfLastMarkerToIsInvalidUUID() throws Exception {
+        TokenAuthentication tokenAuthentication = tokenAuthentication();
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(tokenAuthentication);
+        when(mockCatchmentEncounterService.findEncounterFeedForFacilityCatchment(anyString(), any(Date.class),anyString())).thenReturn(Observable.<List<EncounterEvent>>empty());
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null,"/catchments/3026/encounters");
+        DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncounterFeedForCatchment
+                (mockHttpServletRequest, "3026", "2014-10-10", "invalid-uuid");
+
+        assertTrue(encountersForCatchment.getResult() instanceof BadRequest);
+        verify(mockCatchmentEncounterService, never()).findEncounterFeedForFacilityCatchment(anyString(), any(Date.class), anyString());
+    }
+
+    @Test
+    public void shouldNotReturnBadRequestIfLastMarkerIsNotPassed() throws Exception {
+        TokenAuthentication tokenAuthentication = tokenAuthentication();
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(tokenAuthentication);
+        when(mockCatchmentEncounterService.findEncounterFeedForFacilityCatchment(anyString(), any(Date.class),anyString())).thenReturn(Observable.<List<EncounterEvent>>empty());
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null,"/catchments/3026/encounters");
+        DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncounterFeedForCatchment
+                (mockHttpServletRequest, "3026", "2014-10-10", null);
+
+        assertFalse(encountersForCatchment.getResult() instanceof BadRequest);
+        verify(mockCatchmentEncounterService, times(1)).findEncounterFeedForFacilityCatchment(anyString(), any(Date.class), anyString());
     }
 
     @Test

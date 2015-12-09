@@ -78,4 +78,14 @@ public class TimeUuidUtil {
     public static Date getDateFromUUID(UUID uuid) {
         return new Date(getTimeFromUUID(uuid));
     }
+
+    public static boolean isValidTimeUUID(String uuid){
+        try {
+            UUID parsedUUID = UUID.fromString(uuid);
+            return getDateFromUUID(parsedUUID) != null;
+
+        }catch (Exception ex){
+            return false;
+        }
+    }
 }
