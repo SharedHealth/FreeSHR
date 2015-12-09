@@ -127,6 +127,18 @@ public class CatchmentEncounterControllerTest {
     }
 
     @Test
+    public void shouldNotReturnNextURLIfTheFeedHasLastEntryInIt() throws Exception {
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null,
+                "/catchments/3026/encounters");
+
+        ArrayList<EncounterEvent> lastEventInTheFeed = new ArrayList<>();
+        lastEventInTheFeed.add(new EncounterEvent(null,new Date(),null));
+        String nextResultURL = controller.getNextResultURL(mockHttpServletRequest, lastEventInTheFeed, new Date());
+
+        assertNull("For last event in the feed, should have returned null", nextResultURL);
+    }
+
+    @Test
     public void shouldDefaultToStartOfMonthIfNotSpecified() throws UnsupportedEncodingException {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(controller.getRequestedDateForCatchment(""));
