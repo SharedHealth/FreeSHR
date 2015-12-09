@@ -9,6 +9,7 @@ import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.interfaces.encounter.ws.exceptions.BadRequest;
 import org.freeshr.interfaces.encounter.ws.exceptions.Forbidden;
 import org.freeshr.utils.DateUtil;
+import org.freeshr.utils.TimeUuidUtil;
 import org.freeshr.utils.UrlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,10 @@ public class CatchmentEncounterController extends ShrController {
                 deferredResult.setErrorResult(new BadRequest("Catchment should have division and district"));
                 return deferredResult;
             }
+            if(!isValidLastMarker(lastMarker)) {
+                deferredResult.setErrorResult(new BadRequest("Invalid marker"));
+                return deferredResult;
+            }
             final Date requestedDate = getRequestedDateForCatchment(updatedSince);
             logger.info(String.format("fetching catching encounters for [catchment=%s], [date=%s], [marker=%s]",
                     catchment, DateUtil.toDateString(requestedDate, DateUtil.ISO_DATE_IN_MILLIS_FORMAT), lastMarker));
@@ -104,6 +109,10 @@ public class CatchmentEncounterController extends ShrController {
             deferredResult.setErrorResult(e);
         }
         return deferredResult;
+    }
+
+    private boolean isValidLastMarker(String lastMarker) {
+        return StringUtils.isNotBlank(lastMarker) ? TimeUuidUtil.isValidTimeUUID(lastMarker) : true;
     }
 
     /**
