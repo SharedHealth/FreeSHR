@@ -17,19 +17,21 @@ public class RxMaps {
         };
     }
 
-    public static <T> Func0<Observable<? extends T>> completeResponds(final T value) {
+    public static <T> Func0<Observable<? extends T>> completeResponds() {
         return new Func0<Observable<? extends T>>() {
             @Override
             public Observable<? extends T> call() {
-                return Observable.just(value);
+                return Observable.empty();
             }
         };
     }
 
-    public static <T> Func1<Throwable, Observable<? extends T>> logAndForwardError(final Logger log) {
+    public static <T> Func1<Throwable, Observable<? extends T>> logAndForwardError(final Logger log, final String... errorMessage) {
         return new Func1<Throwable, Observable<? extends T>>() {
             @Override
             public Observable<? extends T> call(Throwable throwable) {
+                if(errorMessage.length > 0)
+                    log.error(errorMessage[0]);
                 log.error(throwable.getMessage());
                 return Observable.error(throwable);
             }

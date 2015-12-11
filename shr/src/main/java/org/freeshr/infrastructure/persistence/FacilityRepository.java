@@ -61,7 +61,7 @@ public class FacilityRepository {
         }, new Func0<Observable<? extends Facility>>() {
             @Override
             public Observable<? extends Facility> call() {
-                return null;
+                return Observable.empty();
             }
         });
     }
@@ -93,18 +93,8 @@ public class FacilityRepository {
             public Observable<Facility> call(ResultSet rows) {
                 return Observable.just(facility);
             }
-        }, new Func1<Throwable, Observable<Facility>>() {
-            @Override
-            public Observable<Facility> call(Throwable throwable) {
-                logger.error(throwable.getMessage());
-                return Observable.error(throwable);
-            }
-        }, new Func0<Observable<Facility>>() {
-            @Override
-            public Observable<Facility> call() {
-                return Observable.just(null);
-            }
-        });
+        }, RxMaps.<Facility>logAndForwardError(logger), RxMaps.<Facility>completeResponds());
+
     }
 
     private Insert buildInsertStatement(Facility facility) {

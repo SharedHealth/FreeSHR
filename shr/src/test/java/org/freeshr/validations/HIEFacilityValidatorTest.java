@@ -1,7 +1,6 @@
 package org.freeshr.validations;
 
 import org.freeshr.config.SHRProperties;
-import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.service.FacilityService;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +45,7 @@ public class HIEFacilityValidatorTest {
     @Test
     public void shouldNotValidateFacilityIfNotPresentOnHRM() throws Exception {
         when(shrProperties.getFacilityReferencePath()).thenReturn("http://hie.org/facilities");
-        Mockito.when(facilityService.checkForFacility("invalid-facility-id")).thenReturn(Observable.<Facility>just(null));
+        Mockito.when(facilityService.checkForFacility("invalid-facility-id")).thenReturn(Observable.just(false));
 
         assertFalse(validator.validate("http://hie.org/facilities/invalid-facility-id.json"));
 
@@ -55,7 +54,7 @@ public class HIEFacilityValidatorTest {
     @Test
     public void shouldValidateFacilityIfPresentOnHRM() throws Exception {
         when(shrProperties.getFacilityReferencePath()).thenReturn("http://hie.org/facilities");
-        Mockito.when(facilityService.checkForFacility("valid-facility-id")).thenReturn(Observable.<Facility>just(new Facility()));
+        Mockito.when(facilityService.checkForFacility("valid-facility-id")).thenReturn(Observable.just(true));
 
         assertTrue(validator.validate("http://hie.org/facilities/valid-facility-id.json"));
 

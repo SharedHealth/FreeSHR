@@ -1,7 +1,6 @@
 package org.freeshr.validations;
 
 import org.freeshr.config.SHRProperties;
-import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.service.FacilityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,11 +24,7 @@ public class HIEFacilityValidator {
             return false;
         }
 
-        Facility facility = facilityService.checkForFacility(extractFacilityId(url)).toBlocking().first();
-        if (facility == null) {
-            return false;
-        }
-        return true;
+        return facilityService.checkForFacility(extractFacilityId(url)).toBlocking().first();
     }
 
     private boolean isValidFacilityUrl(String referenceSimple) {

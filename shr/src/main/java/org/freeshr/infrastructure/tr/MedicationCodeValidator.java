@@ -2,6 +2,7 @@ package org.freeshr.infrastructure.tr;
 
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.config.SHRProperties;
+import org.freeshr.infrastructure.persistence.RxMaps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -9,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.AsyncRestTemplate;
 import rx.Observable;
-import rx.functions.Func0;
 import rx.functions.Func1;
 
 import static org.apache.commons.lang3.StringUtils.substringAfterLast;
@@ -57,12 +57,7 @@ public class MedicationCodeValidator implements CodeValidator {
                 public Observable<? extends Boolean> call(Throwable throwable) {
                     return Observable.just(Boolean.FALSE);
                 }
-            }, new Func0<Observable<? extends Boolean>>() {
-                @Override
-                public Observable<? extends Boolean> call() {
-                    return null;
-                }
-            });
+            }, RxMaps.<Boolean>completeResponds());
         }
         return Observable.just(Boolean.FALSE);
     }

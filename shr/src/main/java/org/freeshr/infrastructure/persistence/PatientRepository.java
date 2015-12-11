@@ -16,7 +16,6 @@ import rx.Observable;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-import static org.freeshr.infrastructure.persistence.RxMaps.completeResponds;
 import static org.freeshr.infrastructure.persistence.RxMaps.respondOnNext;
 
 @Component
@@ -77,8 +76,7 @@ public class PatientRepository {
     public Observable<Boolean> save(Patient patient) {
         Observable<ResultSet> saveObservable = Observable.from(
                 cqlOperations.executeAsynchronously(buildPatientInsertQuery(patient)), Schedulers.io());
-        return saveObservable.flatMap(respondOnNext(true), RxMaps.<Boolean>logAndForwardError(logger),
-                completeResponds(true));
+        return saveObservable.flatMap(respondOnNext(true), RxMaps.<Boolean>logAndForwardError(logger), RxMaps.<Boolean>completeResponds());
     }
 
     private Insert buildPatientInsertQuery(Patient patient) {

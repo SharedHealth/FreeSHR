@@ -9,12 +9,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.EncounterBundle;
-import org.freeshr.events.EncounterEvent;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Catchment;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
+import org.freeshr.events.EncounterEvent;
 import org.freeshr.events.EncounterEventLog;
 import org.freeshr.utils.DateUtil;
 import org.freeshr.utils.TimeUuidUtil;
@@ -36,7 +36,6 @@ import java.util.concurrent.ExecutionException;
 import static ch.lambdaj.Lambda.*;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static java.lang.String.format;
-import static org.freeshr.infrastructure.persistence.RxMaps.completeResponds;
 import static org.freeshr.infrastructure.persistence.RxMaps.respondOnNext;
 import static org.freeshr.utils.Confidentiality.getConfidentiality;
 
@@ -67,8 +66,7 @@ public class EncounterRepository {
         Observable<ResultSet> saveObservable = Observable.from(cqlOperations.executeAsynchronously(batch),
                 Schedulers.io());
 
-        return saveObservable.flatMap(respondOnNext(true), RxMaps.<Boolean>logAndForwardError(logger),
-                completeResponds(true));
+        return saveObservable.flatMap(respondOnNext(true), RxMaps.<Boolean>logAndForwardError(logger), RxMaps.<Boolean>completeResponds());
     }
 
     public Observable<List<EncounterEvent>> findEncounterFeedForCatchmentUpdatedSince(Catchment catchment, Date updatedSince, int limit) {
@@ -134,8 +132,9 @@ public class EncounterRepository {
         Observable<ResultSet> saveObservable = Observable.from(cqlOperations.executeAsynchronously(batch),
                 Schedulers.io());
 
-        return saveObservable.flatMap(respondOnNext(true), RxMaps.<Boolean>logAndForwardError(logger),
-                completeResponds(true));
+        return saveObservable.flatMap(respondOnNext(true),
+                RxMaps.<Boolean>logAndForwardError(logger),
+                RxMaps.<Boolean>completeResponds());
 
     }
 
