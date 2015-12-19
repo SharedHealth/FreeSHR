@@ -9,10 +9,10 @@ import ca.uhn.fhir.model.dstu2.composite.SimpleQuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.validation.IValidationSupport;
 import org.freeshr.application.fhir.TRConceptValidator;
+import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.validations.Severity;
 import org.freeshr.validations.ShrValidationMessage;
 import org.freeshr.validations.SubResourceValidator;
-import org.freeshr.validations.UrlValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +36,14 @@ public class MedicationOrderValidator implements SubResourceValidator {
 
     private TRConceptValidator trConceptValidator;
     private DoseQuantityValidator doseQuantityValidator;
+    private FhirFeedUtil fhirFeedUtil;
 
     @Autowired
     public MedicationOrderValidator(TRConceptValidator trConceptValidator,
-                                    DoseQuantityValidator doseQuantityValidator, UrlValidator urlValidator) {
+                                    DoseQuantityValidator doseQuantityValidator, FhirFeedUtil fhirFeedUtil) {
         this.trConceptValidator = trConceptValidator;
         this.doseQuantityValidator = doseQuantityValidator;
+        this.fhirFeedUtil = fhirFeedUtil;
     }
 
     @Override
@@ -132,8 +134,8 @@ public class MedicationOrderValidator implements SubResourceValidator {
         ArrayList<ShrValidationMessage> shrValidationMessages = new ArrayList<>();
         for (CodingDt codingDt : medicationCoding.getCoding()) {
             if (codingDt.getSystem() != null && codingDt.getCode() != null) {
-                if (trConceptValidator.isCodeSystemSupported(codingDt.getSystem())) {
-                    IValidationSupport.CodeValidationResult validationResult = trConceptValidator.validateCode(codingDt.getSystem(), codingDt.getCode(), codingDt.getDisplay());
+                if (trConceptValidator.isCodeSystemSupported(fhirFeedUtil.getFhirContext(), codingDt.getSystem())) {
+                    IValidationSupport.CodeValidationResult validationResult = trConceptValidator.validateCode(fhirFeedUtil.getFhirContext(), codingDt.getSystem(), codingDt.getCode(), codingDt.getDisplay());
                     if (validationResult != null && !validationResult.isOk()) {
                         logger.debug(String.format("Medication-Order:Encounter failed for %s", validationResult.getMessage()));
                         shrValidationMessages.add(new ShrValidationMessage(Severity.ERROR, location, "invalid", validationResult.getMessage()));

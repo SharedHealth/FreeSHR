@@ -3,9 +3,9 @@ package org.freeshr.validations.bundle;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.validation.*;
-import org.freeshr.utils.FileUtil;
 import org.freeshr.utils.FhirFeedUtil;
-import org.freeshr.validations.*;
+import org.freeshr.utils.FileUtil;
+import org.freeshr.validations.ValidationSubject;
 import org.freeshr.validations.resource.ConditionValidator;
 import org.freeshr.validations.resource.ImmunizationValidator;
 import org.freeshr.validations.resource.MedicationOrderValidator;
@@ -16,7 +16,9 @@ import org.hl7.fhir.instance.model.ValueSet;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.validation.IResourceValidator;
 import org.hl7.fhir.instance.validation.ValidationMessage;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.mockito.Mock;
 
 import java.util.List;
@@ -135,12 +137,12 @@ public class ResourceValidatorTest {
     private IValidationSupport getCustomValidationSupport() {
         return new IValidationSupport() {
             @Override
-            public ValueSet.ValueSetExpansionComponent expandValueSet(ValueSet.ConceptSetComponent theInclude) {
+            public ValueSet.ValueSetExpansionComponent expandValueSet(FhirContext theContext, ValueSet.ConceptSetComponent theInclude) {
                 return null;
             }
 
             @Override
-            public ValueSet fetchCodeSystem(String theSystem) {
+            public ValueSet fetchCodeSystem(FhirContext theContext, String theSystem) {
                 return null;
             }
 
@@ -150,17 +152,17 @@ public class ResourceValidatorTest {
             }
 
             @Override
-            public boolean isCodeSystemSupported(String theSystem) {
+            public boolean isCodeSystemSupported(FhirContext theContext, String theSystem) {
                 if (theSystem.contains("/openmrs/ws/rest/v1/tr/referenceterms/")
-                    ||
-                   theSystem.contains("/openmrs/ws/rest/v1/tr/concepts/")) {
+                        ||
+                        theSystem.contains("/openmrs/ws/rest/v1/tr/concepts/")) {
                     return true;
                 }
                 return false;
             }
 
             @Override
-            public CodeValidationResult validateCode(String theCodeSystem, String theCode, String theDisplay) {
+            public CodeValidationResult validateCode(FhirContext theContext, String theCodeSystem, String theCode, String theDisplay) {
                 if (theCodeSystem.contains("/openmrs/ws/rest/v1/tr/referenceterms/")
                         ||
                         theCodeSystem.contains("/openmrs/ws/rest/v1/tr/concepts/")) {

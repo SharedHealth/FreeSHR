@@ -1,6 +1,6 @@
 package org.freeshr.validations.resource;
 
-import org.freeshr.validations.resource.DoseQuantityValidator;
+import org.freeshr.utils.FhirFeedUtil;
 import org.hl7.fhir.instance.model.Quantity;
 import org.junit.Test;
 
@@ -12,7 +12,7 @@ public class DoseQuantityValidatorTest {
     @Test
     public void shouldCheckForReferenceUrlPresence() throws Exception {
 
-        DoseQuantityValidator doseQuantityValidator = new DoseQuantityValidator(null);
+        DoseQuantityValidator doseQuantityValidator = new DoseQuantityValidator(null, new FhirFeedUtil());
         assertTrue(doseQuantityValidator.isReferenceUrlNotFound((Quantity) null));
         assertTrue(doseQuantityValidator.isReferenceUrlNotFound(new Quantity()));
 

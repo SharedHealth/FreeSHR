@@ -115,7 +115,7 @@
                     </extension>
                     <additionalInstructions>
                         <coding>
-                            <system value="/concepts/1101"/>
+                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/1101"/>
                             <code value="1101"/>
                             <display value="As directed"/>
                         </coding>

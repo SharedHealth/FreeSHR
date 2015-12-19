@@ -125,7 +125,6 @@ public class EncounterValidatorIntegrationTest {
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/cbc_labSet_concept.json"))));
-
         //terms for complete blood count
         givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/referenceterms/Creatinine-4df1-438e-9d72-0a8b161d409b"))
                 .willReturn(aResponse()
@@ -144,6 +143,13 @@ public class EncounterValidatorIntegrationTest {
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/trValueset_Relationship_type.json"))));
+
+        //Dosing instruction as directed
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/concepts/1101"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/concept_as_directed.json"))));
 
         //tr valueset routes of administration
         givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/Route-of-Administration"))
@@ -230,10 +236,10 @@ public class EncounterValidatorIntegrationTest {
                 FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_localRefs_with_invalidConcept.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
-        assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:Condition/f:code",
-                "Unable to validate code \"INVALID-07952dc2-5206-11e5-ae6d-0050568225ca\" in code system \"http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca\"",
-                false, response);
         assertEquals(1, response.getErrors().size());
+        assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:Condition/f:code/f:coding",
+                "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca], code[INVALID-07952dc2-5206-11e5-ae6d-0050568225ca]",
+                false, response);
     }
 
     @Test
@@ -242,8 +248,8 @@ public class EncounterValidatorIntegrationTest {
                 FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_localRefs_with_invalidRefTerm.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
-        assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:Condition/f:code",
-                "Unable to validate code \"INVALID-A90\" in code system \"http://localhost:9997/openmrs/ws/rest/v1/tr/referenceterms/2f6z9872-4df1-438e-9d72-0a8b161d409b\"",
+        assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:Condition/f:code/f:coding[1]",
+                "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/referenceterms/2f6z9872-4df1-438e-9d72-0a8b161d409b], code[INVALID-A90]",
                 false, response);
         assertEquals(1, response.getErrors().size());
     }
@@ -257,7 +263,7 @@ public class EncounterValidatorIntegrationTest {
         EncounterValidationResponse response = validator.validate(validationContext);
         assertFalse(response.isSuccessful());
         assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:Condition/f:clinicalStatus",
-                "Coded value wrong is not in value set http://hl7.org/fhir/ValueSet/condition-clinical", true, response);
+                "The value provided is not in the value set http://hl7.org/fhir/ValueSet/condition-clinical (http://hl7.org/fhir/ValueSet/condition-clinical, and a code is recommended to come from this value set", true, response);
     }
 
     /**
@@ -279,13 +285,13 @@ public class EncounterValidatorIntegrationTest {
         assertFailureInResponse("/f:Bundle/f:entry[3]/f:resource/f:Condition/f:code/f:coding/f:system",
                 "@value cannot be empty", false, response);
         assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:Condition/f:category",
-                "None of the codes are in the example value set http://hl7.org/fhir/ValueSet/condition-category", true, response);
+                "None of the codes provided are in the value set http://hl7.org/fhir/ValueSet/condition-category (http://hl7.org/fhir/ValueSet/condition-category, and a code is recommended to come from this value set", true, response);
         assertFailureInResponse("/f:Bundle/f:entry[3]/f:resource/f:Condition/f:category",
-                "None of the codes are in the example value set http://hl7.org/fhir/ValueSet/condition-category", true, response);
+                "None of the codes provided are in the value set http://hl7.org/fhir/ValueSet/condition-category (http://hl7.org/fhir/ValueSet/condition-category, and a code is recommended to come from this value set", true, response);
         assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:Condition/f:clinicalStatus",
-                "Coded value wrong is not in value set http://hl7.org/fhir/ValueSet/condition-clinical", true, response);
+                "The value provided is not in the value set http://hl7.org/fhir/ValueSet/condition-clinical (http://hl7.org/fhir/ValueSet/condition-clinical, and a code is recommended to come from this value set", true, response);
         assertFailureInResponse("/f:Bundle/f:entry[3]/f:resource/f:Condition/f:clinicalStatus",
-                "Coded value wrong is not in value set http://hl7.org/fhir/ValueSet/condition-clinical", true, response);
+                "The value provided is not in the value set http://hl7.org/fhir/ValueSet/condition-clinical (http://hl7.org/fhir/ValueSet/condition-clinical, and a code is recommended to come from this value set", true, response);
     }
 
     @Test
@@ -330,8 +336,8 @@ public class EncounterValidatorIntegrationTest {
         EncounterValidationResponse response = validator.validate(validationContext);
         assertFalse(response.isSuccessful());
         assertEquals(1, response.getErrors().size());
-        assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:FamilyMemberHistory/f:relationship",
-                "Unable to validate code \"INVALID\" in code system \"http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Relationship-Type\"", true, response);
+        assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:FamilyMemberHistory/f:relationship/f:coding",
+                "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Relationship-Type], code[INVALID]", true, response);
     }
 
     @Test

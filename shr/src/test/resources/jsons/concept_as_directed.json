@@ -1,0 +1,25 @@
+{
+  "version": "1.1",
+  "conceptClass": "Misc ",
+  "fullySpecifiedName": {
+    "conceptNameType": "FULLY_SPECIFIED",
+    "conceptName": "As directed",
+    "locale": "en"
+  },
+  "retireReason": null,
+  "retired": false,
+  "names": [
+    {
+      "conceptNameType": "FULLY_SPECIFIED",
+      "conceptName": "As directed",
+      "locale": "en"
+    }
+  ],
+  "uuid": "1101",
+  "datatypeName": "N/A",
+  "description": {
+    "locale": "en",
+    "description": "As directed dosing instruction"
+  },
+  "set": false
+}

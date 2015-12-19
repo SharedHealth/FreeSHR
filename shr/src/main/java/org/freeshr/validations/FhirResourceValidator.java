@@ -1,13 +1,7 @@
 package org.freeshr.validations;
 
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
-import ca.uhn.fhir.validation.FhirInstanceValidator;
-import ca.uhn.fhir.validation.FhirValidator;
-import ca.uhn.fhir.validation.IValidatorModule;
-import ca.uhn.fhir.validation.ResultSeverityEnum;
-import ca.uhn.fhir.validation.SingleValidationMessage;
-import ca.uhn.fhir.validation.ValidationResult;
-import ca.uhn.fhir.validation.ValidationSupportChain;
+import ca.uhn.fhir.validation.*;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.TRConceptValidator;
 import org.freeshr.utils.FhirFeedUtil;
@@ -109,7 +103,7 @@ public class FhirResourceValidator {
             String message = validationMessage.getMessage();
             String terminologySystem = getTerminologySystem(message);
             if (!StringUtils.isBlank(terminologySystem)) {
-                if (trConceptValidator.isCodeSystemSupported(terminologySystem)) {
+                if (trConceptValidator.isCodeSystemSupported(fhirUtil.getFhirContext(), terminologySystem)) {
                     validationMessage.setSeverity(ResultSeverityEnum.ERROR);
                 }
             }
@@ -119,7 +113,7 @@ public class FhirResourceValidator {
     private static String getTerminologySystem(String message) {
         Pattern pattern = Pattern.compile("Unable to validate code \"(.*)\" in code system \"(?<TRSERVERURL>.*)\"");
         Matcher matcher = pattern.matcher(message);
-        if(matcher.matches()) {
+        if (matcher.matches()) {
             return matcher.group("TRSERVERURL");
         }
         return "";

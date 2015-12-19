@@ -7,6 +7,7 @@ import org.freeshr.infrastructure.tr.TerminologyServer;
 import org.hl7.fhir.instance.model.Enumerations;
 import org.hl7.fhir.instance.model.OperationOutcome;
 import org.hl7.fhir.instance.model.ValueSet;
+import org.hl7.fhir.instance.model.ValueSet.ValueSetExpansionComponent;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,12 +40,12 @@ public class TRConceptValidator implements IValidationSupport {
     }
 
     @Override
-    public ValueSet.ValueSetExpansionComponent expandValueSet(ValueSet.ConceptSetComponent theInclude) {
+    public ValueSetExpansionComponent expandValueSet(FhirContext theContext, ValueSet.ConceptSetComponent theInclude) {
         return null;
     }
 
     @Override
-    public ValueSet fetchCodeSystem(String theSystem) {
+    public ValueSet fetchCodeSystem(FhirContext theContext, String theSystem) {
         return null;
     }
 
@@ -66,15 +67,14 @@ public class TRConceptValidator implements IValidationSupport {
     }
 
 
-
     @Override
-    public boolean isCodeSystemSupported(String theSystem) {
+    public boolean isCodeSystemSupported(FhirContext theContext, String theSystem) {
         return terminologyServer.verifiesSystem(StringUtils.trim(theSystem));
     }
 
     @Override
     @Cacheable(value = "trCache", unless = "#result.ok == false")
-    public CodeValidationResult validateCode(String theCodeSystem, String theCode, String theDisplay) {
+    public CodeValidationResult validateCode(FhirContext theContext, String theCodeSystem, String theCode, String theDisplay) {
         /** TODO - Note: should we be creating a custom CodeValidationResult and return that?
          * the caching expression "unless" uses the javabeans convention for boolean property for ok (isOk) rather than a field
          */

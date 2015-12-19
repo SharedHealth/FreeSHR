@@ -116,9 +116,11 @@ public class PatientEncounterServiceIntegrationTest extends APIIntegrationTestBa
                 withContentForHealthId(EncounterBundleData.HEALTH_ID, "xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_localRefs_with_invalidRefTerm.xml"),
                 getUserInfo(clientId, email, securityToken))
                 .toBlocking().first();
+     
+
         assertTrue(new EncounterResponseFailures(response).matches(new
-                String[]{"/f:Bundle/f:entry/f:resource/f:Condition/f:code", "error",
-                "Unable to validate code \"INVALID-A90\" in code system \"http://localhost:9997/openmrs/ws/rest/v1/tr/referenceterms/2f6z9872-4df1-438e-9d72-0a8b161d409b\""}));
+                String[]{"/f:Bundle/f:entry/f:resource/f:Condition/f:code/f:coding[1]", "error",
+                "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/referenceterms/2f6z9872-4df1-438e-9d72-0a8b161d409b], code[INVALID-A90]"}));
     }
 
     @Test
@@ -132,8 +134,8 @@ public class PatientEncounterServiceIntegrationTest extends APIIntegrationTestBa
                 getUserInfo(clientId, email, securityToken))
                 .toBlocking().first();
         assertTrue(new EncounterResponseFailures(response).matches(new
-                String[]{"/f:Bundle/f:entry/f:resource/f:Condition/f:code", "error",
-                "Unable to validate code \"INVALID-07952dc2-5206-11e5-ae6d-0050568225ca\" in code system \"http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca\""}));
+                String[]{"/f:Bundle/f:entry/f:resource/f:Condition/f:code/f:coding", "error",
+                "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca], code[INVALID-07952dc2-5206-11e5-ae6d-0050568225ca]"}));
     }
 
     @Test
@@ -152,8 +154,8 @@ public class PatientEncounterServiceIntegrationTest extends APIIntegrationTestBa
                 userInfo)
                 .toBlocking().first();
         assertTrue(new EncounterResponseFailures(encounterUpdateResponse).matches(new
-                String[]{"/f:Bundle/f:entry/f:resource/f:Condition/f:code", "error",
-                "Unable to validate code \"INVALID-07952dc2-5206-11e5-ae6d-0050568225ca\" in code system \"http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca\""}));
+                String[]{"/f:Bundle/f:entry/f:resource/f:Condition/f:code/f:coding", "error",
+                "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca], code[INVALID-07952dc2-5206-11e5-ae6d-0050568225ca]"}));
     }
 
     @Test
