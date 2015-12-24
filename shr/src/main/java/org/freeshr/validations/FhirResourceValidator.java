@@ -39,6 +39,7 @@ public class FhirResourceValidator {
         this.resourceFieldErrors.add(Pattern.compile("/f:Bundle/f:entry(\\[\\d+\\])*/f:resource/f:Condition/f:code/f:coding"));
         this.resourceFieldErrors.add(Pattern.compile("/f:Bundle/f:entry(\\[\\d+\\])*/f:resource/f:Condition/f:clinicalStatus"));
 
+        this.extensionFieldErrors.put(Pattern.compile("/f:Bundle/f:entry(\\[\\d+\\])*/f:resource/f:Condition/f:extension(\\[\\d+\\])*"), "https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#PreviousCondition");
         this.extensionFieldErrors.put(Pattern.compile("/f:Bundle/f:entry(\\[\\d+\\])*/f:resource/f:MedicationOrder/f:dosageInstruction(\\[\\d+\\])*/f:timing/f:extension(\\[\\d+\\])*"), "https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#TimingScheduledDate");
         this.extensionFieldErrors.put(Pattern.compile("/f:Bundle/f:entry(\\[\\d+\\])*/f:resource/f:MedicationOrder/f:dosageInstruction(\\[\\d+\\])*/f:extension(\\[\\d+\\])*"), "https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#DosageInstructionCustomDosage");
         this.extensionFieldErrors.put(Pattern.compile("/f:Bundle/f:entry(\\[\\d+\\])*/f:resource/f:MedicationOrder/f:extension(\\[\\d+\\])*"), "https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#MedicationOrderAction");

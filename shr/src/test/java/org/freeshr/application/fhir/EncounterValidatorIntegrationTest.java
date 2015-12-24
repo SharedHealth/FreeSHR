@@ -359,6 +359,15 @@ public class EncounterValidatorIntegrationTest {
     }
 
     @Test
+    public void shouldValidateDiagnosisWithPreviousDiagnosisExtension() throws Exception {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_updated_diagnosis.xml"));
+        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
+        EncounterValidationResponse response = validator.validate(validationContext);
+        assertTrue(response.isSuccessful());
+    }
+
+    @Test
     @Ignore
     public void shouldValidateSpecimenWithDiagnosticOrder() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
