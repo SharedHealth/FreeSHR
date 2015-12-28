@@ -1,0 +1,152 @@
+<Bundle xmlns="http://hl7.org/fhir">
+    <id value="8b1b0345-b940-4c3c-922a-c521b18914dd"/>
+    <meta>
+        <lastUpdated value="2015-09-04T15:15:16.000+05:30"/>
+    </meta>
+    <type value="collection"/>
+    <entry>
+        <fullUrl value="urn:uuid:f642cb40-5810-43b6-81c7-9f800ce78221"/>
+        <resource>
+            <Composition xmlns="http://hl7.org/fhir">
+                <id value="f642cb40-5810-43b6-81c7-9f800ce78221"/>
+                <identifier>
+                    <value value="urn:uuid:f642cb40-5810-43b6-81c7-9f800ce78221"/>
+                </identifier>
+                <date value="2015-09-04T15:15:16.000+05:30"/>
+                <type>
+                    <coding>
+                        <system value="http://hl7.org/fhir/vs/doc-typecodes"/>
+                        <code value="51899-3"/>
+                        <display value="Details Document"/>
+                    </coding>
+                </type>
+                <title value="encounter composition for patient 98001046534"/>
+                <status value="final"/>
+                <confidentiality value="N"/>
+                <subject>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <author>
+                    <reference value="http://localhost:9997/facilities/10019841.json"/>
+                </author>
+                <encounter>
+                    <reference value="urn:uuid:cfd88241-3af9-4f5b-892a-980a70506f20"/>
+                </encounter>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:cfd88241-3af9-4f5b-892a-980a70506f20"/>
+                        <display value="Encounter"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:b0a674b5-486a-4975-af43-60fe74b6ed8e"/>
+                        <display value="Hemoglobin [Mass/volume] in Blood"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:86571847-d982-4af9-887c-ee8d0fccfde5"/>
+                        <display value="Diagnostic Report"/>
+                    </entry>
+                </section>
+            </Composition>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:cfd88241-3af9-4f5b-892a-980a70506f20"/>
+        <resource>
+            <Encounter xmlns="http://hl7.org/fhir">
+                <id value="cfd88241-3af9-4f5b-892a-980a70506f20"/>
+                <identifier>
+                    <value value="urn:uuid:cfd88241-3af9-4f5b-892a-980a70506f20"/>
+                </identifier>
+                <status value="finished"/>
+                <class value="outpatient"/>
+                <type>
+                    <text value="LAB_RESULT"/>
+                </type>
+                <patient>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </patient>
+                <participant>
+                    <individual>
+                        <reference value="http://localhost:9997/providers/19.json"/>
+                    </individual>
+                </participant>
+                <serviceProvider>
+                    <reference value="http://localhost:9997/facilities/10019841.json"/>
+                </serviceProvider>
+            </Encounter>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:b0a674b5-486a-4975-af43-60fe74b6ed8e"/>
+        <resource>
+            <Observation xmlns="http://hl7.org/fhir">
+                <id value="b0a674b5-486a-4975-af43-60fe74b6ed8e"/>
+                <code>
+                    <coding>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07a9e3a1-5206-11e5-ae6d-0050568225ca"/>
+                        <code value="07a9e3a1-5206-11e5-ae6d-0050568225ca"/>
+                        <display value="Hemoglobin [Mass/volume] in Blood"/>
+                    </coding>
+                </code>
+                <valueQuantity>
+                    <value value="80.0"/>
+                </valueQuantity>
+                <status value="final"/>
+                <identifier>
+                    <value value="urn:uuid:b0a674b5-486a-4975-af43-60fe74b6ed8e"/>
+                </identifier>
+                <subject>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <encounter>
+                    <reference value="urn:uuid:cfd88241-3af9-4f5b-892a-980a70506f20"/>
+                </encounter>
+            </Observation>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:86571847-d982-4af9-887c-ee8d0fccfde5"/>
+        <resource>
+            <DiagnosticReport xmlns="http://hl7.org/fhir">
+                <id value="86571847-d982-4af9-887c-ee8d0fccfde5"/>
+                <code>
+                    <coding>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07a9e3a1-5206-11e5-ae6d-0050568225ca"/>
+                        <code value="07a9e3a1-5206-11e5-ae6d-0050568225ca"/>
+                        <display value="Hemoglobin [Mass/volume] in Blood"/>
+                    </coding>
+                </code>
+                <status value="final"/>
+                <issued value="2015-09-04T15:17:08.000+05:30"/>
+                <subject>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <performer>
+                    <reference value="http://localhost:9997/providers/19.json"/>
+                </performer>
+                <encounter>
+                    <reference value="urn:uuid:cfd88241-3af9-4f5b-892a-980a70506f20"/>
+                </encounter>
+                <identifier>
+                    <value value="urn:uuid:86571847-d982-4af9-887c-ee8d0fccfde5"/>
+                </identifier>
+                <request>
+                    <reference
+                            value="http://172.18.46.156:8081/patients/98001046534/encounters/5c2714ce-3b5a-43e3-afd8-50fbb4c32fa4"/>
+                </request>
+                <effectiveDateTime value="2015-09-04T15:15:17.000+05:30"/>
+                <result>
+                    <reference value="urn:uuid:b0a674b5-486a-4975-af43-60fe74b6ed8e"/>
+                </result>
+            </DiagnosticReport>
+        </resource>
+    </entry>
+</Bundle>

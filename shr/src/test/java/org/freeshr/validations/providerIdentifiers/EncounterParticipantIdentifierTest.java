@@ -26,7 +26,7 @@ public class EncounterParticipantIdentifierTest {
     @Before
     public void setUp() {
         encounterParticipantIdentifier = new EncounterParticipantIdentifier();
-        bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnosticReport.xml"), fhirContext);
+        bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnosticReport_with_performer_reference.xml"), fhirContext);
     }
 
     @Test

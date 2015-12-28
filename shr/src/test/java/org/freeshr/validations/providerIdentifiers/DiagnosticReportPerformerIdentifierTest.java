@@ -24,7 +24,7 @@ public class DiagnosticReportPerformerIdentifierTest {
     @Before
     public void setUp() {
         diagnosticReportPerformerIdentifier = new DiagnosticReportPerformerIdentifier();
-        bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnosticReport.xml"), fhirContext);
+        bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnosticReport_with_performer_reference.xml"), fhirContext);
     }
 
     @Test

@@ -43,7 +43,7 @@ public class TerminologyServerIntegrationTest {
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody(asString("jsons/concept.json"))));
+                        .withBody(asString("jsons/concept_vital_pneumonia.json"))));
     }
 
 

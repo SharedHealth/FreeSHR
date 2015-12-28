@@ -45,12 +45,6 @@
                         <display value="Diagnostic Order"/>
                     </entry>
                 </section>
-                <section>
-                    <entry>
-                        <reference value="urn:uuid:06472534-b4a2-4893-9c2f-a44bebfca5cb"/>
-                        <display value="Specimen"/>
-                    </entry>
-                </section>
             </Composition>
         </resource>
     </entry>
@@ -100,64 +94,18 @@
                 <encounter>
                     <reference value="urn:uuid:9026f815-cb5d-4668-9e23-f6e775a620ff"/>
                 </encounter>
-                <specimen>
-                    <reference value="urn:uuid:06472534-b4a2-4893-9c2f-a44bebfca5cb"/>
-                </specimen>
                 <status value="requested"/>
                 <item>
                     <code>
                         <coding>
-                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/referenceterms/Creatinine-4df1-438e-9d72-0a8b161d409b"/>
-                            <code value="35674-1"/>
-                            <display value="Creatinine [Mass/volume] in Urine"/>
-                        </coding>
-                        <coding>
-                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/Creatinine-5206-11e5-ae6d-0050568225ca"/>
-                            <code value="Creatinine-5206-11e5-ae6d-0050568225ca"/>
+                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/referenceterms/Creatinine-4df1-438e-9d72-invalid"/>
+                            <code value="Creatinine-4df1-438e-9d72-invalid"/>
                             <display value="Creatinine [Mass/volume] in Urine"/>
                         </coding>
                     </code>
-                    <specimen>
-                        <reference value="urn:uuid:06472534-b4a2-4893-9c2f-a44bebfca5cb"/>
-                    </specimen>
-                    <status value="requested"/>
-                </item>
-                <item>
-                    <code>
-                        <coding>
-                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/referenceterms/CBC-4df1-438e-9d72-0a8b161d409b"/>
-                            <code value="58410-2"/>
-                            <display value="Complete blood count (hemogram) panel"/>
-                        </coding>
-                        <coding>
-                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/CBC-5206-11e5-ae6d-0050568225ca"/>
-                            <code value="CBC-5206-11e5-ae6d-0050568225ca"/>
-                            <display value="Complete blood count (hemogram) panel"/>
-                        </coding>
-                    </code>
-                    <status value="requested"/>
+                    <status value="cancelled"/>
                 </item>
             </DiagnosticOrder>
-        </resource>
-    </entry>
-    <entry>
-        <fullUrl value="urn:uuid:06472534-b4a2-4893-9c2f-a44bebfca5cb"/>
-        <resource>
-            <Specimen xmlns="http://hl7.org/fhir">
-                <id value="06472534-b4a2-4893-9c2f-a44bebfca5cb"/>
-                <identifier>
-                    <value value="urn:uuid:06472534-b4a2-4893-9c2f-a44bebfca5cb"/>
-                </identifier>
-                <type>
-                    <coding>
-                        <display value="Urine"/>
-                    </coding>
-                </type>
-                <subject>
-                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
-                    <display value="98001046534"/>
-                </subject>
-            </Specimen>
         </resource>
     </entry>
 </Bundle>

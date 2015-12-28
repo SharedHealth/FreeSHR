@@ -1,0 +1,25 @@
+{
+  "version": "1.1",
+  "conceptClass": "LabTest",
+  "fullySpecifiedName": {
+    "conceptNameType": "FULLY_SPECIFIED",
+    "conceptName": "Hemoglobin [Mass/volume] in Blood",
+    "locale": "en"
+  },
+  "retireReason": null,
+  "retired": false,
+  "names": [
+    {
+      "conceptNameType": "FULLY_SPECIFIED",
+      "conceptName": "Hemoglobin [Mass/volume] in Blood",
+      "locale": "en"
+    }
+  ],
+  "uuid": "07a9e3a1-5206-11e5-ae6d-0050568225ca",
+  "datatypeName": "Numeric",
+  "description": {
+    "locale": "en",
+    "description": "Hemoglobin [Mass/volume] in Blood Lab Test"
+  },
+  "set": false
+}

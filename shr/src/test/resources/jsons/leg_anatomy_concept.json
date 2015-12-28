@@ -1,0 +1,31 @@
+{
+  "version": "1.1",
+  "conceptClass": "Anatomy",
+  "fullySpecifiedName": {
+    "conceptNameType": "FULLY_SPECIFIED",
+    "conceptName": "Leg",
+    "locale": "en"
+  },
+  "retireReason": null,
+  "retired": false,
+  "names": [
+    {
+      "conceptNameType": "SHORT",
+      "conceptName": "Leg",
+      "locale": "en"
+    },
+    {
+      "conceptNameType": "FULLY_SPECIFIED",
+      "conceptName": "Leg",
+      "locale": "en"
+    }
+  ],
+  "uuid": "Leg-5206-11e5-io02-0050568225ca",
+  "referenceTerms": [],
+  "datatypeName": "N/A",
+  "description": {
+    "locale": "en",
+    "description": "Leg (anatomy)"
+  },
+  "set": false
+}

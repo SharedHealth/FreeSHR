@@ -6,10 +6,11 @@ import org.freeshr.validations.ShrValidationMessage;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class ValidationFailureTestHelper {
+
+    @Deprecated
     public static void assertFailureFromResponseErrors(String fieldName, String reason, List<Error> errors) {
         for (Error error : errors) {
             if (error.getReason().equals(reason)) {
