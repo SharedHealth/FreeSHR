@@ -1,0 +1,37 @@
+{
+  "uuid": "5dd8f02e-3cda-40f2-9c70-b1a9c91ff1da",
+  "uri": "http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/concepts/5dd8f02e-3cda-40f2-9c70-b1a9c91ff1da",
+  "version": null,
+  "datatypeName": "Numeric",
+  "conceptClass": "Finding",
+  "retireReason": null,
+  "fullySpecifiedName": {
+    "conceptName": "Temperature",
+    "conceptNameType": "FULLY_SPECIFIED",
+    "locale": "en",
+    "preferred": true
+  },
+  "names": [
+    {
+      "conceptName": "Temperature",
+      "conceptNameType": "FULLY_SPECIFIED",
+      "locale": "en",
+      "preferred": true
+    },
+    {
+      "conceptName": "Temperature",
+      "conceptNameType": "SHORT",
+      "locale": "en",
+      "preferred": false
+    }
+  ],
+  "referenceTerms": [],
+  "description": null,
+  "setMembers": [],
+  "properties": {
+    "NUMERIC_PRECISE": "false"
+  },
+  "conceptAnswers": [],
+  "set": false,
+  "retired": false
+}

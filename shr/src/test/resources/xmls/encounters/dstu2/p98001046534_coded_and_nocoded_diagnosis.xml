@@ -23,11 +23,11 @@
                 <status value="final"/>
                 <confidentiality value="N"/>
                 <subject>
-                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
                 <author>
-                    <reference value="http://172.18.46.199:8080/api/1.0/facilities/10000069.json"/>
+                    <reference value="http://localhost:9997/facilities/10019841.json"/>
                 </author>
                 <encounter>
                     <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
@@ -91,16 +91,16 @@
                     <text value="OPD"/>
                 </type>
                 <patient>
-                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </patient>
                 <participant>
                     <individual>
-                        <reference value="http://172.18.46.199:8080/api/1.0/providers/18.json"/>
+                        <reference value="http://localhost:9997/providers/24.json"/>
                     </individual>
                 </participant>
                 <serviceProvider>
-                    <reference value="http://172.18.46.199:8080/api/1.0/facilities/10000069.json"/>
+                    <reference value="http://localhost:9997/facilities/10019841.json"/>
                 </serviceProvider>
             </Encounter>
         </resource>
@@ -114,14 +114,14 @@
                     <value value="urn:uuid:e461943b-12ws-4b41-9730-70b8fc452f45"/>
                 </identifier>
                 <patient>
-                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </patient>
                 <encounter>
                     <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
                 </encounter>
                 <asserter>
-                    <reference value="http://172.18.46.199:8080/api/1.0/providers/18.json"/>
+                    <reference value="http://localhost:9997/providers/24.json"/>
                 </asserter>
                 <dateRecorded value="2015-09-04"/>
                 <code>
@@ -156,14 +156,14 @@
                     <value value="urn:uuid:e461943b-7ad6-4b41-9730-70b8fc452f45"/>
                 </identifier>
                 <patient>
-                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </patient>
                 <encounter>
                     <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
                 </encounter>
                 <asserter>
-                    <reference value="http://172.18.46.199:8080/api/1.0/providers/18.json"/>
+                    <reference value="http://localhost:9997/providers/24.json"/>
                 </asserter>
                 <dateRecorded value="2015-09-04"/>
                 <code>
@@ -198,14 +198,14 @@
                     <value value="urn:uuid:6c764a45-175e-485b-b8d5-12ad7fb6bb08"/>
                 </identifier>
                 <patient>
-                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </patient>
                 <encounter>
                     <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
                 </encounter>
                 <asserter>
-                    <reference value="http://172.18.46.199:8080/api/1.0/providers/18.json"/>
+                    <reference value="http://localhost:9997/providers/24.json"/>
                 </asserter>
                 <dateRecorded value="2015-09-04"/>
                 <code>
@@ -235,14 +235,14 @@
                     <value value="urn:uuid:1aa84947-6807-4822-826f-7163b3db0300"/>
                 </identifier>
                 <patient>
-                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </patient>
                 <encounter>
                     <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
                 </encounter>
                 <asserter>
-                    <reference value="http://172.18.46.199:8080/api/1.0/providers/18.json"/>
+                    <reference value="http://localhost:9997/providers/24.json"/>
                 </asserter>
                 <dateRecorded value="2015-09-04"/>
                 <severity>
@@ -253,9 +253,9 @@
                 </severity>
                 <code>
                     <coding>
-                        <system value="http://127.0.0.1:9997/openmrs/ws/rest/v1/tr/referenceterms/b8d6be25-9547-462a-b858-0252ad04d4b3"/>
-                        <code value="368009"/>
-                        <display value="Heart valve disorder"/>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/referenceterms/2f6z9872-4df1-438e-9d72-0a8b161d409b"/>
+                        <code value="A90"/>
+                        <display value="Dengue fever"/>
                     </coding>
                 </code>
                 <category>
@@ -290,7 +290,7 @@
                     <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
                 </encounter>
                 <asserter>
-                    <reference value="http://localhost:9997/api/1.0/providers/18.json"/>
+                    <reference value="http://localhost:9997/providers/24.json"/>
                 </asserter>
                 <dateRecorded value="2015-09-04"/>
                 <code>
@@ -326,15 +326,10 @@
                     <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
                 </encounter>
                 <asserter>
-                    <reference value="http://localhost:9997/api/1.0/providers/19.json"/>
+                    <reference value="http://localhost:9997/providers/24.json"/>
                 </asserter>
                 <dateRecorded value="2015-09-04"/>
                 <code>
-                    <coding>
-                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/referenceterms/0795c231-5206-11e5-ae6d-0050568225ca"/>
-                        <code value="A90"/>
-                        <display value="Dengue Fever"/>
-                    </coding>
                     <coding>
                         <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca"/>
                         <code value="07952dc2-5206-11e5-ae6d-0050568225ca"/>

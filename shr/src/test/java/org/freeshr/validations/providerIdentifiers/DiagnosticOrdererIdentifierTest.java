@@ -28,14 +28,14 @@ public class DiagnosticOrdererIdentifierTest {
 
     @Test
     public void shouldValidateResourceOfTypeDiagnosticOrder() {
-        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnostic_order.xml"), fhirContext);
+        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_diagnostic_order_with_specimen.xml"), fhirContext);
         List<DiagnosticOrder> orders = FhirResourceHelper.findBundleResourcesOfType(bundle, DiagnosticOrder.class);
         assertTrue(diagnosticOrdererIdentifier.validates(orders.get(0)));
     }
 
     @Test
     public void shouldExtractProperDiagnosticOrdererReference() {
-        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnostic_order.xml"), fhirContext);
+        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_diagnostic_order_with_specimen.xml"), fhirContext);
         List<DiagnosticOrder> orders = FhirResourceHelper.findBundleResourcesOfType(bundle, DiagnosticOrder.class);
         List<ResourceReferenceDt> providerReferences = diagnosticOrdererIdentifier.getProviderReferences(orders.get(0));
         assertEquals(1, providerReferences.size());
@@ -44,7 +44,7 @@ public class DiagnosticOrdererIdentifierTest {
 
     @Test
     public void shouldNotValidateResourceOfOtherType() {
-        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnostic_order.xml"), fhirContext);
+        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_diagnostic_order_with_specimen.xml"), fhirContext);
         List<Encounter> encounters = FhirResourceHelper.findBundleResourcesOfType(bundle, Encounter.class);
         assertFalse(diagnosticOrdererIdentifier.validates(encounters.get(0)));
     }
