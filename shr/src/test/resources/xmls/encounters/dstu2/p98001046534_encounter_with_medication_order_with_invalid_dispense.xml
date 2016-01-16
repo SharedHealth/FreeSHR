@@ -103,7 +103,7 @@
                 <medicationCodeableConcept>
                     <coding>
                         <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/23d7e743-75bd-4a25-8f34-bd849bd50394"/>
-                        <code value="23d7e743-75bd-4a25-8f34-bd849bd50394-INVALID"/>
+                        <code value="23d7e743-75bd-4a25-8f34-bd849bd50394"/>
                         <display value="Paracetamol"/>
                     </coding>
                 </medicationCodeableConcept>
@@ -123,6 +123,13 @@
                             <periodUnits value="h"/>
                         </repeat>
                     </timing>
+                    <route>
+                        <coding>
+                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration"/>
+                            <code value="implant"/>
+                            <display value="implant"/>
+                        </coding>
+                    </route>
                     <asNeededBoolean value="false"/>
                     <doseQuantity>
                         <value value="10"/>
@@ -130,10 +137,13 @@
                     </doseQuantity>
                 </dosageInstruction>
                 <dispenseRequest>
-                    <quantity>
-                        <value value="192.0"/>
-                        <unit value="mg"/>
-                    </quantity>
+                    <medicationCodeableConcept>
+                        <coding>
+                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/23d7e743-75bd-4a25-8f34-bd849bd50394"/>
+                            <code value="23d7e743-75bd-4a25-8f34-bd849bd50394-INVALID"/>
+                            <display value="Paracetamol"/>
+                        </coding>
+                    </medicationCodeableConcept>
                 </dispenseRequest>
             </MedicationOrder>
         </resource>

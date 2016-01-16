@@ -92,7 +92,7 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody(asString("jsons/hemoglobin_diagnostic.json"))));
+                        .withBody(asString("jsons/concept_for_hemoglobin.json"))));
 
         givenThat(get(urlEqualTo("openmrs/ws/rest/v1/tr/concepts/a8a58344-602e-44c6-9677-841deeeb4ab4"))
                 .willReturn(aResponse()

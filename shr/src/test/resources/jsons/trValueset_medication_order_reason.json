@@ -1,0 +1,18 @@
+{
+  "resourceType": "ValueSet",
+  "identifier": "http://localhost:9997/openmrs/ws/rest/v1/tr/vs/order-reason",
+  "name": "Order Reason",
+  "description": "",
+  "status": "active",
+  "codeSystem": {
+    "system": "http://localhost:9997/openmrs/ws/rest/v1/tr/vs/order-reason",
+    "caseSensitive": true,
+    "concept": [
+      {
+        "code": "38341003",
+        "display": "High blood pressure",
+        "definition": ""
+      }
+    ]
+  }
+}

@@ -25,14 +25,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.freeshr.util.ValidationFailureTestHelper.assertFailureFromResponseErrors;
 import static org.freeshr.util.ValidationFailureTestHelper.assertFailureInResponse;
 import static org.freeshr.utils.FileUtil.asString;
-import static org.freeshr.validations.ValidationMessages.INVALID_DISPENSE_MEDICATION_REFERENCE_URL;
-import static org.freeshr.validations.ValidationMessages.INVALID_MEDICATION_REFERENCE_URL;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -195,12 +192,12 @@ public class EncounterValidatorIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/concept_hemoglobin_in_blood.json"))));
 
-        //Lab test concept for hemoglobin in blood
+        //concept for viral pneumonia
         givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/concepts/eddb01eb-61fc-4f9e-aca5-e44193509f35"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody(asString("jsons/concept_vital_pneumonia.json"))));
+                        .withBody(asString("jsons/concept_viral_pneumonia.json"))));
 
         //Temperature concept for vitals
         givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/concepts/5dd8f02e-3cda-40f2-9c70-b1a9c91ff1da"))
@@ -208,6 +205,55 @@ public class EncounterValidatorIntegrationTest {
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/concept_temperature.json"))));
+
+        //Value set for order reason
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/order-reason"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/trValueset_medication_order_reason.json"))));
+
+        //dosage instruction Entire oral cavity
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/dosage-instruction-site"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/trValueset_dosage_instruction_sites_entire_oral_cavity.json"))));
+
+        //valueset additional-instruction take with water
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/additional-instructions"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/trValueset_additional_instruction_take_with_water.json"))));
+
+        //valueset substitution-type paracetamol
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/substitution-type"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/trValueset_substitution_type_paracetamol.json"))));
+
+        //valueset substitution-reason paracetamol
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/substitution-reason"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/trValueset_substitution_reason_paracetamol_.json"))));
+
+        //valueset administration method codes
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/administration-method-codes"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/trValueset_administration-method-codes.json"))));
+
+        //concept for hemoglobin
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/concept_for_hemoglobin.json"))));
 
 
     }
@@ -462,149 +508,102 @@ public class EncounterValidatorIntegrationTest {
     }
 
     @Test
-    @Ignore
     public void shouldValidateMedicationPrescriptionWithInvalidMedicationReference() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu1/medication_prescription_invalid.xml"));
+                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_invalid_medication.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
-        assertFailureFromResponseErrors("urn:5fc6d0d9-9520-4015-87cb-ab0cfa7e4b50", INVALID_MEDICATION_REFERENCE_URL,
-                response.getErrors());
         assertEquals(1, response.getErrors().size());
+        assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:MedicationOrder/f:medicationCodeableConcept/f:coding",
+                "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/23d7e743-75bd-4a25-8f34-bd849bd50394], code[23d7e743-75bd-4a25-8f34-bd849bd50394-INVALID]",
+                false, response);
     }
 
     @Test
-    @Ignore
-    public void shouldValidateRouteInMedicationPrescription() {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu1/medication_prescription_valid.xml"));
-        when(trConceptValidator.isCodeSystemSupported(any(FhirContext.class), anyString())).thenReturn(true);
-        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
-        EncounterValidationResponse response = validator.validate(validationContext);
-        verify(trConceptValidator, times(1)).isCodeSystemSupported(any(FhirContext.class), "http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration");
-        verify(trConceptValidator, times(1)).validateCode(any(FhirContext.class), "http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration", "implant",
-                "implant");
-        assertTrue(response.isSuccessful());
-    }
-
-    @Test
-    @Ignore
     public void shouldValidateRouteInMedicationReference() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu1/medication_prescription_valid.xml"));
-        when(trConceptValidator.isCodeSystemSupported(any(FhirContext.class), anyString())).thenReturn(true);
+                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_valid.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
-        verify(trConceptValidator, times(1)).validateCode(any(FhirContext.class), "http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration", "implant",
-                "implant");
         assertTrue("Medication prescription pass through validation", response.isSuccessful());
     }
 
     @Test
-    @Ignore
+    @Ignore("Ignored because currently we are skipping if Dispense has a medication reference")
     public void shouldValidateDispenseMedicationInMedicationPrescription() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu1/medication_prescription_substitution_type_reason.xml"));
-        when(trConceptValidator.isCodeSystemSupported(any(FhirContext.class), anyString())).thenReturn(true);
+                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_valid.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue("Medication-prescription,Prescriber pass through validation", response.isSuccessful());
     }
 
     @Test
-    @Ignore
     public void shouldValidateSiteAndReasonInMedicationPrescription() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu1/medication_prescription_route_valid.xml"));
-        when(trConceptValidator.isCodeSystemSupported(any(FhirContext.class), anyString())).thenReturn(true);
+                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_valid.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
-        verify(trConceptValidator, times(1)).validateCode(any(FhirContext.class), "http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/dosageInstruction-site",
-                "181220002", "Entire oral cavity");
-        verify(trConceptValidator, times(1)).validateCode(any(FhirContext.class), "http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/prescription-reason", "38341003",
-                "High blood pressure");
         assertTrue(response.isSuccessful());
-
     }
 
     @Test
-    @Ignore
     public void shouldValidateDispenseAndAdditionalInstructionsInMedicationPrescription() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu1/medication_prescription_dispense_addinformation_valid.xml"));
-        when(trConceptValidator.isCodeSystemSupported(any(FhirContext.class), anyString())).thenReturn(true);
+                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_valid.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
-        verify(trConceptValidator, times(1)).validateCode(any(FhirContext.class), "http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/additional-instructions",
-                "79647ed4-a60e-4cf5-ba68-cf4d55956xyz", "Take With Water");
         assertTrue("Should Validate Valid Encounter In MedicationPrescription", response.isSuccessful());
     }
 
     @Test
-    @Ignore
     public void shouldValidateInvalidDispenseInMedicationPrescription() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu1/medication_prescription_dispense_addinformation_invalid.xml"));
-        when(trConceptValidator.isCodeSystemSupported(any(FhirContext.class), anyString())).thenReturn(true);
+                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_with_invalid_dispense.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
-        assertFailureFromResponseErrors("urn:6dc6d0d9-9520-4015-87cb-ab0cfa7e4b50", INVALID_DISPENSE_MEDICATION_REFERENCE_URL,
-                response.getErrors());
         assertEquals(1, response.getErrors().size());
+        assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:MedicationOrder/f:dispenseRequest/f:medicationCodeableConcept/f:coding",
+                "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/23d7e743-75bd-4a25-8f34-bd849bd50394], code[23d7e743-75bd-4a25-8f34-bd849bd50394-INVALID]",
+                false, response);
     }
 
     @Test
-    @Ignore
     public void shouldValidateSubstitutionTypeAndReasonInMedicationPrescription() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu1/medication_prescription_substitution_type_reason.xml"));
-        when(trConceptValidator.isCodeSystemSupported(any(FhirContext.class), anyString())).thenReturn(true);
+                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_valid.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
-        verify(trConceptValidator, times(1)).validateCode(any(FhirContext.class), "http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/substitution-type", "291220002",
-                "Paracetamol");
-        verify(trConceptValidator, times(1)).validateCode(any(FhirContext.class), "http://172.18.46.56:9080/openmrs/ws/rest/v1/tr/vs/substitution-reason", "301220005"
-                , "Paracetamol can be taken in place of this drug");
         assertTrue(response.isSuccessful());
-
-
     }
 
 
     @Test
-    @Ignore
     public void shouldValidateMethodAndAsNeededXInMedicationPrescription() {
 
         /**
-         * medication_prescription_route_valid.xml has
+         * p98001046534_encounter_with_medication_order_valid.xml has
          * 2 medication prescribed with asNeeded (boolean true), and asNeeded with CodeableConcept
          *
          */
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu1/medication_prescription_route_valid.xml"));
-        when(trConceptValidator.isCodeSystemSupported(any(FhirContext.class), anyString())).thenReturn(true);
+                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_valid.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
-        verify(trConceptValidator, times(1)).validateCode(any(FhirContext.class), "http://172.18.46" +
-                        ".56:9080/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba",
-                "79647ed4-a60e-4cf5-ba68-cf4d55956cba", "Hemoglobin");
-        verify(trConceptValidator, times(1)).validateCode(any(FhirContext.class), "http://localhost:9997/openmrs/ws/rest/v1/tr/vs/administration-method-codes",
-                "320276009", "Salmeterol+fluticasone 25/250ug inhaler");
         assertTrue(response.isSuccessful());
 
     }
 
     @Test
-    @Ignore
     public void shouldValidateInvalidDosageQuantityInMedicationPrescription() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu1/medication_prescription_invalid_dosage_quantity.xml"));
-        when(trConceptValidator.isCodeSystemSupported(any(FhirContext.class), anyString())).thenReturn(true);
+                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_with_invalid_dose_quantity.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
-        assertFailureFromResponseErrors("urn:5fc6d0d9-9520-4015-87cb-ab0cfa7e4b50", "Invalid Dosage Quantity",
-                response.getErrors());
         assertEquals(1, response.getErrors().size());
+        assertFailureInResponse("f:MedicationOrder/f:dosageInstruction/f:dose",
+                "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Quantity-Units123], code[TU]",
+                false, response);
     }
 
     @Test
@@ -612,7 +611,6 @@ public class EncounterValidatorIntegrationTest {
     public void shouldValidateDischargeSummaryEncounterWithAllResources() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/dstu1/discharge_summary_encounter.xml"));
-        when(trConceptValidator.isCodeSystemSupported(any(FhirContext.class), anyString())).thenReturn(true);
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue(response.isSuccessful());

@@ -1,0 +1,18 @@
+{
+  "resourceType": "ValueSet",
+  "identifier": "http://localhost:9997/openmrs/ws/rest/v1/tr/vs/additional-instruction",
+  "name": "Additional Instruction",
+  "description": "",
+  "status": "active",
+  "codeSystem": {
+    "system": "http://localhost:9997/openmrs/ws/rest/v1/tr/vs/additional-instruction",
+    "caseSensitive": true,
+    "concept": [
+      {
+        "code": "79647ed4-a60e-4cf5-ba68-cf4d55956xyz",
+        "display": "Take With Water",
+        "definition": ""
+      }
+    ]
+  }
+}

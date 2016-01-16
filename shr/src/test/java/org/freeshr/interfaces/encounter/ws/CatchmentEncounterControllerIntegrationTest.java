@@ -6,7 +6,6 @@ import org.freeshr.domain.model.Facility;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Address;
 import org.freeshr.domain.model.patient.Patient;
-import org.freeshr.utils.DateUtil;
 import org.freeshr.utils.TimeUuidUtil;
 import org.junit.After;
 import org.junit.Before;
@@ -28,7 +27,7 @@ import static org.freeshr.utils.FileUtil.asString;
 import static org.freeshr.utils.HttpUtil.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 
-@TestPropertySource(properties = {"MCI_SERVER_URL=http://localhost:9997","ENCOUNTER_FETCH_LIMIT=20"})
+@TestPropertySource(properties = {"MCI_SERVER_URL=http://localhost:9997", "ENCOUNTER_FETCH_LIMIT=20"})
 public class CatchmentEncounterControllerIntegrationTest extends APIIntegrationTestBase {
     private final String validClientId = "6";
     private final String validEmail = "some@thoughtworks.com";
@@ -104,13 +103,13 @@ public class CatchmentEncounterControllerIntegrationTest extends APIIntegrationT
 
         int encounterFetchLimit = properties.getEncounterFetchLimit();
         List<Date> encounterDates = getTimeInstances(date, encounterFetchLimit + 30);
-        for(int i=0; i<50; i++){
-            createEncounter(createEncounterBundle("E"+ i, healthId, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, encounterDates.get(i)), patient);
+        for (int i = 0; i < 50; i++) {
+            createEncounter(createEncounterBundle("E" + i, healthId, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, encounterDates.get(i)), patient);
         }
 
-        List<String> expectedEventIds = getUuidsForDates(encounterDates.subList(0,encounterFetchLimit-1));
+        List<String> expectedEventIds = getUuidsForDates(encounterDates.subList(0, encounterFetchLimit - 1));
 
-        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/catchments/3026/encounters?updatedSince=%s",new SimpleDateFormat("yyyy-MM-dd").format(date)))
+        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/catchments/3026/encounters?updatedSince=%s", new SimpleDateFormat("yyyy-MM-dd").format(date)))
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
@@ -131,13 +130,13 @@ public class CatchmentEncounterControllerIntegrationTest extends APIIntegrationT
 
         int sizeLessThanFetchLimit = properties.getEncounterFetchLimit() - 10;
         List<Date> encounterDates = getTimeInstances(date, sizeLessThanFetchLimit);
-        for(int i=0; i< sizeLessThanFetchLimit; i++){
-            createEncounter(createEncounterBundle("E"+ i, healthId, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, encounterDates.get(i)), patient);
+        for (int i = 0; i < sizeLessThanFetchLimit; i++) {
+            createEncounter(createEncounterBundle("E" + i, healthId, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, encounterDates.get(i)), patient);
         }
 
-        List<String> expectedEventIds = getUuidsForDates(encounterDates.subList(0, sizeLessThanFetchLimit -1));
+        List<String> expectedEventIds = getUuidsForDates(encounterDates.subList(0, sizeLessThanFetchLimit - 1));
 
-        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/catchments/3026/encounters?updatedSince=%s",new SimpleDateFormat("yyyy-MM-dd").format(date)))
+        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/catchments/3026/encounters?updatedSince=%s", new SimpleDateFormat("yyyy-MM-dd").format(date)))
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
@@ -157,12 +156,12 @@ public class CatchmentEncounterControllerIntegrationTest extends APIIntegrationT
         Date date = new Date();
 
         List<Date> encounterDates = getTimeInstances(date, 50);
-        for(int i=0; i<50; i++){
-            createEncounter(createEncounterBundle("E"+ i, healthId, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, encounterDates.get(i)), patient);
+        for (int i = 0; i < 50; i++) {
+            createEncounter(createEncounterBundle("E" + i, healthId, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, encounterDates.get(i)), patient);
         }
 
         String marker25 = TimeUuidUtil.uuidForDate(encounterDates.get(24)).toString();
-        List<String> markersFrom25till45 = getUuidsForDates(encounterDates.subList(24,44));
+        List<String> markersFrom25till45 = getUuidsForDates(encounterDates.subList(24, 44));
 
         mockMvc.perform(MockMvcRequestBuilders.get(String.format("/catchments/3026/encounters?updatedSince=%s&lastMarker=%s", new SimpleDateFormat("yyyy-MM-dd").format(date), marker25))
                 .header(AUTH_TOKEN_KEY, validAccessToken)
@@ -185,12 +184,12 @@ public class CatchmentEncounterControllerIntegrationTest extends APIIntegrationT
         Date date = new Date();
 
         List<Date> encounterDates = getTimeInstances(date, 50);
-        for(int i=0; i< 50; i++){
-            createEncounter(createEncounterBundle("E"+ i, healthId, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, encounterDates.get(i)), patient);
+        for (int i = 0; i < 50; i++) {
+            createEncounter(createEncounterBundle("E" + i, healthId, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, encounterDates.get(i)), patient);
         }
 
         String marker40 = TimeUuidUtil.uuidForDate(encounterDates.get(39)).toString();
-        List<String> markersFrom40till50 = getUuidsForDates(encounterDates.subList(39,49));
+        List<String> markersFrom40till50 = getUuidsForDates(encounterDates.subList(39, 49));
 
         mockMvc.perform(MockMvcRequestBuilders.get(String.format("/catchments/3026/encounters?updatedSince=%s&lastMarker=%s", new SimpleDateFormat("yyyy-MM-dd").format(date), marker40))
                 .header(AUTH_TOKEN_KEY, validAccessToken)

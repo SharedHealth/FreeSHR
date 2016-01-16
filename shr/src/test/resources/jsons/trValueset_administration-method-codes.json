@@ -1,0 +1,18 @@
+{
+  "resourceType": "ValueSet",
+  "identifier": "http://localhost:9997/openmrs/ws/rest/v1/tr/vs/administration-method-codes",
+  "name": "Administration Method Codes",
+  "description": "",
+  "status": "active",
+  "codeSystem": {
+    "system": "http://localhost:9997/openmrs/ws/rest/v1/tr/vs/administration-method-codes",
+    "caseSensitive": true,
+    "concept": [
+      {
+        "code": "320276009",
+        "display": "Salmeterol+fluticasone 25/250ug inhaler",
+        "definition": ""
+      }
+    ]
+  }
+}

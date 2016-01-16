@@ -1,0 +1,18 @@
+{
+  "resourceType": "ValueSet",
+  "identifier": "http://localhost:9997/openmrs/ws/rest/v1/tr/vs/dosage-instruction-site",
+  "name": "Dosage Instruction site",
+  "description": "",
+  "status": "active",
+  "codeSystem": {
+    "system": "http://localhost:9997/openmrs/ws/rest/v1/tr/vs/dosage-instruction-site",
+    "caseSensitive": true,
+    "concept": [
+      {
+        "code": "181220002",
+        "display": "Entire oral cavity",
+        "definition": ""
+      }
+    ]
+  }
+}
