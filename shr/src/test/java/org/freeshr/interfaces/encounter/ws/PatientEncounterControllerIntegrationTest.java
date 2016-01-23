@@ -237,7 +237,6 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
     }
 
     @Test
-    @Ignore
     public void shouldRejectAnEncounterWithInvalidEncounterType() throws Exception {
         //TODO: Fix this. InstanceValidator (specifically HapiWorkerContext) is overriding encounter-type valueset
         mockMvc.perform(post("/patients/" + VALID_HEALTH_ID_CONFIDENTIAL + "/encounters")

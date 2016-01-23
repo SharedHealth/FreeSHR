@@ -37,7 +37,7 @@ public class ProcedurePerformerIdentifierTest {
         List<Procedure> procedures = FhirResourceHelper.findBundleResourcesOfType(bundle, Procedure.class);
         List<ResourceReferenceDt> providerReferences = procedurePerformerIdentifier.getProviderReferences(procedures.get(0));
         assertEquals(1, providerReferences.size());
-        assertEquals("http://172.18.46.199:8080/api/1.0/providers/19.json", providerReferences.get(0).getReference().getValue());
+        assertEquals("http://localhost:9997/providers/19.json", providerReferences.get(0).getReference().getValue());
     }
 
     @Test

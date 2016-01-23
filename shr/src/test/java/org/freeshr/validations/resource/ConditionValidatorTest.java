@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 public class ConditionValidatorTest {
 
     @Test
-    @Ignore
+    @Ignore("Need to implement it")
     public void shouldValidateClinicalStatus() throws Exception {
         FhirContext fhirContext = FhirContext.forDstu2();
         Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_localRefs_invalidCondition.xml"), fhirContext);

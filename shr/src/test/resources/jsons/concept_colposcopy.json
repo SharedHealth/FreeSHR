@@ -1,0 +1,27 @@
+{
+  "version": "1.1",
+  "conceptClass": "Procedure",
+  "fullySpecifiedName": {
+    "conceptNameType": "FULLY_SPECIFIED",
+    "conceptName": "Colposcopy",
+    "locale": "en"
+  },
+  "retireReason": null,
+  "retired": false,
+  "names": [
+    {
+      "conceptNameType": "FULLY_SPECIFIED",
+      "conceptName": "Colposcopy",
+      "locale": "en"
+    }
+  ],
+  "uuid": "079f6b0e-5206-11e5-ae6d-0050568225ca",
+  "referenceTerms": [
+  ],
+  "datatypeName": "N/A",
+  "description": {
+    "locale": "en",
+    "description": "Colposcopy"
+  },
+  "set": false
+}

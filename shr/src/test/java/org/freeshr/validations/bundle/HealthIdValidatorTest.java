@@ -44,7 +44,7 @@ public class HealthIdValidatorTest {
     @Test
     public void shouldAcceptEncounterIfHealthIdInTheXmlMatchesTheGivenHealthId() {
         final String xml = FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_all_resources.xml");
-        when(shrProperties.getPatientReferencePath()).thenReturn("http://172.18.46.199:8081/api/default/patients");
+        when(shrProperties.getPatientReferencePath()).thenReturn("http://localhost:9997/api/default/patients");
         List<ShrValidationMessage> response = healthIdValidator.validate(getEncounterContext(xml, "98001046534"));
         assertThat(EncounterValidationResponse.fromShrValidationMessages(response).isSuccessful(),
                 is(true));

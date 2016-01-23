@@ -1,0 +1,18 @@
+{
+  "resourceType": "ValueSet",
+  "identifier": "http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Immunization-Reason",
+  "name": "Immunization Reason",
+  "description": "",
+  "status": "active",
+  "codeSystem": {
+    "system": "http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Immunization-Reason",
+    "caseSensitive": true,
+    "concept": [
+      {
+        "code": "281657000",
+        "display": "Travel vaccinations",
+        "definition": ""
+      }
+    ]
+  }
+}

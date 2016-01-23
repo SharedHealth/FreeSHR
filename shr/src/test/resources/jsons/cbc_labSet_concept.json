@@ -3,25 +3,15 @@
   "conceptClass": "LabSet",
   "fullySpecifiedName": {
     "conceptNameType": "FULLY_SPECIFIED",
-    "conceptName": "Complete blood count (hemogram) panel:-:Pt:Bld:-:Automated count",
+    "conceptName": "Complete blood count (hemogram) panel",
     "locale": "en"
   },
   "retireReason": null,
   "retired": false,
   "names": [
     {
-      "conceptNameType": null,
-      "conceptName": "Complete blood count (hemogram) panel - Blood by Automated count",
-      "locale": "en"
-    },
-    {
-      "conceptNameType": "SHORT",
-      "conceptName": "Complete blood count",
-      "locale": "en"
-    },
-    {
       "conceptNameType": "FULLY_SPECIFIED",
-      "conceptName": "Complete blood count (hemogram) panel:-:Pt:Bld:-:Automated count",
+      "conceptName": "Complete blood count (hemogram) panel",
       "locale": "en"
     }
   ],

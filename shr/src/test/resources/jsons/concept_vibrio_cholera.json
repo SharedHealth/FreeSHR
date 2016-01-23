@@ -1,0 +1,27 @@
+{
+  "version": "1.1",
+  "conceptClass": "Procedure",
+  "fullySpecifiedName": {
+    "conceptNameType": "FULLY_SPECIFIED",
+    "conceptName": "Vibrio Cholera",
+    "locale": "en"
+  },
+  "retireReason": null,
+  "retired": false,
+  "names": [
+    {
+      "conceptNameType": "FULLY_SPECIFIED",
+      "conceptName": "Vibrio Cholera",
+      "locale": "en"
+    }
+  ],
+  "uuid": "067c248c-5206-11e5-ae6d-0050568225ca",
+  "referenceTerms": [
+  ],
+  "datatypeName": "N/A",
+  "description": {
+    "locale": "en",
+    "description": "Vibrio Cholera"
+  },
+  "set": false
+}

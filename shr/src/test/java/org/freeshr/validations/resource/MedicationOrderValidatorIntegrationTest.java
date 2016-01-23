@@ -67,13 +67,13 @@ public class MedicationOrderValidatorIntegrationTest {
     }
 
     @Test
-    @Ignore
+    @Ignore("Done as a part of Encounter Validator Integration Test")
     public void shouldValidateMedicationQuantity() {
         //TODO
     }
 
     @Test
-    @Ignore
+    @Ignore("Done as a part of Encounter Validator Integration Test")
     public void shouldValidateMedicationDispense() {
         //TODO
     }

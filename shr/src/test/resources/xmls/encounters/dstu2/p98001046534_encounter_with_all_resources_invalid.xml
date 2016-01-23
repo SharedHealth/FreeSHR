@@ -24,11 +24,11 @@
                 <status value="final"/>
                 <confidentiality value="N"/>
                 <subject>
-                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
                 <author>
-                    <reference value="http://localhost:9997/facilities/10019841.json"/>
+                    <reference value="http://172.18.46.199:8080/api/1.0/facilities/10000069.json"/>
                 </author>
                 <encounter>
                     <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
@@ -43,6 +43,54 @@
                     <entry>
                         <reference value="urn:uuid:e461943b-7ad6-4b41-9730-70b8fc452f45"/>
                         <display value="complaint"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:6c764a45-175e-485b-b8d5-12ad7fb6bb08"/>
+                        <display value="complaint"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:1aa84947-6807-4822-826f-7163b3db0300"/>
+                        <display value="complaint"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:0b4c6d17-a3c4-4de3-8078-751fbf69ae26"/>
+                        <display value="complaint"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:dc4aba4b-0239-4c47-b62a-af30a0b574fa"/>
+                        <display value="Date of death"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:14933d63-e11a-4358-8a7a-fbc8ca6c726a"/>
+                        <display value="Cause of Death"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:e230f2da-f347-429d-b659-3c944ab66333"/>
+                        <display value="Circumstances of Death"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:00f4adcf-8191-4905-ba55-91074a5ac909"/>
+                        <display value="Place of Death"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:7e53fe65-c5b8-49e1-8248-eecb35e5e87c"/>
+                        <display value="Death Note"/>
                     </entry>
                 </section>
                 <section>
@@ -137,6 +185,30 @@
                 </section>
                 <section>
                     <entry>
+                        <reference value="urn:uuid:711f3351-20ba-49f2-9774-954fa812d3a4"/>
+                        <display value="Systolic blood pressure"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:f9519c6e-7e18-48fe-8e26-903da844586d"/>
+                        <display value="Diastolic blood pressure"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:cb144010-c38c-4fcc-975e-ab831ab991ad"/>
+                        <display value="Blood Pressure"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:f95dcc54-702b-47b7-ad37-fbff3dcbf336"/>
+                        <display value="Pulse"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
                         <reference value="urn:uuid:52d4c865-c7d6-450e-9103-d786be461cda"/>
                         <display value="Temperature"/>
                     </entry>
@@ -164,16 +236,16 @@
                     <text value="OPD"/>
                 </type>
                 <patient>
-                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </patient>
                 <participant>
                     <individual>
-                        <reference value="http://localhost:9997/providers/19.json"/>
+                        <reference value="http://172.18.46.199:8080/api/1.0/providers/18.json"/>
                     </individual>
                 </participant>
                 <serviceProvider>
-                    <reference value="http://localhost:9997/facilities/10019841.json"/>
+                    <reference value="http://172.18.46.199:8080/api/1.0/facilities/10000069.json"/>
                 </serviceProvider>
             </Encounter>
         </resource>
@@ -187,21 +259,21 @@
                     <value value="urn:uuid:e461943b-7ad6-4b41-9730-70b8fc452f45"/>
                 </identifier>
                 <patient>
-                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </patient>
                 <encounter>
                     <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
                 </encounter>
                 <asserter>
-                    <reference value="http://localhost:9997/providers/19.json"/>
+                    <reference value="http://172.18.46.199:8080/api/1.0/providers/18.json"/>
                 </asserter>
                 <dateRecorded value="2015-09-04"/>
                 <code>
                     <coding>
-                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca"/>
-                        <code value="07952dc2-5206-11e5-ae6d-0050568225ca"/>
-                        <display value="Dengue Fever"/>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/06ccbc62-5206-11e5-ae6d-0050568225ca"/>
+                        <code value="06ccbc62-5206-11e5-ae6d-0050568225ca"/>
+                        <display value="Headache"/>
                     </coding>
                 </code>
                 <category>
@@ -211,13 +283,291 @@
                         <display value="Complaint"/>
                     </coding>
                 </category>
-                <clinicalStatus value="active"/>
+                <clinicalStatus value="confirmed"/>
                 <verificationStatus value="provisional"/>
                 <onsetPeriod>
                     <start value="2015-08-30T14:12:35.000+05:30"/>
                     <end value="2015-09-04T14:12:35.000+05:30"/>
                 </onsetPeriod>
             </Condition>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:6c764a45-175e-485b-b8d5-12ad7fb6bb08"/>
+        <resource>
+            <Condition xmlns="http://hl7.org/fhir">
+                <id value="6c764a45-175e-485b-b8d5-12ad7fb6bb08"/>
+                <identifier>
+                    <value value="urn:uuid:6c764a45-175e-485b-b8d5-12ad7fb6bb08"/>
+                </identifier>
+                <patient>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </patient>
+                <encounter>
+                    <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+                </encounter>
+                <asserter>
+                    <reference value="http://172.18.46.199:8080/api/1.0/providers/18.json"/>
+                </asserter>
+                <dateRecorded value="2015-09-04"/>
+                <code>
+                    <coding>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/06cdd1ef-5206-11e5-ae6d-0050568225ca"/>
+                        <code value="06cdd1ef-5206-11e5-ae6d-0050568225ca"/>
+                        <display value="Weakness"/>
+                    </coding>
+                </code>
+                <category>
+                    <coding>
+                        <system value="http://hl7.org/fhir/condition-category"/>
+                        <code value="complaint"/>
+                        <display value="Complaint"/>
+                    </coding>
+                </category>
+                <clinicalStatus value="confirmed"/>
+                <verificationStatus value="provisional"/>
+            </Condition>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:1aa84947-6807-4822-826f-7163b3db0300"/>
+        <resource>
+            <Condition xmlns="http://hl7.org/fhir">
+                <id value="1aa84947-6807-4822-826f-7163b3db0300"/>
+                <identifier>
+                    <value value="urn:uuid:1aa84947-6807-4822-826f-7163b3db0300"/>
+                </identifier>
+                <patient>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </patient>
+                <encounter>
+                    <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+                </encounter>
+                <asserter>
+                    <reference value="http://172.18.46.199:8080/api/1.0/providers/18.json"/>
+                </asserter>
+                <dateRecorded value="2015-09-04"/>
+                <code>
+                    <coding>
+                        <display value="cough"/>
+                    </coding>
+                </code>
+                <category>
+                    <coding>
+                        <system value="http://hl7.org/fhir/condition-category"/>
+                        <code value="complaint"/>
+                        <display value="Complaint"/>
+                    </coding>
+                </category>
+                <clinicalStatus value="confirmed"/>
+                <verificationStatus value="provisional"/>
+                <onsetPeriod>
+                    <start value="2015-09-04T02:12:35.000+05:30"/>
+                    <end value="2015-09-04T14:12:35.000+05:30"/>
+                </onsetPeriod>
+            </Condition>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:0b4c6d17-a3c4-4de3-8078-751fbf69ae26"/>
+        <resource>
+            <Condition xmlns="http://hl7.org/fhir">
+                <id value="0b4c6d17-a3c4-4de3-8078-751fbf69ae26"/>
+                <identifier>
+                    <value value="urn:uuid:0b4c6d17-a3c4-4de3-8078-751fbf69ae26"/>
+                </identifier>
+                <patient>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </patient>
+                <encounter>
+                    <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+                </encounter>
+                <asserter>
+                    <reference value="http://172.18.46.199:8080/api/1.0/providers/18.json"/>
+                </asserter>
+                <dateRecorded value="2015-09-04"/>
+                <code>
+                    <coding>
+                        <display value="dizzyness"/>
+                    </coding>
+                </code>
+                <category>
+                    <coding>
+                        <system value="http://hl7.org/fhir/condition-category"/>
+                        <code value="complaint"/>
+                        <display value="Complaint"/>
+                    </coding>
+                </category>
+                <clinicalStatus value="confirmed"/>
+                <verificationStatus value="provisional"/>
+            </Condition>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:dc4aba4b-0239-4c47-b62a-af30a0b574fa"/>
+        <resource>
+            <Observation xmlns="http://hl7.org/fhir">
+                <id value="dc4aba4b-0239-4c47-b62a-af30a0b574fa"/>
+                <status value="preliminary"/>
+                <code>
+                    <coding>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/5ad55052-464f-11e5-b9e5-0050568225ca"/>
+                        <code value="5ad55052-464f-11e5-b9e5-0050568225ca"/>
+                        <display value="Date of death"/>
+                    </coding>
+                </code>
+                <valueDateTime value="2015-09-04T02:02:00.000+05:30"/>
+                <identifier>
+                    <value value="urn:uuid:dc4aba4b-0239-4c47-b62a-af30a0b574fa"/>
+                </identifier>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <encounter>
+                    <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+                </encounter>
+            </Observation>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:14933d63-e11a-4358-8a7a-fbc8ca6c726a"/>
+        <resource>
+            <Observation xmlns="http://hl7.org/fhir">
+                <id value="14933d63-e11a-4358-8a7a-fbc8ca6c726a"/>
+                <status value="preliminary"/>
+                <code>
+                    <coding>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/5ad597a4-464f-11e5-b9e5-0050568225ca"/>
+                        <code value="5ad597a4-464f-11e5-b9e5-0050568225ca"/>
+                        <display value="Cause of Death"/>
+                    </coding>
+                </code>
+                <valueCodeableConcept>
+                    <coding>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca"/>
+                        <code value="07952dc2-5206-11e5-ae6d-0050568225ca"/>
+                        <display value="Dengue Fever"/>
+                    </coding>
+                </valueCodeableConcept>
+                <identifier>
+                    <value value="urn:uuid:14933d63-e11a-4358-8a7a-fbc8ca6c726a"/>
+                </identifier>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <encounter>
+                    <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+                </encounter>
+            </Observation>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:e230f2da-f347-429d-b659-3c944ab66333"/>
+        <resource>
+            <Observation xmlns="http://hl7.org/fhir">
+                <id value="e230f2da-f347-429d-b659-3c944ab66333"/>
+                <code>
+                    <coding>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/5ad5dd9a-464f-11e5-b9e5-0050568225ca"/>
+                        <code value="5ad5dd9a-464f-11e5-b9e5-0050568225ca"/>
+                        <display value="Circumstances of Death"/>
+                    </coding>
+                </code>
+                <valueString value="died in hospital"/>
+                <status value="preliminary"/>
+                <identifier>
+                    <value value="urn:uuid:e230f2da-f347-429d-b659-3c944ab66333"/>
+                </identifier>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <encounter>
+                    <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+                </encounter>
+            </Observation>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:00f4adcf-8191-4905-ba55-91074a5ac909"/>
+        <resource>
+            <Observation xmlns="http://hl7.org/fhir">
+                <id value="00f4adcf-8191-4905-ba55-91074a5ac909"/>
+                <code>
+                    <coding>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/5b1354c4-464f-11e5-b9e5-0050568225ca"/>
+                        <code value="5b1354c4-464f-11e5-b9e5-0050568225ca"/>
+                        <display value="Place of Death"/>
+                    </coding>
+                </code>
+                <valueString value="hospital"/>
+                <status value="final"/>
+                <identifier>
+                    <value value="urn:uuid:00f4adcf-8191-4905-ba55-91074a5ac909"/>
+                </identifier>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <encounter>
+                    <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+                </encounter>
+            </Observation>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:7e53fe65-c5b8-49e1-8248-eecb35e5e87c"/>
+        <resource>
+            <Observation xmlns="http://hl7.org/fhir">
+                <id value="7e53fe65-c5b8-49e1-8248-eecb35e5e87c"/>
+                <code>
+                    <coding>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/5ad35d32-464f-11e5-b9e5-0050568225ca"/>
+                        <code value="5ad35d32-464f-11e5-b9e5-0050568225ca"/>
+                        <display value="Death Note"/>
+                    </coding>
+                </code>
+                <status value="final"/>
+                <identifier>
+                    <value value="urn:uuid:7e53fe65-c5b8-49e1-8248-eecb35e5e87c"/>
+                </identifier>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <encounter>
+                    <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+                </encounter>
+                <related>
+                    <type value="has-member"/>
+                    <target>
+                        <reference value="urn:uuid:dc4aba4b-0239-4c47-b62a-af30a0b574fa"/>
+                    </target>
+                </related>
+                <related>
+                    <type value="has-member"/>
+                    <target>
+                        <reference value="urn:uuid:14933d63-e11a-4358-8a7a-fbc8ca6c726a"/>
+                    </target>
+                </related>
+                <related>
+                    <type value="has-member"/>
+                    <target>
+                        <reference value="urn:uuid:e230f2da-f347-429d-b659-3c944ab66333"/>
+                    </target>
+                </related>
+                <related>
+                    <type value="has-member"/>
+                    <target>
+                        <reference value="urn:uuid:00f4adcf-8191-4905-ba55-91074a5ac909"/>
+                    </target>
+                </related>
+            </Observation>
         </resource>
     </entry>
     <entry>
@@ -229,19 +579,19 @@
                     <value value="urn:uuid:04e9f317-680c-4ff1-9942-bcb5e2b5243b"/>
                 </identifier>
                 <patient>
-                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </patient>
                 <encounter>
                     <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
                 </encounter>
                 <asserter>
-                    <reference value="http://localhost:9997/providers/19.json"/>
+                    <reference value="http://172.18.46.199:8080/api/1.0/providers/19.json"/>
                 </asserter>
                 <dateRecorded value="2015-09-04"/>
                 <code>
                     <coding>
-                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca"/>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca"/>
                         <code value="07952dc2-5206-11e5-ae6d-0050568225ca"/>
                         <display value="Dengue Fever"/>
                     </coding>
@@ -253,7 +603,7 @@
                         <display value="Diagnosis"/>
                     </coding>
                 </category>
-                <clinicalStatus value="active"/>
+                <clinicalStatus value="confirmed"/>
                 <verificationStatus value="provisional"/>
             </Condition>
         </resource>
@@ -264,11 +614,11 @@
             <DiagnosticOrder xmlns="http://hl7.org/fhir">
                 <id value="42a6d58c-4da6-4656-ac0a-172a928da9e5"/>
                 <subject>
-                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
                 <orderer>
-                    <reference value="http://localhost:9997/providers/19.json"/>
+                    <reference value="http://172.18.46.199:8080/api/1.0/providers/18.json"/>
                 </orderer>
                 <identifier>
                     <value value="urn:uuid:42a6d58c-4da6-4656-ac0a-172a928da9e5"/>
@@ -283,9 +633,9 @@
                 <item>
                     <code>
                         <coding>
-                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07a9e3a1-5206-11e5-ae6d-0050568225ca"/>
-                            <code value="07a9e3a1-5206-11e5-ae6d-0050568225ca"/>
-                            <display value="Hemoglobin [Mass/volume] in Blood"/>
+                            <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/07ae6c22-5206-11e5-ae6d-0050568225ca"/>
+                            <code value="07ae6c22-5206-11e5-ae6d-0050568225ca"/>
+                            <display value="Creatinine [Mass/volume] in Urine"/>
                         </coding>
                     </code>
                     <specimen>
@@ -296,13 +646,8 @@
                 <item>
                     <code>
                         <coding>
-                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/referenceterms/CBC-4df1-438e-9d72-0a8b161d409b"/>
-                            <code value="58410-2"/>
-                            <display value="Complete blood count (hemogram) panel"/>
-                        </coding>
-                        <coding>
-                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/CBC-5206-11e5-ae6d-0050568225ca"/>
-                            <code value="CBC-5206-11e5-ae6d-0050568225ca"/>
+                            <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/07a4671e-5206-11e5-ae6d-0050568225ca"/>
+                            <code value="07a4671e-5206-11e5-ae6d-0050568225ca"/>
                             <display value="Complete blood count (hemogram) panel"/>
                         </coding>
                     </code>
@@ -325,7 +670,7 @@
                     </coding>
                 </type>
                 <subject>
-                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
             </Specimen>
@@ -340,7 +685,7 @@
                     <value value="urn:uuid:3d614625-4358-487c-96e9-a775df9579f3"/>
                 </identifier>
                 <patient>
-                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </patient>
                 <status value="partial"/>
@@ -355,9 +700,9 @@
                 <condition>
                     <code>
                         <coding>
-                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca"/>
-                            <code value="07952dc2-5206-11e5-ae6d-0050568225ca"/>
-                            <display value="Dengue Fever"/>
+                            <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/06be5b95-5206-11e5-ae6d-0050568225ca"/>
+                            <code value="06be5b95-5206-11e5-ae6d-0050568225ca"/>
+                            <display value="Malaria fever"/>
                         </coding>
                     </code>
                     <onsetQuantity>
@@ -381,7 +726,7 @@
                     <value value="urn:uuid:96798a3e-4f53-4dfb-b8d6-089ff7aaead3"/>
                 </identifier>
                 <patient>
-                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </patient>
                 <status value="partial"/>
@@ -395,7 +740,7 @@
                 <condition>
                     <code>
                         <coding>
-                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca"/>
+                            <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca"/>
                             <code value="07952dc2-5206-11e5-ae6d-0050568225ca"/>
                             <display value="Dengue Fever"/>
                         </coding>
@@ -421,7 +766,7 @@
                     <value value="urn:uuid:7b78ac79-7607-46fd-aff8-03c0c115857a"/>
                 </identifier>
                 <patient>
-                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </patient>
                 <status value="partial"/>
@@ -436,9 +781,9 @@
                 <condition>
                     <code>
                         <coding>
-                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca"/>
-                            <code value="07952dc2-5206-11e5-ae6d-0050568225ca"/>
-                            <display value="Dengue Fever"/>
+                            <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/06bd368a-5206-11e5-ae6d-0050568225ca"/>
+                            <code value="06bd368a-5206-11e5-ae6d-0050568225ca"/>
+                            <display value="Cough and cold"/>
                         </coding>
                     </code>
                 </condition>
@@ -457,19 +802,19 @@
                 <date value="2015-09-03T00:00:00.000+05:30"/>
                 <vaccineCode>
                     <coding>
-                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/23d7e743-75bd-4a25-8f34-bd849bd50394"/>
-                        <code value="23d7e743-75bd-4a25-8f34-bd849bd50394"/>
-                        <display value="Paracetamol"/>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/28c3c784-c0bf-4cae-bd26-ca76a384085a"/>
+                        <code value="28c3c784-c0bf-4cae-bd26-ca76a384085a"/>
+                        <display value="BCG"/>
                     </coding>
                 </vaccineCode>
                 <patient>
-                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </patient>
                 <wasNotGiven value="false"/>
                 <reported value="true"/>
                 <requester>
-                    <reference value="http://localhost:9997/providers/19.json"/>
+                    <reference value="http://172.18.46.199:8080/api/1.0/providers/18.json"/>
                 </requester>
                 <encounter>
                     <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
@@ -480,7 +825,7 @@
                 <explanation>
                     <reason>
                         <coding>
-                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Immunization-Reason"/>
+                            <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/vs/Immunization-Reason"/>
                             <code value="281657000"/>
                             <display value="Travel vaccinations"/>
                         </coding>
@@ -505,7 +850,7 @@
                     <value value="urn:uuid:92100c03-1da1-45a0-903a-2aefedca18bf"/>
                 </identifier>
                 <subject>
-                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
                 <encounter>
@@ -530,7 +875,7 @@
                     <value value="urn:uuid:12f203b8-dd7b-4d32-9381-e4db7dbba7a7"/>
                 </identifier>
                 <subject>
-                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
                 <encounter>
@@ -555,7 +900,7 @@
                     <value value="urn:uuid:f48c1755-d850-458f-9974-15f3f0d35214"/>
                 </identifier>
                 <subject>
-                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
                 <encounter>
@@ -580,7 +925,7 @@
                     <value value="urn:uuid:5fe5b0ca-c338-4397-90c1-d88d319b33c2"/>
                 </identifier>
                 <subject>
-                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
                 <encounter>
@@ -604,7 +949,7 @@
                     <value value="urn:uuid:621cdaee-bc78-40a2-9e04-870d5aae2118"/>
                 </identifier>
                 <subject>
-                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
                 <encounter>
@@ -644,9 +989,9 @@
                 <id value="394cb368-745f-43cd-a83a-7ea3417eb1ca"/>
                 <code>
                     <coding>
-                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07a9e3a1-5206-11e5-ae6d-0050568225ca"/>
-                        <code value="07a9e3a1-5206-11e5-ae6d-0050568225ca"/>
-                        <display value="Hemoglobin [Mass/volume] in Blood"/>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/07accf29-5206-11e5-ae6d-0050568225ca"/>
+                        <code value="07accf29-5206-11e5-ae6d-0050568225ca"/>
+                        <display value="Creatinine [Mass/time] in 24 hour Urine"/>
                     </coding>
                 </code>
                 <valueQuantity>
@@ -657,7 +1002,7 @@
                     <value value="urn:uuid:394cb368-745f-43cd-a83a-7ea3417eb1ca"/>
                 </identifier>
                 <subject>
-                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
                 <encounter>
@@ -673,19 +1018,19 @@
                 <id value="5c44d7a6-ed3b-4304-9917-dbd9c1074062"/>
                 <code>
                     <coding>
-                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07a9e3a1-5206-11e5-ae6d-0050568225ca"/>
-                        <code value="07a9e3a1-5206-11e5-ae6d-0050568225ca"/>
-                        <display value="Hemoglobin [Mass/volume] in Blood"/>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/07accf29-5206-11e5-ae6d-0050568225ca"/>
+                        <code value="07accf29-5206-11e5-ae6d-0050568225ca"/>
+                        <display value="Creatinine [Mass/time] in 24 hour Urine"/>
                     </coding>
                 </code>
                 <status value="final"/>
                 <issued value="2015-09-04T15:09:13.000+05:30"/>
                 <subject>
-                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
                 <performer>
-                    <reference value="http://localhost:9997/providers/19.json"/>
+                    <reference value="http://172.18.46.199:8080/api/1.0/providers/19.json"/>
                 </performer>
                 <encounter>
                     <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
@@ -699,7 +1044,7 @@
                 </result>
                 <codedDiagnosis>
                     <coding>
-                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/067c248c-5206-11e5-ae6d-0050568225ca"/>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/067c248c-5206-11e5-ae6d-0050568225ca"/>
                         <code value="067c248c-5206-11e5-ae6d-0050568225ca"/>
                         <display value="Vibrio Cholera"/>
                     </coding>
@@ -716,13 +1061,13 @@
                     <value value="urn:uuid:4db65ed8-4cc4-428b-895d-da81d20b82fb"/>
                 </identifier>
                 <subject>
-                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
                 <status value="completed"/>
                 <code>
                     <coding>
-                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/079f6b0e-5206-11e5-ae6d-0050568225ca"/>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/079f6b0e-5206-11e5-ae6d-0050568225ca"/>
                         <code value="079f6b0e-5206-11e5-ae6d-0050568225ca"/>
                         <display value="Colposcopy"/>
                     </coding>
@@ -742,12 +1087,43 @@
         </resource>
     </entry>
     <entry>
+        <fullUrl value="urn:uuid:f95dcc54-702b-47b7-ad37-fbff3dcbf336"/>
+        <resource>
+            <Observation xmlns="http://hl7.org/fhir">
+                <id value="f95dcc54-702b-47b7-ad37-fbff3dcbf336"/>
+                <code>
+                    <coding>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/07b4c2f5-5206-11e5-ae6d-0050568225ca"/>
+                        <code value="07b4c2f5-5206-11e5-ae6d-0050568225ca"/>
+                        <display value="Pulse"/>
+                    </coding>
+                </code>
+                <valueQuantity>
+                    <value value="70.0"/>
+                </valueQuantity>
+                <status value="final"/>
+                <identifier>
+                    <value value="urn:uuid:f95dcc54-702b-47b7-ad37-fbff3dcbf336"/>
+                </identifier>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <encounter>
+                    <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+                </encounter>
+            </Observation>
+        </resource>
+    </entry>
+    <entry>
         <fullUrl value="urn:uuid:a4708fe7-43c5-4b32-86ec-76924cf1f0e1"/>
         <resource>
             <Observation xmlns="http://hl7.org/fhir">
                 <id value="a4708fe7-43c5-4b32-86ec-76924cf1f0e1"/>
                 <code>
                     <coding>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/XYZ38225-5206-11e5-ae6d-005056822123"/>
+                        <code value="XYZ38225-5206-11e5-ae6d-005056822123"/>
                         <display value="Vitals"/>
                     </coding>
                 </code>
@@ -756,7 +1132,7 @@
                     <value value="urn:uuid:a4708fe7-43c5-4b32-86ec-76924cf1f0e1"/>
                 </identifier>
                 <subject>
-                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
                 <encounter>
@@ -765,7 +1141,113 @@
                 <related>
                     <type value="has-member"/>
                     <target>
+                        <reference value="urn:uuid:cb144010-c38c-4fcc-975e-ab831ab991ad"/>
+                    </target>
+                </related>
+                <related>
+                    <type value="has-member"/>
+                    <target>
+                        <reference value="urn:uuid:f95dcc54-702b-47b7-ad37-fbff3dcbf336"/>
+                    </target>
+                </related>
+                <related>
+                    <type value="has-member"/>
+                    <target>
                         <reference value="urn:uuid:52d4c865-c7d6-450e-9103-d786be461cda"/>
+                    </target>
+                </related>
+            </Observation>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:711f3351-20ba-49f2-9774-954fa812d3a4"/>
+        <resource>
+            <Observation xmlns="http://hl7.org/fhir">
+                <id value="711f3351-20ba-49f2-9774-954fa812d3a4"/>
+                <code>
+                    <coding>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/07b01ede-5206-11e5-ae6d-0050568225ca"/>
+                        <code value="07b01ede-5206-11e5-ae6d-0050568225ca"/>
+                        <display value="Systolic blood pressure"/>
+                    </coding>
+                </code>
+                <valueQuantity>
+                    <value value="80.0"/>
+                </valueQuantity>
+                <status value="final"/>
+                <identifier>
+                    <value value="urn:uuid:711f3351-20ba-49f2-9774-954fa812d3a4"/>
+                </identifier>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <encounter>
+                    <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+                </encounter>
+            </Observation>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:f9519c6e-7e18-48fe-8e26-903da844586d"/>
+        <resource>
+            <Observation xmlns="http://hl7.org/fhir">
+                <id value="f9519c6e-7e18-48fe-8e26-903da844586d"/>
+                <code>
+                    <coding>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/07b25cc6-5206-11e5-ae6d-0050568225ca"/>
+                        <code value="07b25cc6-5206-11e5-ae6d-0050568225ca"/>
+                        <display value="Diastolic blood pressure"/>
+                    </coding>
+                </code>
+                <valueQuantity>
+                    <value value="69.0"/>
+                </valueQuantity>
+                <status value="final"/>
+                <identifier>
+                    <value value="urn:uuid:f9519c6e-7e18-48fe-8e26-903da844586d"/>
+                </identifier>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <encounter>
+                    <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+                </encounter>
+            </Observation>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:cb144010-c38c-4fcc-975e-ab831ab991ad"/>
+        <resource>
+            <Observation xmlns="http://hl7.org/fhir">
+                <id value="cb144010-c38c-4fcc-975e-ab831ab991ad"/>
+                <code>
+                    <coding>
+                        <display value="Blood Pressure"/>
+                    </coding>
+                </code>
+                <status value="final"/>
+                <identifier>
+                    <value value="urn:uuid:cb144010-c38c-4fcc-975e-ab831ab991ad"/>
+                </identifier>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <encounter>
+                    <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+                </encounter>
+                <related>
+                    <type value="has-member"/>
+                    <target>
+                        <reference value="urn:uuid:711f3351-20ba-49f2-9774-954fa812d3a4"/>
+                    </target>
+                </related>
+                <related>
+                    <type value="has-member"/>
+                    <target>
+                        <reference value="urn:uuid:f9519c6e-7e18-48fe-8e26-903da844586d"/>
                     </target>
                 </related>
             </Observation>
@@ -778,8 +1260,8 @@
                 <id value="52d4c865-c7d6-450e-9103-d786be461cda"/>
                 <code>
                     <coding>
-                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/5dd8f02e-3cda-40f2-9c70-b1a9c91ff1da"/>
-                        <code value="5dd8f02e-3cda-40f2-9c70-b1a9c91ff1da"/>
+                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/07b38225-5206-11e5-ae6d-0050568225ca"/>
+                        <code value="07b38225-5206-11e5-ae6d-0050568225ca"/>
                         <display value="Temperature"/>
                     </coding>
                 </code>
@@ -791,7 +1273,7 @@
                     <value value="urn:uuid:52d4c865-c7d6-450e-9103-d786be461cda"/>
                 </identifier>
                 <subject>
-                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
                 <encounter>

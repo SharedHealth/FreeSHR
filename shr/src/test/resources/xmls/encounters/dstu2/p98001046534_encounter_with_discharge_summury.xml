@@ -24,11 +24,11 @@
                 <status value="final"/>
                 <confidentiality value="N"/>
                 <subject>
-                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
                 <author>
-                    <reference value="http://172.18.46.199:8080/api/1.0/facilities/10019842.json"/>
+                    <reference value="http://localhost:9997/api/1.0/facilities/10019842.json"/>
                 </author>
                 <encounter>
                     <reference value="urn:uuid:e8b02673-799c-4fcd-8586-afe20c4481f4"/>
@@ -69,12 +69,6 @@
                         <display value="Discharge Summary"/>
                     </entry>
                 </section>
-                <section>
-                    <entry>
-                        <reference value="urn:uuid:68b6c450-4dec-41d3-aa05-464c2bdaeb98"/>
-                        <display value="Is PNC Within 48 Hours After Birth"/>
-                    </entry>
-                </section>
             </Composition>
         </resource>
     </entry>
@@ -92,16 +86,16 @@
                     <text value="OPD"/>
                 </type>
                 <patient>
-                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </patient>
                 <participant>
                     <individual>
-                        <reference value="http://172.18.46.199:8080/api/1.0/providers/18.json"/>
+                        <reference value="http://localhost:9997/providers/19.json"/>
                     </individual>
                 </participant>
                 <serviceProvider>
-                    <reference value="http://172.18.46.199:8080/api/1.0/facilities/10019842.json"/>
+                    <reference value="http://localhost:9997/facilities/10019841.json"/>
                 </serviceProvider>
             </Encounter>
         </resource>
@@ -122,7 +116,7 @@
                     <value value="urn:uuid:92100c03-1da1-45a0-903a-2aefedca18bf"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
                 <encounter>
@@ -147,7 +141,7 @@
                     <value value="urn:uuid:12f203b8-dd7b-4d32-9381-e4db7dbba7a7"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
                 <encounter>
@@ -172,7 +166,7 @@
                     <value value="urn:uuid:f48c1755-d850-458f-9974-15f3f0d35214"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
                 <encounter>
@@ -198,7 +192,7 @@
                     <value value="urn:uuid:5fe5b0ca-c338-4397-90c1-d88d319b33c2"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
                 <encounter>
@@ -222,7 +216,7 @@
                     <value value="urn:uuid:621cdaee-bc78-40a2-9e04-870d5aae2118"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
                 <encounter>
@@ -252,39 +246,6 @@
                         <reference value="urn:uuid:5fe5b0ca-c338-4397-90c1-d88d319b33c2"/>
                     </target>
                 </related>
-            </Observation>
-        </resource>
-    </entry>
-    <entry>
-        <fullUrl value="urn:uuid:68b6c450-4dec-41d3-aa05-464c2bdaeb98"/>
-        <resource>
-            <Observation xmlns="http://hl7.org/fhir">
-                <id value="68b6c450-4dec-41d3-aa05-464c2bdaeb98"/>
-                <code>
-                    <coding>
-                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/079df550-5206-11e5-ae6d-0050568225ca"/>
-                        <code value="079df550-5206-11e5-ae6d-0050568225ca"/>
-                        <display value="Is PNC Within 48 Hours After Birth"/>
-                    </coding>
-                </code>
-                <valueCodeableConcept>
-                    <coding>
-                        <system value="http://hl7.org/fhir/v2/0136"/>
-                        <code value="Y"/>
-                        <display value="Yes"/>
-                    </coding>
-                </valueCodeableConcept>
-                <status value="final"/>
-                <identifier>
-                    <value value="urn:uuid:68b6c450-4dec-41d3-aa05-464c2bdaeb98"/>
-                </identifier>
-                <subject>
-                    <reference value="http://172.18.46.199:8081/api/default/patients/98001095960"/>
-                    <display value="98001095960"/>
-                </subject>
-                <encounter>
-                    <reference value="urn:uuid:96829039-74bb-4e08-84a8-5c3c3aa60c7d"/>
-                </encounter>
             </Observation>
         </resource>
     </entry>

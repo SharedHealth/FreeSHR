@@ -24,11 +24,11 @@
                 <status value="final"/>
                 <confidentiality value="N"/>
                 <subject>
-                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
                 <author>
-                    <reference value="http://172.18.46.199:8080/api/1.0/facilities/10019841.json"/>
+                    <reference value="http://localhost:9997/facilities/10019841.json"/>
                 </author>
                 <encounter>
                     <reference value="urn:uuid:9aed7616-8226-48a1-b581-aed955bdbe97"/>
@@ -68,16 +68,16 @@
                     <text value="OPD"/>
                 </type>
                 <patient>
-                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </patient>
                 <participant>
                     <individual>
-                        <reference value="http://172.18.46.199:8080/api/1.0/providers/19.json"/>
+                        <reference value="http://localhost:9997/providers/19.json"/>
                     </individual>
                 </participant>
                 <serviceProvider>
-                    <reference value="http://172.18.46.199:8080/api/1.0/facilities/10019841.json"/>
+                    <reference value="http://localhost:9997/facilities/10019841.json"/>
                 </serviceProvider>
             </Encounter>
         </resource>
@@ -89,24 +89,19 @@
                 <id value="5c44d7a6-ed3b-4304-9917-dbd9c1074062"/>
                 <code>
                     <coding>
-                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/referenceterms/07adc374-5206-11e5-ae6d-0050568225ca"/>
-                        <code value="2162-6"/>
-                        <display value="Creatinine [Mass/time] in 24 hour Urine"/>
-                    </coding>
-                    <coding>
-                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/07accf29-5206-11e5-ae6d-0050568225ca"/>
-                        <code value="07accf29-5206-11e5-ae6d-0050568225ca"/>
-                        <display value="Creatinine [Mass/time] in 24 hour Urine"/>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07a9e3a1-5206-11e5-ae6d-0050568225ca"/>
+                        <code value="07a9e3a1-5206-11e5-ae6d-0050568225ca"/>
+                        <display value="Hemoglobin [Mass/volume] in Blood"/>
                     </coding>
                 </code>
                 <status value="final"/>
                 <issued value="2015-09-04T15:09:13.000+05:30"/>
                 <subject>
-                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
                 <performer>
-                    <reference value="http://172.18.46.199:8080/api/1.0/providers/19.json"/>
+                    <reference value="http://localhost:9997/providers/19.json"/>
                 </performer>
                 <encounter>
                     <reference value="urn:uuid:9aed7616-8226-48a1-b581-aed955bdbe97"/>
@@ -120,12 +115,7 @@
                 </result>
                 <codedDiagnosis>
                     <coding>
-                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/referenceterms/0d8cc2bd-cbbf-4bb1-8ac7-90f610b8934d"/>
-                        <code value="A00.0"/>
-                        <display value="Vibrio Cholera"/>
-                    </coding>
-                    <coding>
-                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/067c248c-5206-11e5-ae6d-0050568225ca"/>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/067c248c-5206-11e5-ae6d-0050568225ca"/>
                         <code value="067c248c-5206-11e5-ae6d-0050568225ca"/>
                         <display value="Vibrio Cholera"/>
                     </coding>
@@ -142,18 +132,13 @@
                     <value value="urn:uuid:4db65ed8-4cc4-428b-895d-da81d20b82fb"/>
                 </identifier>
                 <subject>
-                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
                     <display value="98001046534"/>
                 </subject>
                 <status value="completed"/>
                 <code>
                     <coding>
-                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/referenceterms/079ffd65-5206-11e5-ae6d-0050568225ca"/>
-                        <code value="392003006"/>
-                        <display value="Colposcopy"/>
-                    </coding>
-                    <coding>
-                        <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/concepts/079f6b0e-5206-11e5-ae6d-0050568225ca"/>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/079f6b0e-5206-11e5-ae6d-0050568225ca"/>
                         <code value="079f6b0e-5206-11e5-ae6d-0050568225ca"/>
                         <display value="Colposcopy"/>
                     </coding>
@@ -171,7 +156,7 @@
                 </report>
                 <performer>
                     <actor>
-                        <reference value="http://172.18.46.199:8080/api/1.0/providers/19.json"/>
+                        <reference value="http://localhost:9997/providers/19.json"/>
                        <display value="Dr Cecil Surgeon"/>
                     </actor>
                 </performer>
