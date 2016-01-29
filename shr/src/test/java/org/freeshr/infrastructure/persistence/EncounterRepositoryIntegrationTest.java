@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cassandra.core.CqlOperations;
 
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -86,7 +87,7 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         Patient patient = new Patient();
         String healthId = generateHealthId();
         patient.setHealthId(healthId);
-        DateTime today = new DateTime(2015,02,01,0,0);
+        DateTime today = new DateTime();
         patient.setAddress(new Address("01", "02", "03", "04", "05"));
 
         Date e1ReceivedDate = today.plusDays(1).toDate();
