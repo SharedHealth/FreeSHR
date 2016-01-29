@@ -145,13 +145,9 @@ public class CatchmentEncounterController extends ShrController {
             HttpServletRequest request, List<EncounterEvent> requestResults, Date requestedDate)
             throws UnsupportedEncodingException, URISyntaxException {
         int size = requestResults.size();
-        if (size <= 0) {
+        if (size <= 1) {
             //next result set url might need to rolled over
             return rollingFeedUrl(request, requestedDate);
-        }
-
-        if (size == 1) {
-            return null;
         }
 
         EncounterEvent lastEncounterEvent = requestResults.get(size - 1);
@@ -176,5 +172,4 @@ public class CatchmentEncounterController extends ShrController {
         }
         return null;
     }
-
 }
