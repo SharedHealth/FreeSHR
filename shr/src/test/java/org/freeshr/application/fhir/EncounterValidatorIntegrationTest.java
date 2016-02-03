@@ -472,7 +472,15 @@ public class EncounterValidatorIntegrationTest {
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue(response.isSuccessful());
     }
-
+    
+    @Test
+    public void shouldValidateDiagnosisWithPreviousProcedureRequestExtension() throws Exception {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_suspended_procedure_request.xml"));
+        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
+        EncounterValidationResponse response = validator.validate(validationContext);
+        assertTrue(response.isSuccessful());
+    }
 
     @Test
     @Ignore("Ignoring because currently instance validator skips if there in no system and code")
