@@ -42,7 +42,9 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
+import static org.mockito.AdditionalMatchers.not;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -99,7 +101,7 @@ public class CatchmentEncounterControllerTest {
     }
 
     @Test
-    public void shouldRollOverForNextUrl() throws UnsupportedEncodingException, URISyntaxException {
+    public void shouldRollOverForNextUrlForRequestSizeZero() throws UnsupportedEncodingException, URISyntaxException {
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null,
                 "/catchments/3026/encounters");
         Calendar calendar = Calendar.getInstance();
@@ -121,6 +123,34 @@ public class CatchmentEncounterControllerTest {
         assertNull("For future year, should have returned null", nextResultURL);
 
         nextResultURL = controller.getNextResultURL(mockHttpServletRequest, new ArrayList<EncounterEvent>(),
+                Calendar.getInstance().getTime());
+        assertNull("For current year, should have returned null", nextResultURL);
+    }
+
+    @Test
+    public void shouldRollOverForNextUrlForRequestSizeOne() throws Exception {
+        List<EncounterEvent> encounterEvents = asList(new EncounterEvent(new EncounterBundle(), new Date(), null));
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null,
+                "/catchments/3026/encounters");
+        Calendar calendar = Calendar.getInstance();
+        int currentYear = calendar.get(Calendar.YEAR);
+        calendar.set(Calendar.YEAR, currentYear - 1);
+        String nextResultURL = controller.getNextResultURL(mockHttpServletRequest, encounterEvents,
+                calendar.getTime());
+        List<NameValuePair> params = URLEncodedUtils.parse(new URI(nextResultURL), "UTF-8");
+
+        calendar.add(Calendar.MONTH, 1);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        String expected = new SimpleDateFormat("YYYY-MM-dd").format(calendar.getTime());
+        assertTrue("Should have rolled over to next month: " + expected, params.get(0).getValue().startsWith(expected));
+
+        Calendar futureDate = Calendar.getInstance();
+        futureDate.add(Calendar.YEAR, 1);
+        nextResultURL = controller.getNextResultURL(mockHttpServletRequest, encounterEvents,
+                futureDate.getTime());
+        assertNull("For future year, should have returned null", nextResultURL);
+
+        nextResultURL = controller.getNextResultURL(mockHttpServletRequest, encounterEvents,
                 Calendar.getInstance().getTime());
         assertNull("For current year, should have returned null", nextResultURL);
     }
@@ -185,6 +215,19 @@ public class CatchmentEncounterControllerTest {
         assertTrue(encountersForCatchment.getResult() instanceof BadRequest);
     }
 
+    @Test
+    public void shouldSerializeErrorInfo() {
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        ErrorInfo errorInfo = new ErrorInfo(HttpStatus.NOT_FOUND, "Not found");
+        MockHttpOutputMessage outputMessage = new MockHttpOutputMessage();
+        try {
+            converter.write(errorInfo, MediaType.APPLICATION_JSON, outputMessage);
+            assertEquals("{\"httpStatus\":\"404\",\"message\":\"Not found\"}", outputMessage.getBodyAsString());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     private List<EncounterEvent> createEncounterEvents(String healthId, int size, List<Date> dates) {
 
@@ -217,20 +260,6 @@ public class CatchmentEncounterControllerTest {
             dates.add(calendar.getTime());
         }
         return dates;
-    }
-
-    @Test
-    public void shouldSerializeErrorInfo() {
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        ErrorInfo errorInfo = new ErrorInfo(HttpStatus.NOT_FOUND, "Not found");
-        MockHttpOutputMessage outputMessage = new MockHttpOutputMessage();
-        try {
-            converter.write(errorInfo, MediaType.APPLICATION_JSON, outputMessage);
-            assertEquals("{\"httpStatus\":\"404\",\"message\":\"Not found\"}", outputMessage.getBodyAsString());
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private TokenAuthentication tokenAuthentication() {
