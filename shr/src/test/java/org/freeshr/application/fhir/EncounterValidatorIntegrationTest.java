@@ -316,11 +316,6 @@ public class EncounterValidatorIntegrationTest {
         assertEquals(1, response.getErrors().size());
     }
 
-    /**
-     * Dependency: StructureValidator
-     *
-     * @throws Exception
-     */
     @Test
     public void shouldValidateEncounterWhenInProperFormat() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,

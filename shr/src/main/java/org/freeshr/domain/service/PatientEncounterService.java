@@ -14,7 +14,6 @@ import org.freeshr.utils.Confidentiality;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.validations.EncounterValidationContext;
 import org.freeshr.validations.HapiEncounterValidator;
-import org.freeshr.validations.RIEncounterValidator;
 import org.freeshr.validations.ShrEncounterValidator;
 import org.hl7.fhir.instance.model.Bundle;
 import org.hl7.fhir.instance.model.Composition;
@@ -46,19 +45,13 @@ public class PatientEncounterService {
 
     @Autowired
     public PatientEncounterService(EncounterRepository encounterRepository, PatientService patientService,
-                                   RIEncounterValidator refImplRIEncounterValidator,
                                    HapiEncounterValidator hapiEncounterValidator,
                                    FhirFeedUtil fhirFeedUtil, SHRProperties shrProperties) {
         this.encounterRepository = encounterRepository;
         this.patientService = patientService;
         this.fhirFeedUtil = fhirFeedUtil;
         this.shrProperties = shrProperties;
-
-        if ("v1".equals(shrProperties.getFhirDocumentSchemaVersion())) {
-            this.shrEncounterValidator = refImplRIEncounterValidator;
-        } else {
-            this.shrEncounterValidator = hapiEncounterValidator;
-        }
+        this.shrEncounterValidator = hapiEncounterValidator;
     }
 
     public Observable<EncounterResponse> ensureCreated(final EncounterBundle encounterBundle, UserInfo userInfo) throws ExecutionException, InterruptedException {
@@ -185,13 +178,13 @@ public class PatientEncounterService {
             Observable<Boolean> update = encounterRepository.updateEncounter(encounterBundle, existingEncounterBundle, patient);
 
             return update.flatMap(new Func1<Boolean, Observable<EncounterResponse>>() {
-                @Override
-                public Observable<EncounterResponse> call(Boolean aBoolean) {
-                    if (aBoolean)
-                        response.setEncounterId(encounterBundle.getEncounterId());
-                    return Observable.just(response);
-                }
-            },
+                                      @Override
+                                      public Observable<EncounterResponse> call(Boolean aBoolean) {
+                                          if (aBoolean)
+                                              response.setEncounterId(encounterBundle.getEncounterId());
+                                          return Observable.just(response);
+                                      }
+                                  },
                     RxMaps.<EncounterResponse>logAndForwardError(logger),
                     RxMaps.<EncounterResponse>completeResponds());
 

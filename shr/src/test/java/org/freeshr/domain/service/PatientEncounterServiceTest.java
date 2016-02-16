@@ -13,7 +13,6 @@ import org.freeshr.infrastructure.security.UserProfile;
 import org.freeshr.utils.Confidentiality;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.validations.EncounterValidationContext;
-import org.freeshr.validations.RIEncounterValidator;
 import org.freeshr.validations.HapiEncounterValidator;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,21 +34,18 @@ public class PatientEncounterServiceTest {
 
     private PatientEncounterService patientEncounterService;
     private EncounterRepository mockEncounterRepository;
-    private RIEncounterValidator mockRIEncounterValidator;
     private HapiEncounterValidator mockHapiEncounterValidator;
     private PatientService mockPatientService;
-    private SHRProperties mockShrProperties;
 
     @Before
     public void setup() {
         mockEncounterRepository = mock(EncounterRepository.class);
-        mockRIEncounterValidator = mock(RIEncounterValidator.class);
         mockPatientService = mock(PatientService.class);
-        mockShrProperties = mock(SHRProperties.class);
+        SHRProperties mockShrProperties = mock(SHRProperties.class);
         mockHapiEncounterValidator = mock(HapiEncounterValidator.class);
         when(mockShrProperties.getFhirDocumentSchemaVersion()).thenReturn("v2");
         patientEncounterService = new PatientEncounterService(mockEncounterRepository, mockPatientService,
-                mockRIEncounterValidator, mockHapiEncounterValidator, new FhirFeedUtil(), mockShrProperties);
+                mockHapiEncounterValidator, new FhirFeedUtil(), mockShrProperties);
     }
 
 
@@ -142,7 +138,7 @@ public class PatientEncounterServiceTest {
         EncounterResponse updateResponse = patientEncounterService.ensureUpdated(bundle, userInfoOfFacilityThatUpdatedEncounter).toBlocking().first();
 
         assertTrue(updateResponse.isTypeOfFailure(EncounterResponse.TypeOfFailure.Forbidden));
-        verify(mockEncounterRepository,never()).updateEncounter(bundle, existingEncounterBundle, patient);
+        verify(mockEncounterRepository, never()).updateEncounter(bundle, existingEncounterBundle, patient);
 
     }
 
@@ -168,7 +164,7 @@ public class PatientEncounterServiceTest {
         EncounterResponse updateResponse = patientEncounterService.ensureUpdated(bundle, userInfoOfProviderWhoUpdatedEncounter).toBlocking().first();
 
         assertTrue(updateResponse.isTypeOfFailure(EncounterResponse.TypeOfFailure.Forbidden));
-        verify(mockEncounterRepository,never()).updateEncounter(bundle, existingEncounterBundle, patient);
+        verify(mockEncounterRepository, never()).updateEncounter(bundle, existingEncounterBundle, patient);
 
     }
 

@@ -63,6 +63,11 @@ public class HapiEncounterValidator implements ShrEncounterValidator {
         return validationResponse;
     }
 
+    @Override
+    public String supportedVersion() {
+        return "v2";
+    }
+
     private EncounterValidationResponse respondFromValidationMessages(ValidationResult validationResult) {
         EncounterValidationResponse response = new EncounterValidationResponse();
         for (SingleValidationMessage validationMessage : validationResult.getMessages()) {
