@@ -273,7 +273,7 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         List<Row> encHistoryRows = cqlOperations.query(selectEncHistoryQuery).all();
         assertEquals(1, encHistoryRows.size());
         Row encounterHistoryRow = encHistoryRows.get(0);
-        assertEquals(encounterRecievedAt.getTime(), TimeUuidUtil.getTimeFromUUID(encounterHistoryRow.getUUID("encounter_updated_at")));
+        assertEquals(updatedAt.getTime(), TimeUuidUtil.getTimeFromUUID(encounterHistoryRow.getUUID("encounter_updated_at")));
         assertEquals("v2", encounterHistoryRow.getString("content_format"));
     }
 

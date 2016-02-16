@@ -1,6 +1,7 @@
 package org.freeshr.interfaces.encounter.ws;
 
 
+import me.prettyprint.cassandra.utils.TimeUUIDUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.freeshr.application.fhir.EncounterBundle;
@@ -16,7 +17,6 @@ import org.freeshr.interfaces.encounter.ws.exceptions.ErrorInfo;
 import org.freeshr.utils.Confidentiality;
 import org.freeshr.utils.DateUtil;
 import org.freeshr.utils.FhirFeedUtil;
-import org.freeshr.utils.TimeUuidUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -35,14 +35,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
-import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
@@ -74,7 +70,8 @@ public class CatchmentEncounterControllerTest {
         List<Date> encounterDates = getTimeInstances(DateUtil.parseDate("2014-10-10"), 10);
         List<EncounterEvent> encounterEvents = createEncounterEvents("hid01", 10, encounterDates);
         Date currentDate = new Date();
-        EncounterEvent updatedEncounterEvent = new EncounterEvent(encounterEvents.get(0).getEncounterBundle(), currentDate, null);
+        final UUID eventId = TimeUUIDUtils.getTimeUUID(currentDate.getTime());
+        EncounterEvent updatedEncounterEvent = new EncounterEvent(encounterEvents.get(0).getEncounterBundle(), eventId, null);
         encounterEvents.add(updatedEncounterEvent);
 
         TokenAuthentication tokenAuthentication = tokenAuthentication();
@@ -96,8 +93,9 @@ public class CatchmentEncounterControllerTest {
         List<NameValuePair> params = URLEncodedUtils.parse(new URI(nextUrl), "UTF-8");
         //generated time uuid for entry at the fetch limit.
         assertEquals(currentDate, DateUtil.parseDate(params.get(0).getValue()));
-        String timeUUidForLastUpdateEvent = TimeUuidUtil.uuidForDate(currentDate).toString();
-        assertEquals(timeUUidForLastUpdateEvent, params.get(1).getValue());
+        //String timeUUidForLastUpdateEvent = TimeUuidUtil.uuidForDate(currentDate).toString();
+
+        assertEquals(eventId.toString(), params.get(1).getValue());
     }
 
     @Test
@@ -129,7 +127,7 @@ public class CatchmentEncounterControllerTest {
 
     @Test
     public void shouldRollOverForNextUrlForRequestSizeOne() throws Exception {
-        List<EncounterEvent> encounterEvents = asList(new EncounterEvent(new EncounterBundle(), new Date(), null));
+        List<EncounterEvent> encounterEvents = asList(new EncounterEvent(new EncounterBundle(), TimeUUIDUtils.getUniqueTimeUUIDinMillis(), null));
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null,
                 "/catchments/3026/encounters");
         Calendar calendar = Calendar.getInstance();
@@ -161,7 +159,7 @@ public class CatchmentEncounterControllerTest {
                 "/catchments/3026/encounters");
 
         ArrayList<EncounterEvent> lastEventInTheFeed = new ArrayList<>();
-        lastEventInTheFeed.add(new EncounterEvent(null, new Date(), null));
+        lastEventInTheFeed.add(new EncounterEvent(null, TimeUUIDUtils.getUniqueTimeUUIDinMillis(), null));
         String nextResultURL = controller.getNextResultURL(mockHttpServletRequest, lastEventInTheFeed, new Date());
 
         assertNull("For last event in the feed, should have returned null", nextResultURL);
@@ -179,8 +177,8 @@ public class CatchmentEncounterControllerTest {
         TokenAuthentication tokenAuthentication = tokenAuthentication();
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication()).thenReturn(tokenAuthentication);
-        when(mockCatchmentEncounterService.findEncounterFeedForFacilityCatchment(anyString(), any(Date.class),anyString())).thenReturn(Observable.<List<EncounterEvent>>empty());
-        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null,"/catchments/3026/encounters");
+        when(mockCatchmentEncounterService.findEncounterFeedForFacilityCatchment(anyString(), any(Date.class), anyString())).thenReturn(Observable.<List<EncounterEvent>>empty());
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null, "/catchments/3026/encounters");
         DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncounterFeedForCatchment
                 (mockHttpServletRequest, "3026", "2014-10-10", "invalid-uuid");
 
@@ -193,8 +191,8 @@ public class CatchmentEncounterControllerTest {
         TokenAuthentication tokenAuthentication = tokenAuthentication();
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication()).thenReturn(tokenAuthentication);
-        when(mockCatchmentEncounterService.findEncounterFeedForFacilityCatchment(anyString(), any(Date.class),anyString())).thenReturn(Observable.<List<EncounterEvent>>empty());
-        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null,"/catchments/3026/encounters");
+        when(mockCatchmentEncounterService.findEncounterFeedForFacilityCatchment(anyString(), any(Date.class), anyString())).thenReturn(Observable.<List<EncounterEvent>>empty());
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest(null, null, "/catchments/3026/encounters");
         DeferredResult<EncounterSearchResponse> encountersForCatchment = controller.findEncounterFeedForCatchment
                 (mockHttpServletRequest, "3026", "2014-10-10", null);
 
@@ -242,7 +240,7 @@ public class CatchmentEncounterControllerTest {
             encounter.setPatientConfidentiality(Confidentiality.Normal);
             encounter.setEncounterConfidentiality(Confidentiality.Normal);
 
-            EncounterEvent event = new EncounterEvent(encounter, dates.get(i), null);
+            EncounterEvent event = new EncounterEvent(encounter, TimeUUIDUtils.getTimeUUID(dates.get(i).getTime()), null);
             encounterEvents.add(event);
         }
         return encounterEvents;

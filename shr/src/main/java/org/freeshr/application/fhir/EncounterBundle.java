@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.Date;
+import java.util.UUID;
 
 @XmlRootElement(name = "encounter")
 public class EncounterBundle {
@@ -25,6 +26,7 @@ public class EncounterBundle {
     private Requester createdBy;
     private Requester updatedBy;
     private Date updatedAt;
+    private UUID updatedEventReference;
 
     @JsonProperty("id")
     @XmlElement(name = "id")
@@ -105,6 +107,13 @@ public class EncounterBundle {
 
     @JsonIgnore
     @XmlTransient
+    public UUID getUpdatedEventReference() {
+        return updatedEventReference;
+    }
+
+
+    @JsonIgnore
+    @XmlTransient
     public boolean isConfidential() {
         return getConfidentialityLevel().ordinal() > Confidentiality.Normal.ordinal();
     }
@@ -162,6 +171,11 @@ public class EncounterBundle {
     public void setUpdatedAt(Date updatedDate) {
         this.updatedAt = updatedDate;
     }
+
+    public void setUpdatedEventReference(UUID updatedEventReference) {
+        this.updatedEventReference = updatedEventReference;
+    }
+
 
     @Override
     public String toString() {

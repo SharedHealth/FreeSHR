@@ -10,6 +10,7 @@ import org.freeshr.utils.TimeUuidUtil;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.UUID;
 
 public class EncounterEvent {
 
@@ -17,24 +18,24 @@ public class EncounterEvent {
     public static final String LATEST_UPDATE_EVENT_CATEGORY_PREFIX = "latest_update_event_id:";
     public static final String ENCOUNTER_MERGED_CATEGORY_PREFIX = "encounter_merged_at:";
     private static final String TITLE = "Encounter";
-    private Date createdAt;
+    private UUID eventId;
     private Date mergedAt;
     private EncounterBundle encounterBundle;
     private ArrayList<String> categories = new ArrayList<String>(){{ add("encounter"); }};
 
-    public EncounterEvent(EncounterBundle encounterBundle, Date eventCreatedAt, Date mergedAt) {
-        this.createdAt = eventCreatedAt;
+    public EncounterEvent(EncounterBundle encounterBundle, UUID eventId, Date mergedAt) {
+        this.eventId = eventId;
         this.encounterBundle = encounterBundle;
         this.mergedAt = mergedAt;
     }
 
     @JsonProperty("publishedDate")
     public String getUpdatedDateISOString() {
-        return DateUtil.toISOString(createdAt);
+        return DateUtil.toISOString(TimeUuidUtil.getDateFromUUID(eventId));
     }
 
     public String getId() {
-        return TimeUuidUtil.uuidForDate(createdAt).toString();
+        return eventId.toString();
     }
 
     public String getContent() {
@@ -52,7 +53,12 @@ public class EncounterEvent {
     public ArrayList<String> getCategories() {
         categories.add(ENCOUNTER_UPDATED_CATEGORY_PREFIX +  DateUtil.toISOString(getEncounterLastUpdatedAt()));
         if (isEncounterFurtherEdited()) {
-            categories.add(LATEST_UPDATE_EVENT_CATEGORY_PREFIX + TimeUuidUtil.uuidForDate(getEncounterLastUpdatedAt()));
+            final UUID updatedEventReference = this.encounterBundle.getUpdatedEventReference();
+            if (updatedEventReference != null) {
+                categories.add(LATEST_UPDATE_EVENT_CATEGORY_PREFIX + updatedEventReference.toString());
+            } else {
+                categories.add(LATEST_UPDATE_EVENT_CATEGORY_PREFIX + "unknown");
+            }
         }
         if (getMergedAt() != null) {
             categories.add(ENCOUNTER_MERGED_CATEGORY_PREFIX + DateUtil.toISOString(getMergedAt()));
@@ -87,7 +93,7 @@ public class EncounterEvent {
 
     @JsonIgnore
     public Date getCreatedAt() {
-        return createdAt;
+        return TimeUuidUtil.getDateFromUUID(eventId);
     }
 
     @JsonIgnore

@@ -3,6 +3,7 @@ package org.freeshr.infrastructure.security;
 import ca.uhn.fhir.model.dstu2.composite.CodingDt;
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.model.dstu2.resource.Composition;
+import me.prettyprint.cassandra.utils.TimeUUIDUtils;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.events.EncounterEvent;
 import org.freeshr.interfaces.encounter.ws.APIIntegrationTestBase;
@@ -37,7 +38,7 @@ public class ConfidentialEncounterHandlerIT extends APIIntegrationTestBase {
         String confidentialContent = asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml");
         EncounterEvent confidentialEncounterEvent = new EncounterEvent(createEncounterBundle("encounter id", "98001046534",
                 Confidentiality.Restricted, Confidentiality.Normal, confidentialContent,
-                createdBy, receivedAt), receivedAt, null);
+                createdBy, receivedAt), TimeUUIDUtils.getTimeUUID(receivedAt.getTime()), null);
         List<EncounterEvent> replacedEncounterEvents = confidentialEncounterHandler.replaceConfidentialEncounterEvents(asList(confidentialEncounterEvent));
         assertEquals(1, replacedEncounterEvents.size());
         EncounterEvent replacedEncounterEvent = replacedEncounterEvents.get(0);

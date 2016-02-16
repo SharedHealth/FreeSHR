@@ -2,6 +2,7 @@ package org.freeshr.application.fhir;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.validation.IValidationSupport;
+import org.apache.commons.lang3.StringUtils;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.infrastructure.tr.TerminologyServer;
 import org.hl7.fhir.instance.model.Enumerations;
@@ -14,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
-import org.thymeleaf.util.StringUtils;
 
 import java.util.HashMap;
 

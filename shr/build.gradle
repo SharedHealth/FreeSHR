@@ -60,7 +60,7 @@ dependencies {
             libraries.spring_context_support, libraries.ehcache_core, libraries.commons_lang,
             libraries.lambdaj, libraries.joda_time, libraries.lz4,
             libraries.hapi_fhir_base, libraries.hapi_fhir_structures, libraries.hapi_fhir_validation_resources, libraries.hapi_fhir_structures_hl7,
-            libraries.phloc_schematron, libraries.phloc_commons, libraries.thymeleaf
+            libraries.phloc_schematron, libraries.phloc_commons, libraries.hector_core
 
     compile(libraries.spring_boot_security) {
         exclude group: 'ch.qos.logback', module: "logback-classic"

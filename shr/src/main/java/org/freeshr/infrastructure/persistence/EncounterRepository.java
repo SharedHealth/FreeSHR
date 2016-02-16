@@ -126,7 +126,7 @@ public class EncounterRepository {
         Update updateEncounterStmt = getUpdateEncounterStmt(encounterBundle, receivedTimeUUID, updatedTimeUUID);
         RegularStatement encCatchmentStmt = getInsertEncCatchmentStmt(encounterBundle, address, updatedTimeUUID);
         RegularStatement encByPatientStmt = getInsertEncByPatientStmt(encounterBundle, updatedTimeUUID);
-        RegularStatement encounterHistoryStmt = getInsertEncHistory(existingEncounterBundle);
+        RegularStatement encounterHistoryStmt = getInsertEncHistory(existingEncounterBundle, updatedTimeUUID);
 
         Batch batch = QueryBuilder.batch(updateEncounterStmt, encCatchmentStmt, encByPatientStmt, encounterHistoryStmt);
         Observable<ResultSet> saveObservable = Observable.from(cqlOperations.executeAsynchronously(batch),
@@ -173,7 +173,8 @@ public class EncounterRepository {
 
                     UUID mergedAt = encounterEventLog.getMergedAt();
                     Date mergedAtUUID = (mergedAt != null) ? TimeUuidUtil.getDateFromUUID(mergedAt) : null;
-                    encounterEvent = new EncounterEvent(savedEncounterBundle, TimeUuidUtil.getDateFromUUID(encounterEventLog.getCreatedAt()), mergedAtUUID);
+                    final UUID eventId = encounterEventLog.getCreatedAt();
+                    encounterEvent = new EncounterEvent(savedEncounterBundle, eventId, mergedAtUUID);
                     encounterEvents.add(encounterEvent);
                 }
                 return Observable.just(encounterEvents);
@@ -182,10 +183,10 @@ public class EncounterRepository {
         };
     }
 
-    private RegularStatement getInsertEncHistory(EncounterBundle encounterBundle) {
+    private RegularStatement getInsertEncHistory(EncounterBundle encounterBundle, UUID updatedTimeUUID) {
         Insert insertEncHistoryStmt = QueryBuilder.insertInto("enc_history");
         insertEncHistoryStmt.value("encounter_id", encounterBundle.getEncounterId());
-        insertEncHistoryStmt.value("encounter_updated_at", TimeUuidUtil.uuidForDate(encounterBundle.getUpdatedAt()));
+        insertEncHistoryStmt.value("encounter_updated_at", updatedTimeUUID);
         insertEncHistoryStmt.value("content_version", encounterBundle.getContentVersion());
         insertEncHistoryStmt.value("content_format", fhirDocumentSchemaVersion);
         insertEncHistoryStmt.value("content", encounterBundle.getContent());
@@ -348,7 +349,9 @@ public class EncounterRepository {
             bundle.setEncounterConfidentiality(getConfidentiality(result.getString("encounter_confidentiality")));
             bundle.setPatientConfidentiality(getConfidentiality(result.getString("patient_confidentiality")));
             bundle.setUpdatedBy(getRequesterValue(result, "updated_by"));
-            bundle.setUpdatedAt(TimeUuidUtil.getDateFromUUID(result.getUUID("updated_at")));
+            final UUID updatedAt = result.getUUID("updated_at");
+            bundle.setUpdatedAt(TimeUuidUtil.getDateFromUUID(updatedAt));
+            bundle.setUpdatedEventReference(updatedAt);
             bundle.setContentVersion(result.getInt("content_version"));
             bundles.add(bundle);
         }
