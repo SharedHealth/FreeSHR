@@ -276,7 +276,7 @@ public class EncounterRepository {
         int yearOfDate = DateUtil.getYearOf(updatedSince);
         //TODO test. condition should be >=
         return format("SELECT encounter_id, created_at, merged_at FROM enc_by_catchment " +
-                        " WHERE year = %s and created_at >= %s and %s LIMIT %s ALLOW FILTERING;",
+                        " WHERE year = %s and created_at > %s and %s LIMIT %s ALLOW FILTERING;",
                 yearOfDate, lastMarker, buildClauseForCatchment(catchment), limit);
     }
 

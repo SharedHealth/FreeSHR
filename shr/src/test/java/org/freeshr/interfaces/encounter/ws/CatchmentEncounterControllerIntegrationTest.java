@@ -161,7 +161,7 @@ public class CatchmentEncounterControllerIntegrationTest extends APIIntegrationT
         }
 
         String marker25 = TimeUuidUtil.uuidForDate(encounterDates.get(24)).toString();
-        List<String> markersFrom25till45 = getUuidsForDates(encounterDates.subList(24, 44));
+        List<String> markersFrom26till46 = getUuidsForDates(encounterDates.subList(25, 45));
 
         mockMvc.perform(MockMvcRequestBuilders.get(String.format("/catchments/3026/encounters?updatedSince=%s&lastMarker=%s", new SimpleDateFormat("yyyy-MM-dd").format(date), marker25))
                 .header(AUTH_TOKEN_KEY, validAccessToken)
@@ -169,7 +169,7 @@ public class CatchmentEncounterControllerIntegrationTest extends APIIntegrationT
                 .header(CLIENT_ID_KEY, validClientId)
                 .accept(MediaType.APPLICATION_ATOM_XML))
                 .andExpect(request().asyncResult(hasEncounterEventsOfSize(20)))
-                .andExpect(request().asyncResult(hasEvents(markersFrom25till45)));
+                .andExpect(request().asyncResult(hasEvents(markersFrom26till46)));
 
     }
 
@@ -189,15 +189,15 @@ public class CatchmentEncounterControllerIntegrationTest extends APIIntegrationT
         }
 
         String marker40 = TimeUuidUtil.uuidForDate(encounterDates.get(39)).toString();
-        List<String> markersFrom40till50 = getUuidsForDates(encounterDates.subList(39, 49));
+        List<String> markersFrom41till50 = getUuidsForDates(encounterDates.subList(40, 49));
 
         mockMvc.perform(MockMvcRequestBuilders.get(String.format("/catchments/3026/encounters?updatedSince=%s&lastMarker=%s", new SimpleDateFormat("yyyy-MM-dd").format(date), marker40))
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
                 .accept(MediaType.APPLICATION_ATOM_XML))
-                .andExpect(request().asyncResult(hasEncounterEventsOfSize(11)))
-                .andExpect(request().asyncResult(hasEvents(markersFrom40till50)));
+                .andExpect(request().asyncResult(hasEncounterEventsOfSize(10)))
+                .andExpect(request().asyncResult(hasEvents(markersFrom41till50)));
 
     }
 

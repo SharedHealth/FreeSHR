@@ -129,9 +129,8 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         queryUtils.insertEncounterByCatchment("E3", "D1", "D1d1", "D1d1u1", mar5T1130);
 
         List<EncounterEvent> encounterEvents = encounterRepository.findEncounterFeedForCatchmentAfterMarker(new Catchment("D1d1u1"),TimeUuidUtil.uuidForDate(mar5T1030).toString(), mar5T900, 20).toBlocking().first();
-        assertEquals(2, encounterEvents.size());
-        assertEquals(mar5T1030, encounterEvents.get(0).getCreatedAt());
-        assertEquals(mar5T1130, encounterEvents.get(1).getCreatedAt());
+        assertEquals(1, encounterEvents.size());
+        assertEquals(mar5T1130, encounterEvents.get(0).getCreatedAt());
 
     }
 
