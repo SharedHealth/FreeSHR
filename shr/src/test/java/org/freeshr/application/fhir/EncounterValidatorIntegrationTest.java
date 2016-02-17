@@ -1,12 +1,10 @@
 package org.freeshr.application.fhir;
 
-import ca.uhn.fhir.context.FhirContext;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import net.sf.ehcache.CacheManager;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.data.EncounterBundleData;
-import org.freeshr.infrastructure.tr.ValueSetCodeValidator;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.utils.FileUtil;
 import org.freeshr.validations.EncounterValidationContext;
@@ -27,10 +25,6 @@ import static org.freeshr.util.ValidationFailureTestHelper.assertFailureInRespon
 import static org.freeshr.utils.FileUtil.asString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
@@ -41,46 +35,13 @@ public class EncounterValidatorIntegrationTest {
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(9997);
     @Autowired
-    ValueSetCodeValidator valueSetCodeValidator;
-    @Autowired
     private HapiEncounterValidator validator;
-
-    private TRConceptValidator trConceptValidator;
-
     private EncounterValidationContext validationContext;
     EncounterBundle encounterBundle;
 
     @Before
     public void setup() throws Exception {
-        initMocks(this);
         encounterBundle = EncounterBundleData.withValidEncounter();
-
-//        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/drugs/3be99d23-e50d-41a6-ad8c-f6434e49f513"))
-//                .willReturn(aResponse()
-//                        .withStatus(200)
-//                        .withHeader("Content-Type", "application/json")
-//                        .withBody(asString("jsons/medication_paracetamol.json"))));
-//
-//        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/Quantity-Units"))
-//                .willReturn(aResponse()
-//                        .withStatus(200)
-//                        .withHeader("Content-Type", "application/json")
-//                        .withBody(asString("jsons/code.json"))));
-//
-//        givenThat(get(urlEqualTo("/facilities/10000069.json"))
-//                .withHeader("client_id", matching("18550"))
-//                .withHeader("X-Auth-Token", matching("c6e6fd3a26313eb250e1019519af33e743808f5bb50428ae5423b8ee278e6fa5"))
-//                .willReturn(aResponse()
-//                        .withStatus(200)
-//                        .withHeader("Content-Type", "application/json")
-//                        .withBody(asString("jsons/facility10000069.json"))));
-//
-//        givenThat(get(urlEqualTo("/facilities/100000603.json"))
-//                .willReturn(aResponse()
-//                        .withStatus(404)
-//                        .withHeader("Content-Type", "application/json")
-//                        .withBody(asString("jsons/facility100000603.json"))));
-
         //encounter-type
         givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/encounter-type"))
                 .willReturn(aResponse()
@@ -467,7 +428,7 @@ public class EncounterValidatorIntegrationTest {
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue(response.isSuccessful());
     }
-    
+
     @Test
     public void shouldValidateDiagnosisWithPreviousProcedureRequestExtension() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
@@ -673,7 +634,6 @@ public class EncounterValidatorIntegrationTest {
     public void shouldValidateInvalidDosageQuantityInDischargeSummaryEncounter() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/dstu1/discharge_summary_dosage_quantity_invalid.xml"));
-        when(trConceptValidator.isCodeSystemSupported(any(FhirContext.class), anyString())).thenReturn(true);
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertFailureFromResponseErrors("urn:5fc6d0d9-9520-4015-87cb-ab0cfa7e4b50", "Invalid Dosage Quantity",

@@ -22,21 +22,21 @@ cluster_name: 'bdshr'
 #initial_token:
 
 # See http://wiki.apache.org/cassandra/HintedHandoff
-hinted_handoff_enabled: true
+hinted_handoff_enabled: false
 # this defines the maximum amount of time a dead host will have hints
 # generated.  After it has been dead this long, new hints for it will not be
 # created until it has been seen alive and gone down again.
-max_hint_window_in_ms: 10800000 # 3 hours
+max_hint_window_in_ms: 0 # 3 hours
 # Maximum throttle in KBs per second, per delivery thread.  This will be
 # reduced proportionally to the number of nodes in the cluster.  (If there
 # are two nodes in the cluster, each delivery thread will use the maximum
 # rate; if there are three, each will throttle to half of the maximum,
 # since we expect two nodes to be delivering hints simultaneously.)
-hinted_handoff_throttle_in_kb: 1024
+hinted_handoff_throttle_in_kb: 0
 # Number of threads with which to deliver hints;
 # Consider increasing this number when you have multi-dc deployments, since
 # cross-dc handoff tends to be slower
-max_hints_delivery_threads: 2
+max_hints_delivery_threads: 1
 
 # The following setting populates the page cache on memtable flush and compaction
 # WARNING: Enable this setting only when the whole node's data fits in memory.
@@ -132,11 +132,11 @@ key_cache_size_in_mb: 0
 # has limited use.
 #
 # Default is 14400 or 4 hours.
-key_cache_save_period: 14400
+key_cache_save_period: 0
 
 # Number of keys from the key cache to save
 # Disabled by default, meaning all keys are going to be saved
-# key_cache_keys_to_save: 100
+key_cache_keys_to_save: 0
 
 # Maximum size of the row cache in memory.
 # NOTE: if you reduce the size, you may not get you hottest keys loaded on startup.
@@ -157,7 +157,7 @@ row_cache_save_period: 0
 
 # Number of keys from the row cache to save
 # Disabled by default, meaning all keys are going to be saved
-# row_cache_keys_to_save: 100
+row_cache_keys_to_save: 0
 
 # saved caches
 saved_caches_directory: target/embeddedCassandra/saved_caches
@@ -186,7 +186,7 @@ commitlog_sync_batch_window_in_ms: 90
 # archiving commitlog segments (see commitlog_archiving.properties),
 # then you probably want a finer granularity of archiving; 8 or 16 MB
 # is reasonable.
-commitlog_segment_size_in_mb: 32
+commitlog_segment_size_in_mb: 1
 
 # any class that implements the SeedProvider interface and has a
 # constructor that takes a Map<String, String> of parameters will do.
@@ -211,8 +211,8 @@ seed_provider:
 # On the other hand, since writes are almost never IO bound, the ideal
 # number of "concurrent_writes" is dependent on the number of cores in
 # your system; (8 * number_of_cores) is a good rule of thumb.
-concurrent_reads: 32
-concurrent_writes: 32
+concurrent_reads: 2
+concurrent_writes: 2
 
 # Total memory to use for memtables.  Cassandra will flush the largest
 # memtable when this much memory is used.
@@ -223,7 +223,7 @@ concurrent_writes: 32
 # If space gets above this value (it will round up to the next nearest
 # segment multiple), Cassandra will flush every dirty CF in the oldest
 # segment and remove it.
-commitlog_total_space_in_mb: 64
+commitlog_total_space_in_mb: 1
 
 # This sets the amount of memtable flush writer threads.  These will
 # be blocked by disk io, and each one will hold a memtable in memory
@@ -307,7 +307,7 @@ rpc_keepalive: true
 #
 # The default is sync because on Windows hsha is about 30% slower.  On Linux,
 # sync/hsha performance is about the same, with hsha of course using less memory.
-rpc_server_type: sync
+rpc_server_type: hsha
 
 # Uncomment rpc_min|max|thread to set request pool size.
 # You would primarily set max for the sync server to safeguard against
@@ -320,8 +320,8 @@ rpc_server_type: sync
 #
 # This configuration is ignored by the async server.
 #
-# rpc_min_threads: 16
-# rpc_max_threads: 2048
+rpc_min_threads: 1
+rpc_max_threads: 1
 
 # uncomment to set socket buffer sizes on rpc connections
 # rpc_send_buff_size_in_bytes:
@@ -381,7 +381,7 @@ column_index_size_in_kb: 64
 #
 # concurrent_compactors defaults to the number of cores.
 # Uncomment to make compaction mono-threaded, the pre-0.8 default.
-#concurrent_compactors: 1
+concurrent_compactors: 1
 
 # Multi-threaded compaction. When enabled, each compaction will use
 # up to one thread per core, plus one thread per sstable being merged.
@@ -396,7 +396,7 @@ column_index_size_in_kb: 64
 # 16 to 32 times the rate you are inserting data is more than sufficient.
 # Setting this to 0 disables throttling. Note that this account for all types
 # of compaction, including validation compaction.
-compaction_throughput_mb_per_sec: 16
+compaction_throughput_mb_per_sec: 0
 
 # Track cached row keys during compaction, and re-cache their new
 # positions in the compacted sstable.  Disable if you use really large
@@ -411,11 +411,11 @@ compaction_throughput_mb_per_sec: 16
 # stream_throughput_outbound_megabits_per_sec: 200
 
 # How long the coordinator should wait for read operations to complete
-read_request_timeout_in_ms: 5000
+read_request_timeout_in_ms: 10000
 # How long the coordinator should wait for seq or index scans to complete
 range_request_timeout_in_ms: 10000
 # How long the coordinator should wait for writes to complete
-write_request_timeout_in_ms: 2000
+write_request_timeout_in_ms: 5000
 # How long a coordinator should continue to retry a CAS operation
 # that contends with other proposals for the same row
 # cas_contention_timeout_in_ms: 1000
