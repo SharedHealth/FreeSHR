@@ -40,7 +40,7 @@ import static org.freeshr.utils.FileUtil.asString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
-public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
+public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase {
 
     @Autowired
     private EncounterRepository encounterRepository;
@@ -54,6 +54,7 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
     @Before
     public void setUp() throws Exception {
         queryUtils = new QueryUtils(cqlOperations);
+        resetUUIDGenLastTime();
     }
 
     @Test
@@ -62,13 +63,13 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         String healthId = generateHealthId();
         patient.setHealthId(healthId);
         patient.setAddress(new Address("01", "02", "03", "04", "05"));
-        DateTime today = new DateTime(2015,02,01,0,0);
+        DateTime today = new DateTime(2015, 02, 01, 0, 0);
         Date monthAfter = today.plusMonths(1).toDate();
         Date twoMonthsAfter = today.plusMonths(2).toDate();
         Date updatedSinceYesterday = today.minusDays(1).toDate();
-        encounterRepository.save(createEncounterBundle("e-1", healthId, Confidentiality.Normal, Confidentiality.Normal, asString("jsons/encounters/valid.json"),  new Requester("facilityId", null), today.toDate()), patient).toBlocking().first();
-        encounterRepository.save(createEncounterBundle("e-2", healthId, Confidentiality.Normal, Confidentiality.Normal, asString("jsons/encounters/valid.json"),  new Requester("facilityId", null), monthAfter), patient).toBlocking().first();
-        encounterRepository.save(createEncounterBundle("e-3", healthId, Confidentiality.Normal, Confidentiality.Normal, asString("jsons/encounters/valid.json"),  new Requester("facilityId", null), twoMonthsAfter), patient).toBlocking().first();
+        encounterRepository.save(createEncounterBundle("e-1", healthId, Confidentiality.Normal, Confidentiality.Normal, asString("jsons/encounters/valid.json"), new Requester("facilityId", null), today.toDate()), patient).toBlocking().first();
+        encounterRepository.save(createEncounterBundle("e-2", healthId, Confidentiality.Normal, Confidentiality.Normal, asString("jsons/encounters/valid.json"), new Requester("facilityId", null), monthAfter), patient).toBlocking().first();
+        encounterRepository.save(createEncounterBundle("e-3", healthId, Confidentiality.Normal, Confidentiality.Normal, asString("jsons/encounters/valid.json"), new Requester("facilityId", null), twoMonthsAfter), patient).toBlocking().first();
 
         List<EncounterEvent> encounterBundles = encounterRepository.getEncounterFeedForPatient(healthId,
                 updatedSinceYesterday, 200).toBlocking().single();
@@ -95,8 +96,8 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
 
         Date e1ReceivedDate = today.plusDays(1).toDate();
         Date e2ReceivedDate = today.plusDays(2).toDate();
-        encounterRepository.save(createEncounterBundle("e-11", healthId, Confidentiality.Normal, Confidentiality.Normal,  asString("jsons/encounters/valid.json"), new Requester("facilityId", null), e1ReceivedDate), patient).toBlocking().first();
-        encounterRepository.save(createEncounterBundle("e-12", healthId, Confidentiality.Normal, Confidentiality.Normal,  asString("jsons/encounters/valid.json"), new Requester("facilityId", null), e2ReceivedDate), patient).toBlocking().first();
+        encounterRepository.save(createEncounterBundle("e-11", healthId, Confidentiality.Normal, Confidentiality.Normal, asString("jsons/encounters/valid.json"), new Requester("facilityId", null), e1ReceivedDate), patient).toBlocking().first();
+        encounterRepository.save(createEncounterBundle("e-12", healthId, Confidentiality.Normal, Confidentiality.Normal, asString("jsons/encounters/valid.json"), new Requester("facilityId", null), e2ReceivedDate), patient).toBlocking().first();
 
         List<EncounterEvent> encountersForCatchment = encounterRepository.
                 findEncounterFeedForCatchmentUpdatedSince(new Catchment("0102"), today.toDate(), 10).toBlocking().first();
@@ -107,10 +108,10 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
 
     @Test
     public void shouldFetchEncountersForCatchmentsUpdatedSince() throws Exception {
-        Date mar5T900 = new DateTime(2015, 03,05,9,00).toDate();
-        Date mar5T0930 = new DateTime(2015, 03,05,9,30).toDate();
-        Date mar5T1030 = new DateTime(2015, 03,05,10,30).toDate();
-        Date mar5T1130 = new DateTime(2015, 03,05,11,30).toDate();
+        Date mar5T900 = new DateTime(2015, 03, 05, 9, 00).toDate();
+        Date mar5T0930 = new DateTime(2015, 03, 05, 9, 30).toDate();
+        Date mar5T1030 = new DateTime(2015, 03, 05, 10, 30).toDate();
+        Date mar5T1130 = new DateTime(2015, 03, 05, 11, 30).toDate();
         queryUtils.insertEncounterByCatchment("E1", "D1", "D1d1", "D1d1u1", mar5T0930);
         queryUtils.insertEncounterByCatchment("E2", "D1", "D1d1", "D1d1u1", mar5T1030);
         queryUtils.insertEncounterByCatchment("E3", "D1", "D1d1", "D1d1u1", mar5T1130);
@@ -124,10 +125,10 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
 
     @Test
     public void shouldFetchEncountersForCatchmentsSinceLastMarker() throws Exception {
-        Date mar5T900 = new DateTime(2015, 03,05,9,00).toDate();
-        Date mar5T0930 = new DateTime(2015, 03,05,9,30).toDate();
-        Date mar5T1030 = new DateTime(2015, 03,05,10,30).toDate();
-        Date mar5T1130 = new DateTime(2015, 03,05,11,30).toDate();
+        Date mar5T900 = new DateTime(2015, 03, 05, 9, 00).toDate();
+        Date mar5T0930 = new DateTime(2015, 03, 05, 9, 30).toDate();
+        Date mar5T1030 = new DateTime(2015, 03, 05, 10, 30).toDate();
+        Date mar5T1130 = new DateTime(2015, 03, 05, 11, 30).toDate();
         queryUtils.insertEncounterByCatchment("E1", "D1", "D1d1", "D1d1u1", mar5T0930);
         queryUtils.insertEncounterByCatchment("E2", "D1", "D1d1", "D1d1u1", mar5T1030);
         queryUtils.insertEncounterByCatchment("E3", "D1", "D1d1", "D1d1u1", mar5T1130);
@@ -231,7 +232,7 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         updateEncounterBundle.setReceivedEventReference(encCreateTimeUuid);
 
         encounterRepository.updateEncounter(updateEncounterBundle,
-            existingEncounterBundle, patient).toBlocking().first();
+                existingEncounterBundle, patient).toBlocking().first();
 
         Select selectEncounterQuery = QueryBuilder
                 .select()
@@ -297,9 +298,9 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         patient.setHealthId(healthId);
         patient.setAddress(new Address("01", "02", "03", "04", "05"));
 
-        Date jan1st0930 = new DateTime(2015,01,01,9,30).toDate();
-        Date jan1st0940 = new DateTime(2015,01,01,9,40).toDate();
-        Date jan1st0945 = new DateTime(2015,02,01,9,45).toDate();
+        Date jan1st0930 = new DateTime(2015, 01, 01, 9, 30).toDate();
+        Date jan1st0940 = new DateTime(2015, 01, 01, 9, 40).toDate();
+        Date jan1st0945 = new DateTime(2015, 02, 01, 9, 45).toDate();
 
         Requester createdBy = new Requester("facilityId", null);
         EncounterBundle existingEncounterBundle = createEncounterBundle(encounterOne, healthId, Confidentiality.Normal,
@@ -324,16 +325,44 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
 
         assertEquals(3, encounterEventsForPatient.size());
         assertEquals("e-1", encounterEventsForPatient.get(0).getEncounterId());
-        assertEquals(jan1st0930,encounterEventsForPatient.get(0).getCreatedAt());
+        assertEquals(jan1st0930, encounterEventsForPatient.get(0).getCreatedAt());
         assertNull(encounterEventsForPatient.get(0).getMergedAt());
 
         assertEquals("e-2", encounterEventsForPatient.get(1).getEncounterId());
-        assertEquals(jan1st0940,encounterEventsForPatient.get(1).getCreatedAt());
+        assertEquals(jan1st0940, encounterEventsForPatient.get(1).getCreatedAt());
         assertNull(encounterEventsForPatient.get(0).getMergedAt());
 
         assertEquals("e-1", encounterEventsForPatient.get(2).getEncounterId());
-        assertEquals(jan1st0945,encounterEventsForPatient.get(2).getCreatedAt());
+        assertEquals(jan1st0945, encounterEventsForPatient.get(2).getCreatedAt());
         assertNull(encounterEventsForPatient.get(0).getMergedAt());
+    }
+
+    @Test
+    public void shouldCreateDiferentUUIDsForSameTime() throws Exception {
+        String encounterId;
+        Patient patient = new Patient();
+        String healthId = generateHealthId();
+        patient.setHealthId(healthId);
+        patient.setAddress(new Address("01", "02", "03", "04", "05"));
+
+        Date jan1st0940 = new DateTime(2016, 01, 01, 9, 40).toDate();
+
+        Requester createdBy = new Requester("facilityId", null);
+        for (int i = 0; i < 10; i++) {
+            encounterId = "e " + i;
+
+            EncounterBundle encounterBundle = createEncounterBundle(encounterId, healthId, Confidentiality.Normal,
+                    Confidentiality.Normal, asString("jsons/encounters/valid.json"), createdBy, jan1st0940);
+
+            encounterRepository.save(encounterBundle, patient).toBlocking().first();
+        }
+
+        List<EncounterEvent> encounterEventsForPatient = encounterRepository.getEncounterFeedForPatient(healthId, null, 20).toBlocking().first();
+
+        assertEquals(10, encounterEventsForPatient.size());
+        for (EncounterEvent encounterEvent : encounterEventsForPatient) {
+            assertEquals(jan1st0940, TimeUuidUtil.getDateFromUUID(encounterEvent.getEncounterBundle().getReceivedEventReference()));
+        }
     }
 
     @After
@@ -342,7 +371,6 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         cqlOperations.execute("truncate enc_by_catchment");
         cqlOperations.execute("truncate enc_by_patient");
         cqlOperations.execute("truncate enc_history");
-        resetUUIDGenLastTime();
     }
 
     private void resetUUIDGenLastTime() throws Exception {

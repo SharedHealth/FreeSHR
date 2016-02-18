@@ -49,18 +49,13 @@ public class CatchmentEncounterControllerIntegrationTest extends APIIntegrationT
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/userDetailsWithAllRoles.json"))));
+        resetUUIDGenLastTime();
+
     }
 
     @After
     public void tearDown() throws Exception {
         CacheManager.getInstance().clearAll();
-        resetUUIDGenLastTime();
-    }
-
-    private void resetUUIDGenLastTime() throws Exception {
-        Field field = UUIDGen.class.getDeclaredField("lastTime");
-        field.setAccessible(true);
-        field.set(null, Long.MIN_VALUE);
     }
 
     @Test
@@ -224,4 +219,11 @@ public class CatchmentEncounterControllerIntegrationTest extends APIIntegrationT
         }
         return dates;
     }
+
+    private void resetUUIDGenLastTime() throws Exception {
+        Field field = UUIDGen.class.getDeclaredField("lastTime");
+        field.setAccessible(true);
+        field.set(null, Long.MIN_VALUE);
+    }
+
 }

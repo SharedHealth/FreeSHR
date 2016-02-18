@@ -109,8 +109,7 @@ public class EncounterRepository {
     }
 
     public Observable<List<EncounterEvent>> getEncounterFeedForPatient(String healthId, Date updatedSince,
-                                                                       int limit) throws ExecutionException,
-            InterruptedException {
+                                                                       int limit) throws ExecutionException, InterruptedException {
         StringBuilder queryBuilder = buildQuery(healthId, updatedSince, limit);
         Observable<ResultSet> encounterIdsWithCreatedTimeObservable = Observable.from(cqlOperations.queryAsynchronously
                 (queryBuilder.toString()), Schedulers.io());
