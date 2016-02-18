@@ -4,7 +4,9 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
+import com.eaio.uuid.UUIDGen;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import me.prettyprint.cassandra.utils.TimeUUIDUtils;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.domain.model.Catchment;
 import org.freeshr.domain.model.Requester;
@@ -25,9 +27,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cassandra.core.CqlOperations;
 
+import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import static ch.lambdaj.Lambda.*;
@@ -128,7 +132,8 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         queryUtils.insertEncounterByCatchment("E2", "D1", "D1d1", "D1d1u1", mar5T1030);
         queryUtils.insertEncounterByCatchment("E3", "D1", "D1d1", "D1d1u1", mar5T1130);
 
-        List<EncounterEvent> encounterEvents = encounterRepository.findEncounterFeedForCatchmentAfterMarker(new Catchment("D1d1u1"),TimeUuidUtil.uuidForDate(mar5T1030).toString(), mar5T900, 20).toBlocking().first();
+        List<EncounterEvent> encounterEvents = encounterRepository.findEncounterFeedForCatchmentAfterMarker(new Catchment("D1d1u1"),
+                TimeUUIDUtils.getTimeUUID(mar5T1030.getTime()).toString(), mar5T900, 20).toBlocking().first();
         assertEquals(1, encounterEvents.size());
         assertEquals(mar5T1130, encounterEvents.get(0).getCreatedAt());
 
@@ -215,11 +220,18 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
                 Confidentiality.Normal, encounterContent, createdBy, encounterRecievedAt);
         encounterRepository.save(existingEncounterBundle, patient).toBlocking().first();
 
+        UUID encCreateTimeUuid = encounterRepository.findEncounterById(encounterId).toBlocking().first().getReceivedEventReference();
+
+
         Date updatedAt = new Date();
         Requester updatedBy = new Requester("facilityId1", null);
-        encounterRepository.updateEncounter(createUpdateEncounterBundle(encounterId, healthId, Confidentiality.Normal,
-                        encounterContent, updatedBy, updatedAt),
-        existingEncounterBundle, patient).toBlocking().first();
+        EncounterBundle updateEncounterBundle = createUpdateEncounterBundle(encounterId, healthId, Confidentiality.Normal,
+                encounterContent, updatedBy, updatedAt);
+        existingEncounterBundle.setReceivedEventReference(encCreateTimeUuid);
+        updateEncounterBundle.setReceivedEventReference(encCreateTimeUuid);
+
+        encounterRepository.updateEncounter(updateEncounterBundle,
+            existingEncounterBundle, patient).toBlocking().first();
 
         Select selectEncounterQuery = QueryBuilder
                 .select()
@@ -294,13 +306,18 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
                 Confidentiality.Normal, asString("jsons/encounters/valid.json"), createdBy, jan1st0930);
         encounterRepository.save(existingEncounterBundle, patient).toBlocking().first();
 
+        UUID encOneCreateTimeUuid = encounterRepository.findEncounterById(encounterOne).toBlocking().first().getReceivedEventReference();
+
         EncounterBundle secondEncounter = createEncounterBundle(encounterTwo, healthId, Confidentiality.Normal,
                 Confidentiality.Normal, asString("jsons/encounters/valid.json"), createdBy, jan1st0940);
         encounterRepository.save(secondEncounter, patient).toBlocking().first();
 
         Requester updatedBy = new Requester("facilityId1", null);
-        encounterRepository.updateEncounter(createUpdateEncounterBundle(encounterOne, healthId, Confidentiality.Normal,
-                        asString("jsons/encounters/valid.json"), updatedBy, jan1st0945),
+        EncounterBundle bundle = createUpdateEncounterBundle(encounterOne, healthId, Confidentiality.Normal,
+                asString("jsons/encounters/valid.json"), updatedBy, jan1st0945);
+        bundle.setReceivedEventReference(encOneCreateTimeUuid);
+        existingEncounterBundle.setReceivedEventReference(encOneCreateTimeUuid);
+        encounterRepository.updateEncounter(bundle,
                 existingEncounterBundle, patient).toBlocking().first();
 
         List<EncounterEvent> encounterEventsForPatient = encounterRepository.getEncounterFeedForPatient(healthId, null, 5).toBlocking().first();
@@ -317,16 +334,21 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase{
         assertEquals("e-1", encounterEventsForPatient.get(2).getEncounterId());
         assertEquals(jan1st0945,encounterEventsForPatient.get(2).getCreatedAt());
         assertNull(encounterEventsForPatient.get(0).getMergedAt());
-
-
     }
 
     @After
-    public void teardown() {
+    public void teardown() throws Exception {
         cqlOperations.execute("truncate encounter");
         cqlOperations.execute("truncate enc_by_catchment");
         cqlOperations.execute("truncate enc_by_patient");
         cqlOperations.execute("truncate enc_history");
+        resetUUIDGenLastTime();
+    }
+
+    private void resetUUIDGenLastTime() throws Exception {
+        Field field = UUIDGen.class.getDeclaredField("lastTime");
+        field.setAccessible(true);
+        field.set(null, Long.MIN_VALUE);
     }
 
     private void assertEncounter(List<EncounterEvent> encounterEvents, String encounterId, Date receivedDate) {

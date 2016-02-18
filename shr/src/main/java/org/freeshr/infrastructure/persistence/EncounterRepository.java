@@ -120,7 +120,8 @@ public class EncounterRepository {
 
     public Observable<Boolean> updateEncounter(EncounterBundle encounterBundle, EncounterBundle existingEncounterBundle, Patient patient) {
         Address address = patient.getAddress();
-        UUID receivedTimeUUID = TimeUuidUtil.uuidForDate(existingEncounterBundle.getReceivedAt());
+        //UUID receivedTimeUUID = TimeUuidUtil.uuidForDate(existingEncounterBundle.getReceivedAt());
+        UUID receivedTimeUUID = existingEncounterBundle.getReceivedEventReference();
         UUID updatedTimeUUID = TimeUuidUtil.uuidForDate(encounterBundle.getUpdatedAt());
 
         Update updateEncounterStmt = getUpdateEncounterStmt(encounterBundle, receivedTimeUUID, updatedTimeUUID);
@@ -343,7 +344,9 @@ public class EncounterRepository {
             EncounterBundle bundle = new EncounterBundle();
             bundle.setEncounterId(result.getString("encounter_id"));
             bundle.setHealthId(result.getString("health_id"));
-            bundle.setReceivedAt(TimeUuidUtil.getDateFromUUID(result.getUUID("received_at")));
+            final UUID receivedAt = result.getUUID("received_at");
+            bundle.setReceivedAt(TimeUuidUtil.getDateFromUUID(receivedAt));
+            bundle.setReceivedEventReference(receivedAt);
             bundle.setCreatedBy(getRequesterValue(result, "created_by"));
             bundle.setEncounterContent(result.getString(getContentColumnName()));
             bundle.setEncounterConfidentiality(getConfidentiality(result.getString("encounter_confidentiality")));

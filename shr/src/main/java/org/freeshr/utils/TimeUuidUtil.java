@@ -13,7 +13,7 @@ public class TimeUuidUtil {
     }
 
     public static UUID uuidForDate(long timeInMillis) {
-        return TimeUUIDUtils.getTimeUUID(timeInMillis);
+        return new java.util.UUID(com.eaio.uuid.UUIDGen.createTime(timeInMillis), com.eaio.uuid.UUIDGen.getClockSeqAndNode());
     }
 
 

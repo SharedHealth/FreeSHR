@@ -3,6 +3,7 @@ package org.freeshr.util;
 
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
+import me.prettyprint.cassandra.utils.TimeUUIDUtils;
 import org.freeshr.utils.DateUtil;
 import org.freeshr.utils.TimeUuidUtil;
 import org.springframework.cassandra.core.CqlOperations;
@@ -23,7 +24,7 @@ public class QueryUtils {
                 .value("district_id", concatenatedDistrictId)
                 .value("upazila_id", concatenatedUpazillaId)
                 .value("year", DateUtil.getYearOf(createdAt))
-                .value("created_at", TimeUuidUtil.uuidForDate(createdAt));
+                .value("created_at", TimeUUIDUtils.getTimeUUID(createdAt.getTime()));
         cqlOperations.execute(insert);
     }
 }

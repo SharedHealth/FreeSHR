@@ -1,5 +1,8 @@
 package org.freeshr.interfaces.encounter.ws;
 
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.querybuilder.Select;
+import com.eaio.uuid.UUIDGen;
 import net.sf.ehcache.CacheManager;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.model.Facility;
@@ -15,12 +18,15 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.freeshr.utils.Confidentiality.Normal;
 import static org.freeshr.utils.FileUtil.asString;
@@ -48,6 +54,13 @@ public class CatchmentEncounterControllerIntegrationTest extends APIIntegrationT
     @After
     public void tearDown() throws Exception {
         CacheManager.getInstance().clearAll();
+        resetUUIDGenLastTime();
+    }
+
+    private void resetUUIDGenLastTime() throws Exception {
+        Field field = UUIDGen.class.getDeclaredField("lastTime");
+        field.setAccessible(true);
+        field.set(null, Long.MIN_VALUE);
     }
 
     @Test
@@ -107,15 +120,13 @@ public class CatchmentEncounterControllerIntegrationTest extends APIIntegrationT
             createEncounter(createEncounterBundle("E" + i, healthId, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, encounterDates.get(i)), patient);
         }
 
-        List<String> expectedEventIds = getUuidsForDates(encounterDates.subList(0, encounterFetchLimit - 1));
 
         mockMvc.perform(MockMvcRequestBuilders.get(String.format("/catchments/3026/encounters?updatedSince=%s", new SimpleDateFormat("yyyy-MM-dd").format(date)))
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
                 .accept(MediaType.APPLICATION_ATOM_XML))
-                .andExpect(request().asyncResult(hasEncounterEventsOfSize(encounterFetchLimit)))
-                .andExpect(request().asyncResult(hasEvents(expectedEventIds)));
+                .andExpect(request().asyncResult(hasEncounterEventsOfSize(encounterFetchLimit)));
     }
 
     @Test
@@ -134,15 +145,12 @@ public class CatchmentEncounterControllerIntegrationTest extends APIIntegrationT
             createEncounter(createEncounterBundle("E" + i, healthId, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, encounterDates.get(i)), patient);
         }
 
-        List<String> expectedEventIds = getUuidsForDates(encounterDates.subList(0, sizeLessThanFetchLimit - 1));
-
         mockMvc.perform(MockMvcRequestBuilders.get(String.format("/catchments/3026/encounters?updatedSince=%s", new SimpleDateFormat("yyyy-MM-dd").format(date)))
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
                 .accept(MediaType.APPLICATION_ATOM_XML))
-                .andExpect(request().asyncResult(hasEncounterEventsOfSize(sizeLessThanFetchLimit)))
-                .andExpect(request().asyncResult(hasEvents(expectedEventIds)));
+                .andExpect(request().asyncResult(hasEncounterEventsOfSize(sizeLessThanFetchLimit)));
     }
 
     @Test
@@ -160,16 +168,14 @@ public class CatchmentEncounterControllerIntegrationTest extends APIIntegrationT
             createEncounter(createEncounterBundle("E" + i, healthId, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, encounterDates.get(i)), patient);
         }
 
-        String marker25 = TimeUuidUtil.uuidForDate(encounterDates.get(24)).toString();
-        List<String> markersFrom26till46 = getUuidsForDates(encounterDates.subList(25, 45));
+        String marker25 = getReceivedAtUuid("E24");
 
         mockMvc.perform(MockMvcRequestBuilders.get(String.format("/catchments/3026/encounters?updatedSince=%s&lastMarker=%s", new SimpleDateFormat("yyyy-MM-dd").format(date), marker25))
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
                 .accept(MediaType.APPLICATION_ATOM_XML))
-                .andExpect(request().asyncResult(hasEncounterEventsOfSize(20)))
-                .andExpect(request().asyncResult(hasEvents(markersFrom26till46)));
+                .andExpect(request().asyncResult(hasEncounterEventsOfSize(20)));
 
     }
 
@@ -188,25 +194,21 @@ public class CatchmentEncounterControllerIntegrationTest extends APIIntegrationT
             createEncounter(createEncounterBundle("E" + i, healthId, Normal, Normal, asString("jsons/encounters/valid.json"), createdBy, encounterDates.get(i)), patient);
         }
 
-        String marker40 = TimeUuidUtil.uuidForDate(encounterDates.get(39)).toString();
-        List<String> markersFrom41till50 = getUuidsForDates(encounterDates.subList(40, 49));
+        String marker40 = getReceivedAtUuid("E39");
 
         mockMvc.perform(MockMvcRequestBuilders.get(String.format("/catchments/3026/encounters?updatedSince=%s&lastMarker=%s", new SimpleDateFormat("yyyy-MM-dd").format(date), marker40))
                 .header(AUTH_TOKEN_KEY, validAccessToken)
                 .header(FROM_KEY, validEmail)
                 .header(CLIENT_ID_KEY, validClientId)
                 .accept(MediaType.APPLICATION_ATOM_XML))
-                .andExpect(request().asyncResult(hasEncounterEventsOfSize(10)))
-                .andExpect(request().asyncResult(hasEvents(markersFrom41till50)));
+                .andExpect(request().asyncResult(hasEncounterEventsOfSize(10)));
 
     }
 
-    private List<String> getUuidsForDates(List<Date> dates) {
-        List<String> uuids = new ArrayList<>();
-        for (Date date : dates) {
-            uuids.add(TimeUuidUtil.uuidForDate(date).toString());
-        }
-        return uuids;
+    private String getReceivedAtUuid(String encounterId) {
+        Select select = select("received_at").from("encounter").where(eq("encounter_id", encounterId)).limit(1);
+        Row row = cqlTemplate.query(select).one();
+        return row.getUUID("received_at").toString();
     }
 
     private List<Date> getTimeInstances(Date startingFrom, int size) {

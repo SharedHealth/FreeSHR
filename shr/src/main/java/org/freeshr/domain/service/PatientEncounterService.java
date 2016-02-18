@@ -174,6 +174,7 @@ public class PatientEncounterService {
             encounterBundle.setUpdatedBy(updatedBy);
             encounterBundle.setContentVersion(existingEncounterBundle.getContentVersion() + 1);
             encounterBundle.setReceivedAt(existingEncounterBundle.getReceivedAt());
+            encounterBundle.setReceivedEventReference(existingEncounterBundle.getReceivedEventReference());
 
             Observable<Boolean> update = encounterRepository.updateEncounter(encounterBundle, existingEncounterBundle, patient);
 

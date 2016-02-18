@@ -70,7 +70,7 @@ public abstract class APIIntegrationTestBase {
 
     @Autowired
     @Qualifier("SHRCassandraTemplate")
-    private CqlOperations cqlTemplate;
+    protected CqlOperations cqlTemplate;
 
     @Before
     public void setUpBase() {

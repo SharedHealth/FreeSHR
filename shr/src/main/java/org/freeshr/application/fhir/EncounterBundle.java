@@ -27,6 +27,7 @@ public class EncounterBundle {
     private Requester updatedBy;
     private Date updatedAt;
     private UUID updatedEventReference;
+    private UUID receivedEventReference;
 
     @JsonProperty("id")
     @XmlElement(name = "id")
@@ -208,5 +209,15 @@ public class EncounterBundle {
         result = 31 * result + (healthId != null ? healthId.hashCode() : 0);
         result = 31 * result + (receivedAt != null ? receivedAt.hashCode() : 0);
         return result;
+    }
+
+    public void setReceivedEventReference(UUID receivedAtUuid) {
+        this.receivedEventReference = receivedAtUuid;
+    }
+
+    @JsonIgnore
+    @XmlTransient
+    public UUID getReceivedEventReference() {
+        return receivedEventReference;
     }
 }
