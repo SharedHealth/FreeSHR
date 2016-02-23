@@ -17,7 +17,7 @@ def mainClassName = "org.freeshr.cassandra.Migrations"
 
 jar {
     baseName = 'shr-schema'
-    version = '0.2-SNAPSHOT'
+    version = '2.2-SNAPSHOT'
     from {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
