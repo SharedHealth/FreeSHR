@@ -373,6 +373,15 @@ public class EncounterValidatorIntegrationTest {
     }
 
     @Test
+    public void shouldValidateDiagnosticOrderWithValidExtension() throws Exception {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/dstu2/p98001046534_diagnostic_order_with_valid_extension.xml"));
+        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
+        EncounterValidationResponse response = validator.validate(validationContext);
+        assertTrue(response.isSuccessful());
+    }
+
+    @Test
     public void shouldValidateFamilyMemberHistory() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
                 FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_family_member_history.xml"));
