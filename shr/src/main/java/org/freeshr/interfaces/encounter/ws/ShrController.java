@@ -27,7 +27,7 @@ public class ShrController {
     @ResponseBody
     @ExceptionHandler(PreconditionFailed.class)
     public ErrorInfo preConditionFailed(PreconditionFailed preconditionFailed) {
-        logger.debug(preconditionFailed.getMessage());
+        logger.error(preconditionFailed.getMessage());
         ErrorInfo errorInfo = new ErrorInfo(HttpStatus.PRECONDITION_FAILED, preconditionFailed);
         errorInfo.setErrors(preconditionFailed.getResult().getErrors());
         return errorInfo;
@@ -37,7 +37,7 @@ public class ShrController {
     @ResponseBody
     @ExceptionHandler(BadRequest.class)
     public ErrorInfo badRequest(BadRequest badRequest) {
-        logger.debug(badRequest.getMessage());
+        logger.error(badRequest.getMessage());
         return new ErrorInfo(HttpStatus.BAD_REQUEST, badRequest.getMessage());
     }
 
@@ -45,7 +45,7 @@ public class ShrController {
     @ResponseBody
     @ExceptionHandler(UnProcessableEntity.class)
     public ErrorInfo unProcessableEntity(UnProcessableEntity unProcessableEntity) {
-        logger.debug(unProcessableEntity.getMessage());
+        logger.error(unProcessableEntity.getMessage());
         ErrorInfo errorInfo = new ErrorInfo(HttpStatus.UNPROCESSABLE_ENTITY, unProcessableEntity);
         errorInfo.setErrors(unProcessableEntity.getResult().getErrors());
         return errorInfo;
@@ -55,7 +55,7 @@ public class ShrController {
     @ResponseBody
     @ExceptionHandler(Redirect.class)
     public ErrorInfo redirect(Redirect exception) {
-        logger.debug(exception.getMessage());
+        logger.warn(exception.getMessage());
         return new ErrorInfo(HttpStatus.PERMANENT_REDIRECT, exception.getMessage());
     }
 
@@ -63,7 +63,7 @@ public class ShrController {
     @ResponseBody
     @ExceptionHandler(ResourceNotFound.class)
     public ErrorInfo resourceNotFound(ResourceNotFound resourceNotFound) {
-        logger.debug(resourceNotFound.getMessage());
+        logger.error(resourceNotFound.getMessage());
         return new ErrorInfo(HttpStatus.NOT_FOUND, resourceNotFound.getMessage());
     }
 
@@ -71,7 +71,7 @@ public class ShrController {
     @ResponseBody
     @ExceptionHandler(Unauthorized.class)
     public ErrorInfo unauthorized(Unauthorized unauthorized) {
-        logger.debug(unauthorized.getMessage());
+        logger.error(unauthorized.getMessage());
         return new ErrorInfo(HttpStatus.UNAUTHORIZED, unauthorized.getMessage());
     }
 
@@ -79,7 +79,7 @@ public class ShrController {
     @ResponseBody
     @ExceptionHandler(Forbidden.class)
     public ErrorInfo forbidden(Forbidden forbidden) {
-        logger.debug(forbidden.getMessage());
+        logger.error(forbidden.getMessage());
         return new ErrorInfo(HttpStatus.FORBIDDEN, forbidden.getMessage());
     }
 
@@ -87,7 +87,7 @@ public class ShrController {
     @ResponseBody
     @ExceptionHandler(AccessDeniedException.class)
     public ErrorInfo accessDenied(AccessDeniedException exception) {
-        logger.debug(exception.getMessage());
+        logger.error(exception.getMessage());
         return new ErrorInfo(HttpStatus.FORBIDDEN, exception.getMessage());
     }
 
@@ -95,7 +95,7 @@ public class ShrController {
     @ResponseBody
     @ExceptionHandler(Exception.class)
     public ErrorInfo catchAll(Exception exception) {
-        logger.debug(exception.getClass().getName() + " : " + exception.getMessage());
+        logger.error(exception.getClass().getName() + " : " + exception.getMessage());
         return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, exception.getLocalizedMessage());
     }
 }
