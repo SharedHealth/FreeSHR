@@ -45,8 +45,7 @@ public class TokenAuthenticationProviderTest {
         assertEquals("foo", tokenAuthentication.getName());
         assertEquals(getUserInfo(token).getProperties().getId(), ((UserInfo) tokenAuthentication.getPrincipal()).getProperties().getId());
         assertEquals(token.toString(), tokenAuthentication.getCredentials());
-        assertTrue(tokenAuthentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_MCI_ADMIN")));
-        assertTrue(tokenAuthentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_SHR_USER")));
+        assertTrue(tokenAuthentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_SHR User")));
         assertTrue(tokenAuthentication.isAuthenticated());
     }
 
@@ -67,6 +66,6 @@ public class TokenAuthenticationProviderTest {
 
     private UserInfo getUserInfo(UUID token) {
         return new UserInfo("123", "foo", "email@gmail.com", 1, true,
-                token.toString(), asList("MCI_ADMIN", "SHR_USER"), asList(new UserProfile("facility", "10000069", asList("3026"))));
+                token.toString(), asList("MCI Admin", "SHR User"), asList(new UserProfile("facility", "10000069", asList("3026"))));
     }
 }

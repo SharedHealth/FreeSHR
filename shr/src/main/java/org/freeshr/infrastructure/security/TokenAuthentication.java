@@ -20,7 +20,7 @@ public class TokenAuthentication implements Authentication {
     }
 
     private List<GrantedAuthority> getUserGroups(UserInfo userInfo) {
-        String commaSeparatedRoles = StringUtils.join(userInfo.getProperties().getGroups(), ",");
+        String commaSeparatedRoles = StringUtils.join(userInfo.getProperties().getUserGroups(), ",");
         return AuthorityUtils.commaSeparatedStringToAuthorityList(commaSeparatedRoles);
     }
 

@@ -278,11 +278,11 @@ public class PatientEncounterServiceTest {
 
     private UserInfo getUserInfoFacility(String facilityId) {
         return new UserInfo("102", "foo", "email@gmail.com", 1, true,
-                "xyz", new ArrayList<>(asList(SHR_USER_GROUP, HRM_FACILITY_ADMIN_GROUP)), asList(new UserProfile("facility", facilityId, asList("3026"))));
+                "xyz", new ArrayList<>(asList(HRM_SHR_USER_GROUP, HRM_FACILITY_ADMIN_GROUP)), asList(new UserProfile("facility", facilityId, asList("3026"))));
     }
 
     private UserInfo getUserInfoProvider(String providerId) {
         return new UserInfo("102", "provider-abc", "provider@gmail.com", 1, true,
-                "xyz", new ArrayList<>(asList(SHR_USER_GROUP, HRM_PROVIDER_GROUP)), asList(new UserProfile("provider", providerId, asList("3026"))));
+                "xyz", new ArrayList<>(asList(HRM_SHR_USER_GROUP, HRM_PROVIDER_GROUP)), asList(new UserProfile("provider", providerId, asList("3026"))));
     }
 }

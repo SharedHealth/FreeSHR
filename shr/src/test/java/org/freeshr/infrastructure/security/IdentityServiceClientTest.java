@@ -69,8 +69,8 @@ public class IdentityServiceClientTest {
         assertEquals(((UserInfo) tokenAuthentication.getPrincipal()).getProperties().isActivated(), expectedUserInfo.getProperties().isActivated());
         assertEquals(tokenAuthentication.getName(), expectedUserInfo.getProperties().getName());
         assertEquals(tokenAuthentication.getName(), "bar");
-        assertEquals(tokenAuthentication.getAuthorities().size(), 2);
-        assertEquals(tokenAuthentication.getAuthorities().size(), 2);
+        assertEquals(tokenAuthentication.getAuthorities().size(), 1);
+        assertEquals(tokenAuthentication.getAuthorities().size(), 1);
     }
 
     @Test(expected = AuthenticationServiceException.class)
@@ -115,6 +115,6 @@ public class IdentityServiceClientTest {
 
     private UserInfo userInfo(String token) {
         return new UserInfo("123", "bar", "email@gmail.com", 1, true,
-                token, asList("MCI_ADMIN", "SHR_USER"), asList(new UserProfile("facility", "10000069", asList("3026"))));
+                token, asList("SHR User"), asList(new UserProfile("facility", "10000069", asList("3026"))));
     }
 }
