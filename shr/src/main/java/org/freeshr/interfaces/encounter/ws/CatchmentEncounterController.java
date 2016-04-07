@@ -85,7 +85,7 @@ public class CatchmentEncounterController extends ShrController {
                             encounterEvents = confidentialEncounterHandler.replaceConfidentialEncounterEvents(encounterEvents);
                         }
                         EncounterSearchResponse searchResponse = new EncounterSearchResponse(
-                                UrlUtil.addLastUpdatedQueryParams(request, requestedDate, lastMarker), encounterEvents);
+                                UrlUtil.formUrlAndAddLastUpdatedQueryParams(request, requestedDate, lastMarker), encounterEvents);
                         searchResponse.setNavLinks(null, getNextResultURL(request, encounterEvents, requestedDate));
                         logger.debug(searchResponse.toString());
                         deferredResult.setResult(searchResponse);
@@ -148,7 +148,7 @@ public class CatchmentEncounterController extends ShrController {
         }
 
         EncounterEvent lastEncounterEvent = requestResults.get(size - 1);
-        return UrlUtil.addLastUpdatedQueryParams(request, lastEncounterEvent.getCreatedAt(), lastEncounterEvent.getId());
+        return UrlUtil.formUrlAndAddLastUpdatedQueryParams(request, lastEncounterEvent.getCreatedAt(), lastEncounterEvent.getId());
     }
 
     private String rollingFeedUrl(HttpServletRequest request, Date forDate) throws UnsupportedEncodingException {
@@ -164,8 +164,7 @@ public class CatchmentEncounterController extends ShrController {
 
             String nextApplicableDate = format("%s-%02d-01", requestedTime.get(Calendar.YEAR),
                     requestedTime.get(Calendar.MONTH) + 1);
-            return UriComponentsBuilder.fromUriString(request.getRequestURL().toString())
-                    .queryParam("updatedSince", nextApplicableDate).build().toString();
+            return UrlUtil.formUrlAndAddLastUpdatedQueryParams(request, DateUtil.parseDate(nextApplicableDate), null);
         }
         return null;
     }

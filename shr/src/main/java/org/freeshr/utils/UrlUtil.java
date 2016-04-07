@@ -8,15 +8,24 @@ import java.net.URLEncoder;
 import java.util.Date;
 
 public class UrlUtil {
-    public static String addLastUpdatedQueryParams(HttpServletRequest request, Date lastUpdateDate, String lastMarker)
+    public static String formUrlAndAddLastUpdatedQueryParams(HttpServletRequest request, Date lastUpdateDate, String lastMarker)
             throws UnsupportedEncodingException {
-        UriComponentsBuilder uriBuilder =
-                UriComponentsBuilder.fromUriString(request.getRequestURL().toString());
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(formRequestUrl(request));
         if (lastUpdateDate != null) {
             uriBuilder.queryParam("updatedSince", URLEncoder.encode(DateUtil.toISOString(lastUpdateDate), "UTF-8"));
         }
         if (!org.apache.commons.lang3.StringUtils.isBlank(lastMarker)) {
             uriBuilder.queryParam("lastMarker", URLEncoder.encode(lastMarker, "UTF-8"));
+        }
+        return uriBuilder.build().toString();
+    }
+
+    public static String formRequestUrl(HttpServletRequest request) {
+        UriComponentsBuilder uriBuilder =
+                UriComponentsBuilder.fromUriString(request.getRequestURL().toString());
+        String scheme = request.getHeader("X-Forwarded-Proto");
+        if(scheme != null) {
+            uriBuilder.scheme(scheme);
         }
         return uriBuilder.build().toString();
     }

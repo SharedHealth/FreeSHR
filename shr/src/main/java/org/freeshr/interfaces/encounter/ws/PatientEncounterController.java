@@ -140,7 +140,7 @@ public class PatientEncounterController extends ShrController {
                                 encounterEvents = confidentialEncounterHandler.replaceConfidentialEncounterEvents(encounterEvents);
                             }
                             EncounterSearchResponse searchResponse = new EncounterSearchResponse(
-                                    UrlUtil.addLastUpdatedQueryParams(request, requestedDate, null), encounterEvents);
+                                    UrlUtil.formUrlAndAddLastUpdatedQueryParams(request, requestedDate, null), encounterEvents);
                             logger.debug(searchResponse.toString());
                             deferredResult.setResult(searchResponse);
                         }
