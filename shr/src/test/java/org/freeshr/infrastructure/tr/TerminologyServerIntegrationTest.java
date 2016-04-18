@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -19,8 +20,8 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
+@TestPropertySource(properties = {"TR_SERVER_BASE_URL=http://tr.com,http://localhost:9997", "TR_USER=admin", "TR_PASSWORD=admin"})
 public class TerminologyServerIntegrationTest {
-
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(9997);
 
@@ -49,23 +50,22 @@ public class TerminologyServerIntegrationTest {
 
     @Test
     public void shouldIdentifyValidReferenceTerms() throws Exception {
-        assertTrue(trServer.isValid(concat("http://localhost:9997", REFERENCE_TERM_PATH), "S40").toBlocking().first());
-        assertFalse(trServer.isValid(concat("http://localhost:9997", REFERENCE_TERM_PATH),
+        assertTrue(trServer.isValid(concat("http://tr.com", REFERENCE_TERM_PATH), "S40").toBlocking().first());
+        assertFalse(trServer.isValid(concat("http://tr.com", REFERENCE_TERM_PATH),
                 "invalid_ref_code").toBlocking().first());
     }
 
     @Test
     public void shouldIdentifyValidConcepts() throws Exception {
-        assertTrue(trServer.isValid(concat("http://localhost:9997", CONCEPT_URL),
+        assertTrue(trServer.isValid(concat("http://tr.com", CONCEPT_URL),
                 "eddb01eb-61fc-4f9e-aca5-e44193509f35").toBlocking().first());
-        assertFalse(trServer.isValid(concat("http://localhost:9997", CONCEPT_URL), "invalid_uuid").toBlocking().first
+        assertFalse(trServer.isValid(concat("http://tr.com", CONCEPT_URL), "invalid_uuid").toBlocking().first
                 ());
-
     }
 
     @Test
     public void shouldRejectInvalidSystemPath() throws Exception {
-        assertFalse(trServer.isValid("http://localhost:9997/invalid/path/code", "code").toBlocking().first());
+        assertFalse(trServer.isValid("http://tr.com/invalid/path/code", "code").toBlocking().first());
     }
 
     @Test
@@ -76,11 +76,11 @@ public class TerminologyServerIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/encounter-type-case-sensitive.json"))));
 
-        assertTrue(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type",
+        assertTrue(trServer.isValid("http://tr.com/openmrs/ws/rest/v1/tr/vs/encounter-type",
                 "REG").toBlocking().first());
-        assertFalse(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type",
+        assertFalse(trServer.isValid("http://tr.com/openmrs/ws/rest/v1/tr/vs/encounter-type",
                 "reg").toBlocking().first());
-        assertFalse(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type",
+        assertFalse(trServer.isValid("http://tr.com/openmrs/ws/rest/v1/tr/vs/encounter-type",
                 "friend").toBlocking().first());
     }
 
@@ -92,16 +92,22 @@ public class TerminologyServerIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/encounter-type-case-insensitive.json"))));
 
-        assertTrue(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type",
+        assertTrue(trServer.isValid("http://tr.com/openmrs/ws/rest/v1/tr/vs/encounter-type",
                 "REG").toBlocking().first());
-        assertTrue(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type",
+        assertTrue(trServer.isValid("http://tr.com/openmrs/ws/rest/v1/tr/vs/encounter-type",
                 "reg").toBlocking().first());
-        assertFalse(trServer.isValid("http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type",
+        assertFalse(trServer.isValid("http://tr.com/openmrs/ws/rest/v1/tr/vs/encounter-type",
                 "friend").toBlocking().first());
     }
 
     @Test
     public void shouldRejectInvalidValueSetReference() {
         assertFalse(trServer.isValid("http://example.com/openmrs/ws/rest/v1/tr/vs/encounter-type", "REG").toBlocking().first());
+    }
+
+    @Test
+    public void shouldIgnoreSchemeWhileValidatingUrl() {
+        assertTrue(trServer.isValid(concat("https://tr.com", CONCEPT_URL),
+                "eddb01eb-61fc-4f9e-aca5-e44193509f35").toBlocking().first());
     }
 }

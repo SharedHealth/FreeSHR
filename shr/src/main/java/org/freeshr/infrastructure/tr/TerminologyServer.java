@@ -4,8 +4,11 @@ import org.freeshr.config.SHRProperties;
 import org.freeshr.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 import rx.Observable;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 @Component
@@ -22,12 +25,21 @@ public class TerminologyServer {
 
     public Observable<Boolean> isValid(String system, String code) {
         String trServerReferencePath = StringUtils.ensureSuffix(shrProperties.getTerminologyServerReferencePath(), "/");
-        if (!system.startsWith(trServerReferencePath)) {
-            return Observable.just(false);
-        }
-
         String trLocationPath = StringUtils.ensureSuffix(shrProperties.getTRLocationPath(), "/");
-        String terminologyRefSystem = system.replace(trServerReferencePath, trLocationPath);
+        String terminologyRefSystem = null;
+        try {
+            URI systemUri = new URI(system);
+            URI trServerUri = new URI(trServerReferencePath);
+            if (!(systemUri.getHost().equals(trServerUri.getHost()) && systemUri.getPort() == trServerUri.getPort())) {
+                return Observable.just(false);
+            }
+            UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(trLocationPath);
+            uriBuilder.path(systemUri.getPath());
+            uriBuilder.query(systemUri.getQuery());
+            terminologyRefSystem = uriBuilder.build().toString();
+        } catch (URISyntaxException e) {
+            Observable.just(false);
+        }
 
         CodeValidator validator = identifyCodeValidator(terminologyRefSystem);
         if (validator != null) {
