@@ -50,7 +50,6 @@ public class HealthIdValidatorTest {
                 is(true));
     }
 
-
     @Test
     public void shouldAcceptEncounterIfHealthIdInTheXmlMatchesTheGivenHealthIdAllVersions() {
         final String xml = FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml");
@@ -107,6 +106,4 @@ public class HealthIdValidatorTest {
             }
         };
     }
-
-
 }

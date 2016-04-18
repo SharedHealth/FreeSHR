@@ -39,7 +39,7 @@ public class HealthIdValidator implements ShrValidator<EncounterValidationContex
     private static final Logger logger = LoggerFactory.getLogger(HealthIdValidator.class);
     private SHRProperties shrProperties;
     //match all urls that have /api/*/patients, 2nd groups contains the variable
-    private Pattern healthIdReferencePattern = Pattern.compile("(.+\\/api\\/)(\\w+)(\\/patients\\/.+)");
+    private Pattern healthIdReferencePattern = Pattern.compile("(^(http|https)://(?<host>.+)\\/api\\/)(\\w+)(\\/patients\\/(?<hid>.+))");
 
     @Autowired
     public HealthIdValidator(SHRProperties shrProperties) {
@@ -85,16 +85,15 @@ public class HealthIdValidator implements ShrValidator<EncounterValidationContex
         return patientRef.getReference().getValue();
     }
 
-
-    private String validateAndIdentifyPatientId(String patientRefUrl, String healthId) {
+    public String validateAndIdentifyPatientId(String patientRefUrl, String healthId) {
         if (org.apache.commons.lang3.StringUtils.isBlank(patientRefUrl)) return null;
         String expectedUrl = StringUtils.ensureSuffix(shrProperties.getPatientReferencePath(), "/") + healthId;
         Matcher actual = healthIdReferencePattern.matcher(patientRefUrl);
         Matcher expected = healthIdReferencePattern.matcher(expectedUrl);
 
-        if (!actual.find() || !expected.find() || actual.groupCount() != 3) return null;
-        if (expected.group(1).equalsIgnoreCase(actual.group(1)) && expected.group(3).equalsIgnoreCase(actual.group(3)))
-            return actual.group(3);
+        if (!actual.find() || !expected.find() || actual.groupCount() != 6) return null;
+        if (expected.group("host").equalsIgnoreCase(actual.group("host")) && expected.group("hid").equalsIgnoreCase(actual.group("hid")))
+            return actual.group("hid");
         return null;
     }
 
