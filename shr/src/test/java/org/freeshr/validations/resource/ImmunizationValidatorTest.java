@@ -2,7 +2,6 @@ package org.freeshr.validations.resource;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.Immunization;
-import ca.uhn.fhir.validation.IValidationSupport;
 import org.freeshr.application.fhir.TRConceptValidator;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
@@ -11,6 +10,7 @@ import org.freeshr.utils.FhirResourceHelper;
 import org.freeshr.utils.FileUtil;
 import org.freeshr.validations.ShrValidationMessage;
 import org.freeshr.validations.UrlValidator;
+import org.hl7.fhir.instance.hapi.validation.IValidationSupport;
 import org.hl7.fhir.instance.model.OperationOutcome;
 import org.junit.Before;
 import org.junit.Test;

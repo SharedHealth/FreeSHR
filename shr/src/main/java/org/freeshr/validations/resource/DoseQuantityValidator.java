@@ -5,6 +5,7 @@ import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.TRConceptValidator;
 import org.freeshr.utils.FhirFeedUtil;
+import org.hl7.fhir.instance.hapi.validation.IValidationSupport;
 import org.hl7.fhir.instance.model.Quantity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,7 +37,7 @@ public class DoseQuantityValidator {
         return doseQuantity != null && isNotEmpty(doseQuantity.getSystem()) && isNotEmpty(doseQuantity.getCode());
     }
 
-    public ca.uhn.fhir.validation.IValidationSupport.CodeValidationResult validate(QuantityDt doseQuantity) {
+    public IValidationSupport.CodeValidationResult validate(QuantityDt doseQuantity) {
         if (StringUtils.isNotBlank(doseQuantity.getSystem())) {
             if (conceptValidator.isCodeSystemSupported(fhirFeedUtil.getFhirContext(), doseQuantity.getSystem())) {
                 return conceptValidator.validateCode(fhirFeedUtil.getFhirContext(), doseQuantity.getSystem(), doseQuantity.getCode(), doseQuantity.getUnit());

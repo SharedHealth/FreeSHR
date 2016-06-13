@@ -1,10 +1,10 @@
 package org.freeshr.application.fhir;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.validation.IValidationSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.infrastructure.tr.TerminologyServer;
+import org.hl7.fhir.instance.hapi.validation.IValidationSupport;
 import org.hl7.fhir.instance.model.Enumerations;
 import org.hl7.fhir.instance.model.OperationOutcome;
 import org.hl7.fhir.instance.model.ValueSet;

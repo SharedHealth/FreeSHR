@@ -6,6 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.TRConceptValidator;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.validations.resource.ShrProfileValidationSupport;
+import org.hl7.fhir.instance.hapi.validation.FhirInstanceValidator;
+import org.hl7.fhir.instance.hapi.validation.ValidationSupportChain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
