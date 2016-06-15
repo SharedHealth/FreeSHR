@@ -17,7 +17,7 @@ public class FileUtil {
         try {
             return Resources.toString(Resources.getResource(path), Charsets.UTF_8);
         } catch (IOException e) {
-            logger.debug(String.format("Could not read file %s, reason : %s", path, e.getMessage()));
+            logger.error(String.format("Could not read file, reason : %s", e.getMessage()));
             throw new RuntimeException("File not found", e);
         }
     }

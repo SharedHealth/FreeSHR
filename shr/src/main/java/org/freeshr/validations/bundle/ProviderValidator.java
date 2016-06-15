@@ -37,7 +37,7 @@ public class ProviderValidator implements ShrValidator<Bundle> {
             IResource resource = entry.getResource();
             for (ClinicalResourceProviderIdentifier clinicalResourceProviderIdentifier : clinicalResourceProviderIdentifiers) {
                 if (!clinicalResourceProviderIdentifier.isValid(resource, shrProperties)) {
-                    logger.debug(String.format("Provider:Encounter failed for %s", ValidationMessages.INVALID_PROVIDER_URL));
+                    logger.error(String.format("Provider:Encounter failed for %s", ValidationMessages.INVALID_PROVIDER_URL));
                     validationMessages.add(
                         new ShrValidationMessage(Severity.ERROR, resource.getResourceName(), "invalid",
                             String.format("%s in %s:%s",

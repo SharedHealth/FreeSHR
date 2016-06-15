@@ -61,7 +61,7 @@ public class HealthIdValidator implements ShrValidator<EncounterValidationContex
             String patientRefUrl = getPatientRefUrl(patientRef);
 
             if ((resource instanceof  Composition) && (patientRefUrl == null)) {
-                logger.debug(String.format("Encounter failed for %s", HEALTH_ID_NOT_PRESENT_IN_COMPOSITION));
+                logger.error(String.format("Encounter failed for %s", HEALTH_ID_NOT_PRESENT_IN_COMPOSITION));
                 ShrValidationMessage message = new ShrValidationMessage(Severity.ERROR, "f:Composition/f:subject",
                         "invalid", "Composition:" + HEALTH_ID_NOT_PRESENT_IN_COMPOSITION);
                 validationMessages.add(message);

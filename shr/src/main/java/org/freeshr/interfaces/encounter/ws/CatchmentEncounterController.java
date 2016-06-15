@@ -77,35 +77,44 @@ public class CatchmentEncounterController extends ShrController {
             }
             final Observable<List<EncounterEvent>> catchmentEncounters = catchmentEncounterService.findEncounterFeedForFacilityCatchment(catchment, requestedDate, lastMarker);
 
-            catchmentEncounters.subscribe(new Action1<List<EncounterEvent>>() {
-                @Override
-                public void call(List<EncounterEvent> encounterEvents) {
-                    try {
-                        if (isUserAccessRestrictedForConfidentialData) {
-                            encounterEvents = confidentialEncounterHandler.replaceConfidentialEncounterEvents(encounterEvents);
-                        }
-                        EncounterSearchResponse searchResponse = new EncounterSearchResponse(
-                                UrlUtil.formUrlAndAddLastUpdatedQueryParams(request, requestedDate, lastMarker), encounterEvents);
-                        searchResponse.setNavLinks(null, getNextResultURL(request, encounterEvents, requestedDate));
-                        logger.debug(searchResponse.toString());
-                        deferredResult.setResult(searchResponse);
-                    } catch (Throwable throwable) {
-                        logger.debug(throwable.getMessage());
-                        deferredResult.setErrorResult(throwable);
-                    }
-                }
-            }, new Action1<Throwable>() {
-                @Override
-                public void call(Throwable throwable) {
-                    logger.debug(throwable.getMessage());
-                    deferredResult.setErrorResult(throwable);
-                }
-            });
+            Action1<List<EncounterEvent>> onCatchmentEncounters = onCatchmentEncounters(request, lastMarker, deferredResult, requestedDate, isUserAccessRestrictedForConfidentialData);
+            catchmentEncounters.subscribe(onCatchmentEncounters, onError(deferredResult));
         } catch (Exception e) {
-            logger.debug(e.getMessage());
+            logger.error(e.getMessage());
             deferredResult.setErrorResult(e);
         }
         return deferredResult;
+    }
+
+    private Action1<Throwable> onError(final DeferredResult<EncounterSearchResponse> deferredResult) {
+        return new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                logger.error(throwable.getMessage());
+                deferredResult.setErrorResult(throwable);
+            }
+        };
+    }
+
+    private Action1<List<EncounterEvent>> onCatchmentEncounters(final HttpServletRequest request, @RequestParam(value = "lastMarker", required = false) final String lastMarker, final DeferredResult<EncounterSearchResponse> deferredResult, final Date requestedDate, final Boolean isUserAccessRestrictedForConfidentialData) {
+        return new Action1<List<EncounterEvent>>() {
+            @Override
+            public void call(List<EncounterEvent> encounterEvents) {
+                try {
+                    if (isUserAccessRestrictedForConfidentialData) {
+                        encounterEvents = confidentialEncounterHandler.replaceConfidentialEncounterEvents(encounterEvents);
+                    }
+                    EncounterSearchResponse searchResponse = new EncounterSearchResponse(
+                            UrlUtil.formUrlAndAddLastUpdatedQueryParams(request, requestedDate, lastMarker), encounterEvents);
+                    searchResponse.setNavLinks(null, getNextResultURL(request, encounterEvents, requestedDate));
+                    logger.debug(searchResponse.toString());
+                    deferredResult.setResult(searchResponse);
+                } catch (Throwable throwable) {
+                    logger.error(throwable.getMessage());
+                    deferredResult.setErrorResult(throwable);
+                }
+            }
+        };
     }
 
     private boolean isValidLastMarker(String lastMarker) {

@@ -50,13 +50,12 @@ public class IdentityServiceClient {
         try {
             responseEntity = listenableFuture.get();
         } catch (Exception e) {
-            logger.debug(String.format("Error while validating client %s with email %s and token %s",
-                     userAuthInfo.getClientId(), userAuthInfo.getEmail(), userAuthInfo.getToken()));
+            logger.error(String.format("Error while validating client with email %s", userAuthInfo.getEmail()));
             throw new AuthenticationServiceException("Unable to authenticate user.");
         }
         if (!responseEntity.getStatusCode().is2xxSuccessful()) {
-            logger.debug(String.format("Unexpected response code %s from IDP while validating client %s with email %s and token %s",
-                    responseEntity.getStatusCode(), userAuthInfo.getClientId(), userAuthInfo.getEmail(), userAuthInfo.getToken()));
+            logger.error(String.format("Unexpected response code %s from IDP while validating client with email %s",
+                    responseEntity.getStatusCode(), userAuthInfo.getEmail()));
             throw new AuthenticationServiceException("Unable to authenticate user.");
         }
         UserInfo userInfo = responseEntity.getBody();

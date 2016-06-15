@@ -107,7 +107,7 @@ public class MedicationOrderValidator implements SubResourceValidator {
 
             IValidationSupport.CodeValidationResult codeValidationResult = doseQuantityValidator.validate(quantity);
             if (!codeValidationResult.isOk()) {
-                logger.debug(String.format("Medication-Prescription:Encounter failed for %s", codeValidationResult.getMessage()));
+                logger.error(String.format("Medication-Prescription:Encounter failed for %s", codeValidationResult.getMessage()));
                 return Arrays.asList(
                         new ShrValidationMessage(Severity.ERROR, location, "invalid", codeValidationResult.getMessage()));
             }
@@ -137,7 +137,7 @@ public class MedicationOrderValidator implements SubResourceValidator {
                 if (trConceptValidator.isCodeSystemSupported(fhirFeedUtil.getFhirContext(), codingDt.getSystem())) {
                     IValidationSupport.CodeValidationResult validationResult = trConceptValidator.validateCode(fhirFeedUtil.getFhirContext(), codingDt.getSystem(), codingDt.getCode(), codingDt.getDisplay());
                     if (validationResult != null && !validationResult.isOk()) {
-                        logger.debug(String.format("Medication-Order:Encounter failed for %s", validationResult.getMessage()));
+                        logger.error(String.format("Medication-Order:Encounter failed for %s", validationResult.getMessage()));
                         shrValidationMessages.add(new ShrValidationMessage(Severity.ERROR, location, "invalid", validationResult.getMessage()));
                     }
                 }

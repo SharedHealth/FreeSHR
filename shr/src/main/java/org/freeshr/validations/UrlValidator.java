@@ -17,7 +17,7 @@ public class UrlValidator {
             new URL(url);
             return true;
         } catch (MalformedURLException ignored) {
-            logger.debug(String.format("%s is a Malformedurl", url));
+            logger.error(String.format("%s is a Malformedurl", url));
         }
         return false;
     }

@@ -20,7 +20,7 @@ public class ShrController {
     }
 
     protected void logAccessDetails(UserInfo userInfo, String action) {
-        logger.info(String.format("ACCESS: USER=%s EMAIL=%s ACTION=%s", userInfo.getProperties().getId(), userInfo.getProperties().getEmail(), action));
+        logger.info(String.format("ACCESS: EMAIL=%s ACTION=%s", userInfo.getProperties().getEmail(), action));
     }
 
     @ResponseStatus(value = HttpStatus.PRECONDITION_FAILED)
@@ -95,7 +95,7 @@ public class ShrController {
     @ResponseBody
     @ExceptionHandler(Exception.class)
     public ErrorInfo catchAll(Exception exception) {
-        logger.error(exception.getClass().getName() + " : " + exception.getMessage());
+        logger.error(exception.getMessage());
         return new ErrorInfo(HttpStatus.INTERNAL_SERVER_ERROR, exception.getLocalizedMessage());
     }
 }

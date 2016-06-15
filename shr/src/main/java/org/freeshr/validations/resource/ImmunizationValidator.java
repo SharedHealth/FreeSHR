@@ -54,7 +54,7 @@ public class ImmunizationValidator implements SubResourceValidator {
             return validationMessages;
         }
 
-        logger.debug("Immunization DosageQuantity is invalid." + immunization.getId().getValue());
+        logger.error("Immunization DosageQuantity is invalid." + immunization.getId().getValue());
 
         validationMessages.add(new ShrValidationMessage(Severity.ERROR, IMMUNIZATION_DOSE_QUANTITY_LOCATION, "invalid",
                 INVALID_DOSAGE_QUANTITY + ":Immunization:" + immunization.getId().getValue()));

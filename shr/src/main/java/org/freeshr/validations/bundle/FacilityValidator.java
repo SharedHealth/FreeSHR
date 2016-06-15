@@ -35,18 +35,18 @@ public class FacilityValidator implements ShrValidator<Bundle> {
         Encounter encounter = identifyEncounter(bundle);
         String serviceProviderUrl = getServiceProviderRefUrl(encounter);
         if (StringUtils.isBlank(serviceProviderUrl)) {
-            logger.debug("Encounter.serviceProvider (facility) is not specified");
+            logger.error("Encounter.serviceProvider (facility) is not specified");
             validationMessages.add(new ShrValidationMessage(Severity.INFORMATION, "Encounter", "notfound", INVALID_SERVICE_PROVIDER));
             //We can't throw error as the serviceProvider may be just a provider
             return validationMessages;
         }
         if (!hieFacilityValidator.validate(serviceProviderUrl)) {
-            logger.debug("Encounter failed for invalid facility URL");
+            logger.error("Encounter failed for invalid facility URL");
             validationMessages.add(new ShrValidationMessage(Severity.ERROR, "Encounter", "invalid", INVALID_SERVICE_PROVIDER + ":" + serviceProviderUrl));
             return validationMessages;
         }
 
-        logger.debug(String.format("Encounter validated for valid facility %s", extractFacilityId(serviceProviderUrl)));
+        logger.info("Encounter validated for facility.");
         return validationMessages;
     }
 

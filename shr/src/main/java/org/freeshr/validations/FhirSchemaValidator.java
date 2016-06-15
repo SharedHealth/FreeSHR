@@ -45,7 +45,7 @@ public class FhirSchemaValidator implements Validator<String> {
         try {
             //return instanceValidator.validateInstance(document(sourceXml).getDocumentElement());
         } catch (Exception e) {
-            logger.debug(String.format("Error in validating schema.Cause: %s", e.getMessage()));
+            logger.error(String.format("Error in validating schema.Cause: %s", e.getMessage()));
             throw new RuntimeException(e);
         }
         return new ArrayList<>();

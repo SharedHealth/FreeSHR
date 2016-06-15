@@ -53,7 +53,7 @@ public class PatientService {
         return remotePatient.onErrorReturn(new Func1<Throwable, Patient>() {
             @Override
             public Patient call(Throwable throwable) {
-                logger.debug(String.format("Patient not found at MCI for health id %s", healthId));
+                logger.error(String.format("Patient not found in MCI for health id %s", healthId));
                 return null;
             }
         });
@@ -69,7 +69,7 @@ public class PatientService {
         }, new Action1<Throwable>() {
             @Override
             public void call(Throwable throwable) {
-                logger.debug(String.format("Unable to save patient.Cause: %s", throwable.getMessage()));
+                logger.error(String.format("Unable to save patient.Cause: %s", throwable.getMessage()));
             }
         });
     }

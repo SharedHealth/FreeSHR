@@ -63,7 +63,7 @@ public class ProcedureValidator implements SubResourceValidator {
         if (performed instanceof PeriodDt) {
             PeriodDt procedurePeriod = (PeriodDt) performed;
             if (!isValidPeriod(procedurePeriod.getStart(), procedurePeriod.getEnd())) {
-                logger.debug(String.format("Procedure:Encounter failed for %s", ValidationMessages.INVALID_PERIOD));
+                logger.error(String.format("Procedure:Encounter failed for %s", ValidationMessages.INVALID_PERIOD));
                 return Arrays.asList(new ShrValidationMessage(Severity.ERROR, PROCEDURE_PERIOD_LOCATION,
                         "invalid", ValidationMessages.INVALID_PERIOD  + ":Procedure:" + procedure.getId().getValue() ));
             }
