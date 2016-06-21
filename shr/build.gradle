@@ -103,7 +103,7 @@ task exportProperties(dependsOn: 'copyZip') << {
 
 task dist(dependsOn: [project(":schema").tasks.build, 'exportProperties'], type: Rpm) {
     packageName = 'shr'
-    version = '2.4'
+    version = '2.5'
     release = project.hasProperty('release') ? project.release : '1'
     arch = NOARCH
     os = LINUX
