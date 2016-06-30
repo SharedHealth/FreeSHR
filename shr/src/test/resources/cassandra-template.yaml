@@ -169,7 +169,7 @@ saved_caches_directory: target/embeddedCassandra/saved_caches
 # performing the sync.
 #
 commitlog_sync: batch
-commitlog_sync_batch_window_in_ms: 90
+commitlog_sync_batch_window_in_ms: 1
 #
 # the other option is "periodic" where writes may be acked immediately
 # and the CommitLog is simply synced every commitlog_sync_period_in_ms
