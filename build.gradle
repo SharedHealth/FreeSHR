@@ -83,7 +83,7 @@ ext.testLibraries = [
         mockito       : "org.mockito:mockito-all:1.8.4",
         spring_test   : "org.springframework:spring-test:4.1.1.RELEASE",
         cassandra_unit_spring: "org.cassandraunit:cassandra-unit-spring:2.0.2.2",
-        wiremock      : "com.github.tomakehurst:wiremock:1.51",
+        wiremock      : "com.github.tomakehurst:wiremock:1.58",
         hamcrest_core : "org.hamcrest:hamcrest-all:1.3"
 ]
 

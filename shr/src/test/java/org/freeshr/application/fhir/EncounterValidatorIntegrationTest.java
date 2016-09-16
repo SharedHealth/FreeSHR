@@ -238,6 +238,10 @@ public class EncounterValidatorIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/concept_vibrio_cholera.json"))));
 
+        givenThat(get(urlPathMatching("/providers/"))
+                .willReturn(aResponse()
+                        .withStatus(200)));
+
 
     }
 

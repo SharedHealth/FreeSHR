@@ -39,7 +39,7 @@ public class ConditionAsserterIdentifierTest {
         List<Condition> conditions = FhirResourceHelper.findBundleResourcesOfType(bundle, Condition.class);
         List<ResourceReferenceDt> providerReferences = conditionAsserterIdentifier.getProviderReferences(conditions.get(0));
         assertEquals(1, providerReferences.size());
-        assertEquals("http://172.18.46.199:8080/api/1.0/providers/19.json", providerReferences.get(0).getReference().getValue());
+        assertEquals("http://localhost:9997/providers/19.json", providerReferences.get(0).getReference().getValue());
 
 //        references = conditionAsserterIdentifier.getProviderReferences(getResource("xmls/encounters/providers_identifiers/condition_no_asserter" +
 //                ".xml", ResourceType.Condition));

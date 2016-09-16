@@ -97,6 +97,11 @@ public class CatchmentEncounterServiceIntegrationTest {
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/concept_dengue.json"))));
+
+        givenThat(get(urlEqualTo("/providers/19.json"))
+                .willReturn(aResponse()
+                        .withStatus(200)));
+
     }
 
     @Test

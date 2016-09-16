@@ -100,6 +100,10 @@ public class PatientEncounterServiceIntegrationTest extends APIIntegrationTestBa
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/concept_dengue.json"))));
 
+        givenThat(get(urlEqualTo("/providers/19.json"))
+                .willReturn(aResponse()
+                        .withStatus(200)));
+
         Facility facility = new Facility(VALID_FACILITY_ID, "facility1", "Main hospital", "3026, 30261801",
                 new Address("30", "26", "18", null, null));
         createFacility(facility);
