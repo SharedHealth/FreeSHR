@@ -67,7 +67,7 @@
                 </patient>
                 <participant>
                     <individual>
-                        <reference value="http://172.18.46.199:8080/api/1.0/providers/19.json"/>
+                        <reference value="http://localhost:9997/providers/19.json"/>
                     </individual>
                 </participant>
                 <serviceProvider>
@@ -92,7 +92,7 @@
                     <reference value="urn:uuid:dd4d51ac-d4b6-42e4-8b50-fa88af41a3e3"/>
                 </encounter>
                 <asserter>
-                    <reference value="http://172.18.46.199:8080/api/1.0/providers/19.json"/>
+                    <reference value="http://localhost:9997/providers/19.json"/>
                 </asserter>
                 <dateRecorded value="2015-09-04"/>
                 <code>

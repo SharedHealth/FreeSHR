@@ -77,6 +77,11 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/facility10019841.json"))));
+
+        givenThat(get(urlEqualTo("/providers/19.json"))
+                .willReturn(aResponse()
+                        .withStatus(200)));
+
     }
 
     @After

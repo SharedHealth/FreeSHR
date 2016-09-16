@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 
 @Component
@@ -36,14 +37,19 @@ public class ProviderValidator implements ShrValidator<Bundle> {
         for (Bundle.Entry entry : entryList) {
             IResource resource = entry.getResource();
             for (ClinicalResourceProviderIdentifier clinicalResourceProviderIdentifier : clinicalResourceProviderIdentifiers) {
-                if (!clinicalResourceProviderIdentifier.isValid(resource, shrProperties)) {
-                    logger.error(String.format("Provider:Encounter failed for %s", ValidationMessages.INVALID_PROVIDER_URL));
-                    validationMessages.add(
-                        new ShrValidationMessage(Severity.ERROR, resource.getResourceName(), "invalid",
-                            String.format("%s in %s:%s",
-                                    ValidationMessages.INVALID_PROVIDER_URL,
-                                    resource.getResourceName(),
-                                    resource.getId().getValue())));
+                try {
+                    if (!clinicalResourceProviderIdentifier.isValid(resource, shrProperties)) {
+                        logger.error(String.format("Provider:Encounter failed for %s", ValidationMessages.INVALID_PROVIDER_URL));
+                        validationMessages.add(
+                            new ShrValidationMessage(Severity.ERROR, resource.getResourceName(), "invalid",
+                                String.format("%s in %s:%s",
+                                        ValidationMessages.INVALID_PROVIDER_URL,
+                                        resource.getResourceName(),
+                                        resource.getId().getValue())));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.error("Unable to reach provider registry ");
                 }
             }
         }

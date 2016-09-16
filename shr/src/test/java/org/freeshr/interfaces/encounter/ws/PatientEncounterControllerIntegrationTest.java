@@ -2,7 +2,7 @@ package org.freeshr.interfaces.encounter.ws;
 
 import com.google.common.base.Charsets;
 import net.sf.ehcache.CacheManager;
-import org.freeshr.application.fhir.*;
+import org.freeshr.application.fhir.EncounterResponse;
 import org.freeshr.application.fhir.Error;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.domain.model.patient.Address;
@@ -17,7 +17,6 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.internal.matchers.InstanceOf;
 import org.springframework.http.MediaType;
@@ -87,7 +86,6 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                         .withBody(asString("jsons/concept_dengue.json"))));
 
 
-
         givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba"))
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -111,6 +109,10 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/userDetailsWithAllRoles.json"))));
+
+        givenThat(get(urlEqualTo("/providers/19.json"))
+                .willReturn(aResponse()
+                        .withStatus(200)));
 
     }
 
@@ -403,7 +405,7 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
         return new BaseMatcher<String>() {
             @Override
             public boolean matches(Object item) {
-                return ((Redirect)item).getMessage().equals(content);
+                return ((Redirect) item).getMessage().equals(content);
             }
 
             @Override
