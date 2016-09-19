@@ -30,11 +30,15 @@ public class SHRCacheConfiguration implements CachingConfigurer {
         
         CacheConfiguration shrProfileCacheConfig = getShrProfileCacheConfiguration();
         shrProfileCacheConfig.persistence(getPersistenceConfiguration());
-        
+
+        CacheConfiguration prCacheConfiguration = getPrCacheConfiguration();
+        prCacheConfiguration.persistence(getPersistenceConfiguration());
+
         net.sf.ehcache.config.Configuration ehCacheConfig = new net.sf.ehcache.config.Configuration();
         ehCacheConfig.addCache(trCacheConfig);
         ehCacheConfig.addCache(identityCacheConfig);
         ehCacheConfig.addCache(shrProfileCacheConfig);
+        ehCacheConfig.addCache(prCacheConfiguration);
 
         return newInstance(ehCacheConfig);
     }
@@ -43,7 +47,16 @@ public class SHRCacheConfiguration implements CachingConfigurer {
         CacheConfiguration cacheConfig = new CacheConfiguration();
         cacheConfig.setName("trCache");
         cacheConfig.setMemoryStoreEvictionPolicy("LRU");
-        cacheConfig.setMaxEntriesLocalHeap(10000);
+        cacheConfig.setMaxEntriesLocalHeap(1000);
+        cacheConfig.setTimeToLiveSeconds(shrProperties.getLocalCacheTTL());
+        return cacheConfig;
+    }
+
+    private CacheConfiguration getPrCacheConfiguration() {
+        CacheConfiguration cacheConfig = new CacheConfiguration();
+        cacheConfig.setName("prCache");
+        cacheConfig.setMemoryStoreEvictionPolicy("LRU");
+        cacheConfig.setMaxEntriesLocalHeap(1000);
         cacheConfig.setTimeToLiveSeconds(shrProperties.getLocalCacheTTL());
         return cacheConfig;
     }

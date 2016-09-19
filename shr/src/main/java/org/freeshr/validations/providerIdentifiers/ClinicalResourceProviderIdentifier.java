@@ -6,6 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.infrastructure.ProviderRegistryClient;
 import org.freeshr.utils.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.regex.Pattern;
 import static org.freeshr.utils.StringUtils.ensureSuffix;
 
 public abstract class ClinicalResourceProviderIdentifier {
+    private static final Logger logger = LoggerFactory.getLogger(ClinicalResourceProviderIdentifier.class);
     private static final String START_MARKER = "^";
     private static final String END_MARKER = "$";
     private static final String PROVIDER_ID_MATCHER = "([0-9]+)";
@@ -44,7 +47,7 @@ public abstract class ClinicalResourceProviderIdentifier {
             try {
                 return providerRegistryClient.checkProvider(refUrl);
             } catch (Exception e) {
-//            what to do?
+                logger.error("Unable to reach provider registry ");
             }
         }
         return false;

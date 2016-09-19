@@ -4,7 +4,7 @@ import org.freeshr.config.SHRProperties;
 import org.freeshr.interfaces.encounter.ws.FacilityMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,6 @@ import static org.freeshr.utils.HttpUtil.getSHRIdentityHeaders;
 
 
 @Component
-//@EnableCaching
 public class ProviderRegistryClient {
 
     private AsyncRestTemplate shrRestTemplate;
@@ -32,7 +31,7 @@ public class ProviderRegistryClient {
         this.shrProperties = shrProperties;
     }
 
-
+    @Cacheable(value = "prCache", unless = "#result == null")
     public boolean checkProvider(final String providerURL) throws ExecutionException, InterruptedException {
 
         ListenableFuture<ResponseEntity<String>> future = shrRestTemplate.exchange(

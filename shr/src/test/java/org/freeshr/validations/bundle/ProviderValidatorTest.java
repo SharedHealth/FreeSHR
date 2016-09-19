@@ -2,6 +2,7 @@ package org.freeshr.validations.bundle;
 
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import net.sf.ehcache.CacheManager;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.config.SHRProperties;
@@ -11,6 +12,7 @@ import org.freeshr.validations.FhirMessageFilter;
 import org.freeshr.validations.ShrValidationMessage;
 import org.freeshr.validations.ValidationSubject;
 import org.freeshr.validations.providerIdentifiers.ClinicalResourceProviderIdentifier;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -63,12 +65,27 @@ public class ProviderValidatorTest {
 
     }
 
+    @After
+    public void tearDown() throws Exception {
+        CacheManager.getInstance().clearAll();
+    }
+
     @Test
     public void shouldValidateEncounterWithValidProvider() throws Exception {
         Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml"), fhirFeedUtil.getFhirContext());
         List<ShrValidationMessage> validationMessages = providerValidator.validate(getBundleContext(bundle));
         assertTrue(validationMessages.isEmpty());
     }
+
+    @Test
+    public void shouldHitProviderUrlOnce() throws Exception {
+        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml"), fhirFeedUtil.getFhirContext());
+        List<ShrValidationMessage> validationMessages = providerValidator.validate(getBundleContext(bundle));
+        assertTrue(validationMessages.isEmpty());
+
+        verify(1, getRequestedFor(urlPathMatching("/providers/19.json")));
+    }
+
 
     @Test
     public void shouldFailEncounterWithInvalidProvider() throws Exception {
