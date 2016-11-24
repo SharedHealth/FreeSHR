@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cassandra.core.CqlTemplate;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import rx.Observable;
 import rx.functions.Func0;
@@ -20,6 +21,7 @@ import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 @Component
+@DependsOn("SHRCassandraTemplate")
 public class FacilityRepository {
     private final static Logger logger = LoggerFactory.getLogger(FacilityRepository.class);
     private CqlTemplate cqlTemplate;
