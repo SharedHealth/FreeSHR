@@ -69,14 +69,12 @@ public class CatchmentEncounterServiceIntegrationTest {
         givenThat(get(urlEqualTo("/api/default/patients/" + VALID_HEALTH_ID))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(asString("jsons/patient.json"))));
+                        .withBody(asString("xmls/patient/patient.xml"))));
 
         givenThat(get(urlEqualTo("/api/default/patients/" + VALID_HEALTH_ID_NEW))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(asString("jsons/patient_not_confidential.json"))));
+                        .withBody(asString("xmls/patient/patient_not_confidential.xml"))));
 
         givenThat(get(urlEqualTo("/facilities/" + VALID_FACILITY_ID + ".json"))
                 .withHeader("client_id", matching(shrProperties.getIdPClientId()))

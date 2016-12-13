@@ -52,8 +52,7 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
         givenThat(get(urlEqualTo("/api/default/patients/" + VALID_HEALTH_ID_CONFIDENTIAL))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(asString("jsons/patient98001046534.json"))));
+                        .withBody(asString("xmls/patient/patient.xml"))));
 
         givenThat(get(urlEqualTo("/api/default/patients/" + INVALID_HEALTH_ID))
                 .willReturn(aResponse()
@@ -62,8 +61,7 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
         givenThat(get(urlEqualTo("/api/default/patients/" + VALID_HEALTH_ID_NOT_CONFIDENTIAL))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(asString("jsons/patient99001046345.json"))));
+                        .withBody(asString("xmls/patient/patient_not_confidential.xml"))));
 
         givenThat(get(urlEqualTo("/facilities/10019841.json"))
                 .withHeader("client_id", matching("18550"))
