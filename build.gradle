@@ -58,7 +58,7 @@ ext.libraries = [
         time_uuid            : "com.eaio.uuid:uuid:3.2",
         spring_security      : "org.springframework.security:spring-security-web:3.2.5.RELEASE",
         spring_boot_security : "org.springframework.boot:spring-boot-starter-security:1.2.0.RELEASE",
-        spring_web           : "org.springframework:spring-web:4.1.0.RELEASE",
+        spring_web           : "org.springframework:spring-web:4.1.6.RELEASE",
         eclipse_moxy         : "org.eclipse.persistence:org.eclipse.persistence.moxy:2.5.2",
         ehcache_core         : "net.sf.ehcache:ehcache-core:2.6.10",
         commons_lang         : "org.apache.commons:commons-lang3:3.3.2",
