@@ -1,14 +1,26 @@
 package org.freeshr.domain.model.patient;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.freeshr.utils.Confidentiality;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Patient {
+
+    @JsonProperty("hid")
     private String healthId;
+
+    @JsonProperty("present_address")
     private Address address;
+
+    @JsonProperty("gender")
     private String gender;
+
+    @JsonProperty("active")
     private Boolean active;
+
+    @JsonProperty("merged_with")
     private String mergedWith;
 
     private Confidentiality confidentiality;
@@ -70,7 +82,7 @@ public class Patient {
     }
 
     public Boolean isMerged() {
-        return !isActive() && getMergedWith() != null;
+        return !isActive() && getMergedWith()!=null;
     }
 
     @Override

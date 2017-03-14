@@ -115,7 +115,6 @@ public class MCIClient {
         setUpazila(address, addressLevels);
         setCityCorporation(address, addressLevels);
         setUnionWard(address, addressLevels);
-        address.setLine(addressDt.getLineFirstRep().getValue());
         return address;
     }
 
