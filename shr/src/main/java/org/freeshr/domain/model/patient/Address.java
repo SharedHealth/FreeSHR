@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.hl7.fhir.instance.model.api.IBaseDatatype;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Address {

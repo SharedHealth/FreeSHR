@@ -49,6 +49,14 @@ public class EncounterValidatorIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/encounter-type-case-insensitive.json"))));
 
+
+        //Patient 98001046534 Reference
+        givenThat(get(urlEqualTo("/api/default/patients/" + HEALTH_ID))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/patient98001046534.json"))));
+
         //Facility 10019841 reference
         givenThat(get(urlEqualTo("/facilities/10019841.json"))
                 .willReturn(aResponse()
