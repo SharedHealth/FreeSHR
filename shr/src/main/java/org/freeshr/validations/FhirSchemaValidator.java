@@ -2,8 +2,8 @@ package org.freeshr.validations;
 
 import org.freeshr.application.fhir.TRConceptLocator;
 import org.freeshr.config.SHRProperties;
-import org.hl7.fhir.instance.validation.InstanceValidator;
-import org.hl7.fhir.instance.validation.ValidationMessage;
+import org.hl7.fhir.dstu3.validation.InstanceValidator;
+import org.hl7.fhir.utilities.validation.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +48,6 @@ public class FhirSchemaValidator implements Validator<String> {
             logger.error(String.format("Error in validating schema.Cause: %s", e.getMessage()));
             throw new RuntimeException(e);
         }
-        return new ArrayList<>();
+        return new ArrayList<ValidationMessage>();
     }
 }

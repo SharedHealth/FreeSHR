@@ -13,8 +13,8 @@ public class EncounterBundleData {
         return withValidEncounter(HEALTH_ID);
     }
 
-    public static EncounterBundle withValidEncounter(String healthId) {
-        return encounter(healthId, asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_local_refs.xml"));
+    private static EncounterBundle withValidEncounter(String healthId) {
+        return encounter(healthId, asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_local_refs.xml"));
     }
 
     public static EncounterBundle withContentForHealthId(String healthId, String filename) {
@@ -26,9 +26,5 @@ public class EncounterBundleData {
         encounter.setEncounterContent(content);
         encounter.setHealthId(healthId);
         return encounter;
-    }
-
-    public static EncounterBundle withNewEncounterForPatient(String healthId) {
-        return encounter(healthId, asString(String.format("xmls/encounters/dstu2/p%s_encounter_with_diagnoses_with_local_refs.xml", healthId)));
     }
 }

@@ -3,8 +3,8 @@ package org.freeshr.validations;
 import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.application.fhir.Error;
 import org.freeshr.utils.CollectionUtils;
-import org.hl7.fhir.instance.model.OperationOutcome;
-import org.hl7.fhir.instance.validation.ValidationMessage;
+import org.hl7.fhir.dstu3.model.OperationOutcome;
+import org.hl7.fhir.utilities.validation.ValidationMessage;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -22,14 +22,18 @@ public class FhirMessageFilter {
         ignoreList.add("f:DiagnosticReport/f:name");
     }
 
-    public EncounterValidationResponse filterMessagesSevereThan(List<ValidationMessage> outputs,
-                                                                final OperationOutcome.IssueSeverity severity) {
+    public EncounterValidationResponse filterMessagesSevereThan(List<ValidationMessage> outputs, final OperationOutcome.IssueSeverity severity) {
         return CollectionUtils.reduce(CollectionUtils.filter(outputs, new CollectionUtils.Fn<ValidationMessage,
                 Boolean>() {
             @Override
             public Boolean call(ValidationMessage input) {
                 //For SHR: We treat FHIR warning level as error.
-                boolean possibleError = severity.compareTo(input.getLevel()) >= 0;
+
+                /**
+                 * Todo : Fixed by true
+                 **/
+//                boolean possibleError = severity.compareTo(input.getLevel()) >= 0;
+                boolean possibleError = true;
                 // TODO :  remove the following if condition once the validation mechanism is finalised for
                 // DiagnosticOrder
                 if (possibleError) {
@@ -68,24 +72,23 @@ public class FhirMessageFilter {
     }
 
     public static EncounterValidationResponse createResponse(List<ShrValidationMessage> outputs,
-                                                      final Severity severity) {
+                                                             final Severity severity) {
         return CollectionUtils.reduce(CollectionUtils.filter(outputs,
                 new CollectionUtils.Fn<ShrValidationMessage, Boolean>() {
-            @Override
-            public Boolean call(ShrValidationMessage input) {
-                //For SHR: We treat FHIR warning level as error?
-                boolean possibleError = severity.compareTo(input.getSeverity()) >= 0;
-                // TODO :  remove the following if condition once the validation mechanism is finalised for
-                // DiagnosticOrder
-                if (possibleError) {
-                    if (shouldFilterMessagesOfType(input)) {
-                        possibleError = false;
-                    }
-                }
-                return possibleError;
+                    @Override
+                    public Boolean call(ShrValidationMessage input) {
+                        //For SHR: We treat FHIR warning level as error?
+                        boolean possibleError = severity.compareTo(input.getSeverity()) >= 0;
+                        // TODO :  remove the following if condition once the validation mechanism is finalised for DiagnosticOrder
+                        if (possibleError) {
+                            if (shouldFilterMessagesOfType(input)) {
+                                possibleError = false;
+                            }
+                        }
+                        return possibleError;
 
-            }
-        }), new EncounterValidationResponse(), new CollectionUtils.ReduceFn<ShrValidationMessage,
+                    }
+                }), new EncounterValidationResponse(), new CollectionUtils.ReduceFn<ShrValidationMessage,
                 EncounterValidationResponse>() {
             @Override
             public EncounterValidationResponse call(ShrValidationMessage input, EncounterValidationResponse acc) {

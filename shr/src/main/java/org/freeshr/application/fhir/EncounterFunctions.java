@@ -1,51 +1,45 @@
 package org.freeshr.application.fhir;
 
 
-import ca.uhn.fhir.model.api.IResource;
-import ca.uhn.fhir.model.dstu2.composite.CodingDt;
-import ca.uhn.fhir.model.dstu2.resource.Condition;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
+import org.freeshr.utils.CollectionUtils;
+import org.hl7.fhir.dstu3.model.Coding;
+import org.hl7.fhir.dstu3.model.Condition;
+import org.hl7.fhir.dstu3.model.Resource;
 
 import java.util.List;
 
-import static org.freeshr.utils.CollectionUtils.*;
+import static org.freeshr.utils.CollectionUtils.isEvery;
+import static org.freeshr.utils.CollectionUtils.isNotEmpty;
 
 public class EncounterFunctions {
 
-    public static final Fn<Condition, Boolean> isDiagnosis = new Fn<Condition, Boolean>() {
+    public static final CollectionUtils.Fn<Condition, Boolean> isDiagnosis = new CollectionUtils.Fn<Condition, Boolean>() {
         @Override
         public Boolean call(Condition resource) {
-            List<CodingDt> coding = resource.getCategory().getCoding();
+            List<Coding> coding = resource.getCategoryFirstRep().getCoding();
 
-            return isNotEmpty(coding) && isEvery(coding, new Fn<CodingDt, Boolean>() {
+            return isNotEmpty(coding) && isEvery(coding, new CollectionUtils.Fn<Coding, Boolean>() {
                 @Override
-                public Boolean call(CodingDt input) {
+                public Boolean call(Coding input) {
                     return input.getCode().equals("Diagnosis");
                 }
             });
         }
     };
 
-    public static final Fn<CodingDt, Boolean> hasSystem = new Fn<CodingDt, Boolean>() {
+    public static final CollectionUtils.Fn<Coding, Boolean> hasSystem = new CollectionUtils.Fn<Coding, Boolean>() {
         @Override
-        public Boolean call(CodingDt coding) {
+        public Boolean call(Coding coding) {
             return coding.getSystem() != null && StringUtils.isNotEmpty(coding.getSystem());
         }
     };
 
-    public static final Fn<IResource, Boolean> isCondition = new Fn<IResource, Boolean>() {
+    public static final CollectionUtils.Fn<Resource, Boolean> isCondition = new CollectionUtils.Fn<Resource, Boolean>() {
         @Override
-        public Boolean call(IResource resource) {
+        public Boolean call(Resource resource) {
             return resource instanceof Condition;
         }
     };
-
-//    public static final Fn<AtomEntry<? extends IResource>, IResource> toResource = new Fn<AtomEntry<? extends
-//            IResource>, IResource>() {
-//        @Override
-//        public IResource call(AtomEntry<? extends IResource> input) {
-//            return input.getResource();
-//        }
-//    };
 
 }

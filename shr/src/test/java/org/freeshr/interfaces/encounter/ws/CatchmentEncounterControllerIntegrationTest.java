@@ -40,7 +40,7 @@ public class CatchmentEncounterControllerIntegrationTest extends APIIntegrationT
     private final String validAccessToken = "2361e0a8-f352-4155-8415-32adfb8c2472";
 
     @Autowired
-    SHRProperties properties;
+    private SHRProperties properties;
 
     @Before
     public void setUp() throws Exception {

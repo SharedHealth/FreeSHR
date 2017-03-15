@@ -15,9 +15,9 @@ import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.validations.EncounterValidationContext;
 import org.freeshr.validations.HapiEncounterValidator;
 import org.freeshr.validations.ShrEncounterValidator;
-import org.hl7.fhir.instance.model.Bundle;
-import org.hl7.fhir.instance.model.Composition;
-import org.hl7.fhir.instance.model.ResourceType;
+import org.hl7.fhir.dstu3.model.Bundle;
+import org.hl7.fhir.dstu3.model.Composition;
+import org.hl7.fhir.dstu3.model.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +31,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import static org.freeshr.utils.Confidentiality.getConfidentiality;
+import static org.freeshr.utils.FhirFeedUtil.FHIR_SCHEMA_VERSION;
 import static org.freeshr.validations.ValidationMessages.*;
 
 @Service
@@ -99,10 +100,11 @@ public class PatientEncounterService {
     }
 
     private Confidentiality determineEncounterConfidentiality(EncounterValidationResponse validationResult) {
-        if ("v2".equals(shrProperties.getFhirDocumentSchemaVersion())) {
+        if (FHIR_SCHEMA_VERSION.equals(shrProperties.getFhirDocumentSchemaVersion())) {
             return getEncounterConfidentiality(validationResult.getBundle());
         } else {
-            return getEncounterConfidentiality(validationResult.getFeed());
+            return null;
+//            return getEncounterConfidentiality(validationResult.getFeed());
         }
     }
 
@@ -229,21 +231,17 @@ public class PatientEncounterService {
     }
 
 
-    private Confidentiality getEncounterConfidentiality(Bundle feed) {
+    private Confidentiality getEncounterConfidentiality(Bundle bundle) {
         Confidentiality encounterConfidentiality = Confidentiality.Normal;
-        for (Bundle.BundleEntryComponent entry : feed.getEntry()) {
+        for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
             if (entry.getResource().getResourceType().equals(ResourceType.Composition)) {
                 Composition composition = (Composition) entry.getResource();
-                String confidentiality = composition.getConfidentiality();
-                encounterConfidentiality = getConfidentiality(confidentiality);
+                if (composition.getConfidentiality() != null) {
+                    encounterConfidentiality = getConfidentiality(composition.getConfidentiality().toString());
+                }
                 break;
             }
         }
         return encounterConfidentiality;
-    }
-
-    private Confidentiality getEncounterConfidentiality(ca.uhn.fhir.model.dstu2.resource.Bundle bundle) {
-        ca.uhn.fhir.model.dstu2.resource.Composition composition = bundle.getAllPopulatedChildElementsOfType(ca.uhn.fhir.model.dstu2.resource.Composition.class).get(0);
-        return getConfidentiality(composition.getConfidentiality());
     }
 }

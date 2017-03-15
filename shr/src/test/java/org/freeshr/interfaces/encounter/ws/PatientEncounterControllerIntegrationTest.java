@@ -130,7 +130,7 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_local_refs.xml")))
+                .content(asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_local_refs.xml")))
                 .andExpect(status().isOk())
                 .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
     }
@@ -145,7 +145,7 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
         final Requester createdBy = new Requester("10000002", null);
         createEncounter(createEncounterBundle(encounterId, VALID_HEALTH_ID_CONFIDENTIAL,
                 Confidentiality.Normal, Confidentiality.Restricted,
-                asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_local_refs.xml"), createdBy, new Date()), patient);
+                asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_local_refs.xml"), createdBy, new Date()), patient);
 
         mockMvc.perform(put("/patients/" + VALID_HEALTH_ID_CONFIDENTIAL + "/encounters/" + encounterId)
                 .header(AUTH_TOKEN_KEY, validAccessToken)
@@ -154,7 +154,7 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_local_refs.xml")))
+                .content(asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_local_refs.xml")))
                 .andExpect(status().isOk())
                 .andExpect(request().asyncResult(assertEncounterResponse(encounterId)));
     }
@@ -169,7 +169,7 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_local_refs.xml")))
+                .content(asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_local_refs.xml")))
                 .andExpect(request().asyncResult(new InstanceOf(PreconditionFailed.class)));
     }
 
@@ -182,7 +182,7 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/dstu2/p1234_encounter_with_diagnoses_with_local_refs.xml")))
+                .content(asString("xmls/encounters/stu3/p1234_encounter_with_diagnoses_with_local_refs.xml")))
                 .andExpect(request().asyncResult(new InstanceOf(PreconditionFailed.class)));
     }
 
@@ -195,7 +195,7 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/dstu2/p1234_encounter_with_diagnoses_with_local_refs.xml")))
+                .content(asString("xmls/encounters/stu3/p1234_encounter_with_diagnoses_with_local_refs.xml")))
                 .andExpect(request().asyncResult(new InstanceOf(PreconditionFailed.class)));
     }
 
@@ -208,7 +208,7 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .accept(MediaType.APPLICATION_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml")))
+                .content(asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses.xml")))
                 .andExpect(request().asyncResult(new InstanceOf(UnProcessableEntity.class)));
     }
 
@@ -221,7 +221,7 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .accept(MediaType.APPLICATION_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_localRefs_with_invalidConcept.xml")))
+                .content(asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_localRefs_with_invalidConcept.xml")))
                 .andExpect(request().asyncResult(new InstanceOf(UnProcessableEntity.class)));
     }
 
@@ -234,7 +234,7 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .accept(MediaType.APPLICATION_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_validEncType.xml")))
+                .content(asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_validEncType.xml")))
                 .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
     }
 
@@ -248,7 +248,7 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .accept(MediaType.APPLICATION_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_inValidEncType.xml")))
+                .content(asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_inValidEncType.xml")))
                 .andExpect(request().asyncResult(new InstanceOf(UnProcessableEntity.class)));
     }
 
@@ -281,7 +281,7 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .header(CLIENT_ID_KEY, validClientId)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/dstu2/p99001046345_encounter_with_diagnoses_with_local_refs.xml")))
+                .content(asString("xmls/encounters/stu3/p99001046345_encounter_with_diagnoses_with_local_refs.xml")))
                 .andExpect(status().isOk())
                 .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
 
@@ -304,7 +304,7 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .accept(MediaType.APPLICATION_ATOM_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/dstu2/p99001046345_encounter_with_diagnoses_with_localRefs_without_confidentiality.xml")))
+                .content(asString("xmls/encounters/stu3/p99001046345_encounter_with_diagnoses_with_localRefs_without_confidentiality.xml")))
                 .andExpect(status().isOk())
                 .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
 
@@ -326,7 +326,7 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
         patient1.setHealthId(healthId1);
         patient1.setAddress(new Address("30", "26", "18", "01", "02"));
         final Requester createdBy = new Requester("facilityId", "providerId");
-        createEncounter(createEncounterBundle("e-0100-" + healthId1, healthId1, Restricted, Normal, asString("xmls/encounters/dstu2/p99001046345_encounter_with_diagnoses_with_local_refs.xml"), createdBy, new Date()), patient1);
+        createEncounter(createEncounterBundle("e-0100-" + healthId1, healthId1, Restricted, Normal, asString("xmls/encounters/stu3/p99001046345_encounter_with_diagnoses_with_local_refs.xml"), createdBy, new Date()), patient1);
 
         mockMvc.perform(MockMvcRequestBuilders.get(
                 String.format("/patients/%s/encounters", VALID_HEALTH_ID_NOT_CONFIDENTIAL))
@@ -374,7 +374,7 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .accept(MediaType.APPLICATION_ATOM_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/dstu2/p1234_encounter_with_diagnoses_with_local_refs.xml")))
+                .content(asString("xmls/encounters/stu3/p1234_encounter_with_diagnoses_with_local_refs.xml")))
                 .andExpect(request().asyncResult(new InstanceOf(Redirect.class)))
                 .andExpect(request().asyncResult(hasContent(asList(inactivePatientError).toString())));
     }
@@ -396,7 +396,7 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
                 .accept(MediaType.APPLICATION_ATOM_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/dstu2/p1234_encounter_with_diagnoses_with_local_refs.xml")))
+                .content(asString("xmls/encounters/stu3/p1234_encounter_with_diagnoses_with_local_refs.xml")))
                 .andExpect(request().asyncResult(new InstanceOf(Redirect.class)))
                 .andExpect(request().asyncResult(hasContent(asList(inactivePatientError).toString())));
     }

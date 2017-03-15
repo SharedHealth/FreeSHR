@@ -1,0 +1,78 @@
+<Bundle xmlns="http://hl7.org/fhir">
+    <id value="53562c57-62d3-42d7-93be-31176977e984"/>
+    <meta>
+        <lastUpdated value="2015-09-04T15:15:16.000+05:30"/>
+    </meta>
+    <type value="collection"/>
+    <entry>
+        <fullUrl value="urn:uuid:4c075fc0-5d0f-4ace-b801-3f6d75476c69"/>
+        <resource>
+            <Composition xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:uuid:4c075fc0-5d0f-4ace-b801-3f6d75476c69"/>
+                </identifier>
+                <status value="final"/>
+                <type>
+                    <coding>
+                        <system value="http://hl7.org/fhir/vs/doc-typecodes"/>
+                        <code value="51899-3"/>
+                        <display value="Details Document"/>
+                    </coding>
+                </type>
+                <subject>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <encounter>
+                    <reference value="urn:uuid:9026f815-cb5d-4668-9e23-f6e775a620ff"/>
+                </encounter>
+                <date value="2015-09-04T15:15:16.000+05:30"/>
+                <author>
+                    <reference value="http://localhost:9997/facilities/10019842.json"/>
+                </author>
+                <title value="encounter composition for patient 98001046534"/>
+                <confidentiality value="N"/>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:9026f815-cb5d-4668-9e23-f6e775a620ff"/>
+                        <display value="Encounter"/>
+                    </entry>
+                </section>
+            </Composition>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:9026f815-cb5d-4668-9e23-f6e775a620ff"/>
+        <resource>
+            <Encounter xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:uuid:9026f815-cb5d-4668-9e23-f6e775a620ff"/>
+                </identifier>
+                <status value="finished"/>
+                <class>
+                    <system value="http://hl7.org/fhir/v3/ActCode"/>
+                    <code value="AMB"/>
+                </class>
+                <type>
+                    <coding>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type"/>
+                        <code value="REG"/>
+                        <display value="registration"/>
+                    </coding>
+                </type>
+                <subject>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <participant>
+                    <individual>
+                        <reference value="http://localhost:9997/providers/18.json"/>
+                    </individual>
+                </participant>
+                <serviceProvider>
+                    <reference value="http://localhost:9997/facilities/10019841.json"/>
+                </serviceProvider>
+            </Encounter>
+        </resource>
+    </entry>
+</Bundle>

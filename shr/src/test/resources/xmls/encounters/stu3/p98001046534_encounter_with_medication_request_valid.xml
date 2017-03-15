@@ -1,0 +1,262 @@
+<Bundle xmlns="http://hl7.org/fhir">
+    <id value="27fb7000-f940-4604-a304-1d3acf27236f"/>
+    <meta>
+        <lastUpdated value="2015-09-04T14:12:35.000+05:30"/>
+    </meta>
+    <type value="collection"/>
+    <entry>
+        <fullUrl value="urn:uuid:206a6d95-454f-48c8-9a7b-d73756652c8d"/>
+        <resource>
+            <Composition xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:uuid:206a6d95-454f-48c8-9a7b-d73756652c8d"/>
+                </identifier>
+                <status value="final"/>
+                <type>
+                    <coding>
+                        <system value="http://hl7.org/fhir/vs/doc-typecodes"/>
+                        <code value="51899-3"/>
+                        <display value="Details Document"/>
+                    </coding>
+                </type>
+                <subject>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <encounter>
+                    <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+                </encounter>
+                <date value="2015-09-04T14:12:35.000+05:30"/>
+                <author>
+                    <reference value="http://localhost:9997/facilities/10019841.json"/>
+                </author>
+                <title value="encounter composition for patient 98001046534"/>
+                <confidentiality value="N"/>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+                        <display value="Encounter"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:e461943b-7ad6-4b41-9730-70b8fc452f45"/>
+                        <display value="Medication Request"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:e461943b-1234-4b41-9730-70b8fc452f45"/>
+                        <display value="Medication Request"/>
+                    </entry>
+                </section>
+            </Composition>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+        <resource>
+            <Encounter xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+                </identifier>
+                <status value="finished"/>
+                <class>
+                    <system value="http://hl7.org/fhir/v3/ActCode"/>
+                    <code value="AMB"/>
+                </class>
+                <type>
+                    <text value="OPD"/>
+                </type>
+                <subject>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <participant>
+                    <individual>
+                        <reference value="http://localhost:9997/providers/19.json"/>
+                    </individual>
+                </participant>
+                <serviceProvider>
+                    <reference value="http://localhost:9997/facilities/10019841.json"/>
+                </serviceProvider>
+            </Encounter>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:e461943b-7ad6-4b41-9730-70b8fc452f45"/>
+        <resource>
+            <MedicationRequest xmlns="http://hl7.org/fhir">
+                <extension
+                        url="https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#MedicationOrderAction">
+                    <valueString value="NEW"/>
+                </extension>
+                <identifier>
+                    <value value="urn:uuid:e461943b-7ad6-4b41-9730-70b8fc452f45"/>
+                </identifier>
+                <status value="active"/>
+                <intent value="order"/>
+                <medicationCodeableConcept>
+                    <coding>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/23d7e743-75bd-4a25-8f34-bd849bd50394"/>
+                        <code value="23d7e743-75bd-4a25-8f34-bd849bd50394"/>
+                        <display value="Paracetamol"/>
+                    </coding>
+                </medicationCodeableConcept>
+                <subject>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <context>
+                    <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+                </context>
+                <authoredOn value="2015-09-22T17:09:54.000+05:30"/>
+                <requester>
+                    <agent>
+                        <reference value="http://localhost:9997/providers/19.json"/>
+                    </agent>
+                </requester>
+                <reasonCode>
+                    <coding>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/order-reason"/>
+                        <code value="38341003"/>
+                        <display value="High blood pressure"/>
+                    </coding>
+                </reasonCode>
+                <dosageInstruction>
+                    <additionalInstruction>
+                        <coding>
+                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/additional-instructions"/>
+                            <code value="79647ed4-a60e-4cf5-ba68-cf4d55956xyz"/>
+                            <display value="Take With Water"/>
+                        </coding>
+                    </additionalInstruction>
+                    <timing>
+                        <extension
+                                url="https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#TimingScheduledDate">
+                            <valueDateTime value="2015-09-24T00:00:00.000+05:30"/>
+                        </extension>
+                        <repeat>
+                            <boundsDuration>
+                                <value value="5"/>
+                                <system value="http://unitsofmeasure.org"/>
+                                <code value="d"/>
+                            </boundsDuration>
+                            <frequency value="1"/>
+                            <period value="2"/>
+                            <periodUnit value="h"/>
+                        </repeat>
+                    </timing>
+                    <asNeededBoolean value="true"/>
+                    <site>
+                        <coding>
+                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/dosage-instruction-site"/>
+                            <code value="181220002"/>
+                            <display value="Entire oral cavity"/>
+                        </coding>
+                    </site>
+                    <route>
+                        <coding>
+                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration"/>
+                            <code value="implant"/>
+                            <display value="implant"/>
+                        </coding>
+                    </route>
+                    <method>
+                        <coding>
+                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/administration-method-codes"/>
+                            <code value="320276009"/>
+                            <display value="Salmeterol+fluticasone 25/250ug inhaler"/>
+                        </coding>
+                    </method>
+                    <doseQuantity>
+                        <value value="10"/>
+                        <unit value="Pill"/>
+                    </doseQuantity>
+                </dosageInstruction>
+                <substitution>
+                    <allowed value="true"/>
+                    <reason>
+                        <coding>
+                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/substitution-reason"/>
+                            <code value="301220005"/>
+                            <display value="Paracetamol can be taken in place of this drug"/>
+                        </coding>
+                    </reason>
+                </substitution>
+            </MedicationRequest>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:e461943b-1234-4b41-9730-70b8fc452f45"/>
+        <resource>
+            <MedicationRequest xmlns="http://hl7.org/fhir">
+                <extension
+                        url="https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#MedicationOrderAction">
+                    <valueString value="NEW"/>
+                </extension>
+                <identifier>
+                    <value value="urn:uuid:e461943b-1234-4b41-9730-70b8fc452f45"/>
+                </identifier>
+                <status value="active"/>
+                <intent value="order"/>
+                <medicationCodeableConcept>
+                    <coding>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/23d7e743-75bd-4a25-8f34-bd849bd50394"/>
+                        <code value="23d7e743-75bd-4a25-8f34-bd849bd50394"/>
+                        <display value="Paracetamol"/>
+                    </coding>
+                </medicationCodeableConcept>
+                <subject>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <context>
+                    <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+                </context>
+                <authoredOn value="2015-09-22T17:09:54.000+05:30"/>
+                <requester>
+                    <agent>
+                        <reference value="http://localhost:9997/providers/19.json"/>
+                    </agent>
+                </requester>
+                <dosageInstruction>
+                    <timing>
+                        <extension
+                                url="https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#TimingScheduledDate">
+                            <valueDateTime value="2015-09-24T00:00:00.000+05:30"/>
+                        </extension>
+                        <repeat>
+                            <boundsDuration>
+                                <value value="5"/>
+                                <system value="http://unitsofmeasure.org"/>
+                                <code value="d"/>
+                            </boundsDuration>
+                            <frequency value="1"/>
+                            <period value="2"/>
+                            <periodUnit value="h"/>
+                        </repeat>
+                    </timing>
+                    <asNeededCodeableConcept>
+                        <coding>
+                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/79647ed4-a60e-4cf5-ba68-cf4d55956cba"/>
+                            <code value="79647ed4-a60e-4cf5-ba68-cf4d55956cba"/>
+                            <display value="Hemoglobin"/>
+                        </coding>
+                    </asNeededCodeableConcept>
+                    <route>
+                        <coding>
+                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Route-of-Administration"/>
+                            <code value="implant"/>
+                            <display value="implant"/>
+                        </coding>
+                    </route>
+                    <doseQuantity>
+                        <value value="10"/>
+                        <unit value="Pill"/>
+                    </doseQuantity>
+                </dosageInstruction>
+            </MedicationRequest>
+        </resource>
+    </entry>
+</Bundle>

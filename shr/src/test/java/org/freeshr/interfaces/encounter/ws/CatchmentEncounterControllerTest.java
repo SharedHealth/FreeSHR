@@ -45,13 +45,10 @@ import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class CatchmentEncounterControllerTest {
-
     @Mock
-    CatchmentEncounterService mockCatchmentEncounterService;
-
+    private CatchmentEncounterService mockCatchmentEncounterService;
     @Mock
     private SHRProperties shrProperties;
-
     @Mock
     private SecurityContext securityContext;
 

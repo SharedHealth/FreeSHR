@@ -1,20 +1,14 @@
 package org.freeshr.validations.resource;
 
-import ca.uhn.fhir.model.dstu2.resource.Condition;
-import ca.uhn.fhir.model.dstu2.valueset.ConditionClinicalStatusCodesEnum;
-import ca.uhn.fhir.model.primitive.BoundCodeDt;
-import org.freeshr.validations.Severity;
 import org.freeshr.validations.ShrValidationMessage;
 import org.freeshr.validations.SubResourceValidator;
+import org.hl7.fhir.dstu3.model.Condition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import static org.freeshr.validations.ValidationMessages.INVALID_DOSAGE_QUANTITY;
 
 @Component
 public class ConditionValidator implements SubResourceValidator {
@@ -106,14 +100,12 @@ public class ConditionValidator implements SubResourceValidator {
         return new ArrayList<>();
     }
 
-    private boolean isValidClinicalStatus(Condition condition, ConditionClinicalStatusCodesEnum[] values) {
-        boolean validClinicalStatus = false;
-        for (ConditionClinicalStatusCodesEnum value : values) {
-             if (value.getCode().equals(condition.getClinicalStatus())) {
-                 validClinicalStatus = true;
-                 break;
-             }
+    private boolean isValidClinicalStatus(Condition condition, Condition.ConditionClinicalStatus[] values) {
+        for (Condition.ConditionClinicalStatus value : values) {
+            if (value.toCode().equals(condition.getClinicalStatus().toCode())){
+                return true;
+            }
         }
-        return validClinicalStatus;
+        return false;
     }
 }

@@ -32,7 +32,7 @@ public class EncounterBundleMessageConverterTest {
 
     @Test
     public void shouldCreateEncounterFromHttpInputMessage() throws IOException {
-        final URL resource = mockMessageToReturn("xmls/encounters/dstu2/p99001046345_encounter_with_diagnoses_with_local_refs.xml");
+        final URL resource = mockMessageToReturn("xmls/encounters/stu3/p99001046345_encounter_with_diagnoses_with_local_refs.xml");
         EncounterBundle bundle = new EncounterBundleMessageConverter().createEncounterBundle(inputMessage);
 
         Assert.assertNull(bundle.getEncounterId());

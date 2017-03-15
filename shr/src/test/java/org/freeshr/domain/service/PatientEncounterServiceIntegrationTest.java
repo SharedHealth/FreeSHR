@@ -32,12 +32,12 @@ import rx.Observable;
 import rx.observers.TestSubscriber;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static java.util.Arrays.asList;
-import static org.freeshr.data.EncounterBundleData.*;
+import static org.freeshr.data.EncounterBundleData.withContentForHealthId;
 import static org.freeshr.utils.FileUtil.asString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -46,7 +46,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
 @TestPropertySource(properties = {"MCI_SERVER_URL=http://localhost:9997", "FACILITY_REGISTRY_URL=http://localhost:9997/facilities/", "PROVIDER_REGISTRY_URL=http://localhost:9997/providers/"})
-public class PatientEncounterServiceIntegrationTest extends APIIntegrationTestBase{
+public class PatientEncounterServiceIntegrationTest extends APIIntegrationTestBase {
 
     private static final String VALID_FACILITY_ID = "10019841";
     @Rule
@@ -117,13 +117,13 @@ public class PatientEncounterServiceIntegrationTest extends APIIntegrationTestBa
         String securityToken = shrProperties.getIdPAuthToken();
 
         EncounterResponse response = patientEncounterService.ensureCreated(
-                withContentForHealthId(EncounterBundleData.HEALTH_ID, "xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_localRefs_with_invalidRefTerm.xml"),
+                withContentForHealthId(EncounterBundleData.HEALTH_ID, "xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_localRefs_with_invalidRefTerm.xml"),
                 getUserInfo(clientId, email, securityToken))
                 .toBlocking().first();
-     
+
 
         assertTrue(new EncounterResponseFailures(response).matches(new
-                String[]{"/f:Bundle/f:entry/f:resource/f:Condition/f:code/f:coding[1]", "error",
+                String[]{"Bundle.entry[3].resource.code.coding[1]", "error",
                 "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/referenceterms/2f6z9872-4df1-438e-9d72-0a8b161d409b], code[INVALID-A90]"}));
     }
 
@@ -134,11 +134,11 @@ public class PatientEncounterServiceIntegrationTest extends APIIntegrationTestBa
         String securityToken = shrProperties.getIdPAuthToken();
 
         EncounterResponse response = patientEncounterService.ensureCreated(
-                withContentForHealthId(EncounterBundleData.HEALTH_ID, "xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_localRefs_with_invalidConcept.xml"),
+                withContentForHealthId(EncounterBundleData.HEALTH_ID, "xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_localRefs_with_invalidConcept.xml"),
                 getUserInfo(clientId, email, securityToken))
                 .toBlocking().first();
         assertTrue(new EncounterResponseFailures(response).matches(new
-                String[]{"/f:Bundle/f:entry/f:resource/f:Condition/f:code/f:coding", "error",
+                String[]{"Bundle.entry[3].resource.code.coding[2]", "error",
                 "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca], code[INVALID-07952dc2-5206-11e5-ae6d-0050568225ca]"}));
     }
 
@@ -148,17 +148,17 @@ public class PatientEncounterServiceIntegrationTest extends APIIntegrationTestBa
         String email = "email@gmail.com";
         String securityToken = shrProperties.getIdPAuthToken();
         UserInfo userInfo = getUserInfo(clientId, email, securityToken);
-        EncounterResponse encounterCreateResponse = patientEncounterService.ensureCreated(
-                withContentForHealthId(VALID_HEALTH_ID, "xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_local_refs.xml"),
+        patientEncounterService.ensureCreated(
+                withContentForHealthId(VALID_HEALTH_ID, "xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_local_refs.xml"),
                 userInfo)
                 .toBlocking().first();
 
         EncounterResponse encounterUpdateResponse = patientEncounterService.ensureUpdated(
-                withContentForHealthId(EncounterBundleData.HEALTH_ID, "xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_localRefs_with_invalidConcept.xml"),
+                withContentForHealthId(EncounterBundleData.HEALTH_ID, "xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_localRefs_with_invalidConcept.xml"),
                 userInfo)
                 .toBlocking().first();
         assertTrue(new EncounterResponseFailures(encounterUpdateResponse).matches(new
-                String[]{"/f:Bundle/f:entry/f:resource/f:Condition/f:code/f:coding", "error",
+                String[]{"Bundle.entry[3].resource.code.coding[2]", "error",
                 "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca], code[INVALID-07952dc2-5206-11e5-ae6d-0050568225ca]"}));
     }
 
@@ -169,13 +169,10 @@ public class PatientEncounterServiceIntegrationTest extends APIIntegrationTestBa
         String securityToken = shrProperties.getIdPAuthToken();
 
         EncounterResponse encounterCreateResponse = patientEncounterService.ensureCreated(
-                withContentForHealthId("99001046345", "xmls/encounters/dstu2/p99001046345_encounter_with_diagnoses_with_local_refs.xml"),
+                withContentForHealthId("99001046345", "xmls/encounters/stu3/p99001046345_encounter_with_diagnoses_with_local_refs.xml"),
                 getUserInfo(clientId, email, securityToken))
                 .toBlocking().first();
 
-//        Observable<EncounterResponse> encounterResponseObservable = patientEncounterService.ensureCreated
-//                (encounterForUnknownPatient(),getUserInfo(clientId, email, securityToken));
-//        EncounterResponse response = encounterResponseObservable.toBlocking().first();
         assertThat(true, is(encounterCreateResponse.isTypeOfFailure(EncounterResponse.TypeOfFailure.Precondition)));
     }
 
@@ -186,7 +183,7 @@ public class PatientEncounterServiceIntegrationTest extends APIIntegrationTestBa
         String securityToken = shrProperties.getIdPAuthToken();
 
         Observable<EncounterResponse> response = patientEncounterService.ensureCreated(
-                withContentForHealthId("98001046534", "xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_local_refs.xml"),
+                withContentForHealthId("98001046534", "xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_local_refs.xml"),
                 getUserInfo(clientId, email, securityToken));
         TestSubscriber<EncounterResponse> encounterResponseSubscriber = new TestSubscriber<>();
         response.subscribe(encounterResponseSubscriber);
@@ -218,7 +215,7 @@ public class PatientEncounterServiceIntegrationTest extends APIIntegrationTestBa
         String securityToken = shrProperties.getIdPAuthToken();
 
         EncounterResponse first = patientEncounterService.ensureCreated(
-                withContentForHealthId("98001046534", "xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_local_refs.xml"),
+                withContentForHealthId("98001046534", "xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_local_refs.xml"),
                 getUserInfo(clientId, email, securityToken))
                 .toBlocking().first();
         String encounterId = first.getEncounterId();
@@ -234,7 +231,7 @@ public class PatientEncounterServiceIntegrationTest extends APIIntegrationTestBa
         String securityToken = shrProperties.getIdPAuthToken();
 
         EncounterResponse first = patientEncounterService.ensureCreated(
-                withContentForHealthId("98001046534", "xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_local_refs.xml"),
+                withContentForHealthId("98001046534", "xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_local_refs.xml"),
                 getUserInfo(clientId, email, securityToken))
                 .toBlocking().first();
         String encounterId = first.getEncounterId();
@@ -258,7 +255,7 @@ public class PatientEncounterServiceIntegrationTest extends APIIntegrationTestBa
 
     private UserInfo getUserInfo(String clientId, String email, String securityToken) {
         return new UserInfo(clientId, "foo", email, 1, true,
-                securityToken, new ArrayList<String>(), asList(new UserProfile("facility", "10000069", asList("302618"))));
+                securityToken, new ArrayList<String>(), Collections.singletonList(new UserProfile("facility", "10000069", Collections.singletonList("302618"))));
     }
 
     @After

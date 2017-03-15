@@ -1,15 +1,16 @@
 package org.freeshr.validations;
 
-import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.validation.ResultSeverityEnum;
 import ca.uhn.fhir.validation.SingleValidationMessage;
 import ca.uhn.fhir.validation.ValidationResult;
 import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.application.fhir.Error;
+import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.validations.bundle.BundleResourceValidator;
 import org.freeshr.validations.bundle.FacilityValidator;
 import org.freeshr.validations.bundle.HealthIdValidator;
 import org.freeshr.validations.bundle.ProviderValidator;
+import org.hl7.fhir.dstu3.model.Bundle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -65,7 +66,7 @@ public class HapiEncounterValidator implements ShrEncounterValidator {
 
     @Override
     public String supportedVersion() {
-        return "v2";
+        return FhirFeedUtil.FHIR_SCHEMA_VERSION;
     }
 
     private EncounterValidationResponse respondFromValidationMessages(ValidationResult validationResult) {
@@ -77,12 +78,6 @@ public class HapiEncounterValidator implements ShrEncounterValidator {
             }
         }
         return response;
-
-//        for (SingleValidationMessage validationMessage : validationResult.getMessages()) {
-//            Error error = new Error(validationMessage.getLocationString(), validationMessage.getSeverity().getCode(), validationMessage.getMessage());
-//            validationResponse.addError(error);
-//        }
-//        return validationResponse;
     }
 
 

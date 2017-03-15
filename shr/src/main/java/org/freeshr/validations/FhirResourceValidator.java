@@ -1,20 +1,18 @@
 package org.freeshr.validations;
 
-import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.validation.*;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.TRConceptValidator;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.validations.resource.ShrProfileValidationSupport;
-import org.hl7.fhir.instance.hapi.validation.FhirInstanceValidator;
-import org.hl7.fhir.instance.hapi.validation.ValidationSupportChain;
+import org.hl7.fhir.dstu3.hapi.validation.FhirInstanceValidator;
+import org.hl7.fhir.dstu3.hapi.validation.ValidationSupportChain;
+import org.hl7.fhir.dstu3.model.Bundle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,7 +24,6 @@ public class FhirResourceValidator {
     private volatile FhirValidator fhirValidator;
     private ShrProfileValidationSupport shrProfileValidationSupport;
     private List<Pattern> resourceFieldErrors = new ArrayList<>();
-    private Map<Pattern, String> extensionFieldErrors = new HashMap<>();
 
     @Autowired
     public FhirResourceValidator(FhirFeedUtil fhirUtil, TRConceptValidator trConceptValidator, ShrProfileValidationSupport shrProfileValidationSupport) {
@@ -37,16 +34,8 @@ public class FhirResourceValidator {
     }
 
     private void initFieldErrorChecks() {
-        this.resourceFieldErrors.add(Pattern.compile("/f:Bundle/f:entry(\\[\\d+\\])*/f:resource/f:Condition/f:category"));
-        this.resourceFieldErrors.add(Pattern.compile("/f:Bundle/f:entry(\\[\\d+\\])*/f:resource/f:Condition/f:code/f:coding"));
-        this.resourceFieldErrors.add(Pattern.compile("/f:Bundle/f:entry(\\[\\d+\\])*/f:resource/f:Condition/f:clinicalStatus"));
-
-        this.extensionFieldErrors.put(Pattern.compile("/f:Bundle/f:entry(\\[\\d+\\])*/f:resource/f:Condition/f:extension(\\[\\d+\\])*"), "https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#PreviousCondition");
-        this.extensionFieldErrors.put(Pattern.compile("/f:Bundle/f:entry(\\[\\d+\\])*/f:resource/f:ProcedureRequest/f:extension(\\[\\d+\\])*"), "https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#PreviousProcedureRequest");
-        this.extensionFieldErrors.put(Pattern.compile("/f:Bundle/f:entry(\\[\\d+\\])*/f:resource/f:MedicationOrder/f:dosageInstruction(\\[\\d+\\])*/f:timing/f:extension(\\[\\d+\\])*"), "https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#TimingScheduledDate");
-        this.extensionFieldErrors.put(Pattern.compile("/f:Bundle/f:entry(\\[\\d+\\])*/f:resource/f:MedicationOrder/f:dosageInstruction(\\[\\d+\\])*/f:extension(\\[\\d+\\])*"), "https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#DosageInstructionCustomDosage");
-        this.extensionFieldErrors.put(Pattern.compile("/f:Bundle/f:entry(\\[\\d+\\])*/f:resource/f:MedicationOrder/f:extension(\\[\\d+\\])*"), "https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#MedicationOrderAction");
-        this.extensionFieldErrors.put(Pattern.compile("/f:Bundle/f:entry(\\[\\d+\\])*/f:resource/f:DiagnosticOrder/f:extension(\\[\\d+\\])*"), "https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#DiagnosticOrderCategory");
+        this.resourceFieldErrors.add(Pattern.compile("Bundle\\.entry(\\[\\d+\\])*\\.resource\\.category\\.coding"));
+        this.resourceFieldErrors.add(Pattern.compile("Bundle\\.entry(\\[\\d+\\])*\\.resource\\.code\\.coding"));
     }
 
     public FhirValidationResult validate(Bundle bundle) {
@@ -59,18 +48,6 @@ public class FhirResourceValidator {
     private void checkValidationResult(FhirValidationResult validationResult) {
         checkForConceptValidationError(validationResult);
         checkForConditionErrors(validationResult);
-        checkForExtensionErrors(validationResult);
-    }
-
-    private void checkForExtensionErrors(FhirValidationResult validationResult) {
-        for (SingleValidationMessage validationMessage : validationResult.getMessages()) {
-            String extensionUrlForLocation = getExtensionForLocationError(validationMessage.getLocationString());
-            if (extensionUrlForLocation != null && validationMessage.getMessage().contains(extensionUrlForLocation)) {
-                if (validationMessage.getSeverity().ordinal() >= ResultSeverityEnum.ERROR.ordinal()) {
-                    validationMessage.setSeverity(ResultSeverityEnum.WARNING);
-                }
-            }
-        }
     }
 
     private void checkForConditionErrors(FhirValidationResult validationResult) {
@@ -81,14 +58,6 @@ public class FhirResourceValidator {
                 }
             }
         }
-    }
-
-    private String getExtensionForLocationError(String locationString) {
-        for (Pattern extensionFieldErrorLocationPattern : extensionFieldErrors.keySet()) {
-            Matcher matcher = extensionFieldErrorLocationPattern.matcher(locationString);
-            if (matcher.matches()) return extensionFieldErrors.get(extensionFieldErrorLocationPattern);
-        }
-        return null;
     }
 
     private boolean isPossibleResourceFieldError(String locationString) {

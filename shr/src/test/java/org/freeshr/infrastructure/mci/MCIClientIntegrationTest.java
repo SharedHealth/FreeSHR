@@ -45,10 +45,10 @@ public class MCIClientIntegrationTest {
 
     @Autowired
     @Qualifier("SHRRestTemplate")
-    AsyncRestTemplate shrRestTemplate;
+    private AsyncRestTemplate shrRestTemplate;
 
     @Mock
-    SHRProperties shrProperties;
+    private SHRProperties shrProperties;
 
     @Before
     public void setUp() {

@@ -1,0 +1,147 @@
+<Bundle xmlns="http://hl7.org/fhir">
+    <id value="bbe1fb06-211e-4b31-9ef8-2c78737bd37c"/>
+    <meta>
+        <lastUpdated value="2016-02-03T15:44:03.000+05:30"/>
+    </meta>
+    <type value="collection"/>
+    <entry>
+        <fullUrl value="urn:uuid:31f9e2db-aab2-4ee4-864d-1c3ac2166a43"/>
+        <resource>
+            <Composition xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:uuid:31f9e2db-aab2-4ee4-864d-1c3ac2166a43"/>
+                </identifier>
+                <status value="final"/>
+                <type>
+                    <coding>
+                        <system value="http://hl7.org/fhir/vs/doc-typecodes"/>
+                        <code value="51899-3"/>
+                        <display value="Details Document"/>
+                        <userSelected value="false"/>
+                    </coding>
+                </type>
+                <subject>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <encounter>
+                    <reference value="urn:uuid:bedd04bf-16cf-46c5-9fb5-78c9a6105ec8"/>
+                </encounter>
+                <date value="2016-02-03T15:44:03+05:30"/>
+                <author>
+                    <reference value="http://localhost:9997/facilities/10019841.json"/>
+                </author>
+                <title value="Patient Clinical Encounter"/>
+                <confidentiality value="N"/>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:bedd04bf-16cf-46c5-9fb5-78c9a6105ec8"/>
+                        <display value="Encounter"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:8dfc4948-3cd8-4fe6-bb5c-30b1d2586ce8"/>
+                        <display value="Procedure Request"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:8896e46b-8715-4c0f-8abd-1c4edb586572"/>
+                        <display value="Procedure Request"/>
+                    </entry>
+                </section>
+            </Composition>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:bedd04bf-16cf-46c5-9fb5-78c9a6105ec8"/>
+        <resource>
+            <Encounter xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:uuid:bedd04bf-16cf-46c5-9fb5-78c9a6105ec8"/>
+                </identifier>
+                <status value="finished"/>
+                <class>
+                    <system value="http://hl7.org/fhir/v3/ActCode"/>
+                    <code value="AMB"/>
+                </class>
+                <type>
+                    <text value="Consultation"/>
+                </type>
+                <subject>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <participant>
+                    <individual>
+                        <reference value="http://localhost:9997/providers/24.json"/>
+                    </individual>
+                </participant>
+                <serviceProvider>
+                    <reference value="http://localhost:9997/facilities/10019841.json"/>
+                </serviceProvider>
+            </Encounter>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:8dfc4948-3cd8-4fe6-bb5c-30b1d2586ce8"/>
+        <resource>
+            <ProcedureRequest xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:uuid:8dfc4948-3cd8-4fe6-bb5c-30b1d2586ce8"/>
+                </identifier>
+                <status value="active"/>
+                <intent value="order"/>
+                <code>
+                    <coding>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/079f6b0e-5206-11e5-ae6d-0050568225ca"/>
+                        <code value="079f6b0e-5206-11e5-ae6d-0050568225ca"/>
+                        <display value="Colposcopy"/>
+                        <userSelected value="false"/>
+                    </coding>
+                </code>
+                <subject>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <context>
+                    <reference value="urn:uuid:bedd04bf-16cf-46c5-9fb5-78c9a6105ec8"/>
+                </context>
+                <authoredOn value="2016-02-03T15:44:03+05:30"/>
+            </ProcedureRequest>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:8896e46b-8715-4c0f-8abd-1c4edb586572"/>
+        <resource>
+            <ProcedureRequest xmlns="http://hl7.org/fhir">
+                <extension
+                        url="https://sharedhealth.atlassian.net/wiki/display/docs/fhir-extensions#PreviousProcedureRequest">
+                    <valueString value="urn:uuid:8dfc4948-3cd8-4fe6-bb5c-30b1d2586ce8"/>
+                </extension>
+                <identifier>
+                    <value value="urn:uuid:8896e46b-8715-4c0f-8abd-1c4edb586572"/>
+                </identifier>
+                <status value="suspended"/>
+                <intent value="order"/>
+                <code>
+                    <coding>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/079f6b0e-5206-11e5-ae6d-0050568225ca"/>
+                        <code value="079f6b0e-5206-11e5-ae6d-0050568225ca"/>
+                        <display value="Colposcopy"/>
+                        <userSelected value="false"/>
+                    </coding>
+                </code>
+                <subject>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <context>
+                    <reference value="urn:uuid:bedd04bf-16cf-46c5-9fb5-78c9a6105ec8"/>
+                </context>
+                <authoredOn value="2016-02-03T15:44:08+05:30"/>
+            </ProcedureRequest>
+        </resource>
+    </entry>
+</Bundle>

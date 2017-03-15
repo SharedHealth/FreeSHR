@@ -10,17 +10,17 @@ import org.freeshr.utils.FileUtil;
 import org.freeshr.validations.EncounterValidationContext;
 import org.freeshr.validations.HapiEncounterValidator;
 import org.freeshr.validations.bundle.FacilityValidator;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.List;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.freeshr.util.ValidationFailureTestHelper.assertFailureFromResponseErrors;
 import static org.freeshr.util.ValidationFailureTestHelper.assertFailureInResponse;
 import static org.freeshr.utils.FileUtil.asString;
 import static org.hamcrest.core.Is.is;
@@ -48,6 +48,12 @@ public class EncounterValidatorIntegrationTest {
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/encounter-type-case-insensitive.json"))));
+
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/Order-Type"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/order-type-case-insensitive.json"))));
 
 
         //Patient 98001046534 Reference
@@ -179,7 +185,7 @@ public class EncounterValidatorIntegrationTest {
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody(asString("jsons/trValueset_medication_order_reason.json"))));
+                        .withBody(asString("jsons/trValueset_medication_request_reason.json"))));
 
         //dosage instruction Entire oral cavity
         givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/dosage-instruction-site"))
@@ -253,7 +259,7 @@ public class EncounterValidatorIntegrationTest {
     @Test
     public void shouldValidateEncounterIfItHasAValidFacility() throws Exception {
         encounterBundle = EncounterBundleData.encounter(HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_local_refs.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_local_refs.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue(response.isSuccessful());
@@ -262,7 +268,7 @@ public class EncounterValidatorIntegrationTest {
     @Test
     public void shouldFailIfNotAValidFacility() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_invalid_facility.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_invalid_facility.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertEquals(1, response.getErrors().size());
@@ -273,7 +279,7 @@ public class EncounterValidatorIntegrationTest {
     @Test
     public void shouldFailIfFacilityUrlIsInvalid() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_invalid_facility_url.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_invalid_facility_url.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertFailureInResponse("Encounter", FacilityValidator.INVALID_SERVICE_PROVIDER, true,
@@ -284,7 +290,7 @@ public class EncounterValidatorIntegrationTest {
     @Test
     public void shouldValidateEncounterWhenInProperFormat() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_local_refs.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_local_refs.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue(response.isSuccessful());
@@ -293,11 +299,11 @@ public class EncounterValidatorIntegrationTest {
     @Test
     public void shouldRejectEncounterWithInvalidConcept() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_localRefs_with_invalidConcept.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_localRefs_with_invalidConcept.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertEquals(1, response.getErrors().size());
-        assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:Condition/f:code/f:coding",
+        assertFailureInResponse("Bundle.entry[3].resource.code.coding[2]",
                 "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca], code[INVALID-07952dc2-5206-11e5-ae6d-0050568225ca]",
                 false, response);
     }
@@ -305,25 +311,24 @@ public class EncounterValidatorIntegrationTest {
     @Test
     public void shouldRejectEncounterWithInvalidConceptReferenceTerms() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_localRefs_with_invalidRefTerm.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_localRefs_with_invalidRefTerm.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
-        assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:Condition/f:code/f:coding[1]",
+        assertFailureInResponse("Bundle.entry[3].resource.code.coding[1]",
                 "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/referenceterms/2f6z9872-4df1-438e-9d72-0a8b161d409b], code[INVALID-A90]",
                 false, response);
         assertEquals(1, response.getErrors().size());
     }
 
-
     @Test
     public void shouldFailIfConditionStatusIsInvalid() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_localRefs_invalidCondition.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_localRefs_invalidCondition.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertFalse(response.isSuccessful());
-        assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:Condition/f:clinicalStatus",
-                "The value provided is not in the value set http://hl7.org/fhir/ValueSet/condition-clinical (http://hl7.org/fhir/ValueSet/condition-clinical, and a code is recommended to come from this value set", true, response);
+        assertFailureInResponse("Bundle.entry[3].resource.clinicalStatus",
+                "The value provided ('wrong') is not in the value set http://hl7.org/fhir/ValueSet/condition-clinical (http://hl7.org/fhir/ValueSet/condition-clinical, and a code is required from this value set", true, response);
     }
 
     /**
@@ -336,59 +341,46 @@ public class EncounterValidatorIntegrationTest {
     @Test
     public void shouldRejectEncounterWithInvalidDiagnosisCategoryAndStatusAndSystem() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_localRefs_invalidCondition.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_localRefs_invalidCondition.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
-        assertEquals(6, response.getErrors().size());
-        assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:Condition/f:code/f:coding/f:system",
-                "@value cannot be empty", false, response);
-        assertFailureInResponse("/f:Bundle/f:entry[3]/f:resource/f:Condition/f:code/f:coding/f:system",
-                "@value cannot be empty", false, response);
-        assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:Condition/f:category",
-                "None of the codes provided are in the value set http://hl7.org/fhir/ValueSet/condition-category (http://hl7.org/fhir/ValueSet/condition-category, and a code is recommended to come from this value set", true, response);
-        assertFailureInResponse("/f:Bundle/f:entry[3]/f:resource/f:Condition/f:category",
-                "None of the codes provided are in the value set http://hl7.org/fhir/ValueSet/condition-category (http://hl7.org/fhir/ValueSet/condition-category, and a code is recommended to come from this value set", true, response);
-        assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:Condition/f:clinicalStatus",
-                "The value provided is not in the value set http://hl7.org/fhir/ValueSet/condition-clinical (http://hl7.org/fhir/ValueSet/condition-clinical, and a code is recommended to come from this value set", true, response);
-        assertFailureInResponse("/f:Bundle/f:entry[3]/f:resource/f:Condition/f:clinicalStatus",
-                "The value provided is not in the value set http://hl7.org/fhir/ValueSet/condition-clinical (http://hl7.org/fhir/ValueSet/condition-clinical, and a code is recommended to come from this value set", true, response);
+        assertEquals(4, response.getErrors().size());
+        assertFailureInResponse("Bundle.entry[3].resource.category.coding",
+                "Unknown code: http://hl7.org/fhir/condition-category / invalid", false, response);
+        assertFailureInResponse("Bundle.entry[4].resource.category.coding",
+                "Unknown code: http://hl7.org/fhir/condition-category / invalid", false, response);
+        assertFailureInResponse("Bundle.entry[3].resource.clinicalStatus",
+                "The value provided ('wrong') is not in the value set http://hl7.org/fhir/ValueSet/condition-clinical (http://hl7.org/fhir/ValueSet/condition-clinical, and a code is required from this value set", true, response);
+        assertFailureInResponse("Bundle.entry[4].resource.clinicalStatus",
+                "The value provided ('wrong') is not in the value set http://hl7.org/fhir/ValueSet/condition-clinical (http://hl7.org/fhir/ValueSet/condition-clinical, and a code is required from this value set", true, response);
     }
 
     @Test
-    public void shouldValidateDiagnosticOrderWithSpecimen() throws Exception {
+    public void shouldValidateProcedureRequestWithSpecimen() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_diagnostic_order_with_specimen.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_procedure_request_for_lab_with_specimen.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue(response.isSuccessful());
     }
 
     @Test
-    public void shouldInvalidateDiagnosticOrderWithInvalidItem() throws Exception {
+    public void shouldInvalidateProcedureRequestWithInvalidItem() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_diagnostic_order_with_invalid_item.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_procedure_request_with_invalid_code.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertFalse(response.isSuccessful());
         assertEquals(1, response.getErrors().size());
-        assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:DiagnosticOrder/f:item/f:code/f:coding",
+        assertFailureInResponse("Bundle.entry[3].resource.code.coding",
                 "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/referenceterms/Creatinine-4df1-438e-9d72-invalid], code[Creatinine-4df1-438e-9d72-invalid]"
                 , false, response);
     }
 
     @Test
-    public void shouldValidateDiagnosticOrderWithValidExtension() throws Exception {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_diagnostic_order_with_valid_extension.xml"));
-        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
-        EncounterValidationResponse response = validator.validate(validationContext);
-        assertTrue(response.isSuccessful());
-    }
-
-    @Test
     public void shouldValidateFamilyMemberHistory() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_family_member_history.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_family_member_history.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue(response.isSuccessful());
@@ -397,28 +389,28 @@ public class EncounterValidatorIntegrationTest {
     @Test
     public void shouldRejectInvalidRelationshipTypeInFamilyMemberHistory() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_family_member_history_relationship_invalid.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_family_member_history_relationship_invalid.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertFalse(response.isSuccessful());
         assertEquals(1, response.getErrors().size());
-        assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:FamilyMemberHistory/f:relationship/f:coding",
+        assertFailureInResponse("Bundle.entry[3].resource.relationship.coding",
                 "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Relationship-Type], code[INVALID]", true, response);
     }
 
     @Test
-    public void shouldValidateMedicationOrderWithScheduledDateExtension() throws Exception {
+    public void shouldValidateMedicationRequestWithScheduledDateExtension() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_scheduled_date.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_medication_request_scheduled_date.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue(response.isSuccessful());
     }
 
     @Test
-    public void shouldValidateMedicationOrderWithCustomDosageExtension() throws Exception {
+    public void shouldValidateMedicationRequestWithCustomDosageExtension() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_custom_dosage.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_medication_request_custom_dosage.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue(response.isSuccessful());
@@ -427,7 +419,7 @@ public class EncounterValidatorIntegrationTest {
     @Test
     public void shouldValidateDiagnosticReport() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnostic_report.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnostic_report.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue(response.isSuccessful());
@@ -436,39 +428,37 @@ public class EncounterValidatorIntegrationTest {
     @Test
     public void shouldValidateDiagnosisWithPreviousDiagnosisExtension() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_updated_diagnosis.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_updated_diagnosis.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue(response.isSuccessful());
+    }
+
+    @Test
+    public void shouldInvalidateDignosisWhenClinicalStatusIsNotGiven() throws Exception {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_updated_diagnosis_without_clinical_status.xml"));
+        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
+        EncounterValidationResponse response = validator.validate(validationContext);
+        assertFalse(response.isSuccessful());
+        assertFailureInResponse("Bundle.entry[3].resource",
+                "Condition.clinicalStatus SHALL be present if verificationStatus is not entered-in-error [verificationStatus='entered-in-error' or clinicalStatus.exists()]",
+                false, response);
     }
 
     @Test
     public void shouldValidateDiagnosisWithPreviousProcedureRequestExtension() throws Exception {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_suspended_procedure_request.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_suspended_procedure_request.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue(response.isSuccessful());
     }
 
     @Test
-    @Ignore("Ignoring because currently instance validator skips if there in no system and code")
-    public void shouldValidateConditionsToCheckIfCategoriesOtherThanChiefComplaintAreCoded() {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_coded_and_nocoded_diagnosis.xml"));
-        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
-        EncounterValidationResponse response = validator.validate(validationContext);
-        List<Error> errors = response.getErrors();
-        assertThat(errors.size(), is(3));
-        assertFailureFromResponseErrors("urn:5f982a33-4454-4b74-9236-b8157aa8effd", "Viral pneumonia 785857", errors);
-        assertFailureFromResponseErrors("urn:5f982a33-4454-4b74-9236-b8157aa8e678", "Viral pneumonia 785857", errors);
-        assertFailureFromResponseErrors("urn:9826cf0c-66d6-4e33-bed1-91381ab200b5", "Moderate", errors);
-    }
-
-    @Test
     public void shouldValidateCodesInObservations() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_obs_valid.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_obs_valid.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue(response.isSuccessful());
@@ -477,11 +467,14 @@ public class EncounterValidatorIntegrationTest {
     @Test
     public void shouldInvalidateWrongCodesInObservations() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_obs_invalid.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_obs_invalid.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
-        assertEquals(1, response.getErrors().size());
-        assertFailureInResponse("/f:Bundle/f:entry[3]/f:resource/f:Observation/f:code/f:coding",
+        assertEquals(2, response.getErrors().size());
+        assertFailureInResponse("Bundle.entry[3].resource.code.coding",
+                "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/5dd8f02e-3cda-40f2-9c70-b1a9c91ff1da], code[5dd8f02e-3cda-40f2-9c70-b1a9c91ff1da-INVALID]",
+                false, response);
+        assertFailureInResponse("Bundle.entry[4].resource.related.target.resource.code.coding",
                 "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/5dd8f02e-3cda-40f2-9c70-b1a9c91ff1da], code[5dd8f02e-3cda-40f2-9c70-b1a9c91ff1da-INVALID]",
                 false, response);
     }
@@ -500,7 +493,7 @@ public class EncounterValidatorIntegrationTest {
     @Test
     public void shouldValidateEncounterTypeAgainstValueSet() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_valid_type.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_valid_type.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue(response.isSuccessful());
@@ -509,11 +502,11 @@ public class EncounterValidatorIntegrationTest {
     @Test
     public void shouldValidateMedicationPrescriptionWithInvalidMedicationReference() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_invalid_medication.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_medication_request_invalid_medication.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertEquals(1, response.getErrors().size());
-        assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:MedicationOrder/f:medicationCodeableConcept/f:coding",
+        assertFailureInResponse("Bundle.entry[3].resource.medicationCodeableConcept.coding",
                 "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/23d7e743-75bd-4a25-8f34-bd849bd50394], code[23d7e743-75bd-4a25-8f34-bd849bd50394-INVALID]",
                 false, response);
     }
@@ -521,17 +514,16 @@ public class EncounterValidatorIntegrationTest {
     @Test
     public void shouldValidateRouteInMedicationReference() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_valid.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_medication_request_valid.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue("Medication prescription pass through validation", response.isSuccessful());
     }
 
     @Test
-    @Ignore("Ignored because currently we are skipping if Dispense has a medication reference")
     public void shouldValidateDispenseMedicationInMedicationPrescription() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_valid.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_medication_request_valid.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue("Medication-prescription,Prescriber pass through validation", response.isSuccessful());
@@ -540,7 +532,7 @@ public class EncounterValidatorIntegrationTest {
     @Test
     public void shouldValidateSiteAndReasonInMedicationPrescription() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_valid.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_medication_request_valid.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue(response.isSuccessful());
@@ -549,28 +541,16 @@ public class EncounterValidatorIntegrationTest {
     @Test
     public void shouldValidateDispenseAndAdditionalInstructionsInMedicationPrescription() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_valid.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_medication_request_valid.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue("Should Validate Valid Encounter In MedicationPrescription", response.isSuccessful());
     }
 
     @Test
-    public void shouldValidateInvalidDispenseInMedicationPrescription() {
+    public void shouldValidateSubstitutionReasonInMedicationPrescription() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_with_invalid_dispense.xml"));
-        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
-        EncounterValidationResponse response = validator.validate(validationContext);
-        assertEquals(1, response.getErrors().size());
-        assertFailureInResponse("/f:Bundle/f:entry/f:resource/f:MedicationOrder/f:dispenseRequest/f:medicationCodeableConcept/f:coding",
-                "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/23d7e743-75bd-4a25-8f34-bd849bd50394], code[23d7e743-75bd-4a25-8f34-bd849bd50394-INVALID]",
-                false, response);
-    }
-
-    @Test
-    public void shouldValidateSubstitutionTypeAndReasonInMedicationPrescription() {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_valid.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_medication_request_valid.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue(response.isSuccessful());
@@ -581,12 +561,12 @@ public class EncounterValidatorIntegrationTest {
     public void shouldValidateMethodAndAsNeededXInMedicationPrescription() {
 
         /**
-         * p98001046534_encounter_with_medication_order_valid.xml has
+         * p98001046534_encounter_with_medication_request_valid.xml has
          * 2 medication prescribed with asNeeded (boolean true), and asNeeded with CodeableConcept
          *
          */
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_valid.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_medication_request_valid.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue(response.isSuccessful());
@@ -596,11 +576,11 @@ public class EncounterValidatorIntegrationTest {
     @Test
     public void shouldValidateInvalidDosageQuantityInMedicationPrescription() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_with_invalid_dose_quantity.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_medication_request_with_invalid_dose_quantity.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertEquals(1, response.getErrors().size());
-        assertFailureInResponse("f:MedicationOrder/f:dosageInstruction/f:dose",
+        assertFailureInResponse("f:MedicationRequest/f:dosageInstruction/f:dose",
                 "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Quantity-Units123], code[TU]",
                 false, response);
     }
@@ -608,79 +588,31 @@ public class EncounterValidatorIntegrationTest {
     @Test
     public void shouldValidateDischargeSummaryEncounterWithAllResources() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_discharge_summury.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_discharge_summury.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue(response.isSuccessful());
     }
 
     @Test
-    @Ignore("This test is actually for discharge summary, but testing condition schema")
-    public void shouldValidateInvalidSchemaInDischargeSummaryEncounter() {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu1/discharge_summary_encounter_invalid_schema.xml"));
-
-        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
-        EncounterValidationResponse response = validator.validate(validationContext);
-        List<Error> errors = response.getErrors();
-        assertEquals(1, errors.size());
-        assertEquals("Unknown", errors.get(0).getField());
-        assertTrue("Should have failed for unknown ConditionStatus code", errors.get(0).getReason().contains("Unknown ConditionStatus " +
-                "code 'foo-bar'"));
-    }
-
-    @Test
-    @Ignore("Testing Medication instead of Discharge Summary")
-    public void shouldValidateInvalidMedicationInDischargeSummaryEncounter() {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu1/discharge_summary_encounter_medication_invalid.xml"));
-
-        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
-        EncounterValidationResponse response = validator.validate(validationContext);
-        assertFailureFromResponseErrors("urn:5fc6d0d9-9520-4015-87cb-ab0cfa7e4b50", "Invalid Medication Reference URL",
-                response.getErrors());
-        assertEquals(1, response.getErrors().size());
-    }
-
-    @Test
-    @Ignore("Testing Medication instead of Discharge Summary")
-    public void shouldValidateInvalidDosageQuantityInDischargeSummaryEncounter() {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu1/discharge_summary_dosage_quantity_invalid.xml"));
-        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
-        EncounterValidationResponse response = validator.validate(validationContext);
-        assertFailureFromResponseErrors("urn:5fc6d0d9-9520-4015-87cb-ab0cfa7e4b50", "Invalid Dosage Quantity",
-                response.getErrors());
-        assertEquals(1, response.getErrors().size());
-    }
-
-    @Test
     public void shouldValidateInvalidCodeInDischargeSummaryEncounter() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_discharge_summury_code_invalid.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_discharge_summury_code_invalid.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
-        assertEquals(1, response.getErrors().size());
-        assertFailureInResponse("/f:Bundle/f:entry[4]/f:resource/f:Observation/f:code/f:coding",
+        assertEquals(2, response.getErrors().size());
+        assertFailureInResponse("Bundle.entry[4].resource.code.coding",
+                "Could not validate concept system[http://172.18.46.53:9080/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca], code[07952dc2-5206-11e5-ae6d-0050568225ca]",
+                false, response);
+        assertFailureInResponse("Bundle.entry[7].resource.related[2].target.resource.code.coding",
                 "Could not validate concept system[http://172.18.46.53:9080/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca], code[07952dc2-5206-11e5-ae6d-0050568225ca]",
                 false, response);
     }
 
     @Test
-    public void shouldValidateMissingSystemCodeInDischargeSummaryEncounter() {
-        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_discharge_summury_system_missing.xml"));
-        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
-        EncounterValidationResponse response = validator.validate(validationContext);
-        assertEquals(1, response.getErrors().size());
-        assertFailureInResponse("/f:Bundle/f:entry[4]/f:resource/f:Observation/f:code/f:coding/f:system",
-                "@value cannot be empty", false, response);
-    }
-
-    @Test
     public void shouldValidateProcedure() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_procedure.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_procedure.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue(response.isSuccessful());
@@ -689,17 +621,17 @@ public class EncounterValidatorIntegrationTest {
     @Test
     public void shouldValidateInvalidEncounterWithAllResources() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_all_resources_invalid.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_all_resources_invalid.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertFalse(response.isSuccessful());
-        assertEquals(30, response.getErrors().size());
+        assertEquals(38, response.getErrors().size());
     }
 
     @Test
     public void shouldValidateEncounterWithAllResources() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_all_resources.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_all_resources.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertTrue(response.isSuccessful());

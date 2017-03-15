@@ -1,0 +1,24 @@
+{
+  "resourceType": "ValueSet",
+  "identifier": "/rest/v1/tr/vs/Order-Type",
+  "name": "Order Type",
+  "description": "Order Types",
+  "status": "active",
+  "date": "2015-06-22",
+  "codeSystem": {
+    "system": "/rest/v1/tr/vs/Order-Type",
+    "caseSensitive": false,
+    "concept": [
+      {
+        "code": "LAB",
+        "display": "LAB Order",
+        "definition": "Test Orders"
+      },
+      {
+        "code": "RAD",
+        "display": "RADIOLOGY orders",
+        "definition": "Radiology"
+      }
+    ]
+  }
+}

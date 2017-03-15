@@ -31,7 +31,6 @@ import java.util.concurrent.ExecutionException;
 import static ch.lambdaj.Lambda.extract;
 import static ch.lambdaj.Lambda.on;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static java.util.Arrays.asList;
 import static org.freeshr.data.EncounterBundleData.withContentForHealthId;
 import static org.freeshr.utils.FileUtil.asString;
 import static org.junit.Assert.*;
@@ -116,7 +115,7 @@ public class CatchmentEncounterServiceIntegrationTest {
         Date date = new Date();
         facilityRepository.save(facility).toBlocking().first();
         patientEncounterService.ensureCreated(
-                withContentForHealthId(VALID_HEALTH_ID, "xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_local_refs.xml"),
+                withContentForHealthId(VALID_HEALTH_ID, "xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_local_refs.xml"),
                 getUserInfo(clientId, email, securityToken)).toBlocking().first();
 
         List<EncounterEvent> encounterEvents = catchmentEncounterService.findEncounterFeedForFacilityCatchment("305610", date, null).toBlocking().first();
@@ -138,12 +137,12 @@ public class CatchmentEncounterServiceIntegrationTest {
 
         assertNotNull(facilityRepository.find("3").toBlocking().first());
         EncounterResponse response = patientEncounterService.ensureCreated(
-                withContentForHealthId(VALID_HEALTH_ID, "xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_local_refs.xml"),
+                withContentForHealthId(VALID_HEALTH_ID, "xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_local_refs.xml"),
                 getUserInfo(clientId, email, securityToken)).toBlocking()
                 .first();
         assertTrue(response.isSuccessful());
         assertTrue(patientEncounterService.ensureCreated(
-                withContentForHealthId(VALID_HEALTH_ID_NEW, "xmls/encounters/dstu2/p99001046345_encounter_with_diagnoses_with_local_refs.xml"),
+                withContentForHealthId(VALID_HEALTH_ID_NEW, "xmls/encounters/stu3/p99001046345_encounter_with_diagnoses_with_local_refs.xml"),
                 getUserInfo(clientId, email, securityToken)).toBlocking().first()
                 .isSuccessful());
 
@@ -158,7 +157,7 @@ public class CatchmentEncounterServiceIntegrationTest {
 
     private UserInfo getUserInfo(String clientId, String email, String securityToken) {
         return new UserInfo(clientId, "foo", email, 1, true,
-                securityToken, new ArrayList<String>(), asList(new UserProfile("facility", "10000069", asList("3026"))));
+                securityToken, new ArrayList<String>(), Collections.singletonList(new UserProfile("facility", "10000069", Collections.singletonList("3026"))));
     }
 
     @After

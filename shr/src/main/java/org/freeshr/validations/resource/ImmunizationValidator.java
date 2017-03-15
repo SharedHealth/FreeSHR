@@ -1,9 +1,12 @@
 package org.freeshr.validations.resource;
 
 
-import ca.uhn.fhir.model.dstu2.composite.SimpleQuantityDt;
-import ca.uhn.fhir.model.dstu2.resource.Immunization;
-import org.freeshr.validations.*;
+import org.freeshr.validations.Severity;
+import org.freeshr.validations.ShrValidationMessage;
+import org.freeshr.validations.SubResourceValidator;
+import org.freeshr.validations.UrlValidator;
+import org.hl7.fhir.dstu3.model.Immunization;
+import org.hl7.fhir.dstu3.model.SimpleQuantity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +34,7 @@ public class ImmunizationValidator implements SubResourceValidator {
 
     @Override
     public boolean validates(Object resource) {
-        return resource instanceof ca.uhn.fhir.model.dstu2.resource.Immunization;
+        return resource instanceof Immunization;
     }
 
     @Override
@@ -42,7 +45,7 @@ public class ImmunizationValidator implements SubResourceValidator {
 
     private List<ShrValidationMessage> validateDosageQuantity(Immunization immunization) {
         List<ShrValidationMessage> validationMessages = new ArrayList<>();
-        SimpleQuantityDt doseQuantity = immunization.getDoseQuantity();
+        SimpleQuantity doseQuantity = immunization.getDoseQuantity();
         if (doseQuantity.isEmpty()) {
             return validationMessages;
         }
@@ -54,10 +57,10 @@ public class ImmunizationValidator implements SubResourceValidator {
             return validationMessages;
         }
 
-        logger.error("Immunization DosageQuantity is invalid." + immunization.getId().getValue());
+        logger.error("Immunization DosageQuantity is invalid." + immunization.getId());
 
         validationMessages.add(new ShrValidationMessage(Severity.ERROR, IMMUNIZATION_DOSE_QUANTITY_LOCATION, "invalid",
-                INVALID_DOSAGE_QUANTITY + ":Immunization:" + immunization.getId().getValue()));
+                INVALID_DOSAGE_QUANTITY + ":Immunization:" + immunization.getId()));
         return validationMessages;
     }
 }

@@ -1,8 +1,8 @@
 package org.freeshr.application.fhir;
 
 import org.freeshr.infrastructure.tr.TerminologyServer;
-import org.hl7.fhir.instance.model.ValueSet;
-import org.hl7.fhir.instance.terminologies.ITerminologyServices;
+import org.hl7.fhir.dstu3.model.ValueSet;
+import org.hl7.fhir.dstu3.terminologies.ITerminologyServices;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +12,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 import static java.util.Collections.EMPTY_LIST;
-import static org.hl7.fhir.instance.model.ValueSet.ValueSetCodeSystemComponent;
-import static org.hl7.fhir.instance.model.ValueSet.ValueSetExpansionContainsComponent;
 
 @Component
 @Deprecated
@@ -29,7 +27,7 @@ public class TRConceptLocator  {
     }
 
 //    @Override
-    public ValueSet.ValueSetCodeSystemComponent locate(String system, final String code) {
+//    public ValueSet.ValueSetCodeSystemComponent locate(String system, final String code) {
 //        try {
 //            final Boolean isValid = terminologyServer.isValid(system, code).toBlocking().first();
 //            if (isValid) {
@@ -45,8 +43,8 @@ public class TRConceptLocator  {
 //            logger.debug("Problem while validating concept", e);
 //            return null;
 //        }
-        return null;
-    }
+//        return null;
+//    }
 
 //    @Override
     @Cacheable(value = "trCache", unless = "#result != null")
@@ -64,7 +62,7 @@ public class TRConceptLocator  {
     }
 
 //    @Override
-    public List<ValueSetExpansionContainsComponent> expand(ValueSet.ConceptSetComponent inc) throws Exception {
+    public List<ValueSet.ValueSetExpansionContainsComponent> expand(ValueSet.ConceptSetComponent inc) throws Exception {
         return EMPTY_LIST;
     }
 }

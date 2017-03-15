@@ -1,0 +1,130 @@
+<Bundle xmlns="http://hl7.org/fhir">
+    <id value="27fb7000-f940-4604-a304-1d3acf27236f"/>
+    <meta>
+        <lastUpdated value="2015-09-04T14:12:35.000+05:30"/>
+    </meta>
+    <type value="collection"/>
+    <entry>
+        <fullUrl value="urn:uuid:206a6d95-454f-48c8-9a7b-d73756652c8d"/>
+        <resource>
+            <Composition xmlns="http://hl7.org/fhir">
+                <id value="206a6d95-454f-48c8-9a7b-d73756652c8d"/>
+                <identifier>
+                    <value value="urn:uuid:206a6d95-454f-48c8-9a7b-d73756652c8d"/>
+                </identifier>
+                <status value="final"/>
+                <type>
+                    <coding>
+                        <system value="http://hl7.org/fhir/vs/doc-typecodes"/>
+                        <code value="51899-3"/>
+                        <display value="Details Document"/>
+                        <userSelected value="false"/>
+                    </coding>
+                </type>
+                <subject>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <encounter>
+                    <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+                </encounter>
+                <date value="2015-09-04T14:12:35+05:30"/>
+                <author>
+                    <reference value="http://localhost:9997/facilities/10019841.json"/>
+                </author>
+                <title value="encounter composition for patient 98001046534"/>
+                <confidentiality value="N"/>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+                        <display value="Encounter"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:3d614625-4358-487c-96e9-a775df9579f3"/>
+                        <display value="Family History"/>
+                    </entry>
+                </section>
+            </Composition>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+        <resource>
+            <Encounter xmlns="http://hl7.org/fhir">
+                <id value="34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+                <identifier>
+                    <value value="urn:uuid:34ba3e1c-55c0-434d-b74b-b1bfe6472d4c"/>
+                </identifier>
+                <status value="finished"/>
+                <class>
+                    <system value="http://hl7.org/fhir/v3/ActCode"/>
+                    <code value="AMB"/>
+                </class>
+                <type>
+                    <text value="OPD"/>
+                </type>
+                <subject>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <participant>
+                    <individual>
+                        <reference value="http://localhost:9997/providers/19.json"/>
+                    </individual>
+                </participant>
+                <serviceProvider>
+                    <reference value="http://localhost:9997/facilities/10019841.json"/>
+                </serviceProvider>
+            </Encounter>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:3d614625-4358-487c-96e9-a775df9579f3"/>
+        <resource>
+            <FamilyMemberHistory xmlns="http://hl7.org/fhir">
+                <id value="3d614625-4358-487c-96e9-a775df9579f3"/>
+                <identifier>
+                    <value value="urn:uuid:3d614625-4358-487c-96e9-a775df9579f3"/>
+                </identifier>
+                <status value="partial"/>
+                <patient>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </patient>
+                <relationship>
+                    <coding>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Relationship-Type"/>
+                        <code value="FTH"/>
+                        <display value="father"/>
+                        <userSelected value="false"/>
+                    </coding>
+                </relationship>
+                <bornDate value="1954-02-23"/>
+                <condition>
+                    <code>
+                        <coding>
+                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/referenceterms/2f6z9872-4df1-438e-9d72-0a8b161d409b"/>
+                            <code value="A90"/>
+                            <display value="Dengue Fever"/>
+                            <userSelected value="false"/>
+                        </coding>
+                        <coding>
+                            <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca"/>
+                            <code value="07952dc2-5206-11e5-ae6d-0050568225ca"/>
+                            <display value="Dengue Fever"/>
+                            <userSelected value="false"/>
+                        </coding>
+                    </code>
+                    <onsetAge>
+                        <value value="10.0"/>
+                        <unit value="a"/>
+                        <code value="a"/>
+                        <system value="http://unitsofmeasure.org"/>
+                    </onsetAge>
+                </condition>
+            </FamilyMemberHistory>
+        </resource>
+    </entry>
+</Bundle>
