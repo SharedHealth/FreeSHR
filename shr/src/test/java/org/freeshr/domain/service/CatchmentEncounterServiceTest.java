@@ -18,7 +18,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
-public class    CatchmentEncounterServiceTest {
+public class CatchmentEncounterServiceTest {
 
     private CatchmentEncounterService catchmentEncounterService;
     private EncounterRepository mockEncounterRepository;
@@ -51,7 +51,7 @@ public class    CatchmentEncounterServiceTest {
     @Test
     public void shouldFetchEncountersByCatchmentBasedOnLastMarkerIfPresent() throws Exception {
         Date date = new SimpleDateFormat("dd/mm/YYYY").parse("10/9/2014");
-        catchmentEncounterService.findEncounterFeedForFacilityCatchment("3026",date, "last-read-marker");
+        catchmentEncounterService.findEncounterFeedForFacilityCatchment("3026", date, "last-read-marker");
 
         verify(mockEncounterRepository).findEncounterFeedForCatchmentAfterMarker(new Catchment("3026"), "last-read-marker", date, 20);
         verify(mockEncounterRepository, times(0)).findEncounterFeedForCatchmentUpdatedSince(new Catchment("3026"), date, 20);
@@ -60,10 +60,10 @@ public class    CatchmentEncounterServiceTest {
     @Test
     public void shouldFetchEncountersByCatchmentBasedOnUpdatedSinceIfLastMarkerIsAbsent() throws Exception {
         Date date = new SimpleDateFormat("dd/mm/YYYY").parse("10/9/2014");
-        catchmentEncounterService.findEncounterFeedForFacilityCatchment("3026",date, null);
+        catchmentEncounterService.findEncounterFeedForFacilityCatchment("3026", date, null);
 
         verify(mockEncounterRepository).findEncounterFeedForCatchmentUpdatedSince(new Catchment("3026"), date, 20);
-        verify(mockEncounterRepository,times(0)).findEncounterFeedForCatchmentAfterMarker(eq(new Catchment("3026")), anyString(), eq(date), eq(20));
+        verify(mockEncounterRepository, times(0)).findEncounterFeedForCatchmentAfterMarker(eq(new Catchment("3026")), anyString(), eq(date), eq(20));
 
     }
 }

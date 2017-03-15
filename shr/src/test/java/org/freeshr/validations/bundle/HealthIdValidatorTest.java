@@ -11,6 +11,7 @@ import org.freeshr.validations.ShrValidationMessage;
 import org.freeshr.validations.ValidationSubject;
 import org.freeshr.validations.bundle.HealthIdValidator;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 
@@ -26,11 +27,11 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class HealthIdValidatorTest {
 
     private HealthIdValidator healthIdValidator;
-    FhirFeedUtil fhirFeedUtil;
-    FhirMessageFilter fhirMessageFilter;
+    private FhirFeedUtil fhirFeedUtil;
+    private FhirMessageFilter fhirMessageFilter;
 
     @Mock
-    SHRProperties shrProperties;
+    private SHRProperties shrProperties;
 
     @Before
     public void setup() {
@@ -43,7 +44,7 @@ public class HealthIdValidatorTest {
 
     @Test
     public void shouldAcceptEncounterIfHealthIdInTheXmlMatchesTheGivenHealthId() {
-        final String xml = FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_all_resources.xml");
+        final String xml = FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_all_resources.xml");
         when(shrProperties.getPatientReferencePath()).thenReturn("http://localhost:9997/api/default/patients");
         List<ShrValidationMessage> response = healthIdValidator.validate(getEncounterContext(xml, "98001046534"));
         assertThat(EncounterValidationResponse.fromShrValidationMessages(response).isSuccessful(),
@@ -52,7 +53,7 @@ public class HealthIdValidatorTest {
 
     @Test
     public void shouldAcceptEncounterIfHealthIdInTheXmlMatchesTheGivenHealthIdAllVersions() {
-        final String xml = FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml");
+        final String xml = FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses.xml");
         when(shrProperties.getPatientReferencePath()).thenReturn("http://172.18.46.199:8081/api/default/patients");
         List<ShrValidationMessage> response = healthIdValidator.validate(getEncounterContext(xml, "98001046534"));
         assertThat(EncounterValidationResponse.fromShrValidationMessages(response).isSuccessful(),
@@ -62,7 +63,7 @@ public class HealthIdValidatorTest {
     @Test
     public void shouldNotAcceptEncounterIfNoHealthIdIsPresentInComposition() {
         //NOTE this is not actually needed as the check would be done at the XSD cardinality level. A composition without subject ref is not valid
-        String xml = FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_without_composition_subject.xml");
+        String xml = FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_without_composition_subject.xml");
         when(shrProperties.getPatientReferencePath()).thenReturn("http://172.18.46.199:8081/api/default/patients");
         EncounterValidationResponse response = EncounterValidationResponse.fromShrValidationMessages(
                 healthIdValidator.validate(getEncounterContext(xml, "98001046534")));
@@ -73,7 +74,7 @@ public class HealthIdValidatorTest {
 
     @Test
     public void shouldRejectEncounterIfHealthIdInTheXmlDoesNotMatchTheGivenHealthId() {
-        final String xml = FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml");
+        final String xml = FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses.xml");
         when(shrProperties.getPatientReferencePath()).thenReturn("http://172.18.46.199:8081/api/default/patients");
         EncounterValidationResponse response = EncounterValidationResponse.fromShrValidationMessages(
                 healthIdValidator.validate(getEncounterContext(xml, "11112222233333")));
@@ -84,7 +85,7 @@ public class HealthIdValidatorTest {
 
     @Test
     public void shouldRejectEncounterIfThereIsNoHealthIdInTheComposition() {
-        String xml = FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_invalid_condition_patient.xml");
+        String xml = FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_invalid_condition_patient.xml");
         when(shrProperties.getPatientReferencePath()).thenReturn("http://172.18.46.199:8081/api/default/patients");
         EncounterValidationResponse response = EncounterValidationResponse.fromShrValidationMessages(
                 healthIdValidator.validate(getEncounterContext(xml, "98001046534")));

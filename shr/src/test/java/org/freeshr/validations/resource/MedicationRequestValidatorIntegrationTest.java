@@ -2,18 +2,18 @@ package org.freeshr.validations.resource;
 
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.dstu2.resource.Bundle;
-import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import net.sf.ehcache.CacheManager;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.util.ValidationFailureTestHelper;
+import org.freeshr.utils.FhirResourceHelper;
 import org.freeshr.utils.FileUtil;
 import org.freeshr.validations.ShrValidationMessage;
+import org.hl7.fhir.dstu3.model.Bundle;
+import org.hl7.fhir.dstu3.model.MedicationRequest;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,19 +26,20 @@ import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.freeshr.utils.BundleHelper.parseResource;
-import static org.freeshr.validations.resource.MedicationOrderValidator.MEDICATION_ORDER_MEDICATION_LOCATION;
+import static org.freeshr.validations.resource.MedicationRequestValidator.MEDICATION_REQUEST_DISPENSE_MEDICATION_LOCATION;
+import static org.freeshr.validations.resource.MedicationRequestValidator.MEDICATION_REQUEST_MEDICATION_LOCATION;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(initializers = SHREnvironmentMock.class, classes = SHRConfig.class)
 @TestPropertySource(properties = {"MCI_SERVER_URL=http://localhost:9997", "FACILITY_REGISTRY_URL=http://localhost:9997/facilities/", "PROVIDER_REGISTRY_URL=http://localhost:9997/providers/"})
-public class MedicationOrderValidatorIntegrationTest {
+public class MedicationRequestValidatorIntegrationTest {
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(9997);
 
     @Autowired
-    private MedicationOrderValidator medicationOrderValidator;
+    private MedicationRequestValidator medicationRequestValidator;
 
     @Before
     public void setup() throws Exception {
@@ -56,25 +57,16 @@ public class MedicationOrderValidatorIntegrationTest {
                 .willReturn(aResponse()
                         .withStatus(404)));
 
-        final FhirContext fhirContext = FhirContext.forDstu2();
-        Bundle medicationOrderBundle = (Bundle) parseResource(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_medication_order_scheduled_date.xml"), fhirContext);
-        MedicationOrder medicationOrder = medicationOrderBundle.getAllPopulatedChildElementsOfType(MedicationOrder.class).get(0);
-        List<ShrValidationMessage> shrValidationMessages = medicationOrderValidator.validate(medicationOrder);
-        assertEquals(1, shrValidationMessages.size());
-        ValidationFailureTestHelper.assertFailureFromShrValidationMessages(MEDICATION_ORDER_MEDICATION_LOCATION,
+        final FhirContext fhirContext = FhirContext.forDstu3();
+        Bundle medicationRequestBundle = (Bundle) parseResource(FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_medication_request_scheduled_date.xml"), fhirContext);
+        MedicationRequest medicationRequest = FhirResourceHelper.findBundleResourcesOfType(medicationRequestBundle, MedicationRequest.class).get(0);
+        List<ShrValidationMessage> shrValidationMessages = medicationRequestValidator.validate(medicationRequest);
+        assertEquals(2, shrValidationMessages.size());
+        ValidationFailureTestHelper.assertFailureFromShrValidationMessages(MEDICATION_REQUEST_MEDICATION_LOCATION,
                 "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/23d7e743-75bd-4a25-8f34-bd849bd50394], code[23d7e743-75bd-4a25-8f34-bd849bd50394]",
                 shrValidationMessages);
-    }
-
-    @Test
-    @Ignore("Done as a part of Encounter Validator Integration Test")
-    public void shouldValidateMedicationQuantity() {
-        //TODO
-    }
-
-    @Test
-    @Ignore("Done as a part of Encounter Validator Integration Test")
-    public void shouldValidateMedicationDispense() {
-        //TODO
+        ValidationFailureTestHelper.assertFailureFromShrValidationMessages(MEDICATION_REQUEST_DISPENSE_MEDICATION_LOCATION,
+                "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/23d7e743-75bd-4a25-8f34-bd849bd50394], code[23d7e743-75bd-4a25-8f34-bd849bd50394]",
+                shrValidationMessages);
     }
 }

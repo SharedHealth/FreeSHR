@@ -1,0 +1,262 @@
+<Bundle xmlns="http://hl7.org/fhir">
+    <id value="5f18e990-9ab3-4a40-b206-3eb56ed267d6"/>
+    <meta>
+        <lastUpdated value="2015-09-15T12:44:30.000+05:30"/>
+    </meta>
+    <type value="collection"/>
+    <entry>
+        <fullUrl value="urn:uuid:e2754e01-018b-449b-92a9-1463d0a86e82"/>
+        <resource>
+            <Composition xmlns="http://hl7.org/fhir">
+                <id value="e2754e01-018b-449b-92a9-1463d0a86e82"/>
+                <identifier>
+                    <value value="urn:uuid:e2754e01-018b-449b-92a9-1463d0a86e82"/>
+                </identifier>
+                <status value="final"/>
+                <type>
+                    <coding>
+                        <system value="http://hl7.org/fhir/vs/doc-typecodes"/>
+                        <code value="51899-3"/>
+                        <display value="Details Document"/>
+                        <userSelected value="false"/>
+                    </coding>
+                </type>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001158560"/>
+                    <display value="98001158560"/>
+                </subject>
+                <encounter>
+                    <reference value="urn:uuid:e8c4b9f6-0f66-4e96-9a29-46b2c9be3515"/>
+                </encounter>
+                <date value="2015-09-15T12:44:30+05:30"/>
+                <author>
+                    <reference value="http://172.18.46.199:8080/api/1.0/facilities/10019842.json"/>
+                </author>
+                <title value="encounter composition for patient 98001046534"/>
+                <confidentiality value="N"/>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:e8c4b9f6-0f66-4e96-9a29-46b2c9be3515"/>
+                        <display value="Encounter"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:78f45550-34a1-47f9-b4b1-1a6ba435c4e0"/>
+                        <display value="Hospital course"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:1e5612e9-4af1-4b92-bf49-189cd7f5f451"/>
+                        <display value="History and examination notes"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:6acf00d1-dca4-4570-aef0-ef262e31482c"/>
+                        <display value="Additional advice"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:929e40cc-8a2f-4f0c-9a82-2a5b16185030"/>
+                        <display value="Follow up date"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:f75c7fe7-5817-4e53-a8ac-1a2c84dfde34"/>
+                        <display value="Discharge Summary"/>
+                    </entry>
+                </section>
+            </Composition>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:e8c4b9f6-0f66-4e96-9a29-46b2c9be3515"/>
+        <resource>
+            <Encounter xmlns="http://hl7.org/fhir">
+                <id value="e8c4b9f6-0f66-4e96-9a29-46b2c9be3515"/>
+                <identifier>
+                    <value value="urn:uuid:e8c4b9f6-0f66-4e96-9a29-46b2c9be3515"/>
+                </identifier>
+                <status value="finished"/>
+                <class>
+                    <system value="http://hl7.org/fhir/v3/ActCode"/>
+                    <code value="AMB"/>
+                </class>
+                <type>
+                    <text value="OPD"/>
+                </type>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001158560"/>
+                    <display value="98001158560"/>
+                </subject>
+                <participant>
+                    <individual>
+                        <reference value="http://172.18.46.199:8080/api/1.0/providers/18.json"/>
+                    </individual>
+                </participant>
+                <serviceProvider>
+                    <reference value="http://172.18.46.199:8080/api/1.0/facilities/10019842.json"/>
+                </serviceProvider>
+            </Encounter>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:78f45550-34a1-47f9-b4b1-1a6ba435c4e0"/>
+        <resource>
+            <Observation xmlns="http://hl7.org/fhir">
+                <id value="78f45550-34a1-47f9-b4b1-1a6ba435c4e0"/>
+                <identifier>
+                    <value value="urn:uuid:78f45550-34a1-47f9-b4b1-1a6ba435c4e0"/>
+                </identifier>
+                <status value="final"/>
+                <code>
+                    <coding>
+                        <display value="Hospital course"/>
+                        <userSelected value="false"/>
+                    </coding>
+                </code>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001158560"/>
+                    <display value="98001158560"/>
+                </subject>
+                <context>
+                    <reference value="urn:uuid:e8c4b9f6-0f66-4e96-9a29-46b2c9be3515"/>
+                </context>
+                <valueString value="hospital course"/>
+            </Observation>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:1e5612e9-4af1-4b92-bf49-189cd7f5f451"/>
+        <resource>
+            <Observation xmlns="http://hl7.org/fhir">
+                <id value="1e5612e9-4af1-4b92-bf49-189cd7f5f451"/>
+                <identifier>
+                    <value value="urn:uuid:1e5612e9-4af1-4b92-bf49-189cd7f5f451"/>
+                </identifier>
+                <status value="final"/>
+                <code>
+                    <coding>
+                        <system value="http://172.18.46.53:9080/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca"/>
+                        <code value="07952dc2-5206-11e5-ae6d-0050568225ca"/>
+                        <display value="History and examination notes"/>
+                        <userSelected value="false"/>
+                    </coding>
+                </code>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001158560"/>
+                    <display value="98001158560"/>
+                </subject>
+                <context>
+                    <reference value="urn:uuid:e8c4b9f6-0f66-4e96-9a29-46b2c9be3515"/>
+                </context>
+                <valueString value="History and examination notes"/>
+            </Observation>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:6acf00d1-dca4-4570-aef0-ef262e31482c"/>
+        <resource>
+            <Observation xmlns="http://hl7.org/fhir">
+                <id value="6acf00d1-dca4-4570-aef0-ef262e31482c"/>
+                <identifier>
+                    <value value="urn:uuid:6acf00d1-dca4-4570-aef0-ef262e31482c"/>
+                </identifier>
+                <status value="final"/>
+                <code>
+                    <coding>
+                        <display value="Additional advice"/>
+                        <userSelected value="false"/>
+                    </coding>
+                </code>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001158560"/>
+                    <display value="98001158560"/>
+                </subject>
+                <context>
+                    <reference value="urn:uuid:e8c4b9f6-0f66-4e96-9a29-46b2c9be3515"/>
+                </context>
+                <valueString value="Additional Advice"/>
+            </Observation>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:929e40cc-8a2f-4f0c-9a82-2a5b16185030"/>
+        <resource>
+            <Observation xmlns="http://hl7.org/fhir">
+                <id value="929e40cc-8a2f-4f0c-9a82-2a5b16185030"/>
+                <identifier>
+                    <value value="urn:uuid:929e40cc-8a2f-4f0c-9a82-2a5b16185030"/>
+                </identifier>
+                <status value="final"/>
+                <code>
+                    <coding>
+                        <display value="Follow up date"/>
+                        <userSelected value="false"/>
+                    </coding>
+                </code>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001158560"/>
+                    <display value="98001158560"/>
+                </subject>
+                <context>
+                    <reference value="urn:uuid:e8c4b9f6-0f66-4e96-9a29-46b2c9be3515"/>
+                </context>
+                <valueDateTime value="2015-04-10T00:00:00+05:30"/>
+            </Observation>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:f75c7fe7-5817-4e53-a8ac-1a2c84dfde34"/>
+        <resource>
+            <Observation xmlns="http://hl7.org/fhir">
+                <id value="f75c7fe7-5817-4e53-a8ac-1a2c84dfde34"/>
+                <identifier>
+                    <value value="urn:uuid:f75c7fe7-5817-4e53-a8ac-1a2c84dfde34"/>
+                </identifier>
+                <status value="final"/>
+                <code>
+                    <coding>
+                        <display value="Discharge Summary"/>
+                        <userSelected value="false"/>
+                    </coding>
+                </code>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001158560"/>
+                    <display value="98001158560"/>
+                </subject>
+                <context>
+                    <reference value="urn:uuid:e8c4b9f6-0f66-4e96-9a29-46b2c9be3515"/>
+                </context>
+                <related>
+                    <type value="has-member"/>
+                    <target>
+                        <reference value="urn:uuid:78f45550-34a1-47f9-b4b1-1a6ba435c4e0"/>
+                    </target>
+                </related>
+                <related>
+                    <type value="has-member"/>
+                    <target>
+                        <reference value="urn:uuid:1e5612e9-4af1-4b92-bf49-189cd7f5f451"/>
+                    </target>
+                </related>
+                <related>
+                    <type value="has-member"/>
+                    <target>
+                        <reference value="urn:uuid:6acf00d1-dca4-4570-aef0-ef262e31482c"/>
+                    </target>
+                </related>
+                <related>
+                    <type value="has-member"/>
+                    <target>
+                        <reference value="urn:uuid:929e40cc-8a2f-4f0c-9a82-2a5b16185030"/>
+                    </target>
+                </related>
+            </Observation>
+        </resource>
+    </entry>
+</Bundle>

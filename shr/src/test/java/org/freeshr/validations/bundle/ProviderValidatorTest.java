@@ -1,6 +1,5 @@
 package org.freeshr.validations.bundle;
 
-import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import net.sf.ehcache.CacheManager;
 import org.freeshr.config.SHRConfig;
@@ -12,6 +11,8 @@ import org.freeshr.validations.FhirMessageFilter;
 import org.freeshr.validations.ShrValidationMessage;
 import org.freeshr.validations.ValidationSubject;
 import org.freeshr.validations.providerIdentifiers.ClinicalResourceProviderIdentifier;
+import org.hl7.fhir.dstu3.model.Bundle;
+import org.hl7.fhir.dstu3.model.DiagnosticReport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,15 +37,11 @@ import static org.mockito.MockitoAnnotations.initMocks;
 @TestPropertySource(properties = {"PROVIDER_REGISTRY_URL=http://localhost:9997/providers"})
 public class ProviderValidatorTest {
 
-    ProviderValidator providerValidator;
-
+    private ProviderValidator providerValidator;
     @Autowired
-    FhirFeedUtil fhirFeedUtil;
-
-    FhirMessageFilter fhirMessageFilter;
-
+    private FhirFeedUtil fhirFeedUtil;
     @Autowired
-    List<ClinicalResourceProviderIdentifier> clinicalResourceProviderIdentifiers;
+    private List<ClinicalResourceProviderIdentifier> clinicalResourceProviderIdentifiers;
     @Autowired
     private SHRProperties shrProperties;
 
@@ -54,7 +51,6 @@ public class ProviderValidatorTest {
     @Before
     public void setup() {
         initMocks(this);
-        fhirMessageFilter = new FhirMessageFilter();
         providerValidator = new ProviderValidator(clinicalResourceProviderIdentifiers, shrProperties);
 
         givenThat(get(urlPathMatching("/providers/19.json"))
@@ -72,24 +68,23 @@ public class ProviderValidatorTest {
 
     @Test
     public void shouldValidateEncounterWithValidProvider() throws Exception {
-        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml"), fhirFeedUtil.getFhirContext());
+        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses.xml"), fhirFeedUtil.getFhirContext());
         List<ShrValidationMessage> validationMessages = providerValidator.validate(getBundleContext(bundle));
         assertTrue(validationMessages.isEmpty());
     }
 
     @Test
     public void shouldHitProviderUrlOnce() throws Exception {
-        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml"), fhirFeedUtil.getFhirContext());
+        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses.xml"), fhirFeedUtil.getFhirContext());
         List<ShrValidationMessage> validationMessages = providerValidator.validate(getBundleContext(bundle));
         assertTrue(validationMessages.isEmpty());
 
         verify(1, getRequestedFor(urlPathMatching("/providers/19.json")));
     }
 
-
     @Test
     public void shouldFailEncounterWithInvalidProvider() throws Exception {
-        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_invalid_participants_and_provider.xml"), fhirFeedUtil.getFhirContext());
+        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_invalid_participants_and_provider.xml"), fhirFeedUtil.getFhirContext());
         List<ShrValidationMessage> validationMessages = providerValidator.validate(getBundleContext(bundle));
         assertFailureFromResponseErrors("urn:c41cabed-3c47-4260-bd70-ac4893b97ee8", "Invalid Provider URL in Encounter:urn:uuid:dd4d51ac-d4b6-42e4-8b50-fa88af41a3e3",
                 validationMessages);
@@ -99,7 +94,7 @@ public class ProviderValidatorTest {
 
     @Test
     public void shouldValidateEncounterWithoutAnyProvider() throws Exception {
-        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_without_participant.xml"), fhirFeedUtil.getFhirContext());
+        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_without_participant.xml"), fhirFeedUtil.getFhirContext());
         List<ShrValidationMessage> validationMessages = providerValidator.validate(getBundleContext(bundle));
         assertTrue(validationMessages.isEmpty());
     }

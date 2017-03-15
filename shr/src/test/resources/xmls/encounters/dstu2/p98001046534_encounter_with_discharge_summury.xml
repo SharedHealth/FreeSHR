@@ -176,7 +176,6 @@
         </resource>
     </entry>
     <entry>
-        <base value="urn:uuid:"/>
         <resource>
             <Observation xmlns="http://hl7.org/fhir">
                 <id value="5fe5b0ca-c338-4397-90c1-d88d319b33c2"/>

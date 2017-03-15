@@ -4,6 +4,7 @@ import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.data.EncounterBundleData;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.utils.FileUtil;
+import org.hl7.fhir.dstu3.model.Bundle;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -13,7 +14,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 public class EncounterValidationContextTest {
     @Mock
-    FhirFeedUtil fhirFeedUtil;
+    private FhirFeedUtil fhirFeedUtil;
 
     @Before
     public void setUp() throws Exception {
@@ -22,10 +23,10 @@ public class EncounterValidationContextTest {
 
     @Test
     public void shouldDeserialiseOnlyOnce() throws Exception {
-        String content = FileUtil.asString("xmls/encounters/dstu2/p99001046345_encounter_with_diagnoses_with_local_refs.xml");
+        String content = FileUtil.asString("xmls/encounters/stu3/p99001046345_encounter_with_diagnoses_with_local_refs.xml");
         EncounterBundle encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID, content);
 
-        when(fhirFeedUtil.parseBundle(content, "xml")).thenReturn(new ca.uhn.fhir.model.dstu2.resource.Bundle());
+        when(fhirFeedUtil.parseBundle(content, "xml")).thenReturn(new Bundle());
 
         EncounterValidationContext validationContext = new EncounterValidationContext(encounterBundle,
                 fhirFeedUtil);

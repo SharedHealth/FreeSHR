@@ -1,6 +1,5 @@
 package org.freeshr.validations.bundle;
 
-import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.domain.service.FacilityService;
@@ -10,6 +9,7 @@ import org.freeshr.validations.HIEFacilityValidator;
 import org.freeshr.validations.Severity;
 import org.freeshr.validations.ShrValidationMessage;
 import org.freeshr.validations.ValidationSubject;
+import org.hl7.fhir.dstu3.model.Bundle;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,11 +28,11 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class FacilityValidatorTest {
 
     @Mock
-    SHRProperties shrProperties;
+    private SHRProperties shrProperties;
     @Mock
-    FacilityService facilityService;
+    private FacilityService facilityService;
 
-    HIEFacilityValidator hieFacilityValidator;
+    private HIEFacilityValidator hieFacilityValidator;
     private FacilityValidator facilityValidator;
     private FhirFeedUtil fhirFeedUtil;
 
@@ -46,7 +46,7 @@ public class FacilityValidatorTest {
 
     @Test
     public void shouldValidateFacilityReference() throws Exception {
-        final String xml = FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml");
+        final String xml = FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses.xml");
         when(shrProperties.getFacilityReferencePath()).thenReturn("http://172.18.46.199:8080/api/1.0/facilities");
         Mockito.when(facilityService.checkForFacility("10019841")).thenReturn(Observable.just(true));
         List<ShrValidationMessage> response = facilityValidator.validate(getBundleFragment(xml));
@@ -55,7 +55,7 @@ public class FacilityValidatorTest {
 
     @Test
     public void shouldFailForInvalidFacilityRegistryReference() {
-        final String xml = FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml");
+        final String xml = FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses.xml");
         when(shrProperties.getFacilityReferencePath()).thenReturn("http://172.18.46.199:8080/api/1.0/facilities");
         Mockito.when(facilityService.checkForFacility("10019841")).thenReturn(Observable.just(false));
         List<ShrValidationMessage> response = facilityValidator.validate(getBundleFragment(xml));
@@ -64,7 +64,7 @@ public class FacilityValidatorTest {
 
     @Test
     public void shouldFailForNonMatchingFacilityReference() {
-        final String xml = FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml");
+        final String xml = FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses.xml");
         when(shrProperties.getFacilityReferencePath()).thenReturn("http://example.org/api/1.0/facilities");
         Mockito.when(facilityService.checkForFacility("10019841")).thenReturn(Observable.just(false));
         List<ShrValidationMessage> response = facilityValidator.validate(getBundleFragment(xml));
@@ -73,7 +73,7 @@ public class FacilityValidatorTest {
 
     @Test
     public void shouldNotFailForMissingEncounterFacilityReference() {
-        final String xml = FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_without_serviceProvider.xml");
+        final String xml = FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_without_serviceProvider.xml");
         when(shrProperties.getFacilityReferencePath()).thenReturn("http://example.org/api/1.0/facilities");
         Mockito.when(facilityService.checkForFacility("10019841")).thenReturn(Observable.just(false));
         List<ShrValidationMessage> response = facilityValidator.validate(getBundleFragment(xml));
@@ -86,7 +86,7 @@ public class FacilityValidatorTest {
         return new ValidationSubject<Bundle>() {
             @Override
             public Bundle extract() {
-                return fhirFeedUtil.parseBundle(xml,"xml");
+                return fhirFeedUtil.parseBundle(xml, "xml");
             }
         };
     }

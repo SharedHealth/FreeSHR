@@ -1,0 +1,129 @@
+<Bundle xmlns="http://hl7.org/fhir">
+    <id value="7f95be5c-6763-445a-a088-68b91f87f215"/>
+    <meta>
+        <lastUpdated value="2015-09-04T12:35:10.000+05:30"/>
+    </meta>
+    <type value="collection"/>
+    <entry>
+        <fullUrl value="urn:uuid:e51cc578-c55f-4a8b-a938-777cb0ff8a90"/>
+        <resource>
+            <Composition xmlns="http://hl7.org/fhir">
+                <id value="e51cc578-c55f-4a8b-a938-777cb0ff8a90"/>
+                <identifier>
+                    <value value="urn:uuid:e51cc578-c55f-4a8b-a938-777cb0ff8a90"/>
+                </identifier>
+                <status value="final"/>
+                <type>
+                    <coding>
+                        <system value="http://hl7.org/fhir/vs/doc-typecodes"/>
+                        <code value="51899-3"/>
+                        <display value="Details Document"/>
+                        <userSelected value="false"/>
+                    </coding>
+                </type>
+                <subject>
+                    <reference value="http://localhost:9997/api/default/patients/1234"/>
+                    <display value="1234"/>
+                </subject>
+                <encounter>
+                    <reference value="urn:uuid:dd4d51ac-d4b6-42e4-8b50-fa88af41a3e3"/>
+                </encounter>
+                <date value="2015-09-04T12:35:10+05:30"/>
+                <author>
+                    <reference value="http://localhost:9997/facilities/10019841.json"/>
+                </author>
+                <title value="Composition"/>
+                <confidentiality value="N"/>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:dd4d51ac-d4b6-42e4-8b50-fa88af41a3e3"/>
+                        <display value="Encounter"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:04e9f317-680c-4ff1-9942-bcb5e2b5243b"/>
+                        <display value="Diagnosis"/>
+                    </entry>
+                </section>
+            </Composition>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:dd4d51ac-d4b6-42e4-8b50-fa88af41a3e3"/>
+        <resource>
+            <Encounter xmlns="http://hl7.org/fhir">
+                <id value="dd4d51ac-d4b6-42e4-8b50-fa88af41a3e3"/>
+                <identifier>
+                    <value value="urn:uuid:dd4d51ac-d4b6-42e4-8b50-fa88af41a3e3"/>
+                </identifier>
+                <status value="finished"/>
+                <class>
+                    <system value="http://hl7.org/fhir/v3/ActCode"/>
+                    <code value="AMB"/>
+                </class>
+                <type>
+                    <text value="OPD"/>
+                </type>
+                <subject>
+                    <reference value="http://localhost:9997/api/default/patients/1234"/>
+                    <display value="1234"/>
+                </subject>
+                <participant>
+                    <individual>
+                        <reference value="http://localhost:9997/providers/19.json"/>
+                    </individual>
+                </participant>
+                <serviceProvider>
+                    <reference value="http://localhost:9997/facilities/10019841.json"/>
+                </serviceProvider>
+            </Encounter>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:04e9f317-680c-4ff1-9942-bcb5e2b5243b"/>
+        <resource>
+            <Condition xmlns="http://hl7.org/fhir">
+                <id value="04e9f317-680c-4ff1-9942-bcb5e2b5243b"/>
+                <identifier>
+                    <value value="urn:uuid:04e9f317-680c-4ff1-9942-bcb5e2b5243b"/>
+                </identifier>
+                <clinicalStatus value="active"/>
+                <verificationStatus value="provisional"/>
+                <category>
+                    <coding>
+                        <system value="http://hl7.org/fhir/condition-category"/>
+                        <code value="encounter-diagnosis"/>
+                        <display value="Diagnosis"/>
+                        <userSelected value="false"/>
+                    </coding>
+                </category>
+                <code>
+                    <coding>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/referenceterms/2f6z9872-4df1-438e-9d72-0a8b161d409b"/>
+                        <code value="A90"/>
+                        <display value="Dengue Fever"/>
+                        <userSelected value="false"/>
+                    </coding>
+                    <coding>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/07952dc2-5206-11e5-ae6d-0050568225ca"/>
+                        <code value="07952dc2-5206-11e5-ae6d-0050568225ca"/>
+                        <display value="Dengue Fever"/>
+                        <userSelected value="false"/>
+                    </coding>
+                </code>
+                <subject>
+                    <reference value="http://localhost:9997/api/default/patients/1234"/>
+                    <display value="1234"/>
+                </subject>
+                <context>
+                    <reference value="urn:uuid:dd4d51ac-d4b6-42e4-8b50-fa88af41a3e3"/>
+                </context>
+                <assertedDate value="2015-09-04T00:00:00+05:30"/>
+                <asserter>
+                    <reference value="http://localhost:9997/providers/19.json"/>
+                </asserter>
+            </Condition>
+        </resource>
+    </entry>
+</Bundle>

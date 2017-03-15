@@ -1,8 +1,7 @@
 package org.freeshr.validations;
 
-import org.hl7.fhir.instance.model.Bundle;
-import org.hl7.fhir.instance.model.Resource;
-import org.hl7.fhir.instance.validation.ValidationMessage;
+import org.hl7.fhir.dstu3.model.Bundle;
+import org.hl7.fhir.utilities.validation.ValidationMessage;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,7 +1,7 @@
 package org.freeshr.validations.resource;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.dstu2.resource.Immunization;
+import ca.uhn.fhir.parser.LenientErrorHandler;
 import org.freeshr.application.fhir.TRConceptValidator;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
@@ -10,8 +10,10 @@ import org.freeshr.utils.FhirResourceHelper;
 import org.freeshr.utils.FileUtil;
 import org.freeshr.validations.ShrValidationMessage;
 import org.freeshr.validations.UrlValidator;
-import org.hl7.fhir.instance.hapi.validation.IValidationSupport;
-import org.hl7.fhir.instance.model.OperationOutcome;
+import org.hl7.fhir.dstu3.hapi.validation.IValidationSupport;
+import org.hl7.fhir.dstu3.model.Bundle;
+import org.hl7.fhir.dstu3.model.Immunization;
+import org.hl7.fhir.utilities.validation.ValidationMessage;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,8 +52,9 @@ public class ImmunizationValidatorTest {
 
     @Test
     public void shouldValidateImmunization() throws Exception {
-        final FhirContext fhirContext = FhirContext.forDstu2();
-        ca.uhn.fhir.model.dstu2.resource.Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_immunization.xml"), fhirContext);
+        final FhirContext fhirContext = FhirContext.forDstu3();
+        fhirContext.setParserErrorHandler(new LenientErrorHandler().setErrorOnInvalidValue(false));
+        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_immunization.xml"), fhirContext);
         List<Immunization> immunizations = FhirResourceHelper.findBundleResourcesOfType(bundle, Immunization.class);
         when(conceptValidator.isCodeSystemSupported(any(FhirContext.class), anyString())).thenReturn(true);
         ImmunizationValidator immunizationValidator = getValidator();
@@ -61,8 +64,8 @@ public class ImmunizationValidatorTest {
 
     @Test
     public void shouldRejectInvalidDoseQuantityType() {
-        final FhirContext fhirContext = FhirContext.forDstu2();
-        ca.uhn.fhir.model.dstu2.resource.Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/dstu2/p98001046534_encounter_with_immunization.xml"), fhirContext);
+        final FhirContext fhirContext = FhirContext.forDstu3();
+        Bundle bundle = parseBundle(FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_immunization.xml"), fhirContext);
         List<Immunization> immunizations = FhirResourceHelper.findBundleResourcesOfType(bundle, Immunization.class);
         when(conceptValidator.isCodeSystemSupported(any(FhirContext.class), anyString())).thenReturn(true);
         when(conceptValidator.validateCode(any(FhirContext.class), anyString(), anyString(), anyString())).thenReturn(mockValidationResult());
@@ -74,6 +77,6 @@ public class ImmunizationValidatorTest {
     }
 
     private IValidationSupport.CodeValidationResult mockValidationResult() {
-        return new IValidationSupport.CodeValidationResult(OperationOutcome.IssueSeverity.ERROR, "Invalid Code");
+        return new IValidationSupport.CodeValidationResult(ValidationMessage.IssueSeverity.ERROR, "Invalid Code");
     }
 }

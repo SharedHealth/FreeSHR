@@ -1,8 +1,5 @@
 package org.freeshr.infrastructure.security;
 
-import ca.uhn.fhir.model.dstu2.composite.CodingDt;
-import ca.uhn.fhir.model.dstu2.resource.Bundle;
-import ca.uhn.fhir.model.dstu2.resource.Composition;
 import me.prettyprint.cassandra.utils.TimeUUIDUtils;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.events.EncounterEvent;
@@ -10,6 +7,9 @@ import org.freeshr.interfaces.encounter.ws.APIIntegrationTestBase;
 import org.freeshr.utils.Confidentiality;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.utils.FhirResourceHelper;
+import org.hl7.fhir.dstu3.model.Bundle;
+import org.hl7.fhir.dstu3.model.Coding;
+import org.hl7.fhir.dstu3.model.Composition;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,7 +35,7 @@ public class ConfidentialEncounterHandlerIT extends APIIntegrationTestBase {
     public void shouldReplaceConfidentialEncounters() throws Exception {
         final Requester createdBy = new Requester("facilityId", "providerId");
         Date receivedAt = new Date();
-        String confidentialContent = asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml");
+        String confidentialContent = asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses.xml");
         EncounterEvent confidentialEncounterEvent = new EncounterEvent(createEncounterBundle("encounter id", "98001046534",
                 Confidentiality.Restricted, Confidentiality.Normal, confidentialContent,
                 createdBy, receivedAt), TimeUUIDUtils.getTimeUUID(receivedAt.getTime()), null);
@@ -54,30 +54,27 @@ public class ConfidentialEncounterHandlerIT extends APIIntegrationTestBase {
         assertEquals(originalComposition.getStatus(), replacedComposition.getStatus());
         assertEquals(originalComposition.getDate(), replacedComposition.getDate());
         assertEquals(originalComposition.getAuthor().get(0).getReference(), replacedComposition.getAuthor().get(0).getReference());
-        CodingDt replaceCompositionType = replacedComposition.getType().getCoding().get(0);
-        CodingDt originalCompositionType = originalComposition.getType().getCoding().get(0);
+        Coding replaceCompositionType = replacedComposition.getType().getCoding().get(0);
+        Coding originalCompositionType = originalComposition.getType().getCoding().get(0);
         assertEquals(originalCompositionType.getCode(), replaceCompositionType.getCode());
         assertEquals(originalCompositionType.getSystem(), replaceCompositionType.getSystem());
         assertEquals(originalCompositionType.getDisplay(), replaceCompositionType.getDisplay());
-        assertEquals(Confidentiality.Restricted.getLevel(), replacedComposition.getConfidentiality());
+        assertEquals(Confidentiality.Restricted.getLevel(), replacedComposition.getConfidentiality().toCode());
 
         assertEquals(1, replacedBundle.getEntry().size());
-        assertEquals("Composition", replacedBundle.getEntry().get(0).getResource().getResourceName());
-        Bundle.Entry replacedCompositionEntry = getCompositionEntry(replacedBundle);
-        Bundle.Entry confidentialCompositionEntry = getCompositionEntry(confidentialBundle);
+        assertEquals("Composition", replacedBundle.getEntry().get(0).getResource().getResourceType().name());
+        Bundle.BundleEntryComponent replacedCompositionEntry = getCompositionEntry(replacedBundle);
+        Bundle.BundleEntryComponent confidentialCompositionEntry = getCompositionEntry(confidentialBundle);
         assertEquals(confidentialCompositionEntry.getId(), replacedCompositionEntry.getId());
         assertEquals(confidentialCompositionEntry.getFullUrl(), replacedCompositionEntry.getFullUrl());
-        //TODO verify something
-//        assertEquals(confidentialCompositionEntry.getAuthorName(), replacedCompositionEntry.getAuthorName());
-//        assertEquals(confidentialCompositionEntry.getAuthorUri(), replacedCompositionEntry.getAuthorUri());
     }
 
     private Composition getComposition(Bundle fhirFeed) {
         return (Composition) getCompositionEntry(fhirFeed).getResource();
     }
 
-    private Bundle.Entry getCompositionEntry(Bundle bundle) {
-        List<Bundle.Entry> entries = FhirResourceHelper.getBundleEntriesForResource(bundle, "Composition");
+    private Bundle.BundleEntryComponent getCompositionEntry(Bundle bundle) {
+        List<Bundle.BundleEntryComponent> entries = FhirResourceHelper.getBundleEntriesForResource(bundle, "Composition");
         return entries.get(0);
     }
 }

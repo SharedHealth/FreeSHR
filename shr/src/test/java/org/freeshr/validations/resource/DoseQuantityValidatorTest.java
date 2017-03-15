@@ -1,7 +1,7 @@
 package org.freeshr.validations.resource;
 
 import org.freeshr.utils.FhirFeedUtil;
-import org.hl7.fhir.instance.model.Quantity;
+import org.hl7.fhir.dstu3.model.Quantity;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;

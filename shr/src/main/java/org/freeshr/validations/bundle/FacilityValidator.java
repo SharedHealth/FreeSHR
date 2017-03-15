@@ -1,11 +1,11 @@
 package org.freeshr.validations.bundle;
 
-import ca.uhn.fhir.model.dstu2.resource.Bundle;
-import ca.uhn.fhir.model.dstu2.resource.Composition;
-import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.utils.FhirResourceHelper;
 import org.freeshr.validations.*;
+import org.hl7.fhir.dstu3.model.Bundle;
+import org.hl7.fhir.dstu3.model.Composition;
+import org.hl7.fhir.dstu3.model.Encounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +13,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.freeshr.utils.UrlUtil.extractFacilityId;
 
 @Component
 public class FacilityValidator implements ShrValidator<Bundle> {
@@ -56,9 +54,8 @@ public class FacilityValidator implements ShrValidator<Bundle> {
     }
 
     private String getServiceProviderRefUrl(Encounter encounter) {
-        return (encounter != null) ? encounter.getServiceProvider().getReference().getValue() : null;
+        return (encounter != null) ? encounter.getServiceProvider().getReference() : null;
     }
-
 
 
 }

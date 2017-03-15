@@ -59,7 +59,7 @@ dependencies {
             libraries.spring_security, libraries.spring_web, libraries.eclipse_moxy,
             libraries.spring_context_support, libraries.ehcache_core, libraries.commons_lang,
             libraries.lambdaj, libraries.joda_time, libraries.lz4,
-            libraries.hapi_fhir_base, libraries.hapi_fhir_structures, libraries.hapi_fhir_validation_resources, libraries.hapi_fhir_structures_hl7,
+            libraries.hapi_fhir_base, libraries.hapi_fhir_structures, libraries.hapi_fhir_validation_resources,
             libraries.phloc_schematron, libraries.phloc_commons, libraries.hector_core
 
     compile(libraries.spring_boot_security) {
@@ -103,7 +103,7 @@ task exportProperties(dependsOn: 'copyZip') << {
 
 task dist(dependsOn: [project(":schema").tasks.build, 'exportProperties'], type: Rpm) {
     packageName = 'shr'
-    version = '2.6'
+    version = '2.7'
     release = project.hasProperty('release') ? project.release : '1'
     arch = NOARCH
     os = LINUX

@@ -47,9 +47,9 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase {
 
     @Autowired
     @Qualifier("SHRCassandraTemplate")
-    CqlOperations cqlOperations;
+    private CqlOperations cqlOperations;
 
-    QueryUtils queryUtils;
+    private QueryUtils queryUtils;
 
     @Before
     public void setUp() throws Exception {
@@ -216,7 +216,7 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase {
         patient.setAddress(new Address("01", "02", "03", "04", "05"));
 
         Requester createdBy = new Requester("facilityId", null);
-        String encounterContent = asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_local_refs.xml");
+        String encounterContent = asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_local_refs.xml");
         EncounterBundle existingEncounterBundle = createEncounterBundle(encounterId, healthId, Confidentiality.Normal,
                 Confidentiality.Normal, encounterContent, createdBy, encounterRecievedAt);
         encounterRepository.save(existingEncounterBundle, patient).toBlocking().first();
@@ -247,7 +247,7 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase {
         assertEquals(updatedAt.getTime(), TimeUuidUtil.getTimeFromUUID(updatedEncounterRow.getUUID("updated_at")));
         assertEquals(createdBy, new ObjectMapper().readValue(updatedEncounterRow.getString("created_by"), Requester.class));
         assertEquals(updatedBy, new ObjectMapper().readValue(updatedEncounterRow.getString("updated_by"), Requester.class));
-        assertEquals(encounterContent, updatedEncounterRow.getString("content_v2"));
+        assertEquals(encounterContent, updatedEncounterRow.getString("content_v3"));
         assertTrue(resultSet.isExhausted());
 
         Select selectEncByPatientQuery = QueryBuilder
@@ -286,7 +286,7 @@ public class EncounterRepositoryIntegrationTest extends APIIntegrationTestBase {
         assertEquals(1, encHistoryRows.size());
         Row encounterHistoryRow = encHistoryRows.get(0);
         assertEquals(updatedAt.getTime(), TimeUuidUtil.getTimeFromUUID(encounterHistoryRow.getUUID("encounter_updated_at")));
-        assertEquals("v2", encounterHistoryRow.getString("content_format"));
+        assertEquals("v3", encounterHistoryRow.getString("content_format"));
     }
 
     @Test

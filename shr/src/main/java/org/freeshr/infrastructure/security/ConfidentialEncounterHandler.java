@@ -1,11 +1,16 @@
 package org.freeshr.infrastructure.security;
 
-import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.events.EncounterEvent;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.utils.FhirResourceHelper;
-import org.hl7.fhir.instance.model.*;
+import org.hl7.fhir.dstu3.model.Bundle;
+import org.hl7.fhir.dstu3.model.Coding;
+import org.hl7.fhir.dstu3.model.Composition;
+import org.hl7.fhir.dstu3.model.ResourceType;
+import org.hl7.fhir.exceptions.FHIRException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,12 +20,11 @@ import java.util.List;
 @Component
 public class ConfidentialEncounterHandler {
     private FhirFeedUtil fhirFeedUtil;
-    private SHRProperties shrProperties;
+    private final static Logger logger = LoggerFactory.getLogger(ConfidentialEncounterHandler.class);
 
     @Autowired
     public ConfidentialEncounterHandler(FhirFeedUtil fhirFeedUtil, SHRProperties shrProperties) {
         this.fhirFeedUtil = fhirFeedUtil;
-        this.shrProperties = shrProperties;
     }
 
     public List<EncounterEvent> replaceConfidentialEncounterEvents(List<EncounterEvent> encounterEvents) {
@@ -35,65 +39,38 @@ public class ConfidentialEncounterHandler {
     }
 
     private void replaceEncounterBundle(EncounterEvent encounterEvent) {
-        String encounterContent = "";
-        if ("v1".equals(shrProperties.getFhirDocumentSchemaVersion())) {
-            encounterContent = replacedContentWithDstu1(encounterEvent);
-        } else {
-            encounterContent = replacedContentWithDstu2(encounterEvent);
-        }
+        String encounterContent;
+        encounterContent = replacedContentWithDstu2(encounterEvent);
         encounterEvent.getEncounterBundle().setEncounterContent(encounterContent);
     }
 
     private String replacedContentWithDstu2(EncounterEvent encounterEvent) {
         Bundle originalBundle = fhirFeedUtil.parseBundle(encounterEvent.getContent(), "xml");
 
-        ca.uhn.fhir.model.dstu2.resource.Composition originalComposition = originalBundle.getAllPopulatedChildElementsOfType(ca.uhn.fhir.model.dstu2.resource.Composition.class).get(0);
-        ca.uhn.fhir.model.dstu2.resource.Composition composition = new ca.uhn.fhir.model.dstu2.resource.Composition();
+        Composition originalComposition = FhirResourceHelper.findBundleResourcesOfType(originalBundle, Composition.class).get(0);
+        Composition composition = new Composition();
         composition.setSubject(originalComposition.getSubject());
-        composition.setConfidentiality(encounterEvent.getConfidentialityLevel().getLevel());
-        composition.setStatus(originalComposition.getStatusElement());
-        composition.setDate(originalComposition.getDateElement());
+        Composition.DocumentConfidentiality value = null;
+        try {
+            value = Composition.DocumentConfidentiality.fromCode(encounterEvent.getConfidentialityLevel().getLevel());
+        } catch (FHIRException e) {
+            logger.error("Cannot determine confidentiality for %s", encounterEvent.getConfidentialityLevel().getLevel());
+        }
+        composition.setConfidentiality(value);
+        composition.setStatus(originalComposition.getStatus());
+        composition.setDate(originalComposition.getDate());
         composition.setAuthor(originalComposition.getAuthor());
         composition.setType(originalComposition.getType());
         composition.setId(originalComposition.getId());
         composition.setIdentifier(originalComposition.getIdentifier());
 
         Bundle bundle = new Bundle();
-        bundle.setType(originalBundle.getTypeElement());
-        Bundle.Entry entry = bundle.addEntry();
-        Bundle.Entry compositionEntry = FhirResourceHelper.getBundleEntriesForResource(originalBundle, "Composition").get(0);
+        bundle.setType(originalBundle.getType());
+        Bundle.BundleEntryComponent entry = bundle.addEntry();
+        Bundle.BundleEntryComponent compositionEntry = FhirResourceHelper.getBundleEntriesForResource(originalBundle, "Composition").get(0);
         entry.setFullUrl(compositionEntry.getFullUrl());
         entry.setResource(composition);
 
         return fhirFeedUtil.encodeBundle(bundle, "xml");
-    }
-
-    private String replacedContentWithDstu1(EncounterEvent encounterEvent) {
-        org.hl7.fhir.instance.model.Bundle originalFeed = fhirFeedUtil.deSerialize(encounterEvent.getContent());
-
-        org.hl7.fhir.instance.model.Bundle.BundleEntryComponent originalCompositionEntry = fhirFeedUtil.getAtomEntryOfResourceType(originalFeed.getEntry(), ResourceType.Composition);
-        Composition originalComposition = (Composition) originalCompositionEntry.getResource();
-        Composition composition = new Composition();
-        composition.setSubject(originalComposition.getSubject());
-        Coding confidentiality = new Coding();
-        confidentiality.setCode(encounterEvent.getConfidentialityLevel().getLevel());
-        composition.setConfidentiality(confidentiality.getCode());
-        composition.setStatus(originalComposition.getStatus());
-        composition.setDate(originalComposition.getDate());
-        for (Reference resourceReference : originalComposition.getAuthor()) {
-            Reference authorReference = composition.addAuthor();
-            authorReference.setReference(resourceReference.getReference());
-
-        }
-        composition.setType(originalComposition.getType());
-
-        org.hl7.fhir.instance.model.Bundle feed = new org.hl7.fhir.instance.model.Bundle();
-        org.hl7.fhir.instance.model.Bundle.BundleEntryComponent atomEntry = new org.hl7.fhir.instance.model.Bundle.BundleEntryComponent();
-        atomEntry.setResource(composition);
-        atomEntry.setId(originalCompositionEntry.getId());
-        atomEntry.setFullUrl("urn:uuid:" + originalCompositionEntry.getId());
-        feed.getEntry().add(atomEntry);
-
-        return fhirFeedUtil.serialize(feed);
     }
 }

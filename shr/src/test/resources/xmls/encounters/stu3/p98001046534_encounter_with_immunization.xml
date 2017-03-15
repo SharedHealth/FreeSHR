@@ -1,0 +1,149 @@
+<Bundle xmlns="http://hl7.org/fhir">
+    <id value="34e3d0d2-8820-4261-a3d6-1a80a98123d5"/>
+    <meta>
+        <lastUpdated value="2015-09-04T15:11:45.000+05:30"/>
+    </meta>
+    <type value="collection"/>
+    <entry>
+        <fullUrl value="urn:uuid:dfd13a67-77aa-4d2d-bded-77e1adf22187"/>
+        <resource>
+            <Composition xmlns="http://hl7.org/fhir">
+                <id value="dfd13a67-77aa-4d2d-bded-77e1adf22187"/>
+                <identifier>
+                    <value value="urn:uuid:dfd13a67-77aa-4d2d-bded-77e1adf22187"/>
+                </identifier>
+                <status value="final"/>
+                <type>
+                    <coding>
+                        <system value="http://hl7.org/fhir/vs/doc-typecodes"/>
+                        <code value="51899-3"/>
+                        <display value="Details Document"/>
+                        <userSelected value="false"/>
+                    </coding>
+                </type>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <encounter>
+                    <reference value="urn:uuid:5ad37e7b-d800-49d7-9c7d-8872c0612ffb"/>
+                </encounter>
+                <date value="2015-09-04T15:11:45+05:30"/>
+                <author>
+                    <reference value="http://172.18.46.199:8080/api/1.0/facilities/10019841.json"/>
+                </author>
+                <title value="encounter composition for patient 98001046534"/>
+                <confidentiality value="N"/>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:5ad37e7b-d800-49d7-9c7d-8872c0612ffb"/>
+                        <display value="Encounter"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:554e13d9-25f9-4802-8f21-669249bf51be"/>
+                        <display value="Immunization"/>
+                    </entry>
+                </section>
+            </Composition>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:5ad37e7b-d800-49d7-9c7d-8872c0612ffb"/>
+        <resource>
+            <Encounter xmlns="http://hl7.org/fhir">
+                <id value="5ad37e7b-d800-49d7-9c7d-8872c0612ffb"/>
+                <identifier>
+                    <value value="urn:uuid:5ad37e7b-d800-49d7-9c7d-8872c0612ffb"/>
+                </identifier>
+                <status value="finished"/>
+                <class>
+                    <system value="http://hl7.org/fhir/v3/ActCode"/>
+                    <code value="AMB"/>
+                </class>
+                <type>
+                    <text value="OPD"/>
+                </type>
+                <subject>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <participant>
+                    <individual>
+                        <reference value="http://172.18.46.199:8080/api/1.0/providers/18.json"/>
+                    </individual>
+                </participant>
+                <serviceProvider>
+                    <reference value="http://172.18.46.199:8080/api/1.0/facilities/10019841.json"/>
+                </serviceProvider>
+            </Encounter>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:554e13d9-25f9-4802-8f21-669249bf51be"/>
+        <resource>
+            <Immunization xmlns="http://hl7.org/fhir">
+                <id value="554e13d9-25f9-4802-8f21-669249bf51be"/>
+                <identifier>
+                    <value value="urn:uuid:554e13d9-25f9-4802-8f21-669249bf51be"/>
+                </identifier>
+                <notGiven value="false"/>
+                <vaccineCode>
+                    <coding>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/28c3c784-c0bf-4cae-bd26-ca76a384085a"/>
+                        <code value="28c3c784-c0bf-4cae-bd26-ca76a384085a"/>
+                        <display value="BCG"/>
+                        <userSelected value="false"/>
+                    </coding>
+                </vaccineCode>
+                <patient>
+                    <reference value="http://172.18.46.199:8081/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </patient>
+                <encounter>
+                    <reference value="urn:uuid:5ad37e7b-d800-49d7-9c7d-8872c0612ffb"/>
+                </encounter>
+                <date value="2015-09-03T00:00:00+05:30"/>
+                <primarySource value="false"/>
+                <doseQuantity>
+                    <value value="20.0"/>
+                    <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/invalid-code"/>
+                    <code value="invalid-code"/>
+                </doseQuantity>
+                <practitioner>
+                    <role>
+                        <coding>
+                            <system value="http://hl7.org/fhir/v2/0443"/>
+                            <code value="AP"/>
+                        </coding>
+                    </role>
+                    <actor>
+                        <reference value="http://172.18.46.199:8080/api/1.0/providers/19.json"/>
+                    </actor>
+                </practitioner>
+                <practitioner>
+                    <role>
+                        <coding>
+                            <system value="http://hl7.org/fhir/v2/0443"/>
+                            <code value="OP"/>
+                        </coding>
+                    </role>
+                    <actor>
+                        <reference value="http://172.18.46.199:8080/api/1.0/providers/18.json"/>
+                    </actor>
+                </practitioner>
+                <explanation>
+                    <reason>
+                        <coding>
+                            <system value="http://172.18.46.199:9080/openmrs/ws/rest/v1/tr/vs/Immunization-Reason"/>
+                            <code value="281657000"/>
+                            <display value="Travel vaccinations"/>
+                            <userSelected value="false"/>
+                        </coding>
+                    </reason>
+                </explanation>
+            </Immunization>
+        </resource>
+    </entry>
+</Bundle>

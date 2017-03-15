@@ -10,14 +10,9 @@ import java.io.IOException;
 import java.util.Map;
 
 public class TestMigrations extends Migrations {
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TestMigrations.class);
-
-    private static final String MUTAGEN_CONNECTION_POOL_NAME = "shrMigrationConnectionPool";
-
     public TestMigrations(Map<String, String> env) {
         super(env);
     }
-
 
     @Override
     protected Cluster connectCluster() {

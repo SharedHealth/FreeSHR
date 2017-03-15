@@ -102,7 +102,7 @@ public class PatientEncounterController extends ShrController {
 
     @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER', 'ROLE_SHR_PATIENT', 'ROLE_SHR System Admin')")
     @RequestMapping(value = "/{healthId}/encounters", method = RequestMethod.GET,
-            produces = {"application/json","application/atom+xml"})
+            produces = {"application/json", "application/atom+xml"})
     public DeferredResult<EncounterSearchResponse> findEncounterFeedForPatient(
             final HttpServletRequest request,
             @PathVariable final String healthId,
@@ -122,7 +122,7 @@ public class PatientEncounterController extends ShrController {
 
             String mergedWith = patientService.getPatientMergedWith(healthId);
             if (mergedWith != null) {
-                deferredResult.setErrorResult(new Redirect(String.format("%s has been moved and replaced with %s",healthId, mergedWith)));
+                deferredResult.setErrorResult(new Redirect(String.format("%s has been moved and replaced with %s", healthId, mergedWith)));
                 return deferredResult;
             }
 
@@ -177,26 +177,26 @@ public class PatientEncounterController extends ShrController {
             Observable<EncounterBundle> observable = patientEncounterService.findEncounter(healthId,
                     encounterId).firstOrDefault(null);
             observable.subscribe(new Action1<EncounterBundle>() {
-                 @Override
-                 public void call(EncounterBundle encounterBundle) {
-                     if (encounterBundle != null) {
-                         if ((isRestrictedAccess == null || isRestrictedAccess) && encounterBundle.isConfidential()) {
-                             deferredResult.setErrorResult(new Forbidden(format("Access is denied to user %s for encounter %s",
-                                     userInfo.getProperties().getId(), encounterId)));
-                         } else {
-                             deferredResult.setResult(encounterBundle);
-                         }
-                     } else {
-                         deferredResult.setErrorResult(new ResourceNotFound(format("Encounter %s not found", encounterId)));
-                     }
-                 }
-             },
-            new Action1<Throwable>() {
-                @Override
-                public void call(Throwable throwable) {
-                    deferredResult.setErrorResult(throwable);
-                }
-            });
+                                     @Override
+                                     public void call(EncounterBundle encounterBundle) {
+                                         if (encounterBundle != null) {
+                                             if ((isRestrictedAccess == null || isRestrictedAccess) && encounterBundle.isConfidential()) {
+                                                 deferredResult.setErrorResult(new Forbidden(format("Access is denied to user %s for encounter %s",
+                                                         userInfo.getProperties().getId(), encounterId)));
+                                             } else {
+                                                 deferredResult.setResult(encounterBundle);
+                                             }
+                                         } else {
+                                             deferredResult.setErrorResult(new ResourceNotFound(format("Encounter %s not found", encounterId)));
+                                         }
+                                     }
+                                 },
+                    new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            deferredResult.setErrorResult(throwable);
+                        }
+                    });
         } catch (Exception e) {
             logger.error(e.getMessage());
             deferredResult.setErrorResult(e);
@@ -204,7 +204,7 @@ public class PatientEncounterController extends ShrController {
         return deferredResult;
     }
 
-    private Action1<Throwable>  errorCallback(final DeferredResult<EncounterResponse> deferredResult) {
+    private Action1<Throwable> errorCallback(final DeferredResult<EncounterResponse> deferredResult) {
         return new Action1<Throwable>() {
             @Override
             public void call(Throwable error) {

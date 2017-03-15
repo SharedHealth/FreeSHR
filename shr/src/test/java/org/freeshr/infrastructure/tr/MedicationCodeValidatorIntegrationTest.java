@@ -1,11 +1,11 @@
 package org.freeshr.infrastructure.tr;
 
-import ca.uhn.fhir.model.dstu2.composite.CodingDt;
-import ca.uhn.fhir.model.dstu2.resource.Medication;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.freeshr.config.SHRConfig;
 import org.freeshr.config.SHREnvironmentMock;
 import org.freeshr.utils.FhirFeedUtil;
+import org.hl7.fhir.dstu3.model.Coding;
+import org.hl7.fhir.dstu3.model.Medication;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.junit.Rule;
 import org.junit.Test;
@@ -104,7 +104,7 @@ public class MedicationCodeValidatorIntegrationTest {
     public void shouldParseMedicationResource() {
         IBaseResource resource = feedUtil.getFhirContext().newJsonParser().parseResource(asString("jsons/medication_paracetamol.json"));
         assertTrue(resource instanceof Medication);
-        List<CodingDt> codings = ((Medication) resource).getCode().getCoding();
+        List<Coding> codings = ((Medication) resource).getCode().getCoding();
         assertEquals(2, codings.size());
 
     }

@@ -43,7 +43,7 @@ public class PatientEncounterServiceTest {
         mockPatientService = mock(PatientService.class);
         SHRProperties mockShrProperties = mock(SHRProperties.class);
         mockHapiEncounterValidator = mock(HapiEncounterValidator.class);
-        when(mockShrProperties.getFhirDocumentSchemaVersion()).thenReturn("v2");
+        when(mockShrProperties.getFhirDocumentSchemaVersion()).thenReturn("v3");
         patientEncounterService = new PatientEncounterService(mockEncounterRepository, mockPatientService,
                 mockHapiEncounterValidator, new FhirFeedUtil(), mockShrProperties);
     }
@@ -272,7 +272,7 @@ public class PatientEncounterServiceTest {
         EncounterBundle bundle = new EncounterBundle();
         bundle.setHealthId(healthId);
         bundle.setEncounterId(encounterId);
-        bundle.setEncounterContent(asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml"));
+        bundle.setEncounterContent(asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses.xml"));
         return bundle;
     }
 

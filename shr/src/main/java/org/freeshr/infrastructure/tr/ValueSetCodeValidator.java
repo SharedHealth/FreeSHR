@@ -3,7 +3,8 @@ package org.freeshr.infrastructure.tr;
 
 import org.freeshr.config.SHRProperties;
 import org.freeshr.utils.StringUtils;
-import org.hl7.fhir.instance.model.ValueSet;
+import org.hl7.fhir.dstu3.model.CodeSystem;
+import org.hl7.fhir.dstu3.model.ValueSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,17 +48,16 @@ public class ValueSetCodeValidator implements CodeValidator {
             public Boolean call(ResponseEntity<String> stringResponseEntity) {
                 try {
                     String content = stringResponseEntity.getBody();
-                    ValueSet valueSet = vsBuilder.deSerializeValueSet(content, system);
-                    ValueSet.ValueSetCodeSystemComponent codeSystem = valueSet.getCodeSystem();
+                    CodeSystem codeSystem = vsBuilder.deserializeValueSetAndGetCodeSystem(content, system);
+
                     boolean isCaseSensitive = codeSystem.getCaseSensitive();
                     ConceptMatcher conceptMatcher = getConceptMatcher(isCaseSensitive);
 
-                    for (ValueSet.ConceptDefinitionComponent concept : codeSystem.getConcept()) {
+                    for (CodeSystem.ConceptDefinitionComponent concept : codeSystem.getConcept()) {
                         if (conceptMatcher.isMatching(concept.getCode(), code)) {
                             return true;
                         }
                     }
-
                     return false;
 
 

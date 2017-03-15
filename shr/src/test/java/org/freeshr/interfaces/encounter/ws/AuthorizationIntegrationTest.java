@@ -108,7 +108,7 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .accept(MediaType.APPLICATION_ATOM_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_local_refs.xml")))
+                .content(asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_local_refs.xml")))
                 .andExpect(status().isOk())
                 .andExpect(request()
                 .asyncResult(new InstanceOf(EncounterResponse.class)));
@@ -133,7 +133,7 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .accept(MediaType.APPLICATION_ATOM_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses_with_local_refs.xml")))
+                .content(asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_local_refs.xml")))
                 .andExpect(status().isOk())
                 .andExpect(request().asyncResult(new InstanceOf(EncounterResponse.class)));
     }
@@ -157,7 +157,7 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .accept(MediaType.APPLICATION_ATOM_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml")))
+                .content(asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses.xml")))
                 .andExpect(status().isForbidden());
     }
 
@@ -180,7 +180,7 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
                 .accept(MediaType.APPLICATION_ATOM_XML)
                 .contentType(MediaType.APPLICATION_XML)
                 .characterEncoding(Charsets.UTF_8.name())
-                .content(asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml")))
+                .content(asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses.xml")))
                 .andExpect(status().isForbidden());
     }
 
@@ -490,14 +490,14 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
         Patient patient = createPatient(healthId, division, district);
 
         final Requester createdBy = new Requester("facilityId", "providerId");
-        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, Normal, Normal, asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml"), createdBy, new Date()), patient);
+        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, Normal, Normal, asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses.xml"), createdBy, new Date()), patient);
     }
 
     private void createConfidentialEncounter(String healthId) throws Exception {
         Patient patient = createPatient(healthId, DATASENSE_REGISTERED_DIVISION, DATASENSE_REGISTERED_DISTRICT);
 
         final Requester createdBy = new Requester("facilityId", "providerId");
-        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, VeryRestricted, Normal, asString("xmls/encounters/dstu2/p98001046534_encounter_with_diagnoses.xml"), createdBy, new Date()), patient);
+        createEncounter(createEncounterBundle(ENCOUNTER_ID, healthId, VeryRestricted, Normal, asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses.xml"), createdBy, new Date()), patient);
     }
 
     private Patient createPatient(String healthId, String division, String district) {

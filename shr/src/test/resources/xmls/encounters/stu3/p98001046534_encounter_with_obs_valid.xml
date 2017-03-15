@@ -1,0 +1,152 @@
+<Bundle xmlns="http://hl7.org/fhir">
+    <id value="61e7f549-6903-4bb0-84ba-1a8a70f46c18"/>
+    <meta>
+        <lastUpdated value="2015-12-30T19:46:11.000+05:30"/>
+    </meta>
+    <type value="collection"/>
+    <entry>
+        <fullUrl value="urn:uuid:090b7d99-8c80-4338-89af-7dd2a90c2de8"/>
+        <resource>
+            <Composition xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:uuid:090b7d99-8c80-4338-89af-7dd2a90c2de8"/>
+                </identifier>
+                <status value="final"/>
+                <type>
+                    <coding>
+                        <system value="http://hl7.org/fhir/vs/doc-typecodes"/>
+                        <code value="51899-3"/>
+                        <display value="Details Document"/>
+                        <userSelected value="false"/>
+                    </coding>
+                </type>
+                <subject>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <encounter>
+                    <reference value="urn:uuid:565df4c2-1ac9-499e-95f6-6fab9358f313"/>
+                </encounter>
+                <date value="2015-12-30T19:46:11+05:30"/>
+                <author>
+                    <reference value="http://localhost:9997/facilities/10019841.json"/>
+                </author>
+                <title value="Patient Clinical Encounter"/>
+                <confidentiality value="N"/>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:565df4c2-1ac9-499e-95f6-6fab9358f313"/>
+                        <display value="Encounter"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:56ac6acd-8fa6-4769-a082-460fc92d4ed7"/>
+                        <display value="Temperature"/>
+                    </entry>
+                </section>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:2a90bef6-6bf7-461c-82a6-1bbd94093b1d"/>
+                        <display value="Vitals"/>
+                    </entry>
+                </section>
+            </Composition>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:565df4c2-1ac9-499e-95f6-6fab9358f313"/>
+        <resource>
+            <Encounter xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:uuid:565df4c2-1ac9-499e-95f6-6fab9358f313"/>
+                </identifier>
+                <status value="finished"/>
+                <class>
+                    <system value="http://hl7.org/fhir/v3/ActCode"/>
+                    <code value="AMB"/>
+                </class>
+                <type>
+                    <text value="Consultation"/>
+                </type>
+                <subject>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <participant>
+                    <individual>
+                        <reference value="http://localhost:9997/providers/24.json"/>
+                    </individual>
+                </participant>
+                <serviceProvider>
+                    <reference value="http://localhost:9997/facilities/10019841.json"/>
+                </serviceProvider>
+            </Encounter>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:56ac6acd-8fa6-4769-a082-460fc92d4ed7"/>
+        <resource>
+            <Observation xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:uuid:56ac6acd-8fa6-4769-a082-460fc92d4ed7"/>
+                </identifier>
+                <status value="preliminary"/>
+                <code>
+                    <coding>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/concepts/5dd8f02e-3cda-40f2-9c70-b1a9c91ff1da"/>
+                        <code value="5dd8f02e-3cda-40f2-9c70-b1a9c91ff1da"/>
+                        <display value="Temperature"/>
+                        <userSelected value="false"/>
+                    </coding>
+                </code>
+                <subject>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <context>
+                    <reference value="urn:uuid:565df4c2-1ac9-499e-95f6-6fab9358f313"/>
+                </context>
+                <performer>
+                    <reference value="http://localhost:9997/providers/24.json"/>
+                </performer>
+                <valueQuantity>
+                    <value value="98.0"/>
+                </valueQuantity>
+            </Observation>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:2a90bef6-6bf7-461c-82a6-1bbd94093b1d"/>
+        <resource>
+            <Observation xmlns="http://hl7.org/fhir">
+                <identifier>
+                    <value value="urn:uuid:2a90bef6-6bf7-461c-82a6-1bbd94093b1d"/>
+                </identifier>
+                <status value="preliminary"/>
+                <code>
+                    <coding>
+                        <display value="Vitals"/>
+                        <userSelected value="false"/>
+                    </coding>
+                </code>
+                <subject>
+                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
+                    <display value="98001046534"/>
+                </subject>
+                <context>
+                    <reference value="urn:uuid:565df4c2-1ac9-499e-95f6-6fab9358f313"/>
+                </context>
+                <performer>
+                    <reference value="http://localhost:9997/providers/24.json"/>
+                </performer>
+                <related>
+                    <type value="has-member"/>
+                    <target>
+                        <reference value="urn:uuid:56ac6acd-8fa6-4769-a082-460fc92d4ed7"/>
+                    </target>
+                </related>
+            </Observation>
+        </resource>
+    </entry>
+</Bundle>
