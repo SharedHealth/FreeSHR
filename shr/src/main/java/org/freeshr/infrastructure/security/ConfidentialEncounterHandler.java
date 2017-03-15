@@ -1,11 +1,11 @@
 package org.freeshr.infrastructure.security;
 
-import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.events.EncounterEvent;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.utils.FhirResourceHelper;
-import org.hl7.fhir.instance.model.*;
+import org.hl7.fhir.dstu3.model.Bundle;
+import org.hl7.fhir.dstu3.model.Composition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -47,7 +47,7 @@ public class ConfidentialEncounterHandler {
     private String replacedContentWithDstu2(EncounterEvent encounterEvent) {
         Bundle originalBundle = fhirFeedUtil.parseBundle(encounterEvent.getContent(), "xml");
 
-        ca.uhn.fhir.model.dstu2.resource.Composition originalComposition = originalBundle.getAllPopulatedChildElementsOfType(ca.uhn.fhir.model.dstu2.resource.Composition.class).get(0);
+        Composition originalComposition = originalBundle.getAllPopulatedChildElementsOfType(ca.uhn.fhir.model.dstu2.resource.Composition.class).get(0);
         ca.uhn.fhir.model.dstu2.resource.Composition composition = new ca.uhn.fhir.model.dstu2.resource.Composition();
         composition.setSubject(originalComposition.getSubject());
         composition.setConfidentiality(encounterEvent.getConfidentialityLevel().getLevel());

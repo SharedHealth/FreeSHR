@@ -1,6 +1,6 @@
 package org.freeshr.validations;
 
-import org.hl7.fhir.instance.validation.ValidationMessage;
+import org.hl7.fhir.dstu3.validation.ValidationMessage;
 
 import java.util.List;
 

@@ -2,17 +2,13 @@ package org.freeshr.validations.resource;
 
 
 import ca.uhn.fhir.model.api.IDatatype;
-import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
-import ca.uhn.fhir.model.dstu2.composite.CodingDt;
-import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
-import ca.uhn.fhir.model.dstu2.composite.SimpleQuantityDt;
-import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import org.freeshr.application.fhir.TRConceptValidator;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.validations.Severity;
 import org.freeshr.validations.ShrValidationMessage;
 import org.freeshr.validations.SubResourceValidator;
-import org.hl7.fhir.instance.hapi.validation.IValidationSupport;
+import org.hl7.fhir.dstu3.hapi.validation.IValidationSupport;
+import org.hl7.fhir.dstu3.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,12 +44,12 @@ public class MedicationOrderValidator implements SubResourceValidator {
 
     @Override
     public boolean validates(Object resource) {
-        return resource instanceof ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
+        return resource instanceof MedicationRequest;
     }
 
     @Override
     public List<ShrValidationMessage> validate(Object resource) {
-        ca.uhn.fhir.model.dstu2.resource.MedicationOrder medicationOrder = (ca.uhn.fhir.model.dstu2.resource.MedicationOrder) resource;
+        MedicationRequest medicationOrder = (MedicationRequest) resource;
         List<ShrValidationMessage> validationMessages = new ArrayList<>();
 
         validationMessages.addAll(validateMedication(medicationOrder));
@@ -66,37 +62,37 @@ public class MedicationOrderValidator implements SubResourceValidator {
         return validationMessages;
     }
 
-    private Collection<? extends ShrValidationMessage> validateDispenseMedication(ca.uhn.fhir.model.dstu2.resource.MedicationOrder medicationOrder) {
+    private Collection<? extends ShrValidationMessage> validateDispenseMedication(MedicationRequest medicationOrder) {
         if (medicationOrder.getDispenseRequest() != null) {
-            IDatatype medicine = medicationOrder.getDispenseRequest().getMedication();
-            if (medicine == null || !(medicine instanceof CodeableConceptDt)) {
+            IDatatype medicine = medicationOrder.getMedication();
+            if (medicine == null || !(medicine instanceof CodeableConcept)) {
                 return new ArrayList<>();
             }
 
-            CodeableConceptDt medicationCoding = ((CodeableConceptDt) medicine);
+            CodeableConcept medicationCoding = ((CodeableConcept) medicine);
 
             return validateCodeableConcept(medicationCoding, MEDICATION_ORDER_DISPENSE_MEDICATION_LOCATION);
         }
         return new ArrayList<>();
     }
 
-    private Collection<? extends ShrValidationMessage> validateDispenseQuantity(MedicationOrder medicationOrder) {
-        SimpleQuantityDt dispenseQuantity = medicationOrder.getDispenseRequest().getQuantity();
+    private Collection<? extends ShrValidationMessage> validateDispenseQuantity(MedicationRequest medicationOrder) {
+        SimpleQuantity dispenseQuantity = medicationOrder.getDispenseRequest().getQuantity();
         if (dispenseQuantity != null) {
             return validateQuantity(dispenseQuantity, MEDICATION_ORDER_DISPENSE_QUANTITY_LOCATION);
         }
         return null;
     }
 
-    private Collection<? extends ShrValidationMessage> validateDosageInstructionDosageQuantity(ca.uhn.fhir.model.dstu2.resource.MedicationOrder medicationOrder) {
-        List<ca.uhn.fhir.model.dstu2.resource.MedicationOrder.DosageInstruction> instructions = medicationOrder.getDosageInstruction();
+    private Collection<? extends ShrValidationMessage> validateDosageInstructionDosageQuantity(MedicationRequest medicationOrder) {
+        List<DosageInstruction> instructions = medicationOrder.getDosageInstruction();
 
 
-        for (ca.uhn.fhir.model.dstu2.resource.MedicationOrder.DosageInstruction instruction : instructions) {
+        for (DosageInstruction instruction : instructions) {
             IDatatype dose = instruction.getDose();
 
             if (dose instanceof QuantityDt) {
-                return validateQuantity((QuantityDt) dose, MEDICATION_DOSE_INSTRUCTION_LOCATION);
+                return validateQuantity((Quantity) dose, MEDICATION_DOSE_INSTRUCTION_LOCATION);
             }
         }
         return new ArrayList<>();

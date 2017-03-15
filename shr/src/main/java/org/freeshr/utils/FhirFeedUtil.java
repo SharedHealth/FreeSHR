@@ -1,9 +1,7 @@
 package org.freeshr.utils;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.dstu2.resource.Bundle;
-import org.hl7.fhir.instance.model.Resource;
-import org.hl7.fhir.instance.model.ResourceType;
+import org.hl7.fhir.dstu3.model.Bundle;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,36 +12,36 @@ public class FhirFeedUtil {
     //TODO initialize when needed.
     private FhirContext fhirContext = FhirContext.forDstu2();
 
-    public org.hl7.fhir.instance.model.Bundle deSerialize(String xml) {
-        try {
-//            return new XmlParser(true).parseGeneral(new ByteArrayInputStream(xml.getBytes())).getFeed();
-            return null;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public String serialize(org.hl7.fhir.instance.model.Bundle feed) {
-//        XmlComposer composer = new XmlComposer();
-//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//    public org.hl7.fhir.instance.model.Bundle deSerialize(String xml) {
 //        try {
-//            composer.compose(byteArrayOutputStream, feed, true);
+////            return new XmlParser(true).parseGeneral(new ByteArrayInputStream(xml.getBytes())).getFeed();
+//            return null;
 //        } catch (Exception e) {
 //            throw new RuntimeException(e);
 //        }
-//        return byteArrayOutputStream.toString();
-        return null;
-    }
+//    }
 
-    public org.hl7.fhir.instance.model.Bundle.BundleEntryComponent getAtomEntryOfResourceType(List<org.hl7.fhir.instance.model.Bundle.BundleEntryComponent> entryList, ResourceType resourceType) {
-        for (org.hl7.fhir.instance.model.Bundle.BundleEntryComponent bundleEntryComponent : entryList) {
-            Resource resource = bundleEntryComponent.getResource();
-            if (resource.getResourceType().equals(resourceType)) {
-                return bundleEntryComponent;
-            }
-        }
-        return null;
-    }
+//    public String serialize(org.hl7.fhir.instance.model.Bundle feed) {
+////        XmlComposer composer = new XmlComposer();
+////        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+////        try {
+////            composer.compose(byteArrayOutputStream, feed, true);
+////        } catch (Exception e) {
+////            throw new RuntimeException(e);
+////        }
+////        return byteArrayOutputStream.toString();
+//        return null;
+//    }
+
+//    public org.hl7.fhir.instance.model.Bundle.BundleEntryComponent getAtomEntryOfResourceType(List<org.hl7.fhir.instance.model.Bundle.BundleEntryComponent> entryList, ResourceType resourceType) {
+//        for (org.hl7.fhir.instance.model.Bundle.BundleEntryComponent bundleEntryComponent : entryList) {
+//            Resource resource = bundleEntryComponent.getResource();
+//            if (resource.getResourceType().equals(resourceType)) {
+//                return bundleEntryComponent;
+//            }
+//        }
+//        return null;
+//    }
 
     public Bundle parseBundle(String content, String type) {
         if (type.equals("xml")) {

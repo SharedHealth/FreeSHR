@@ -1,13 +1,13 @@
 package org.freeshr.validations;
 
-import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.validation.*;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.TRConceptValidator;
 import org.freeshr.utils.FhirFeedUtil;
 import org.freeshr.validations.resource.ShrProfileValidationSupport;
-import org.hl7.fhir.instance.hapi.validation.FhirInstanceValidator;
-import org.hl7.fhir.instance.hapi.validation.ValidationSupportChain;
+import org.hl7.fhir.dstu3.hapi.validation.FhirInstanceValidator;
+import org.hl7.fhir.dstu3.hapi.validation.ValidationSupportChain;
+import org.hl7.fhir.dstu3.model.Bundle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
