@@ -1,11 +1,12 @@
 package org.freeshr.validations.resource;
 
 
+import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.application.fhir.TRConceptValidator;
 import org.freeshr.utils.FhirFeedUtil;
-import org.hl7.fhir.dstu3.hapi.validation.IValidationSupport;
-import org.hl7.fhir.dstu3.model.Quantity;
+import org.hl7.fhir.instance.hapi.validation.IValidationSupport;
+import org.hl7.fhir.instance.model.Quantity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,11 +33,11 @@ public class DoseQuantityValidator {
         return conceptValidator.validateCode(fhirFeedUtil.getFhirContext(), doseQuantity.getSystem(), doseQuantity.getCode(), DOSE_QUANTITY);
     }
 
-    public boolean hasReferenceUrlAndCode(Quantity doseQuantity) {
+    public boolean hasReferenceUrlAndCode(QuantityDt doseQuantity) {
         return doseQuantity != null && isNotEmpty(doseQuantity.getSystem()) && isNotEmpty(doseQuantity.getCode());
     }
 
-    public IValidationSupport.CodeValidationResult validate(Quantity doseQuantity) {
+    public IValidationSupport.CodeValidationResult validate(QuantityDt doseQuantity) {
         if (StringUtils.isNotBlank(doseQuantity.getSystem())) {
             if (conceptValidator.isCodeSystemSupported(fhirFeedUtil.getFhirContext(), doseQuantity.getSystem())) {
                 return conceptValidator.validateCode(fhirFeedUtil.getFhirContext(), doseQuantity.getSystem(), doseQuantity.getCode(), doseQuantity.getUnit());

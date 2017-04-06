@@ -1,6 +1,5 @@
 package org.freeshr.validations;
 
-import org.hl7.fhir.dstu3.validation.ValidationMessage;
 import org.hl7.fhir.instance.model.Bundle;
 import org.hl7.fhir.instance.model.Resource;
 import org.hl7.fhir.instance.validation.ValidationMessage;

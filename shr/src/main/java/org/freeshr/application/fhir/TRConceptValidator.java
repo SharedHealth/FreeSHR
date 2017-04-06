@@ -4,8 +4,11 @@ import ca.uhn.fhir.context.FhirContext;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.infrastructure.tr.TerminologyServer;
-import org.hl7.fhir.dstu3.hapi.validation.IValidationSupport;
-import org.hl7.fhir.dstu3.model.*;
+import org.hl7.fhir.instance.hapi.validation.IValidationSupport;
+import org.hl7.fhir.instance.model.Enumerations;
+import org.hl7.fhir.instance.model.OperationOutcome;
+import org.hl7.fhir.instance.model.ValueSet;
+import org.hl7.fhir.instance.model.ValueSet.ValueSetExpansionComponent;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +17,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
-import java.util.List;
 
 
 @Component
@@ -38,17 +40,12 @@ public class TRConceptValidator implements IValidationSupport {
     }
 
     @Override
-    public ValueSet.ValueSetExpansionComponent expandValueSet(FhirContext theContext, ValueSet.ConceptSetComponent theInclude) {
+    public ValueSetExpansionComponent expandValueSet(FhirContext theContext, ValueSet.ConceptSetComponent theInclude) {
         return null;
     }
 
     @Override
-    public List<StructureDefinition> fetchAllStructureDefinitions(FhirContext theContext) {
-        return null;
-    }
-
-    @Override
-    public CodeSystem fetchCodeSystem(FhirContext theContext, String theSystem) {
+    public ValueSet fetchCodeSystem(FhirContext theContext, String theSystem) {
         return null;
     }
 
@@ -60,18 +57,13 @@ public class TRConceptValidator implements IValidationSupport {
             String theSystem = map.get(theUri);
             ValueSet valueSet = new ValueSet();
             valueSet.setUrl(theUri);
-            valueSet.setStatus(Enumerations.PublicationStatus.DRAFT);
+            valueSet.setStatus(Enumerations.ConformanceResourceStatus.DRAFT);
             ValueSet.ValueSetComposeComponent valueSetComposeComponent = new ValueSet.ValueSetComposeComponent();
             valueSetComposeComponent.addInclude().setSystem(theSystem);
             valueSet.setCompose(valueSetComposeComponent);
             baseResource = valueSet;
         }
         return (T) baseResource;
-    }
-
-    @Override
-    public StructureDefinition fetchStructureDefinition(FhirContext theCtx, String theUrl) {
-        return null;
     }
 
 
@@ -94,7 +86,7 @@ public class TRConceptValidator implements IValidationSupport {
         try {
             Boolean result = terminologyServer.isValid(system, code).toBlocking().first();
             if (result != null && result.booleanValue()) {
-                CodeSystem.ConceptDefinitionComponent def = new CodeSystem.ConceptDefinitionComponent();
+                ValueSet.ConceptDefinitionComponent def = new ValueSet.ConceptDefinitionComponent();
                 def.setDefinition(system);
                 def.setCode(code);
                 def.setDisplay(display);

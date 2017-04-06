@@ -2,10 +2,23 @@ package org.freeshr.validations.bundle;
 
 
 import ca.uhn.fhir.model.api.IResource;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
+import ca.uhn.fhir.model.dstu2.resource.BaseResource;
+import ca.uhn.fhir.model.dstu2.resource.Bundle;
+import ca.uhn.fhir.model.dstu2.resource.Composition;
+import ca.uhn.fhir.model.dstu2.resource.Condition;
+import ca.uhn.fhir.model.dstu2.resource.DiagnosticOrder;
+import ca.uhn.fhir.model.dstu2.resource.DiagnosticReport;
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.dstu2.resource.FamilyMemberHistory;
+import ca.uhn.fhir.model.dstu2.resource.Immunization;
+import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
+import ca.uhn.fhir.model.dstu2.resource.Observation;
+import ca.uhn.fhir.model.dstu2.resource.Procedure;
+import ca.uhn.fhir.model.dstu2.resource.Specimen;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.utils.StringUtils;
 import org.freeshr.validations.*;
-import org.hl7.fhir.dstu3.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,15 +52,15 @@ public class HealthIdValidator implements ShrValidator<EncounterValidationContex
         Bundle bundle = validationContext.getBundle();
         String expectedHealthId = validationContext.getHealthId();
         List<ShrValidationMessage> validationMessages = new ArrayList<>();
-        for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-            IResource resource = (IResource) entry.getResource();
+        for (Bundle.Entry entry : bundle.getEntry()) {
+            IResource resource = entry.getResource();
             if (!PatientReferenceIdentifier.canIdentify(resource)) {
                 continue;
             }
-            Reference patientRef = PatientReferenceIdentifier.identifyPatientReference(resource);
+            ResourceReferenceDt patientRef = PatientReferenceIdentifier.identifyPatientReference(resource);
             String patientRefUrl = getPatientRefUrl(patientRef);
 
-            if ((resource instanceof Composition) && (patientRefUrl == null)) {
+            if ((resource instanceof  Composition) && (patientRefUrl == null)) {
                 logger.error(String.format("Encounter failed for %s", HEALTH_ID_NOT_PRESENT_IN_COMPOSITION));
                 ShrValidationMessage message = new ShrValidationMessage(Severity.ERROR, "f:Composition/f:subject",
                         "invalid", "Composition:" + HEALTH_ID_NOT_PRESENT_IN_COMPOSITION);
@@ -60,16 +73,16 @@ public class HealthIdValidator implements ShrValidator<EncounterValidationContex
                 logger.debug(String.format("Encounter failed for %s", HEALTH_ID_NOT_MATCH));
                 ShrValidationMessage message = new ShrValidationMessage(Severity.ERROR,
                         String.format("f:%s/f:patient", resource.getResourceName()),"invalid",
-                        patientRef.getReference() + ":" + HEALTH_ID_NOT_MATCH);
+                        patientRef.getReference().getValue()  + ":" + HEALTH_ID_NOT_MATCH);
                 validationMessages.add(message);
             }
         }
         return validationMessages;
     }
 
-    private String getPatientRefUrl(Reference patientRef) {
+    private String getPatientRefUrl(ResourceReferenceDt patientRef) {
         if ((patientRef == null) || (patientRef.getReference() == null)) return null;
-        return patientRef.getReference();
+        return patientRef.getReference().getValue();
     }
 
     public String validateAndIdentifyPatientId(String patientRefUrl, String healthId) {
@@ -85,28 +98,28 @@ public class HealthIdValidator implements ShrValidator<EncounterValidationContex
     }
 
     public static class PatientReferenceIdentifier {
-        public static List<Class<? extends DomainResource>> supportedTypes = Arrays.asList(Composition.class, Encounter.class, Condition.class, FamilyMemberHistory.class,
-                Observation.class, DiagnosticRequest.class, DiagnosticReport.class, Specimen.class,
-                Immunization.class, Procedure.class, MedicationRequest.class);
+        public static List<Class<? extends BaseResource>> supportedTypes = Arrays.asList(Composition.class, Encounter.class, Condition.class, FamilyMemberHistory.class,
+                Observation.class, DiagnosticOrder.class, DiagnosticReport.class, Specimen.class,
+                Immunization.class, Procedure.class, MedicationOrder.class);
 
         public static boolean canIdentify(IResource resource) {
             return supportedTypes.contains(resource.getClass());
         }
 
-        public static Reference identifyPatientReference(IResource resource) {
-            Reference patientRef = null;
+        public static ResourceReferenceDt identifyPatientReference(IResource resource) {
+            ResourceReferenceDt patientRef = null;
             if (resource instanceof Composition) {
                 patientRef = ((Composition) resource).getSubject();
             } else if (resource instanceof Encounter) {
                 patientRef = ((Encounter) resource).getPatient();
             } else if (resource instanceof Condition) {
-                patientRef = ((Condition) resource).getSubject();
+                patientRef = ((Condition) resource).getPatient();
             } else if (resource instanceof FamilyMemberHistory) {
                 patientRef = ((FamilyMemberHistory) resource).getPatient();
             } else if (resource instanceof Observation) {
                 patientRef = ((Observation) resource).getSubject();
-            } else if (resource instanceof DiagnosticRequest) {
-                patientRef = ((DiagnosticRequest) resource).getSubject();
+            } else if (resource instanceof DiagnosticOrder) {
+                patientRef = ((DiagnosticOrder) resource).getSubject();
             } else if (resource instanceof DiagnosticReport) {
                 patientRef = ((DiagnosticReport) resource).getSubject();
             } else if (resource instanceof Specimen) {
@@ -115,8 +128,8 @@ public class HealthIdValidator implements ShrValidator<EncounterValidationContex
                 patientRef = ((Immunization) resource).getPatient();
             } else if (resource instanceof Procedure) {
                 patientRef = ((Procedure) resource).getSubject();
-            } else if (resource instanceof MedicationRequest) {
-                patientRef = ((MedicationRequest) resource).getPatient();
+            } else if (resource instanceof MedicationOrder) {
+                patientRef = ((MedicationOrder) resource).getPatient();
             }
             return patientRef;
         }

@@ -3,7 +3,7 @@ package org.freeshr.infrastructure.tr;
 
 import org.freeshr.config.SHRProperties;
 import org.freeshr.utils.StringUtils;
-import org.hl7.fhir.dstu3.model.ValueSet;
+import org.hl7.fhir.instance.model.ValueSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

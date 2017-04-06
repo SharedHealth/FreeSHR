@@ -1,7 +1,7 @@
 package org.freeshr.validations.resource;
 
 import ca.uhn.fhir.context.FhirContext;
-import org.hl7.fhir.dstu3.hapi.validation.DefaultProfileValidationSupport;
+import org.hl7.fhir.instance.hapi.validation.DefaultProfileValidationSupport;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;

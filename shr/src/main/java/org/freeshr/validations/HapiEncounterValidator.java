@@ -1,5 +1,6 @@
 package org.freeshr.validations;
 
+import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.validation.ResultSeverityEnum;
 import ca.uhn.fhir.validation.SingleValidationMessage;
 import ca.uhn.fhir.validation.ValidationResult;
@@ -9,7 +10,6 @@ import org.freeshr.validations.bundle.BundleResourceValidator;
 import org.freeshr.validations.bundle.FacilityValidator;
 import org.freeshr.validations.bundle.HealthIdValidator;
 import org.freeshr.validations.bundle.ProviderValidator;
-import org.hl7.fhir.dstu3.model.Bundle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

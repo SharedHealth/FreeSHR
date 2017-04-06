@@ -1,11 +1,12 @@
 package org.freeshr.utils;
 
 import ca.uhn.fhir.model.api.IResource;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
+import ca.uhn.fhir.model.dstu2.resource.Bundle;
+import ca.uhn.fhir.model.dstu2.resource.Composition;
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.primitive.IdDt;
-import org.hl7.fhir.dstu3.model.Bundle;
-import org.hl7.fhir.dstu3.model.Reference;
-import org.hl7.fhir.dstu3.model.Resource;
-import org.hl7.fhir.instance.model.api.IIdType;
+import org.apache.commons.lang3.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +15,8 @@ public class FhirResourceHelper {
 
     public static <T> List<T> findBundleResourcesOfType(Bundle bundle, Class<T> type) {
         ArrayList<T> resourceList = new ArrayList<T>();
-        for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-            IResource resource = (IResource) entry.getResource();
+        for (Bundle.Entry entry : bundle.getEntry()) {
+            IResource resource = entry.getResource();
             if (resource.getClass().isAssignableFrom(type)) {
                 resourceList.add((T) resource);
             }
@@ -23,10 +24,10 @@ public class FhirResourceHelper {
         return resourceList;
     }
 
-    public static IResource findBundleResourceByRef(Bundle bundle, Reference resourceRef) {
-        IIdType resourceReference = resourceRef.getReferenceElement();
-        for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-            IResource entryResource = (IResource) entry.getResource();
+    public static IResource findBundleResourceByRef(Bundle bundle, ResourceReferenceDt resourceRef) {
+        IdDt resourceReference = resourceRef.getReference();
+        for (Bundle.Entry entry : bundle.getEntry()) {
+            IResource entryResource = entry.getResource();
             IdDt entryResourceId = entryResource.getId();
             boolean hasFullUrlDefined = !org.apache.commons.lang3.StringUtils.isBlank(entry.getFullUrl());
 
@@ -45,11 +46,10 @@ public class FhirResourceHelper {
         return null;
     }
 
-    public static List<Bundle.BundleEntryComponent> getBundleEntriesForResource(Bundle bundle, String resourceName) {
-        List<Bundle.BundleEntryComponent> resourceEntries = new ArrayList<>();
-        for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-            IResource resource = (IResource) entry.getResource();
-            if (resource.getResourceName().equalsIgnoreCase(resourceName)) {
+    public static List<Bundle.Entry> getBundleEntriesForResource(Bundle bundle, String resourceName) {
+        List<Bundle.Entry> resourceEntries = new ArrayList<>();
+        for (Bundle.Entry entry : bundle.getEntry()) {
+            if (entry.getResource().getResourceName().equalsIgnoreCase(resourceName)) {
                 resourceEntries.add(entry);
             }
         }

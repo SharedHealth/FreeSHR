@@ -3,8 +3,8 @@ package org.freeshr.validations;
 import org.freeshr.application.fhir.EncounterValidationResponse;
 import org.freeshr.application.fhir.Error;
 import org.freeshr.utils.CollectionUtils;
-import org.hl7.fhir.dstu3.model.OperationOutcome;
-import org.hl7.fhir.dstu3.validation.ValidationMessage;
+import org.hl7.fhir.instance.model.OperationOutcome;
+import org.hl7.fhir.instance.validation.ValidationMessage;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

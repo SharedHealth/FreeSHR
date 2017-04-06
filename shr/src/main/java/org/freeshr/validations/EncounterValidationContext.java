@@ -1,8 +1,8 @@
 package org.freeshr.validations;
 
+import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.utils.FhirFeedUtil;
-import org.hl7.fhir.dstu3.model.Bundle;
 
 public class EncounterValidationContext {
     private EncounterBundle encounterBundle;
@@ -15,25 +15,25 @@ public class EncounterValidationContext {
         this.fhirFeedUtil = fhirFeedUtil;
     }
 
-//    @Deprecated
-//    public org.hl7.fhir.instance.model.Bundle getFeed() {
-//        return null;
-//    }
+    @Deprecated
+    public org.hl7.fhir.instance.model.Bundle getFeed() {
+        return null;
+    }
 
     public String getHealthId() {
         return this.encounterBundle.getHealthId();
     }
 
 
-//    @Deprecated
-//    public ValidationSubject<org.hl7.fhir.instance.model.Bundle> feedFragment() {
-//        return new ValidationSubject<org.hl7.fhir.instance.model.Bundle>() {
-//            @Override
-//            public org.hl7.fhir.instance.model.Bundle extract() {
-//                return getFeed();
-//            }
-//        };
-//    }
+    @Deprecated
+    public ValidationSubject<org.hl7.fhir.instance.model.Bundle> feedFragment() {
+        return new ValidationSubject<org.hl7.fhir.instance.model.Bundle>() {
+            @Override
+            public org.hl7.fhir.instance.model.Bundle extract() {
+                return getFeed();
+            }
+        };
+    }
 
     public ValidationSubject<Bundle> bundleFragment() {
         return new ValidationSubject<Bundle>() {

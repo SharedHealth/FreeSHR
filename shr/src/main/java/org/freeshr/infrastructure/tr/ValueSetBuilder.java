@@ -5,7 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import org.hl7.fhir.dstu3.model.ValueSet;
+import org.hl7.fhir.instance.model.Enumerations;
+import org.hl7.fhir.instance.model.ValueSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -25,7 +26,7 @@ public class ValueSetBuilder {
         TextNode name = (TextNode) root.get("name");
         TextNode description = (TextNode) root.get("description");
         TextNode status = (TextNode) root.get("status");
-        ValueSet valueSet = new ValueSet();
+        org.hl7.fhir.instance.model.ValueSet valueSet = new org.hl7.fhir.instance.model.ValueSet();
         String defaultName = getNameFromSystem(theSystem);
         if (identifier != null) {
             valueSet.setId(identifier.asText());

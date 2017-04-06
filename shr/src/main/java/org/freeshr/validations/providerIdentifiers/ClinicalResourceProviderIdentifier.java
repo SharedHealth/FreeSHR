@@ -1,11 +1,11 @@
 package org.freeshr.validations.providerIdentifiers;
 
 import ca.uhn.fhir.model.api.IResource;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import org.apache.commons.lang3.StringUtils;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.infrastructure.ProviderRegistryClient;
 import org.freeshr.utils.CollectionUtils;
-import org.hl7.fhir.dstu3.model.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,20 +28,20 @@ public abstract class ClinicalResourceProviderIdentifier {
 
     protected abstract boolean validates(IResource resource);
 
-    protected abstract List<Reference> getProviderReferences(IResource resource);
+    protected abstract List<ResourceReferenceDt> getProviderReferences(IResource resource);
 
     public final boolean isValid(IResource resource, SHRProperties shrProperties) {
         if (!validates(resource)) return true;
-        List<Reference> refs = getProviderReferences(resource);
+        List<ResourceReferenceDt> refs = getProviderReferences(resource);
         if (!validateUrl(refs, shrProperties)) return false;
         return true;
     }
 
-    private boolean validateUrl(List<Reference> urls, SHRProperties shrProperties) {
+    private boolean validateUrl(List<ResourceReferenceDt> urls, SHRProperties shrProperties) {
         if (CollectionUtils.isEmpty(urls)) return true;
 
-        for (Reference ref : urls) {
-            String refUrl = ref.getReference();
+        for (ResourceReferenceDt ref : urls) {
+            String refUrl = ref.getReference().getValue();
             if (StringUtils.isBlank(refUrl)) continue;
             if (!isUrlPatternMatched(refUrl, shrProperties)) return false;
             try {
