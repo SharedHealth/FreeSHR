@@ -1,27 +1,42 @@
 package org.freeshr.validations.resource;
 
+import org.apache.commons.lang3.StringUtils;
+import org.freeshr.config.SHRProperties;
+import org.freeshr.utils.CollectionUtils;
+import org.freeshr.validations.Severity;
 import org.freeshr.validations.ShrValidationMessage;
 import org.freeshr.validations.SubResourceValidator;
+import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.Condition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
+import static org.freeshr.utils.StringUtils.removeSuffix;
 
 @Component
 public class ConditionValidator implements SubResourceValidator {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConditionValidator.class);
-    private static final String CODEABLE_CONCEPT = "CodeableConcept";
-    public static final String DIAGNOSIS = "Diagnosis";
-    public static final String CATEGORY = "category";
-    private static final String CONDITION_CLINICAL_STATUS_LOCATION = "/f:Bundle/f:entry/f:resource/f:Condition/f:clinicalStatus";
-    private static final String UNKNOWN_CONDITION_CLINICAL_STATUS_MSG =
-            "Coded value %s is not in value set http://hl7.org/fhir/ValueSet/condition-clinical (http://hl7.org/fhir/ValueSet/condition-clinical). Condition: %s";
+    private static final String CONDITION_CATEGORY_VALUESET_NAME = "condition-category";
+    private static final String DIAGNOSIS = "Diagnosis";
+    private static final String CONDITION_CODE_CODING_LOCATION_FORMAT = "Bundle.entry[%s].resource.code.coding";
+    private static final String CONDITION_CODE_NOT_PRESENT_MSG = "There must be a code in condition";
+    private static final String CONDITION_DIAGNOSIS_NON_CODED_MSG = "The Code must come from TR for Diagnosis";
 
-//    @Override
+    private SHRProperties shrProperties;
+
+    @Autowired
+    public ConditionValidator(SHRProperties shrProperties) {
+        this.shrProperties = shrProperties;
+    }
+
+    //    @Override
 //    public List<ValidationMessage> validate(ValidationSubject<Bundle.BundleEntryComponent> subject) {
 //        Bundle.BundleEntryComponent atomEntry = subject.extract();
 //        ArrayList<ValidationMessage> validationMessages = new ArrayList<>();
@@ -89,23 +104,54 @@ public class ConditionValidator implements SubResourceValidator {
     }
 
     @Override
-    public List<ShrValidationMessage> validate(Object resource) {
-//        Condition condition = (Condition) resource;
-//        ConditionClinicalStatusCodesEnum[] values = ConditionClinicalStatusCodesEnum.values();
-//        boolean validClinicalStatus = isValidClinicalStatus(condition, values);
-//        if (!validClinicalStatus) {
-//           return Arrays.asList(new ShrValidationMessage(Severity.ERROR, CONDITION_CLINICAL_STATUS_LOCATION,
-//                   "invalid", String.format(UNKNOWN_CONDITION_CLINICAL_STATUS_MSG, condition.getClinicalStatus(), condition.getId().getValue())));
-//        }
+    public List<ShrValidationMessage> validate(Object resource, int entryIndex) {
+        Condition condition = (Condition) resource;
+        List<Coding> coding = condition.getCode().getCoding();
+        if (CollectionUtils.isEmpty(coding)) {
+            String location = String.format(CONDITION_CODE_CODING_LOCATION_FORMAT, entryIndex);
+            return Arrays.asList(new ShrValidationMessage(Severity.ERROR, location,
+                    "invalid", CONDITION_CODE_NOT_PRESENT_MSG));
+        }
+        Coding categoryCoding = condition.getCategoryFirstRep().getCodingFirstRep();
+
+        String conditionCategoryValuesetUrl = getTRValueSetUrl(CONDITION_CATEGORY_VALUESET_NAME);
+        if (!isDiagnosis(categoryCoding, conditionCategoryValuesetUrl)) {
+            return Collections.emptyList();
+        }
+        if (getConceptCoding(coding) == null) {
+            String location = String.format(CONDITION_CODE_CODING_LOCATION_FORMAT, entryIndex);
+            return Arrays.asList(new ShrValidationMessage(Severity.ERROR, location,
+                    "invalid", CONDITION_DIAGNOSIS_NON_CODED_MSG));
+        }
         return new ArrayList<>();
+    }
+
+    public static Coding getConceptCoding(List<Coding> codings) {
+        for (Coding coding : codings) {
+            if (StringUtils.isNotBlank(coding.getSystem()) && coding.getSystem().contains("/tr/concepts/")) {
+                return coding;
+            }
+        }
+        return null;
+    }
+
+
+    private boolean isDiagnosis(Coding categoryCoding, String conditionCategoryValuesetUrl) {
+        return categoryCoding.getSystem().equals(conditionCategoryValuesetUrl) ||
+                categoryCoding.getCode().equalsIgnoreCase(DIAGNOSIS);
     }
 
     private boolean isValidClinicalStatus(Condition condition, Condition.ConditionClinicalStatus[] values) {
         for (Condition.ConditionClinicalStatus value : values) {
-            if (value.toCode().equals(condition.getClinicalStatus().toCode())){
+            if (value.toCode().equals(condition.getClinicalStatus().toCode())) {
                 return true;
             }
         }
         return false;
     }
+
+    String getTRValueSetUrl(String code) {
+        return removeSuffix(shrProperties.getTRLocationPath(), "/") + shrProperties.getTerminologiesContextPathForValueSet() + code;
+    }
+
 }

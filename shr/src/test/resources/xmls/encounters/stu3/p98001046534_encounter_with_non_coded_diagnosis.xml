@@ -88,57 +88,17 @@
                 <identifier>
                     <value value="urn:uuid:04e9f319-980c-4ff1-9942-bcb5e2b5243b"/>
                 </identifier>
-                <clinicalStatus value="wrong"/>
+                <clinicalStatus value="active"/>
                 <verificationStatus value="provisional"/>
                 <category>
                     <coding>
-                        <system value="http://hl7.org/fhir/condition-category"/>
-                        <code value="invalid"/>
-                        <display value="invalid-category"/>
+                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/condition-category"/>
+                        <code value="diagnosis"/>
+                        <display value="Diagnosis"/>
                     </coding>
                 </category>
                 <code>
                     <coding>
-                        <system value=""/>
-                        <code value="A90"/>
-                        <display value="Dengue Fever"/>
-                    </coding>
-                </code>
-                <subject>
-                    <reference value="http://localhost:9997/api/default/patients/98001046534"/>
-                    <display value="98001046534"/>
-                </subject>
-                <context>
-                    <reference value="urn:uuid:dd4d51ac-d4b6-42e4-8b50-fa88af41a3e3"/>
-                </context>
-                <assertedDate value="2015-09-04T00:00:00+05:30"/>
-                <asserter>
-                    <reference value="http://localhost:9997/providers/19.json"/>
-                </asserter>
-            </Condition>
-        </resource>
-    </entry>
-    <entry>
-        <fullUrl value="urn:uuid:04e9f317-680c-4ff1-9942-bcb5e2b5243b"/>
-        <resource>
-            <Condition xmlns="http://hl7.org/fhir">
-                <id value="04e9f317-680c-4ff1-9942-bcb5e2b5243b"/>
-                <identifier>
-                    <value value="urn:uuid:04e9f317-680c-4ff1-9942-bcb5e2b5243b"/>
-                </identifier>
-                <clinicalStatus value="wrong"/>
-                <verificationStatus value="provisional"/>
-                <category>
-                    <coding>
-                        <system value="http://hl7.org/fhir/condition-category"/>
-                        <code value="invalid"/>
-                        <display value="invalid-category"/>
-                    </coding>
-                </category>
-                <code>
-                    <coding>
-                        <system value=""/>
-                        <code value="A90"/>
                         <display value="Dengue Fever"/>
                     </coding>
                 </code>

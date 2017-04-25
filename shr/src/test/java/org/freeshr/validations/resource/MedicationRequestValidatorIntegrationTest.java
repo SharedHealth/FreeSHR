@@ -60,12 +60,12 @@ public class MedicationRequestValidatorIntegrationTest {
         final FhirContext fhirContext = FhirContext.forDstu3();
         Bundle medicationRequestBundle = (Bundle) parseResource(FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_medication_request_scheduled_date.xml"), fhirContext);
         MedicationRequest medicationRequest = FhirResourceHelper.findBundleResourcesOfType(medicationRequestBundle, MedicationRequest.class).get(0);
-        List<ShrValidationMessage> shrValidationMessages = medicationRequestValidator.validate(medicationRequest);
+        List<ShrValidationMessage> shrValidationMessages = medicationRequestValidator.validate(medicationRequest, 2);
         assertEquals(2, shrValidationMessages.size());
-        ValidationFailureTestHelper.assertFailureFromShrValidationMessages(MEDICATION_REQUEST_MEDICATION_LOCATION,
+        ValidationFailureTestHelper.assertFailureFromShrValidationMessages("Bundle.entry[2].resource.medication",
                 "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/23d7e743-75bd-4a25-8f34-bd849bd50394], code[23d7e743-75bd-4a25-8f34-bd849bd50394]",
                 shrValidationMessages);
-        ValidationFailureTestHelper.assertFailureFromShrValidationMessages(MEDICATION_REQUEST_DISPENSE_MEDICATION_LOCATION,
+        ValidationFailureTestHelper.assertFailureFromShrValidationMessages("Bundle.entry[2].resource.dispenseRequest.medication",
                 "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/drugs/23d7e743-75bd-4a25-8f34-bd849bd50394], code[23d7e743-75bd-4a25-8f34-bd849bd50394]",
                 shrValidationMessages);
     }

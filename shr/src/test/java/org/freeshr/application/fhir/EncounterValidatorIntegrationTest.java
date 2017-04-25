@@ -55,6 +55,12 @@ public class EncounterValidatorIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(asString("jsons/order-type-case-insensitive.json"))));
 
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/condition-category"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/condition-category-case-insensitive.json"))));
+
 
         //Patient 98001046534 Reference
         givenThat(get(urlEqualTo("/api/default/patients/" + HEALTH_ID))
@@ -332,8 +338,7 @@ public class EncounterValidatorIntegrationTest {
     }
 
     /**
-     * Coding System can not be empty
-     * Category must be one of the preferred
+     * Category must be one from given valueset
      * Clinical Status must be of the preferred
      *
      * @throws Exception
@@ -353,6 +358,28 @@ public class EncounterValidatorIntegrationTest {
                 "The value provided ('wrong') is not in the value set http://hl7.org/fhir/ValueSet/condition-clinical (http://hl7.org/fhir/ValueSet/condition-clinical, and a code is required from this value set", true, response);
         assertFailureInResponse("Bundle.entry[4].resource.clinicalStatus",
                 "The value provided ('wrong') is not in the value set http://hl7.org/fhir/ValueSet/condition-clinical (http://hl7.org/fhir/ValueSet/condition-clinical, and a code is required from this value set", true, response);
+    }
+
+    @Test
+    public void shouldRejectEncounterWithConditionWithoutCode() throws Exception {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_condition__missing_code.xml"));
+        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
+        EncounterValidationResponse response = validator.validate(validationContext);
+        assertEquals(1, response.getErrors().size());
+        assertFailureInResponse("Bundle.entry[3].resource.code.coding",
+                "There must be a code in condition", false, response);
+    }
+
+    @Test
+    public void shouldRejectEncounterWithNonCodedDiagnosis() throws Exception {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_non_coded_diagnosis.xml"));
+        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
+        EncounterValidationResponse response = validator.validate(validationContext);
+        assertEquals(1, response.getErrors().size());
+        assertFailureInResponse("Bundle.entry[3].resource.code.coding",
+                "The Code must come from TR for Diagnosis", false, response);
     }
 
     @Test
@@ -580,7 +607,7 @@ public class EncounterValidatorIntegrationTest {
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
         assertEquals(1, response.getErrors().size());
-        assertFailureInResponse("f:MedicationRequest/f:dosageInstruction/f:dose",
+        assertFailureInResponse("Bundle.entry[3].resource.dosageInstruction.dose",
                 "Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/vs/Quantity-Units123], code[TU]",
                 false, response);
     }

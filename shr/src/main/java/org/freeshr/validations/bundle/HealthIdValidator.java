@@ -1,7 +1,6 @@
 package org.freeshr.validations.bundle;
 
 
-import ca.uhn.fhir.model.api.IResource;
 import org.freeshr.config.SHRProperties;
 import org.freeshr.utils.StringUtils;
 import org.freeshr.validations.*;
@@ -39,7 +38,9 @@ public class HealthIdValidator implements ShrValidator<EncounterValidationContex
         Bundle bundle = validationContext.getBundle();
         String expectedHealthId = validationContext.getHealthId();
         List<ShrValidationMessage> validationMessages = new ArrayList<>();
-        for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+        List<Bundle.BundleEntryComponent> entries = bundle.getEntry();
+        for (int i = 0; i < entries.size(); i++) {
+            Bundle.BundleEntryComponent entry = entries.get(i);
             Resource resource = entry.getResource();
             if (!PatientReferenceIdentifier.canIdentify(resource)) {
                 continue;
@@ -49,7 +50,7 @@ public class HealthIdValidator implements ShrValidator<EncounterValidationContex
 
             if ((resource instanceof Composition) && (patientRefUrl == null)) {
                 logger.error(String.format("Encounter failed for %s", HEALTH_ID_NOT_PRESENT_IN_COMPOSITION));
-                ShrValidationMessage message = new ShrValidationMessage(Severity.ERROR, "f:Composition/f:subject",
+                ShrValidationMessage message = new ShrValidationMessage(Severity.ERROR, "Bundle.entry[1].resource.subject",
                         "invalid", "Composition:" + HEALTH_ID_NOT_PRESENT_IN_COMPOSITION);
                 validationMessages.add(message);
                 return validationMessages;
@@ -59,7 +60,7 @@ public class HealthIdValidator implements ShrValidator<EncounterValidationContex
             if (healthIdFromUrl == null) {
                 logger.debug(String.format("Encounter failed for %s", HEALTH_ID_NOT_MATCH));
                 ShrValidationMessage message = new ShrValidationMessage(Severity.ERROR,
-                        String.format("f:%s/f:patient", resource.getResourceType().name()), "invalid",
+                        String.format("Bundle.entry[%s].resource.subject", i + 1), "invalid",
                         patientRef.getReference() + ":" + HEALTH_ID_NOT_MATCH);
                 validationMessages.add(message);
             }

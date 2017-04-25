@@ -91,7 +91,7 @@ public class HealthIdValidatorTest {
                 healthIdValidator.validate(getEncounterContext(xml, "98001046534")));
         assertThat(response.isSuccessful(), is(false));
         assertThat(response.getErrors().get(0).getType(), is("invalid"));
-        assertEquals("f:Condition/f:patient", response.getErrors().get(0).getField());
+        assertEquals("Bundle.entry[3].resource.subject", response.getErrors().get(0).getField());
         assertTrue("Didn't respond with proper message", response.getErrors().get(0).getReason().endsWith("Patient's Health Id does not match."));
     }
 

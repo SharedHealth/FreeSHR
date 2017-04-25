@@ -1,0 +1,24 @@
+{
+  "resourceType": "ValueSet",
+  "identifier": "/rest/v1/tr/vs/Condition-Category",
+  "name": "Condition Category",
+  "description": "Condition Category",
+  "status": "active",
+  "date": "2015-06-22",
+  "codeSystem": {
+    "system": "/rest/v1/tr/vs/Condition-Category",
+    "caseSensitive": false,
+    "concept": [
+      {
+        "code": "diagnosis",
+        "display": "Diagnosis",
+        "definition": "Diagnosis Condition"
+      },
+      {
+        "code": "complaint",
+        "display": "Complaint",
+        "definition": "Complaint Condition"
+      }
+    ]
+  }
+}

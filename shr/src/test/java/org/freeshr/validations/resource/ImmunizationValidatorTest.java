@@ -58,7 +58,7 @@ public class ImmunizationValidatorTest {
         List<Immunization> immunizations = FhirResourceHelper.findBundleResourcesOfType(bundle, Immunization.class);
         when(conceptValidator.isCodeSystemSupported(any(FhirContext.class), anyString())).thenReturn(true);
         ImmunizationValidator immunizationValidator = getValidator();
-        List<ShrValidationMessage> validationMessages = immunizationValidator.validate(immunizations.get(0));
+        List<ShrValidationMessage> validationMessages = immunizationValidator.validate(immunizations.get(0), 2);
         assertTrue(validationMessages.isEmpty());
     }
 
@@ -71,7 +71,7 @@ public class ImmunizationValidatorTest {
         when(conceptValidator.validateCode(any(FhirContext.class), anyString(), anyString(), anyString())).thenReturn(mockValidationResult());
         ImmunizationValidator immunizationValidator = getValidator();
 
-        List<ShrValidationMessage> validationMessages = immunizationValidator.validate(immunizations.get(0));
+        List<ShrValidationMessage> validationMessages = immunizationValidator.validate(immunizations.get(0), 2);
         assertEquals(1, validationMessages.size());
         assertEquals(INVALID_DOSAGE_QUANTITY + ":Immunization:urn:uuid:554e13d9-25f9-4802-8f21-669249bf51be", validationMessages.get(0).getMessage());
     }

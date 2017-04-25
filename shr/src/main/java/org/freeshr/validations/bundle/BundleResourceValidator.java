@@ -1,6 +1,5 @@
 package org.freeshr.validations.bundle;
 
-import ca.uhn.fhir.model.api.IResource;
 import org.freeshr.validations.ShrValidationMessage;
 import org.freeshr.validations.ShrValidator;
 import org.freeshr.validations.SubResourceValidator;
@@ -25,12 +24,14 @@ public class BundleResourceValidator implements ShrValidator<Bundle> {
     public List<ShrValidationMessage> validate(ValidationSubject<Bundle> subject) {
         Bundle bundle = subject.extract();
         List<ShrValidationMessage> validationMessages = new ArrayList<>();
-        for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+        List<Bundle.BundleEntryComponent> entries = bundle.getEntry();
+        for (int index = 0; index < entries.size(); index++) {
+            Bundle.BundleEntryComponent entry = entries.get(index);
             Resource resource = entry.getResource();
             List<SubResourceValidator> validators = findSubResourceValidator(resource);
             if (!validators.isEmpty()) {
                 for (SubResourceValidator validator : validators) {
-                    validationMessages.addAll(validator.validate(resource));
+                    validationMessages.addAll(validator.validate(resource, index + 1));
                 }
             }
         }

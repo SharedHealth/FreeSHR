@@ -506,28 +506,4 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
         patient.setAddress(new Address(division, district, "03", "04", "05"));
         return patient;
     }
-
-    private BaseMatcher<EncounterResponse> debugEncounterSaveResponse() {
-        return new BaseMatcher<EncounterResponse>() {
-            @Override
-            public void describeTo(Description description) {
-            }
-
-            @Override
-            public boolean matches(Object item) {
-                if (item instanceof EncounterResponse) {
-                    EncounterResponse response = (EncounterResponse) item;
-                    for (org.freeshr.application.fhir.Error error : response.getErrors()) {
-                        System.out.println(error.getReason());
-                    }
-                } else if (item instanceof UnProcessableEntity) {
-                    UnProcessableEntity response = (UnProcessableEntity) item;
-                    for (Error error : response.getResult().getErrors()) {
-                        System.out.println(error.toString());
-                    }
-                }
-                return false;
-            }
-        };
-    }
 }

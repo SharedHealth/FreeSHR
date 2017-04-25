@@ -24,10 +24,10 @@ import static org.freeshr.validations.ValidationMessages.UNSPECIFIED_MEDICATION;
 public class MedicationRequestValidator implements SubResourceValidator {
 
     private static final Logger logger = LoggerFactory.getLogger(MedicationRequestValidator.class);
-    public static final String MEDICATION_REQUEST_MEDICATION_LOCATION = "f:MedicationRequest/f:medication";
-    public static final String MEDICATION_DOSE_INSTRUCTION_LOCATION = "f:MedicationRequest/f:dosageInstruction/f:dose";
-    public static final String MEDICATION_REQUEST_DISPENSE_MEDICATION_LOCATION = "f:MedicationRequest/f:dispenseRequest/f:medication";
-    private static final String MEDICATION_REQUEST_DISPENSE_QUANTITY_LOCATION = "f:MedicationRequest/f:dispenseRequest/f:quantity";
+    public static final String MEDICATION_REQUEST_MEDICATION_LOCATION = "Bundle.entry[%s].resource.medication";
+    public static final String MEDICATION_DOSE_INSTRUCTION_LOCATION = "Bundle.entry[%s].resource.dosageInstruction.dose";
+    public static final String MEDICATION_REQUEST_DISPENSE_MEDICATION_LOCATION = "Bundle.entry[%s].resource.dispenseRequest.medication";
+    private static final String MEDICATION_REQUEST_DISPENSE_QUANTITY_LOCATION = "Bundle.entry[%s].resource.dispenseRequest.quantity";
 
     private TRConceptValidator trConceptValidator;
     private DoseQuantityValidator doseQuantityValidator;
@@ -47,21 +47,21 @@ public class MedicationRequestValidator implements SubResourceValidator {
     }
 
     @Override
-    public List<ShrValidationMessage> validate(Object resource) {
-        MedicationRequest medicationOrder = (MedicationRequest) resource;
+    public List<ShrValidationMessage> validate(Object resource, int entryIndex) {
+        MedicationRequest medicationRequest = (MedicationRequest) resource;
         List<ShrValidationMessage> validationMessages = new ArrayList<>();
 
-        validationMessages.addAll(validateMedication(medicationOrder));
+        validationMessages.addAll(validateMedication(medicationRequest, entryIndex));
 
-        validationMessages.addAll(validateDosageInstructionDosageQuantity(medicationOrder));
+        validationMessages.addAll(validateDosageInstructionDosageQuantity(medicationRequest, entryIndex));
 
-        validationMessages.addAll(validateDispenseMedication(medicationOrder));
+        validationMessages.addAll(validateDispenseMedication(medicationRequest, entryIndex));
 
-        validationMessages.addAll(validateDispenseQuantity(medicationOrder));
+        validationMessages.addAll(validateDispenseQuantity(medicationRequest, entryIndex));
         return validationMessages;
     }
 
-    private Collection<? extends ShrValidationMessage> validateDispenseMedication(MedicationRequest medicationOrder) {
+    private Collection<? extends ShrValidationMessage> validateDispenseMedication(MedicationRequest medicationOrder, int entryIndex) {
         if (medicationOrder.getDispenseRequest() != null) {
             Type medicine = medicationOrder.getMedication();
             if (medicine == null || !(medicine instanceof CodeableConcept)) {
@@ -70,28 +70,28 @@ public class MedicationRequestValidator implements SubResourceValidator {
 
             CodeableConcept medicationCoding = ((CodeableConcept) medicine);
 
-            return validateCodeableConcept(medicationCoding, MEDICATION_REQUEST_DISPENSE_MEDICATION_LOCATION);
+            return validateCodeableConcept(medicationCoding, String.format(MEDICATION_REQUEST_DISPENSE_MEDICATION_LOCATION, entryIndex));
         }
         return new ArrayList<>();
     }
 
-    private Collection<? extends ShrValidationMessage> validateDispenseQuantity(MedicationRequest medicationOrder) {
+    private Collection<? extends ShrValidationMessage> validateDispenseQuantity(MedicationRequest medicationOrder, int entryIndex) {
         SimpleQuantity dispenseQuantity = medicationOrder.getDispenseRequest().getQuantity();
         if (dispenseQuantity != null) {
-            return validateQuantity(dispenseQuantity, MEDICATION_REQUEST_DISPENSE_QUANTITY_LOCATION);
+            return validateQuantity(dispenseQuantity, String.format(MEDICATION_REQUEST_DISPENSE_QUANTITY_LOCATION, entryIndex));
         }
-        return null;
+        return new ArrayList<>();
     }
 
-    private Collection<? extends ShrValidationMessage> validateDosageInstructionDosageQuantity(MedicationRequest medicationOrder) {
-            List<Dosage> instructions = medicationOrder.getDosageInstruction();
+    private Collection<? extends ShrValidationMessage> validateDosageInstructionDosageQuantity(MedicationRequest medicationOrder, int entryIndex) {
+        List<Dosage> instructions = medicationOrder.getDosageInstruction();
 
 
         for (Dosage instruction : instructions) {
             Type dose = instruction.getDose();
 
             if (dose instanceof Quantity) {
-                return validateQuantity((Quantity) dose, MEDICATION_DOSE_INSTRUCTION_LOCATION);
+                return validateQuantity((Quantity) dose, String.format(MEDICATION_DOSE_INSTRUCTION_LOCATION, entryIndex));
             }
         }
         return new ArrayList<>();
@@ -110,7 +110,7 @@ public class MedicationRequestValidator implements SubResourceValidator {
         return new ArrayList<>();
     }
 
-    private Collection<? extends ShrValidationMessage> validateMedication(MedicationRequest medicationOrder) {
+    private Collection<? extends ShrValidationMessage> validateMedication(MedicationRequest medicationOrder, int entryIndex) {
         Type medicine = medicationOrder.getMedication();
 
         if (!(medicine instanceof CodeableConcept)) {
@@ -118,12 +118,13 @@ public class MedicationRequestValidator implements SubResourceValidator {
         }
 
         CodeableConcept medicationCoding = ((CodeableConcept) medicine);
+        String location = String.format(MEDICATION_REQUEST_MEDICATION_LOCATION, entryIndex);
         if (medicationCoding.isEmpty()) {
-            return Arrays.asList(new ShrValidationMessage(Severity.ERROR, MEDICATION_REQUEST_MEDICATION_LOCATION, "invalid",
+            return Arrays.asList(new ShrValidationMessage(Severity.ERROR, location, "invalid",
                     UNSPECIFIED_MEDICATION));
         }
 
-        return validateCodeableConcept(medicationCoding, MEDICATION_REQUEST_MEDICATION_LOCATION);
+        return validateCodeableConcept(medicationCoding, location);
     }
 
     private Collection<? extends ShrValidationMessage> validateCodeableConcept(CodeableConcept medicationCoding, String location) {

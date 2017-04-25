@@ -20,7 +20,7 @@ import static org.freeshr.validations.ValidationMessages.INVALID_DOSAGE_QUANTITY
 @Component
 public class ImmunizationValidator implements SubResourceValidator {
 
-    public static final String IMMUNIZATION_DOSE_QUANTITY_LOCATION = "f:Immunization/f:doseQuantity";
+    public static final String IMMUNIZATION_DOSE_QUANTITY_LOCATION = "Bundle.entry[%s].resource.doseQuantity";
     private static final Logger logger = LoggerFactory.getLogger(ImmunizationValidator.class);
     private DoseQuantityValidator doseQuantityValidator;
     private UrlValidator urlValidator;
@@ -38,12 +38,12 @@ public class ImmunizationValidator implements SubResourceValidator {
     }
 
     @Override
-    public List<ShrValidationMessage> validate(Object resource) {
+    public List<ShrValidationMessage> validate(Object resource, int entryIndex) {
         Immunization immunization = (Immunization) resource;
-        return validateDosageQuantity(immunization);
+        return validateDosageQuantity(immunization, entryIndex);
     }
 
-    private List<ShrValidationMessage> validateDosageQuantity(Immunization immunization) {
+    private List<ShrValidationMessage> validateDosageQuantity(Immunization immunization, int entryIndex) {
         List<ShrValidationMessage> validationMessages = new ArrayList<>();
         SimpleQuantity doseQuantity = immunization.getDoseQuantity();
         if (doseQuantity.isEmpty()) {
@@ -59,7 +59,8 @@ public class ImmunizationValidator implements SubResourceValidator {
 
         logger.error("Immunization DosageQuantity is invalid." + immunization.getId());
 
-        validationMessages.add(new ShrValidationMessage(Severity.ERROR, IMMUNIZATION_DOSE_QUANTITY_LOCATION, "invalid",
+        String location = String.format(IMMUNIZATION_DOSE_QUANTITY_LOCATION, entryIndex);
+        validationMessages.add(new ShrValidationMessage(Severity.ERROR, location, "invalid",
                 INVALID_DOSAGE_QUANTITY + ":Immunization:" + immunization.getId()));
         return validationMessages;
     }
