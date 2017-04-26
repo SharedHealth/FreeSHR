@@ -379,7 +379,7 @@ public class EncounterValidatorIntegrationTest {
         EncounterValidationResponse response = validator.validate(validationContext);
         assertEquals(1, response.getErrors().size());
         assertFailureInResponse("Bundle.entry[3].resource.code.coding",
-                "The Code must come from TR for Diagnosis", false, response);
+                "There must be a Code from TR for Diagnosis", false, response);
     }
 
     @Test

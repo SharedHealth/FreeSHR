@@ -8,8 +8,6 @@ import org.freeshr.validations.ShrValidationMessage;
 import org.freeshr.validations.SubResourceValidator;
 import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.Condition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +25,7 @@ public class ConditionValidator implements SubResourceValidator {
     private static final String DIAGNOSIS = "Diagnosis";
     private static final String CONDITION_CODE_CODING_LOCATION_FORMAT = "Bundle.entry[%s].resource.code.coding";
     private static final String CONDITION_CODE_NOT_PRESENT_MSG = "There must be a code in condition";
-    private static final String CONDITION_DIAGNOSIS_NON_CODED_MSG = "The Code must come from TR for Diagnosis";
+    private static final String CONDITION_DIAGNOSIS_NON_CODED_MSG = "There must be a Code from TR for Diagnosis";
 
     private SHRProperties shrProperties;
 
@@ -118,7 +116,7 @@ public class ConditionValidator implements SubResourceValidator {
         if (!isDiagnosis(categoryCoding, conditionCategoryValuesetUrl)) {
             return Collections.emptyList();
         }
-        if (getConceptCoding(coding) == null) {
+        if (!hasTRCoding(coding)) {
             String location = String.format(CONDITION_CODE_CODING_LOCATION_FORMAT, entryIndex);
             return Arrays.asList(new ShrValidationMessage(Severity.ERROR, location,
                     "invalid", CONDITION_DIAGNOSIS_NON_CODED_MSG));
@@ -126,13 +124,15 @@ public class ConditionValidator implements SubResourceValidator {
         return new ArrayList<>();
     }
 
-    public static Coding getConceptCoding(List<Coding> codings) {
+    public static boolean hasTRCoding(List<Coding> codings) {
         for (Coding coding : codings) {
             if (StringUtils.isNotBlank(coding.getSystem()) && coding.getSystem().contains("/tr/concepts/")) {
-                return coding;
+                if (StringUtils.isNotBlank(coding.getCode())) {
+                    return true;
+                }
             }
         }
-        return null;
+        return false;
     }
 
 
