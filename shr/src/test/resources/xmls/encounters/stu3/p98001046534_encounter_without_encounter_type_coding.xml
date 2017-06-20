@@ -54,11 +54,7 @@
                     <code value="AMB"/>
                 </class>
                 <type>
-                    <coding>
-                        <system value="http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type"/>
-                        <code value="REG"/>
-                        <display value="registration"/>
-                    </coding>
+                    <text value="OPD"/>
                 </type>
                 <subject>
                     <reference value="http://localhost:9997/api/default/patients/98001046534"/>

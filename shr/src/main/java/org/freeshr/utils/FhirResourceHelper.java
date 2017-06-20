@@ -1,10 +1,8 @@
 package org.freeshr.utils;
 
 import ca.uhn.fhir.model.api.IResource;
-import org.hl7.fhir.dstu3.model.Bundle;
-import org.hl7.fhir.dstu3.model.IdType;
-import org.hl7.fhir.dstu3.model.Reference;
-import org.hl7.fhir.dstu3.model.Resource;
+import org.apache.commons.lang3.*;
+import org.hl7.fhir.dstu3.model.*;
 import org.hl7.fhir.instance.model.api.IIdType;
 
 import java.util.ArrayList;
@@ -54,5 +52,16 @@ public class FhirResourceHelper {
             }
         }
         return resourceEntries;
+    }
+
+    public static boolean hasTRCoding(List<Coding> codings) {
+        for (Coding coding : codings) {
+            if (org.apache.commons.lang3.StringUtils.isNotBlank(coding.getSystem()) && coding.getSystem().contains("/tr/concepts/")) {
+                if (org.apache.commons.lang3.StringUtils.isNotBlank(coding.getCode())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

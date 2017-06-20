@@ -268,6 +268,11 @@ public class EncounterValidatorIntegrationTest {
                 FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_diagnoses_with_local_refs.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
+        for (Error error : response.getErrors()) {
+            System.out.println(error.getField());
+            System.out.println(error.getType());
+            System.out.println(error.getReason());
+        }
         assertTrue(response.isSuccessful());
     }
 
@@ -518,12 +523,25 @@ public class EncounterValidatorIntegrationTest {
     }
 
     @Test
-    public void shouldValidateEncounterTypeAgainstValueSet() {
+    public void shouldRejectIfEncounterTypeIsNotACoding() {
         encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
-                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_with_valid_type.xml"));
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_without_encounter_type_coding.xml"));
         validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
         EncounterValidationResponse response = validator.validate(validationContext);
-        assertTrue(response.isSuccessful());
+        assertFalse(response.isSuccessful());
+        assertThat(response.getErrors().size(), is(1));
+        assertEquals("There must be an encounter type code from TR", response.getErrors().get(0).getReason());
+    }
+
+    @Test
+    public void shouldInvalidateWrongEncounterType() {
+        encounterBundle = EncounterBundleData.encounter(EncounterBundleData.HEALTH_ID,
+                FileUtil.asString("xmls/encounters/stu3/p98001046534_encounter_having_invalid_encounter_type.xml"));
+        validationContext = new EncounterValidationContext(encounterBundle, new FhirFeedUtil());
+        EncounterValidationResponse response = validator.validate(validationContext);
+        assertFalse(response.isSuccessful());
+        assertThat(response.getErrors().size(), is(1));
+        assertEquals("Could not validate concept system[http://localhost:9997/openmrs/ws/rest/v1/tr/vs/encounter-type], code[Invalid]", response.getErrors().get(0).getReason());
     }
 
     @Test

@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.freeshr.utils.FhirResourceHelper.hasTRCoding;
 import static org.freeshr.utils.StringUtils.removeSuffix;
 
 @Component
@@ -124,16 +125,6 @@ public class ConditionValidator implements SubResourceValidator {
         return new ArrayList<>();
     }
 
-    public static boolean hasTRCoding(List<Coding> codings) {
-        for (Coding coding : codings) {
-            if (StringUtils.isNotBlank(coding.getSystem()) && coding.getSystem().contains("/tr/concepts/")) {
-                if (StringUtils.isNotBlank(coding.getCode())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
 
     private boolean isDiagnosis(Coding categoryCoding, String conditionCategoryValuesetUrl) {

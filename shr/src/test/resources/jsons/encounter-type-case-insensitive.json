@@ -20,6 +20,11 @@
         "definition": "Encounter Type admission in a hospital"
       },
       {
+        "code": "OPD",
+        "display": "outpatient",
+        "definition": "Encounter Type outpatient in a hospital"
+      },
+      {
         "code": "DISCHARGE",
         "display": "discharge",
         "definition": "Encounter Type discharge from hospital"

@@ -17,6 +17,6 @@ public class ValueSetBuilderTest {
         String content = asString("jsons/encounter-type-case-insensitive.json");
         CodeSystem codeSystem = new ValueSetBuilder().deserializeValueSetAndGetCodeSystem(content, "http://tr.hie.org/rest/v1/tr/vs/encounter-type");
         Assert.assertNotNull(codeSystem);
-        Assert.assertEquals(3, codeSystem.getConcept().size());
+        Assert.assertEquals(4, codeSystem.getConcept().size());
     }
 }

@@ -49,6 +49,12 @@ public class PatientEncounterControllerIntegrationTest extends APIIntegrationTes
 
     @Before
     public void setUp() throws Exception {
+        givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/vs/encounter-type"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/encounter-type-case-insensitive.json"))));
+
         givenThat(get(urlEqualTo("/api/default/patients/" + VALID_HEALTH_ID_CONFIDENTIAL))
                 .willReturn(aResponse()
                         .withStatus(200)
