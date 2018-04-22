@@ -1,0 +1,4 @@
+**/**
+!Dockerfile
+!env/docker_shr
+!shr/build/distributions/shr-*.noarch.rpm
