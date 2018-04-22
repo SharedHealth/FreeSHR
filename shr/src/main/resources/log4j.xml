@@ -29,17 +29,20 @@
 
     <logger name="org.freeshr" additivity="false">
         <level value="${SHR_LOG_LEVEL}"/>
+        <appender-ref ref="CONSOLE"/>
         <appender-ref ref="VAR_LOG"/>
     </logger>
 
     <logger name="org.freeshr.interfaces.encounter.ws">
         <level value="${SHR_LOG_LEVEL}"/>
         <appender-ref ref="ACCESS_LOG"/>
+        <appender-ref ref="VAR_LOG"/>
     </logger>
 
     <root>
         <priority value="${SHR_LOG_LEVEL}"/>
         <appender-ref ref="ACCESS_LOG"/>
+        <appender-ref ref="CONSOLE"/>
         <appender-ref ref="VAR_LOG"/>
     </root>
 
