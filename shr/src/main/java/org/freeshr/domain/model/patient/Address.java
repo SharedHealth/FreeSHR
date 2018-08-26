@@ -1,20 +1,40 @@
 package org.freeshr.domain.model.patient;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.hl7.fhir.instance.model.api.IBaseDatatype;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Address {
+    @JsonProperty("address_line")
     private String line;
+
+    @JsonProperty("district_id")
     private String district;
+
+    @JsonProperty("division_id")
     private String division;
+
+    @JsonProperty("upazila_id")
     private String upazila;
+
+    @JsonProperty("city_corporation_id")
     private String cityCorporation;
+
+    @JsonProperty("union_or_urban_ward_id")
     private String unionOrUrbanWardId;
+
+    @JsonProperty("country_code")
     private String countryCode;
 
+
     public Address() {
+
     }
+
     public Address(String division, String district, String upazila, String cityCorporation, String unionOrUrbanWardId) {
         this.division = division;
         this.district = district;
