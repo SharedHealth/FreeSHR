@@ -40,14 +40,15 @@ public class AuthorizationIntegrationTest extends APIIntegrationTestBase {
     private static final String DATASENSE_REGISTERED_DISTRICT = "02";
 
     @Autowired
-    private SHRProperties properties;
+    SHRProperties properties;
 
     @Before
     public void setUp() throws Exception {
         givenThat(get(urlEqualTo("/api/default/patients/" + VALID_HEALTH_ID))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withBody(asString("xmls/patient/patient_not_confidential.xml"))));
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/patient_not_confidential.json"))));
 
         givenThat(get(urlEqualTo("/openmrs/ws/rest/v1/tr/referenceterms/2f6z9872-4df1-438e-9d72-0a8b161d409b"))
                 .willReturn(aResponse()

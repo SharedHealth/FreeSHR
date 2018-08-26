@@ -9,7 +9,6 @@ import org.freeshr.domain.model.patient.Patient;
 import org.freeshr.infrastructure.security.UserInfo;
 import org.freeshr.infrastructure.security.UserProfile;
 import org.freeshr.utils.Confidentiality;
-import org.freeshr.utils.FhirFeedUtil;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,7 +30,8 @@ import static org.freeshr.utils.FileUtil.asString;
 import static org.freeshr.utils.HttpUtil.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -50,13 +50,10 @@ public class MCIClientIntegrationTest {
     @Mock
     SHRProperties shrProperties;
 
-    @Autowired
-    private FhirFeedUtil fhirFeedUtil;
-
     @Before
     public void setUp() {
         initMocks(this);
-        mci = new MCIClient(shrRestTemplate, shrProperties, fhirFeedUtil);
+        mci = new MCIClient(shrRestTemplate, shrProperties);
         when(shrProperties.getMCIPatientLocationPath()).thenReturn("http://localhost:9997/api/default/patients");
     }
 
@@ -73,22 +70,22 @@ public class MCIClientIntegrationTest {
                 .withHeader(FROM_KEY, equalTo(userEmail))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withBody(asString("xmls/patient/incative_merged_patient.xml"))));
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/patient.json"))));
 
         Patient patient = mci.getPatient(heathId, getUserInfo(clientId, userEmail, accessToken)).toBlocking().first();
 
         assertThat(patient, is(notNullValue()));
         assertThat(patient.getHealthId(), is(heathId));
-        assertThat(patient.getGender(), is("M"));
-        assertTrue(patient.getConfidentiality().equals(Confidentiality.Normal));
+        assertThat(patient.getGender(), is("1"));
+        assertTrue(patient.getConfidentiality().equals(Confidentiality.VeryRestricted));
         Address address = patient.getAddress();
-        assertThat(address.getDivision(), is("20"));
-        assertThat(address.getDistrict(), is("19"));
-        assertThat(address.getUpazila(), is("18"));
+        assertThat(address.getLine(), is("house30"));
+        assertThat(address.getDistrict(), is("56"));
+        assertThat(address.getDivision(), is("30"));
+        assertThat(address.getUpazila(), is("10"));
+        assertThat(address.getUnionOrUrbanWardId(), is("17"));
         assertThat(address.getCityCorporation(), is("99"));
-        assertThat(address.getUnionOrUrbanWardId(), is("11"));
-        assertFalse(patient.isActive());
-        assertThat(patient.getMergedWith(), is("98000100563"));
     }
 
     private UserInfo getUserInfo(String clientId, String email, String securityToken) {

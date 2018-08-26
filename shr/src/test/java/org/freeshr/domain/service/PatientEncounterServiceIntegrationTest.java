@@ -75,12 +75,14 @@ public class PatientEncounterServiceIntegrationTest extends APIIntegrationTestBa
         givenThat(get(urlEqualTo("/api/default/patients/" + VALID_HEALTH_ID))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withBody(asString("xmls/patient/patient.xml"))));
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/patient98001046534.json"))));
 
         givenThat(get(urlEqualTo("/api/default/patients/" + VALID_HEALTH_ID_NEW))
                 .willReturn(aResponse()
                         .withStatus(200)
-                        .withBody(asString("xmls/patient/patient_not_confidential.xml"))));
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(asString("jsons/patient_not_confidential.json"))));
 
         givenThat(get(urlEqualTo("/api/default/patients/" + INVALID_HEALTH_ID))
                 .willReturn(aResponse()
@@ -246,11 +248,12 @@ public class PatientEncounterServiceIntegrationTest extends APIIntegrationTestBa
     private void assertValidPatient(Patient patient) {
         assertThat(patient, is(notNullValue()));
         Address address = patient.getAddress();
-        assertThat(address.getDivision(), is("30"));
+        assertThat(address.getLine(), is("house30"));
         assertThat(address.getDistrict(), is("56"));
+        assertThat(address.getUnionOrUrbanWardId(), is("17"));
         assertThat(address.getUpazila(), is("10"));
+        assertThat(address.getDivision(), is("30"));
         assertThat(address.getCityCorporation(), is("99"));
-        assertThat(address.getUnionOrUrbanWardId(), is("11"));
     }
 
     private UserInfo getUserInfo(String clientId, String email, String securityToken) {
