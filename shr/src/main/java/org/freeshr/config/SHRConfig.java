@@ -1,10 +1,5 @@
 package org.freeshr.config;
 
-import org.apache.http.client.RedirectStrategy;
-import org.apache.http.conn.ssl.TrustStrategy;
-import org.apache.http.impl.client.LaxRedirectStrategy;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
@@ -13,15 +8,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.client.HttpComponentsAsyncClientHttpRequestFactory;
+import org.springframework.http.client.AsyncClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.AsyncRestTemplate;
-
-import javax.net.ssl.SSLContext;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 
 @Configuration
 @Import({SHRSecurityConfig.class, SHRCassandraConfig.class,
@@ -39,25 +29,16 @@ public class SHRConfig {
 
     @Bean(name = "SHRRestTemplate")
     public AsyncRestTemplate shrRestTemplate() {
-        try {
-            /*TODO: See whether ThreadPoolExecutor is the best for the job*/
-            TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
-            SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
-                    .loadTrustMaterial(null, acceptingTrustStrategy)
-                    .build();
-
-            CloseableHttpAsyncClient httpAsyncClient = HttpAsyncClients.custom()
-                    .setRedirectStrategy(new LaxRedirectStrategy())
-                    .setSSLContext(sslContext)
-                    .setSSLHostnameVerifier((s, sslSession) -> true)
-                    .build();
-
-            HttpComponentsAsyncClientHttpRequestFactory httpRequestFactory = new HttpComponentsAsyncClientHttpRequestFactory(httpAsyncClient);
-            return new AsyncRestTemplate(httpRequestFactory);
-        } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
-            e.printStackTrace();
+        /*TODO: See whether ThreadPoolExecutor is the best for the job*/
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.initialize();
+        executor.setCorePoolSize(shrProperties.getRestPoolSize());
+        AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate(executor);
+        AsyncClientHttpRequestFactory asyncRequestFactory = asyncRestTemplate.getAsyncRequestFactory();
+        if (asyncRequestFactory instanceof SimpleClientHttpRequestFactory) {
+            setRequestTimeOuts((SimpleClientHttpRequestFactory) asyncRequestFactory);
         }
-        return new AsyncRestTemplate();
+        return asyncRestTemplate;
     }
 
     private void setRequestTimeOuts(SimpleClientHttpRequestFactory asyncRequestFactory) {

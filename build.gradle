@@ -53,7 +53,6 @@ ext.libraries = [
         jackson              : 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.4.0',
         saxon                : 'net.sf.saxon:Saxon-HE:9.5.1-6',
         rxjava               : 'io.reactivex:rxjava:1.0.15',
-        httpAsyncClient      : 'org.apache.httpcomponents:httpasyncclient:4.1.1',
         rome                 : "rome:rome:1.0",
         rome_tools           : "com.rometools:rome:1.5.0",
         time_uuid            : "com.eaio.uuid:uuid:3.2",
