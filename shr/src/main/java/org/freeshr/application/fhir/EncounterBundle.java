@@ -137,6 +137,10 @@ public class EncounterBundle {
         this.contentVersion = contentVersion;
     }
 
+    public void setContent(String content) {
+        this.encounterContent = new EncounterContent(content);
+    }
+
     public void setEncounterConfidentiality(Confidentiality encounterConfidentiality) {
         this.encounterConfidentiality = encounterConfidentiality;
     }
