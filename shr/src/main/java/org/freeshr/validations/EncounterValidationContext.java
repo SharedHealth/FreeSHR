@@ -3,6 +3,7 @@ package org.freeshr.validations;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.utils.FhirFeedUtil;
 import org.hl7.fhir.dstu3.model.Bundle;
+import org.springframework.http.MediaType;
 
 public class EncounterValidationContext {
     private EncounterBundle encounterBundle;
@@ -48,7 +49,13 @@ public class EncounterValidationContext {
 
     public Bundle getBundle() {
         if (bundle != null) return bundle;
-        bundle = fhirFeedUtil.parseBundle(encounterBundle.getContent(), "xml");
+
+        if(encounterBundle.getContentType().contains(MediaType.APPLICATION_JSON_VALUE)){
+            bundle = fhirFeedUtil.parseBundle(encounterBundle.getContent(), "json");
+        }else {
+            bundle = fhirFeedUtil.parseBundle(encounterBundle.getContent(), "xml");
+        }
+
         return bundle;
     }
 }

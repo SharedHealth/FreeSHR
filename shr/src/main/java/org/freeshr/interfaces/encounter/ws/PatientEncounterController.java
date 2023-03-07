@@ -17,6 +17,7 @@ import org.freeshr.utils.UrlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
@@ -24,6 +25,7 @@ import rx.Observable;
 import rx.functions.Action1;
 
 import javax.servlet.http.HttpServletRequest;
+import java.awt.*;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
@@ -53,20 +55,19 @@ public class PatientEncounterController extends ShrController {
     }
 
     @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER')")
-    @RequestMapping(value = "/{healthId}/encounters", method = RequestMethod.POST)
+    @RequestMapping(value = "/{healthId}/encounters", method = RequestMethod.POST, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public DeferredResult<EncounterResponse> create(
             @PathVariable String healthId,
-            @RequestBody EncounterBundle encounterBundle) throws ExecutionException, InterruptedException {
+            @RequestBody EncounterBundle encounterBundle, HttpServletRequest request) throws ExecutionException, InterruptedException {
         UserInfo userInfo = getUserInfo();
         logAccessDetails(userInfo, String.format("Create encounter request for patient (healthId) %s", healthId));
         final DeferredResult<EncounterResponse> deferredResult = new DeferredResult<>();
-
+        encounterBundle.setContentType(request.getHeader("Content-Type"));
         try {
             logger.info(String.format("Create encounter for patient (healthId) %s", healthId));
             encounterBundle.setHealthId(healthId);
             Observable<EncounterResponse> encounterResponse = patientEncounterService.ensureCreated(encounterBundle,
                     userInfo);
-
             encounterResponse.subscribe(encounterSaveSuccessCallback(deferredResult), errorCallback(deferredResult));
         } catch (Exception e) {
             logger.error(e.getMessage());
