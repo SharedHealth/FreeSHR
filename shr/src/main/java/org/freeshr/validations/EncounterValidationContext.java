@@ -50,9 +50,9 @@ public class EncounterValidationContext {
     public Bundle getBundle() {
         if (bundle != null) return bundle;
 
-        if(encounterBundle.getContentType().contains(MediaType.APPLICATION_JSON_VALUE)){
+        if (encounterBundle.getContentType().contains(MediaType.APPLICATION_JSON_VALUE)) {
             bundle = fhirFeedUtil.parseBundle(encounterBundle.getContent(), "json");
-        }else {
+        } else {
             bundle = fhirFeedUtil.parseBundle(encounterBundle.getContent(), "xml");
         }
 
