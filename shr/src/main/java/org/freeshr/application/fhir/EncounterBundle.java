@@ -1,19 +1,16 @@
 package org.freeshr.application.fhir;
 
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.eclipse.persistence.oxm.annotations.XmlCDATA;
 import org.freeshr.domain.model.Requester;
 import org.freeshr.utils.Confidentiality;
 import org.freeshr.utils.DateUtil;
-import org.springframework.http.MediaType;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
 import java.util.UUID;
 
@@ -31,7 +28,7 @@ public class EncounterBundle {
     private Date updatedAt;
     private UUID updatedEventReference;
     private UUID receivedEventReference;
-    private String contentType = MediaType.APPLICATION_XML_VALUE;
+    private String contentType;
 
     public String getContentType() {
         return contentType;
