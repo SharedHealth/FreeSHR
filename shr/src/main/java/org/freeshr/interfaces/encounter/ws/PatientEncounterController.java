@@ -55,7 +55,8 @@ public class PatientEncounterController extends ShrController {
     }
 
     @PreAuthorize("hasAnyRole('ROLE_SHR_FACILITY', 'ROLE_SHR_PROVIDER')")
-    @RequestMapping(value = "/{healthId}/encounters", method = RequestMethod.POST, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @RequestMapping(value = "/{healthId}/encounters", method = RequestMethod.POST,
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_ATOM_XML_VALUE})
     public DeferredResult<EncounterResponse> create(
             @PathVariable String healthId,
             @RequestBody EncounterBundle encounterBundle,
