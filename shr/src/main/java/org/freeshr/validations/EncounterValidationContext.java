@@ -3,6 +3,7 @@ package org.freeshr.validations;
 import org.freeshr.application.fhir.EncounterBundle;
 import org.freeshr.utils.FhirFeedUtil;
 import org.hl7.fhir.dstu3.model.Bundle;
+import java.util.Optional;
 
 public class EncounterValidationContext {
     private EncounterBundle encounterBundle;
@@ -48,7 +49,10 @@ public class EncounterValidationContext {
 
     public Bundle getBundle() {
         if (bundle != null) return bundle;
-        bundle = fhirFeedUtil.parseBundle(encounterBundle.getContent(), "xml");
+
+        String type = Optional.ofNullable(encounterBundle.getContentType()).orElse("xml");
+        bundle = fhirFeedUtil.parseBundle(encounterBundle.getContent(), type);
+
         return bundle;
     }
 }
